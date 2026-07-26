@@ -10,9 +10,10 @@ import { LLMClient, type BlockDetector } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
+import { MeetingStore } from "./src/store.ts";
 import { join, sep } from "node:path";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { spawn } from "child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { spawn, spawnSync } from "child_process";
 import type { ServerWebSocket } from "bun";
 
 const args = process.argv.slice(2);
@@ -41,11 +42,22 @@ const listeners = new Set<ClientListener>();
 const broadcast = (msg: ServerMessage) => {
   for (const l of listeners) { try { l(msg); } catch {} }
 };
+// anarlog(fastrepl) 방식: 전사·슬라이드를 로컬 SQLite에 영속 저장
+const store = new MeetingStore(join(import.meta.dir, "meetings.db"));
 const session = new MeetingSession(
   llm,
   config.block.detectInterval,
   config.block.contextWindow,
   listeners,
+  {
+    onLine: (entry) => store.addLine(entry),
+    onSlide: (slide) => store.addSlide({
+      idx: slide.index,
+      title: slide.title,
+      bullets: slide.bullets,
+      startedAt: slide.startedAt,
+    }),
+  },
 );
 
 // ── 프로바이더 런타임 선택 (사용자가 UI에서 교체) ──
@@ -151,18 +163,38 @@ const httpServer = Bun.serve({
       ws.send(JSON.stringify(session.snapshot()));
       ws.send(JSON.stringify(providersMessage()));
       ws.send(JSON.stringify(captureMessage()));
+      ws.send(JSON.stringify(session.transcript("snapshot")));
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
       try {
         const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string };
         if (cmd.action === "startCapture") startCapture();
         if (cmd.action === "stopCapture") void stopCapture();
-        if (cmd.action === "reset") session.reset();
+        if (cmd.action === "reset") {
+          session.reset();
+          // 회의 저장소도 새 회의로 전환 (캡처 중이면 이어서 기록)
+          store.endMeeting();
+          if (capturing) store.startMeeting(currentProviderId);
+          broadcast(session.transcript("snapshot"));
+        }
         if (cmd.action === "status") {
           ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
         }
         if (cmd.action === "transcript") {
-          ws.send(JSON.stringify(session.transcript()));
+          ws.send(JSON.stringify(session.transcript("export")));
+        }
+        if (cmd.action === "saveNotes") {
+          // anarlog 방식: 브라우저 다운로드가 아니라 서버 디스크에 저장 (항상 동작)
+          try {
+            const dir = join(import.meta.dir, "exports");
+            mkdirSync(dir, { recursive: true });
+            const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.md`;
+            writeFileSync(join(dir, filename), store.exportMarkdown(), "utf-8");
+            broadcast({ type: "status", text: `저장됨: exports/${filename}` });
+          } catch (e) {
+            const message = e instanceof Error ? e.message : String(e);
+            broadcast({ type: "status", text: `저장 실패: ${message}` });
+          }
         }
         if (cmd.action === "setProvider" && typeof cmd.id === "string") {
           const entry = providerEntries.find((e) => e.id === cmd.id);
@@ -293,6 +325,12 @@ const whisperHandlers = {
 function startCapture(): void {
   if (capturing) return;
   capturing = true;
+  // 이전 실행의 고아 whisper-stream이 마이크 장치를 점유하면 새 캡처는 무음이
+  // 된다. 우리 바이너리+모델 경로 조합의 잔재만 정리하고 시작한다.
+  if (config.input.mode === "mic") {
+    spawnSync("pkill", ["-f", `${config.whisper.streamBin} -m ${config.whisper.modelPath}`], { stdio: "ignore" });
+  }
+  store.startMeeting(currentProviderId);
   broadcast(captureMessage());
   broadcast({ type: "status", text: "🎤 녹음 시작 — 말씀하세요" });
   void whisper.start(whisperHandlers).then(async () => {
@@ -323,6 +361,7 @@ async function stopCapture(): Promise<void> {
   await whisper.stop();
   // 중지 시점의 남은 문장까지 마지막으로 블록 감지
   await session.flush();
+  store.endMeeting();
   broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
 }
 

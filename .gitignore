@@ -1,3 +1,6 @@
 node_modules/
 .env
 models/*.bin
+meetings.db
+meetings.db-*
+exports/

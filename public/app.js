@@ -25,6 +25,8 @@ const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
 const btnRecheckEl = $("btn-recheck");
 const btnRecordEl = $("btn-record");
+const feedListEl = $("feed-list");
+const feedCountEl = $("feed-count");
 const btnResetEl = $("btn-reset");
 
 let currentSlide = null;
@@ -286,6 +288,38 @@ document.addEventListener("click", (ev) => {
   }
 });
 
+// ── 실시간 전사 피드 ──
+let feedCount = 0;
+
+function renderFeedLine(entry) {
+  const empty = feedListEl.querySelector(".feed__empty");
+  if (empty) empty.remove();
+  const row = document.createElement("div");
+  row.className = "feed-line";
+  const time = new Date(entry.ts).toLocaleTimeString("ko-KR", { hour12: false });
+  const chip = entry.speaker
+    ? `<span class="speaker-chip" style="--chip-color: ${SPEAKER_COLORS[(entry.speaker - 1) % SPEAKER_COLORS.length]}">화자 ${entry.speaker}</span>`
+    : "";
+  row.innerHTML = `
+    <span class="feed-line__meta"><span class="feed-line__time">${escapeHtml(time)}</span>${chip}</span>
+    <span class="feed-line__text">${escapeHtml(entry.text)}</span>`;
+  feedListEl.appendChild(row);
+  feedCount += 1;
+  feedCountEl.textContent = String(feedCount);
+  feedListEl.scrollTop = feedListEl.scrollHeight;
+}
+
+function renderFeedBacklog(entries) {
+  feedListEl.innerHTML = "";
+  feedCount = 0;
+  feedCountEl.textContent = "0";
+  if (!entries || entries.length === 0) {
+    feedListEl.innerHTML = `<div class="feed__empty">녹음을 시작하면<br>전사가 여기에 흐릅니다</div>`;
+    return;
+  }
+  for (const e of entries) renderFeedLine(e);
+}
+
 // ── 녹음 시작/중지 버튼 ──
 let capturing = false;
 let inputMode = "mic";
@@ -309,10 +343,11 @@ btnExportMdEl.onclick = () => exportSlides("markdown");
 btnExportJsonEl.onclick = () => exportSlides("json");
 btnExportTranscriptEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "transcript" }));
-    renderStatus("전사본 요청 중…");
+    // anarlog 방식: 서버 디스크(exports/)에 저장 — 브라우저 다운로드 차단과 무관
+    ws.send(JSON.stringify({ action: "saveNotes" }));
+    renderStatus("전사본 저장 중…");
   } else {
-    renderStatus("연결되지 않음 — 전사본 불가");
+    renderStatus("연결되지 않음 — 저장 불가");
   }
 };
 btnResetEl.onclick = () => {
@@ -378,7 +413,13 @@ function connect() {
       } else if (msg.type === "caption") {
         renderCaption(msg.text, msg.speaker);
       } else if (msg.type === "transcript") {
-        exportTranscript(msg.entries);
+        if (msg.reason === "snapshot") {
+          renderFeedBacklog(msg.entries);
+        } else {
+          exportTranscript(msg.entries);
+        }
+      } else if (msg.type === "line") {
+        renderFeedLine(msg);
       } else if (msg.type === "providers") {
         renderProviders(msg);
       } else if (msg.type === "capture") {

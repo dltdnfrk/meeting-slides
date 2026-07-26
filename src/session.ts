@@ -42,6 +42,21 @@ export interface TranscriptEntry {
 export interface TranscriptUpdate {
   type: "transcript";
   entries: TranscriptEntry[];
+  reason?: "snapshot" | "export";
+}
+
+/** 실시간 전사 피드용 확정 문장 한 줄 */
+export interface LineUpdate {
+  type: "line";
+  text: string;
+  ts: number;
+  speaker?: number;
+}
+
+/** 영속 저장소 연결용 싱크 (server.ts에서 MeetingStore로 연결) */
+export interface MeetingSink {
+  onLine(entry: TranscriptEntry): void;
+  onSlide(slide: Slide): void;
 }
 
 export interface ProviderInfo {
@@ -63,7 +78,7 @@ export interface CaptureUpdate {
   mode: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate;
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | LineUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 
@@ -105,6 +120,7 @@ export class MeetingSession {
     private detectInterval: number,
     private contextWindow: number,
     private listeners: Set<ClientListener>,
+    private sink: MeetingSink | null = null,
   ) {}
 
   addListener(l: ClientListener) { this.listeners.add(l); }
@@ -119,8 +135,8 @@ export class MeetingSession {
     return { type: "slide", current: this.currentSlide, history: [...this.history] };
   }
 
-  transcript(): TranscriptUpdate {
-    return { type: "transcript", entries: [...this.transcriptLog] };
+  transcript(reason: "snapshot" | "export" = "export"): TranscriptUpdate {
+    return { type: "transcript", entries: [...this.transcriptLog], reason };
   }
 
   async flush(): Promise<void> {
@@ -143,7 +159,16 @@ export class MeetingSession {
 
   onChunk(chunk: TranscriptChunk): void {
     this.sentences.push(chunk.text);
-    this.transcriptLog.push({ text: chunk.text, ts: chunk.ts, speaker: chunk.speaker });
+    const entry: TranscriptEntry = { text: chunk.text, ts: chunk.ts, speaker: chunk.speaker };
+    this.transcriptLog.push(entry);
+    // 실시간 전사 피드 + 영속 저장 (anarlog 방식)
+    this.broadcast({ type: "line", text: chunk.text, ts: chunk.ts, speaker: chunk.speaker });
+    // 싱크(영속 저장) 실패가 세션을 죽이지 않도록 격리
+    try {
+      this.sink?.onLine(entry);
+    } catch (e) {
+      console.error("[store] 라인 저장 실패:", e);
+    }
     if (this.transcriptLog.length > MeetingSession.MAX_TRANSCRIPT_ENTRIES) {
       this.transcriptLog.shift();
     }
@@ -276,6 +301,11 @@ export class MeetingSession {
         startedAt: Date.now(),
         sentenceCount: this.sentences.length,
       };
+      try {
+        this.sink?.onSlide(this.currentSlide);
+      } catch (e) {
+        console.error("[store] 슬라이드 저장 실패:", e);
+      }
       this.advanceStreak = 0;
       changed = true;
     } else if (this.currentSlide) {
