@@ -57,7 +57,13 @@ export interface ProvidersUpdate {
   current: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate;
+export interface CaptureUpdate {
+  type: "capture";
+  capturing: boolean;
+  mode: string;
+}
+
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 

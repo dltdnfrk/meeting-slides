@@ -24,6 +24,7 @@ const btnSettingsEl = $("btn-settings");
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
 const btnRecheckEl = $("btn-recheck");
+const btnRecordEl = $("btn-record");
 const btnResetEl = $("btn-reset");
 
 let currentSlide = null;
@@ -285,6 +286,24 @@ document.addEventListener("click", (ev) => {
   }
 });
 
+// ── 녹음 시작/중지 버튼 ──
+let capturing = false;
+let inputMode = "mic";
+
+function renderCaptureButton() {
+  btnRecordEl.hidden = inputMode === "file";
+  btnRecordEl.classList.toggle("record-btn--on", capturing);
+  const label = btnRecordEl.querySelector(".record-btn__label");
+  if (label) label.textContent = capturing ? "중지" : "녹음 시작";
+}
+
+btnRecordEl.onclick = () => {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
+};
+
+renderCaptureButton();
+
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
 btnExportMdEl.onclick = () => exportSlides("markdown");
 btnExportJsonEl.onclick = () => exportSlides("json");
@@ -362,6 +381,12 @@ function connect() {
         exportTranscript(msg.entries);
       } else if (msg.type === "providers") {
         renderProviders(msg);
+      } else if (msg.type === "capture") {
+        capturing = !!msg.capturing;
+        inputMode = msg.mode ?? "mic";
+        renderCaptureButton();
+        // ON AIR 표시도 캡처 상태와 연동
+        setOnAir(capturing || !!currentSlide);
       } else if (msg.type === "status") {
         renderStatus(msg.text);
       }

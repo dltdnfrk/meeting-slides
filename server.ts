@@ -5,10 +5,10 @@
 // 단일 프로세스에서 whisper-stream 자식 + LLM 블록 감지 + 클라이언트 push.
 
 import { loadConfig, loadWhisperConfig } from "./src/config.ts";
-import { WhisperStream, WhisperCLI, listCaptureDevices } from "./src/whisper.ts";
+import { WhisperStream, WhisperCLI, listCaptureDevices, type TranscriptChunk } from "./src/whisper.ts";
 import { LLMClient, type BlockDetector } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
-import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate } from "./src/session.ts";
+import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { join, sep } from "node:path";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -150,10 +150,13 @@ const httpServer = Bun.serve({
       }));
       ws.send(JSON.stringify(session.snapshot()));
       ws.send(JSON.stringify(providersMessage()));
+      ws.send(JSON.stringify(captureMessage()));
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
       try {
         const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string };
+        if (cmd.action === "startCapture") startCapture();
+        if (cmd.action === "stopCapture") void stopCapture();
         if (cmd.action === "reset") session.reset();
         if (cmd.action === "status") {
           ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
@@ -265,33 +268,67 @@ if (config.server.openBrowser) {
   }).catch(() => {});
 }
 
-void whisper.start({
-  onChunk: (c) => session.onChunk(c),
-  onStatus: (s) => {
+// ── 캡처 제어 ──
+// 마이크 모드는 사용자가 UI의 "녹음 시작/중지" 버튼으로 제어한다 (부팅 시 자동
+// 시작하지 않음 — 마이크 권한 요청 시점도 사용자 클릭에 맞춤). 파일 모드는
+// 데모용으로 부팅 즉시 자동 시작.
+let capturing = false;
+
+function captureMessage(): CaptureUpdate {
+  return { type: "capture", capturing, mode: config.input.mode };
+}
+
+const whisperHandlers = {
+  onChunk: (c: TranscriptChunk) => session.onChunk(c),
+  onStatus: (s: string) => {
     console.log(`[whisper] ${s}`);
-    for (const l of listeners) { try { l({ type: "status", text: s }); } catch {} }
+    broadcast({ type: "status", text: s });
   },
-  onError: (e) => {
+  onError: (e: Error) => {
     console.error(`[whisper error] ${e.message}`);
-    for (const l of listeners) { try { l({ type: "status", text: `whisper 오류: ${e.message}` }); } catch {} }
+    broadcast({ type: "status", text: `whisper 오류: ${e.message}` });
   },
-}).then(async () => {
-  await session.flush();
-  const mode = config.input.mode;
-  if (mode === "mic") {
-    // 마이크 모드에서 whisper-stream이 종료되면 비정상 (사용자가 멈추지 않는 한).
-    console.warn("[whisper] 마이크 캡처가 종료됨 — 장치/권한 확인 필요");
-    for (const l of listeners) {
-      try { l({ type: "status", text: "⚠️ 마이크 캡처 종료. 마이크 권한/장치를 확인하고 서버를 재시작하세요." }); } catch {}
+};
+
+function startCapture(): void {
+  if (capturing) return;
+  capturing = true;
+  broadcast(captureMessage());
+  broadcast({ type: "status", text: "🎤 녹음 시작 — 말씀하세요" });
+  void whisper.start(whisperHandlers).then(async () => {
+    await session.flush();
+    const wasCapturing = capturing;
+    capturing = false;
+    broadcast(captureMessage());
+    if (config.input.mode === "mic" && wasCapturing) {
+      // 사용자가 중지하지 않았는데 캡처가 끝남 = 장치/권한 이상
+      console.warn("[whisper] 마이크 캡처가 종료됨 — 장치/권한 확인 필요");
+      broadcast({ type: "status", text: "⚠️ 마이크 캡처가 종료되었습니다 — 장치/권한 확인 후 다시 시작하세요" });
+    } else {
+      broadcast({ type: "status", text: "입력 종료" });
     }
-  } else {
-    for (const l of listeners) { try { l({ type: "status", text: "입력 종료" }); } catch {} }
-  }
-}).catch((e: unknown) => {
-  const message = e instanceof Error ? e.message : String(e);
-  console.error(`[whisper fatal] ${message}`);
-  for (const l of listeners) { try { l({ type: "status", text: `whisper 치명 오류: ${message}` }); } catch {} }
-});
+  }).catch((e: unknown) => {
+    capturing = false;
+    broadcast(captureMessage());
+    const message = e instanceof Error ? e.message : String(e);
+    console.error(`[whisper fatal] ${message}`);
+    broadcast({ type: "status", text: `whisper 치명 오류: ${message}` });
+  });
+}
+
+async function stopCapture(): Promise<void> {
+  if (!capturing) return;
+  capturing = false;
+  broadcast(captureMessage());
+  await whisper.stop();
+  // 중지 시점의 남은 문장까지 마지막으로 블록 감지
+  await session.flush();
+  broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
+}
+
+if (config.input.mode === "file") {
+  startCapture();
+}
 
 const ok = await llm.ping();
 if (ok) {
