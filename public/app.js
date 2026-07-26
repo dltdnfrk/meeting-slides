@@ -19,6 +19,7 @@ const statusIndicatorEl = $("status-indicator");
 const statusTextEl = $("status-text");
 const btnExportMdEl = $("btn-export-md");
 const btnExportJsonEl = $("btn-export-json");
+const btnExportTranscriptEl = $("btn-export-transcript");
 const btnResetEl = $("btn-reset");
 
 let currentSlide = null;
@@ -191,9 +192,35 @@ function exportSlides(format) {
   }
 }
 
+// ── 전사본(원문)보내기 ──
+function exportTranscript(entries) {
+  if (!entries || entries.length === 0) {
+    renderStatus("저장할 전사 문장 없음");
+    return;
+  }
+  const fmtTime = (ts) => new Date(ts).toLocaleTimeString("ko-KR", { hour12: false });
+  const lines = ["# Meeting Transcript", "", `Exported: ${new Date().toISOString()}`, ""];
+  for (const e of entries) {
+    const who = e.speaker ? `화자 ${e.speaker}` : "전사";
+    lines.push(`**[${fmtTime(e.ts)}] ${who}** — ${e.text}`);
+  }
+  lines.push("");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  downloadText(`meeting-transcript-${stamp}.md`, "text/markdown;charset=utf-8", lines.join("\n"));
+  renderStatus(`전사본 저장 완료 (${entries.length}문장)`);
+}
+
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
 btnExportMdEl.onclick = () => exportSlides("markdown");
 btnExportJsonEl.onclick = () => exportSlides("json");
+btnExportTranscriptEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "transcript" }));
+    renderStatus("전사본 요청 중…");
+  } else {
+    renderStatus("연결되지 않음 — 전사본 불가");
+  }
+};
 btnResetEl.onclick = () => {
   currentSlide = null;
   slideHistory = [];
@@ -252,6 +279,8 @@ function connect() {
         renderThumbnails(slideHistory);
       } else if (msg.type === "caption") {
         renderCaption(msg.text, msg.speaker);
+      } else if (msg.type === "transcript") {
+        exportTranscript(msg.entries);
       } else if (msg.type === "status") {
         renderStatus(msg.text);
       }

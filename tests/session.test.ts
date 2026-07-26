@@ -124,6 +124,20 @@ describe("MeetingSession", () => {
     expect(session.snapshot().current?.title).toBe("고객 피드백"); // TOPIC_RULES fallback
   });
 
+  test("전사 로그는 문장+시각+화자를 전부 보관하고 reset에서 비움", async () => {
+    const { session } = makeSession({});
+    session.onChunk({ text: "첫 문장", ts: 1000, speaker: 1 });
+    session.onChunk({ text: "둘째 문장", ts: 2000, speaker: 2 });
+    const t = session.transcript();
+    expect(t.type).toBe("transcript");
+    expect(t.entries).toEqual([
+      { text: "첫 문장", ts: 1000, speaker: 1 },
+      { text: "둘째 문장", ts: 2000, speaker: 2 },
+    ]);
+    session.reset();
+    expect(session.transcript().entries).toHaveLength(0);
+  });
+
   test("화자 번호가 캡션에 실리고, 화자 변경 시 버퍼 즉시 플러시", async () => {
     const { session, messages } = makeSession({});
     session.onChunk({ text: "안녕하세요", ts: Date.now(), speaker: 1 });

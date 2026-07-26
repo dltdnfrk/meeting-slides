@@ -134,6 +134,41 @@ export function extractSpeakerTurn(line: string): { text: string; turn: boolean 
   return { text: turn ? line.replace("[SPEAKER_TURN]", "").trim() : line, turn };
 }
 
+// 미완결 조각을 이 길이까지 모으면 강제 방출 (실시간성 하한)
+export const ASSEMBLER_MAX_HOLD_CHARS = 60;
+
+/**
+ * 한국어 STT는 문장부호가 자주 빠진다. 구두점 없이 잘린 조각을 그대로 문장으로
+ * 방출하면 "그래서 저는" / "가보겠습니다"처럼 반쪽 문장이 LLM 컨텍스트와
+ * 전사본에 쌓인다. 이 조립기는 미완결 조각을 보류해 다음 조각과 병합하고,
+ * 완결 구두점·화자 전환·길이 상한·종료 중 하나에서만 방출한다.
+ */
+export class SentenceAssembler {
+  private pending = "";
+
+  /**
+   * 조각을 넣는다. 방출 가능한 문장 배열(0~1개)을 반환.
+   * complete = 구두점으로 끝나는 등 완결 신호.
+   */
+  push(piece: string, complete: boolean): string[] {
+    const merged = this.pending ? this.pending + piece : piece;
+    if (!merged) return [];
+    if (complete || merged.length >= ASSEMBLER_MAX_HOLD_CHARS) {
+      this.pending = "";
+      return [merged];
+    }
+    this.pending = merged;
+    return [];
+  }
+
+  /** 종료·화자 전환 시 보류분 강제 방출 */
+  flush(): string | null {
+    const out = this.pending || null;
+    this.pending = "";
+    return out;
+  }
+}
+
 abstract class WhisperBase {
   protected proc: ChildProcess | null = null;
   protected buf = "";
@@ -143,6 +178,8 @@ abstract class WhisperBase {
   private recentSentences: string[] = [];
   // tinydiarize 발화(턴) 카운터 — [SPEAKER_TURN] 마커마다 증가
   private speakerTurn = 0;
+  // 구두점 없이 잘린 조각 병합기 (문장 분할 품질)
+  private assembler = new SentenceAssembler();
 
   constructor(protected config: WhisperConfig) {}
 
@@ -218,30 +255,42 @@ abstract class WhisperBase {
 
       const { text, turn } = extractSpeakerTurn(rawText);
       if (text) {
-        // 문장 분할 + 중복 제거
+        // 문장 분할 → 미완결 조각은 조립기에 보류했다가 다음 조각과 병합
         const parts = text.split(this.sentenceEnd);
         for (let i = 0; i < parts.length; i += 2) {
           const frag = (parts[i] ?? "").trim();
           const sep = parts[i + 1] ?? "";
-          const sentence = (frag + sep).trim();
-          if (!sentence || this.isMeta(sentence)) continue;
-          // 최근 3문장 내 완전 일치 또는 70% 이상 겹치면 중복으로 판단
-          if (this.isDuplicate(sentence)) continue;
-          this.recentSentences.push(sentence);
-          if (this.recentSentences.length > 3) this.recentSentences.shift();
-          onChunk({
-            text: sentence,
-            ts: Date.now(),
-            speaker: this.config.diarize ? this.speakerTurn + 1 : undefined,
-          });
+          const piece = (frag + sep).trim();
+          if (!piece) continue;
+          for (const sentence of this.assembler.push(piece, sep.length > 0)) {
+            this.emitSentence(sentence, onChunk);
+          }
         }
       }
-      // [SPEAKER_TURN]은 "이 라인 이후"부터 화자가 바뀐다는 마커
-      if (turn) this.speakerTurn++;
+      // [SPEAKER_TURN]은 "이 라인 이후"부터 화자가 바뀐다는 마커.
+      // 보류 조각은 이전 화자의 것이므로 턴 증가 전에 방출한다.
+      if (turn) {
+        const rest = this.assembler.flush();
+        if (rest) this.emitSentence(rest, onChunk);
+        this.speakerTurn++;
+      }
     }
   }
 
   private static readonly NEAR_DUP_THRESHOLD = 0.5;
+
+  private emitSentence(sentence: string, onChunk: (c: TranscriptChunk) => void): void {
+    if (!sentence || this.isMeta(sentence)) return;
+    // 최근 3문장 내 완전 일치 또는 bigram 유사 시 중복으로 판단
+    if (this.isDuplicate(sentence)) return;
+    this.recentSentences.push(sentence);
+    if (this.recentSentences.length > 3) this.recentSentences.shift();
+    onChunk({
+      text: sentence,
+      ts: Date.now(),
+      speaker: this.config.diarize ? this.speakerTurn + 1 : undefined,
+    });
+  }
 
   private isDuplicate(sentence: string): boolean {
     for (const prev of this.recentSentences) {
@@ -278,6 +327,9 @@ abstract class WhisperBase {
     proc.on("close", (code) => {
       this.buf += "\n";
       this.drain(opts.onChunk);
+      // 종료 시 보류 중인 미완결 조각도 버리지 않고 방출
+      const rest = this.assembler.flush();
+      if (rest) this.emitSentence(rest, opts.onChunk);
       opts.onStatus?.(`${label} 종료 (code=${code})`);
       resolve();
     });

@@ -33,7 +33,18 @@ export interface StatusUpdate {
   text: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate;
+export interface TranscriptEntry {
+  text: string;
+  ts: number;
+  speaker?: number;
+}
+
+export interface TranscriptUpdate {
+  type: "transcript";
+  entries: TranscriptEntry[];
+}
+
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 
@@ -53,6 +64,10 @@ const BULLET_PREFIX_PATTERN = /^(?:첫\s*번째|두\s*번째|세\s*번째)(?:는
 
 export class MeetingSession {
   private sentences: string[] = [];
+  // 전사본보내기용 전체 로그. sentences[]는 LLM 컨텍스트용이라 상한(200)을
+  // 두지만, 전사 원문은 회의 끝까지 전부 보관한다 (50k 안전 상한).
+  private transcriptLog: TranscriptEntry[] = [];
+  private static readonly MAX_TRANSCRIPT_ENTRIES = 50_000;
   private currentSlide: Slide | null = null;
   private history: Slide[] = [];
   private slideIndex = 0;
@@ -80,6 +95,10 @@ export class MeetingSession {
     return { type: "slide", current: this.currentSlide, history: [...this.history] };
   }
 
+  transcript(): TranscriptUpdate {
+    return { type: "transcript", entries: [...this.transcriptLog] };
+  }
+
   async flush(): Promise<void> {
     this.flushCaption();
     while (this.detecting) {
@@ -100,6 +119,10 @@ export class MeetingSession {
 
   onChunk(chunk: TranscriptChunk): void {
     this.sentences.push(chunk.text);
+    this.transcriptLog.push({ text: chunk.text, ts: chunk.ts, speaker: chunk.speaker });
+    if (this.transcriptLog.length > MeetingSession.MAX_TRANSCRIPT_ENTRIES) {
+      this.transcriptLog.shift();
+    }
     // 장시간 회의 메모리 상한
     if (this.sentences.length > MeetingSession.MAX_SENTENCES) {
       const removed = this.sentences.length - MeetingSession.MAX_SENTENCES;
@@ -258,6 +281,7 @@ export class MeetingSession {
       this.captionFlushTimer = null;
     }
     this.sentences = [];
+    this.transcriptLog = [];
     this.currentSlide = null;
     this.history = [];
     this.slideIndex = 0;

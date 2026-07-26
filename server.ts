@@ -99,6 +99,9 @@ const httpServer = Bun.serve({
         if (cmd.action === "status") {
           ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
         }
+        if (cmd.action === "transcript") {
+          ws.send(JSON.stringify(session.transcript()));
+        }
       } catch {}
     },
     close(ws: ServerWebSocket<undefined>) {
