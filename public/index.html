@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meeting Slides — 실시간 회의 슬라이드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- 앰비언트 배경 레이어 -->
+  <div class="ambient" aria-hidden="true">
+    <div class="ambient__glow ambient__glow--a"></div>
+    <div class="ambient__glow ambient__glow--b"></div>
+    <div class="ambient__grid"></div>
+    <div class="ambient__noise"></div>
+  </div>
+
+  <div class="app">
+    <!-- ── 상단 바 ─────────────────────────────── -->
+    <header class="topbar">
+      <div class="topbar__brand">
+        <span class="brand__mark">◧</span>
+        <span class="brand__name">MEETING<em>SLIDES</em></span>
+      </div>
+
+      <div class="onair" id="onair">
+        <span class="onair__dot"></span>
+        <span class="onair__label">ON AIR</span>
+      </div>
+
+      <div class="topbar__status">
+        <span class="status__indicator" id="status-indicator"></span>
+        <span class="status__text" id="status-text">서버에 연결 중…</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- ── 사이드바: 히스토리 ─────────────────── -->
+      <aside class="sidebar">
+        <div class="sidebar__head">
+          <h2 class="sidebar__title">히스토리</h2>
+          <span class="sidebar__count" id="history-count">0</span>
+        </div>
+
+        <div class="filmstrip" id="thumbnails">
+          <div class="filmstrip__empty">
+            <span class="filmstrip__empty-ring"></span>
+            아직 슬라이드가<br>없습니다
+          </div>
+        </div>
+
+        <div class="sidebar__actions">
+          <button id="btn-export-md" class="btn">
+            <span class="btn__icon">↓</span> Markdown
+          </button>
+          <button id="btn-export-json" class="btn">
+            <span class="btn__icon">{ }</span> JSON
+          </button>
+          <button id="btn-reset" class="btn btn--danger">
+            <span class="btn__icon">⟲</span> 초기화
+          </button>
+        </div>
+      </aside>
+
+      <!-- ── 메인 스테이지 ─────────────────────── -->
+      <main class="stage">
+        <section class="slide-frame" id="slide-frame">
+          <div class="slide" id="current-slide">
+            <div class="slide__placeholder">
+              <div class="placeholder__mic">
+                <span class="mic__core" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 1 0 6 0V6a3 3 0 0 0-3-3Z"></path>
+                    <path d="M5 11a1 1 0 1 1 2 0v1a5 5 0 0 0 10 0v-1a1 1 0 1 1 2 0v1a7 7 0 0 1-6 6.93V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.07A7 7 0 0 1 5 12v-1Z"></path>
+                  </svg>
+                </span>
+              </div>
+              <h2 class="placeholder__title">발언을 시작하면<br>슬라이드가 만들어집니다</h2>
+              <p class="placeholder__sub">whisper.cpp가 음성을 전사하고, AI가 주제 블록을 감지해 한 장씩 정리합니다</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 캡션 -->
+        <section class="island" id="island">
+          <span class="island__dot"></span>
+          <span class="island__text" id="caption-text">대기 중…</span>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

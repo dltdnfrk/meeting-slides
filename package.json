@@ -1,0 +1,15 @@
+{
+  "name": "meeting-slides",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run server.ts",
+    "start": "bun run server.ts",
+    "devices": "bun run server.ts --devices"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^26.1.1",
+    "puppeteer": "^25.3.0"
+  }
+}
