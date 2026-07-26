@@ -21,6 +21,8 @@ export interface WhisperConfig {
   captureId: number;
   threads: number;
   stepMs: number;
+  diarize: boolean;     // tinydiarize 화자 전환 감지
+  tdrzModelPath: string; // diarize=true일 때 사용하는 tdrz 모델 (현재 영어 전용만 존재)
 }
 
 export type InputMode = "mic" | "file";
@@ -114,6 +116,8 @@ export function loadWhisperConfig(): WhisperConfig {
     captureId: intEnv("WHISPER_CAPTURE_ID", -1),
     threads: intEnv("WHISPER_THREADS", 4),
     stepMs: intEnv("WHISPER_STEP_MS", 3000),
+    diarize: ["true", "1", "yes", "on"].includes(env("WHISPER_DIARIZE", "false").toLowerCase()),
+    tdrzModelPath: env("WHISPER_TDRZ_MODEL_PATH", "./models/ggml-small.en-tdrz.bin"),
   };
 }
 

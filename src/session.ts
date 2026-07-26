@@ -25,6 +25,7 @@ export interface CaptionUpdate {
   type: "caption";
   text: string;
   ts: number;
+  speaker?: number;
 }
 
 export interface StatusUpdate {
@@ -58,6 +59,7 @@ export class MeetingSession {
   private lastDetectCount = 0;
   private detecting = false;
   private captionBuffer = "";
+  private captionSpeaker: number | undefined = undefined;
   private captionFlushTimer: NodeJS.Timeout | null = null;
   private epoch = 0;
   private advanceStreak = 0;
@@ -79,14 +81,7 @@ export class MeetingSession {
   }
 
   async flush(): Promise<void> {
-    if (this.captionFlushTimer !== null) {
-      clearTimeout(this.captionFlushTimer);
-      this.captionFlushTimer = null;
-    }
-    if (this.captionBuffer) {
-      this.broadcast({ type: "caption", text: this.captionBuffer, ts: Date.now() });
-      this.captionBuffer = "";
-    }
+    this.flushCaption();
     while (this.detecting) {
       await Bun.sleep(50);
     }
@@ -112,7 +107,12 @@ export class MeetingSession {
       this.lastDetectCount = Math.max(0, this.lastDetectCount - removed);
     }
 
-    // 실시간 자막: 버퍼 후 200ms 디바운스
+    // 실시간 자막: 화자가 바뀌면 기존 버퍼를 먼저 보내고 새 화자로 시작.
+    // 그 후 200ms 디바운스로 묶어서 브로드캐스트.
+    if (chunk.speaker !== undefined && this.captionSpeaker !== undefined && chunk.speaker !== this.captionSpeaker) {
+      this.flushCaption();
+    }
+    if (chunk.speaker !== undefined) this.captionSpeaker = chunk.speaker;
     this.captionBuffer += (this.captionBuffer ? " " : "") + chunk.text;
     this.scheduleCaptionFlush();
 
@@ -126,11 +126,19 @@ export class MeetingSession {
   private scheduleCaptionFlush(): void {
     if (this.captionFlushTimer) clearTimeout(this.captionFlushTimer);
     this.captionFlushTimer = setTimeout(() => {
-      if (this.captionBuffer) {
-        this.broadcast({ type: "caption", text: this.captionBuffer, ts: Date.now() });
-        this.captionBuffer = "";
-      }
+      this.flushCaption();
     }, 200);
+  }
+
+  private flushCaption(): void {
+    if (this.captionFlushTimer !== null) {
+      clearTimeout(this.captionFlushTimer);
+      this.captionFlushTimer = null;
+    }
+    if (this.captionBuffer) {
+      this.broadcast({ type: "caption", text: this.captionBuffer, ts: Date.now(), speaker: this.captionSpeaker });
+      this.captionBuffer = "";
+    }
   }
 
   private async maybeDetect(): Promise<void> {
@@ -255,6 +263,7 @@ export class MeetingSession {
     this.slideIndex = 0;
     this.lastDetectCount = 0;
     this.captionBuffer = "";
+    this.captionSpeaker = undefined;
     this.advanceStreak = 0;
     this.broadcast({ type: "slide", current: null, history: [] });
     this.broadcast({ type: "status", text: "세션 초기화" });

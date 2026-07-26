@@ -12,6 +12,7 @@ const currentSlideEl = $("current-slide");
 const thumbnailsEl = $("thumbnails");
 const historyCountEl = $("history-count");
 const captionTextEl = $("caption-text");
+const speakerChipEl = $("speaker-chip");
 const islandEl = $("island");
 const onairEl = $("onair");
 const statusIndicatorEl = $("status-indicator");
@@ -106,9 +107,18 @@ function renderThumbnails(history) {
     </div>`).join("");
 }
 
-function renderCaption(text) {
+const SPEAKER_COLORS = ["#10b981", "#60a5fa", "#f59e0b", "#f472b6"];
+
+function renderCaption(text, speaker) {
   captionTextEl.textContent = text;
   islandEl.classList.toggle("island--live", !!text);
+  if (speaker) {
+    speakerChipEl.hidden = false;
+    speakerChipEl.textContent = `화자 ${speaker}`;
+    speakerChipEl.style.setProperty("--chip-color", SPEAKER_COLORS[(speaker - 1) % SPEAKER_COLORS.length]);
+  } else {
+    speakerChipEl.hidden = true;
+  }
 }
 
 function setOnAir(active) {
@@ -241,7 +251,7 @@ function connect() {
         renderMain();
         renderThumbnails(slideHistory);
       } else if (msg.type === "caption") {
-        renderCaption(msg.text);
+        renderCaption(msg.text, msg.speaker);
       } else if (msg.type === "status") {
         renderStatus(msg.text);
       }

@@ -123,4 +123,20 @@ describe("MeetingSession", () => {
     expect(messages.some((m) => m.type === "status" && m.text.includes("LLM 오류"))).toBe(true);
     expect(session.snapshot().current?.title).toBe("고객 피드백"); // TOPIC_RULES fallback
   });
+
+  test("화자 번호가 캡션에 실리고, 화자 변경 시 버퍼 즉시 플러시", async () => {
+    const { session, messages } = makeSession({});
+    session.onChunk({ text: "안녕하세요", ts: Date.now(), speaker: 1 });
+    session.onChunk({ text: "반갑습니다", ts: Date.now(), speaker: 2 });
+    // 화자 변경 시점에 이전 화자 버퍼가 즉시 플러시됨
+    const first = messages.filter((m) => m.type === "caption");
+    expect(first).toHaveLength(1);
+    expect(first[0].type === "caption" && first[0].speaker).toBe(1);
+    expect(first[0].type === "caption" && first[0].text).toBe("안녕하세요");
+    // 디바운스 후 두 번째 화자 캡션
+    await Bun.sleep(260);
+    const all = messages.filter((m) => m.type === "caption");
+    expect(all).toHaveLength(2);
+    expect(all[1].type === "caption" && all[1].speaker).toBe(2);
+  });
 });

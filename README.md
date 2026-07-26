@@ -94,6 +94,23 @@ bun run server.ts --file ./sample.m4a
 - **Markdown / JSON 저장**으로 회의록 다운로드
 - **초기화**로 세션 리셋
 
+## 화자 분리 (tinydiarize, 실험적)
+
+발화마다 화자(턴) 번호를 감지해 캡션에 색상 칩으로 표시합니다.
+
+```bash
+# 1. tdrz 모델 다운로드 (465MB)
+curl -L -o models/ggml-small.en-tdrz.bin \
+  https://huggingface.co/akashmjn/tinydiarize-whisper.cpp/resolve/main/ggml-small.en-tdrz.bin
+
+# 2. .env에 추가
+WHISPER_DIARIZE=true
+```
+
+**제약 (중요)**:
+- tdrz 모델이 **영어 전용**이라 한국어 회의에서는 전사가 깨집니다. 한국어는 `WHISPER_DIARIZE=false`(기본값)로 두세요. 다국어 tdrz 모델이 나오면 바로 쓸 수 있게 코드는 준비돼 있습니다.
+- tinydiar는 화자 "**전환 감지**"이지 "식별"이 아닙니다. 번호가 실제 인물과 1:1로 고정되지 않고 드리프트할 수 있어요(2인 회의처럼 교대 패턴이면 잘 맞습니다).
+
 ## 프로젝트 구조
 
 ```

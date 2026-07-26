@@ -6,11 +6,13 @@
 // 두 포맷 모두 같은 TranscriptChunk 스트림으로 변환.
 
 import { spawn, type ChildProcess } from "child_process";
+import { existsSync } from "node:fs";
 import type { WhisperConfig } from "./config.js";
 
 export interface TranscriptChunk {
   text: string;
   ts: number;
+  speaker?: number;  // tinydiarize 활성 시 1부터 시작하는 발화(턴) 번호
 }
 
 export interface WhisperOptions {
@@ -122,6 +124,16 @@ export function bigramSimilarity(a: string, b: string): number {
   return inter / (A.size + B.size - inter);
 }
 
+/**
+ * 라인에 붙은 [SPEAKER_TURN] 마커를 분리한다. tinydiarize가 화자 전환 지점에
+ * 찍는 마커로, 이 마커가 나오면 "다음 발화부터" 화자가 바뀐다는 뜻이다.
+ * 주의: tinydiar는 화자 '식별'이 아니라 '전환 감지'라 번호가 드리프트할 수 있다.
+ */
+export function extractSpeakerTurn(line: string): { text: string; turn: boolean } {
+  const turn = line.includes("[SPEAKER_TURN]");
+  return { text: turn ? line.replace("[SPEAKER_TURN]", "").trim() : line, turn };
+}
+
 abstract class WhisperBase {
   protected proc: ChildProcess | null = null;
   protected buf = "";
@@ -129,10 +141,29 @@ abstract class WhisperBase {
   // 최근 방출한 문장 링버퍼 — whisper-stream 오디오 윈도우 겹침으로 인한
   // 반복 출력을 걸러낸다. (step=3s, length=5s → 2s 겹침)
   private recentSentences: string[] = [];
+  // tinydiarize 발화(턴) 카운터 — [SPEAKER_TURN] 마커마다 증가
+  private speakerTurn = 0;
 
   constructor(protected config: WhisperConfig) {}
 
   abstract start(opts: WhisperOptions): Promise<void>;
+
+  /** diarize 모드면 tdrz 모델로, 아니면 기본 모델로. */
+  protected effectiveModelPath(): string {
+    return this.config.diarize ? this.config.tdrzModelPath : this.config.modelPath;
+  }
+
+  /** diarize 모드 가드: tdrz 모델 파일이 없으면 다운로드 방법과 함께 실패. */
+  protected assertDiarizeReady(): void {
+    if (!this.config.diarize) return;
+    if (!existsSync(this.config.tdrzModelPath)) {
+      throw new Error(
+        `tdrz 모델 없음: ${this.config.tdrzModelPath}\n` +
+        "다운로드: curl -L -o models/ggml-small.en-tdrz.bin " +
+        "https://huggingface.co/akashmjn/tinydiarize-whisper.cpp/resolve/main/ggml-small.en-tdrz.bin"
+      );
+    }
+  }
 
   async stop(): Promise<void> {
     const proc = this.proc;
@@ -181,23 +212,32 @@ abstract class WhisperBase {
       //   [00:00:00.000 --> 00:00:05.000]  안녕하세요
       //   00:00:00.000-->00:00:05.000  안녕하세요
       const tsMatch = line.match(/^\s*\[?\s*\d{2}:\d{2}:\d{2}[.\d]*\s*-->\s*\d{2}:\d{2}:\d{2}[.\d]*\s*\]?\s*(.+)$/);
-      const text = tsMatch ? tsMatch[1].trim() : line;
-      if (!text) continue;
-      if (this.isMeta(text)) continue;
+      const rawText = tsMatch ? tsMatch[1].trim() : line;
+      if (!rawText) continue;
+      if (this.isMeta(rawText)) continue;
 
-      // 문장 분할 + 중복 제거
-      const parts = text.split(this.sentenceEnd);
-      for (let i = 0; i < parts.length; i += 2) {
-        const frag = (parts[i] ?? "").trim();
-        const sep = parts[i + 1] ?? "";
-        const sentence = (frag + sep).trim();
-        if (!sentence || this.isMeta(sentence)) continue;
-        // 최근 3문장 내 완전 일치 또는 70% 이상 겹치면 중복으로 판단
-        if (this.isDuplicate(sentence)) continue;
-        this.recentSentences.push(sentence);
-        if (this.recentSentences.length > 3) this.recentSentences.shift();
-        onChunk({ text: sentence, ts: Date.now() });
+      const { text, turn } = extractSpeakerTurn(rawText);
+      if (text) {
+        // 문장 분할 + 중복 제거
+        const parts = text.split(this.sentenceEnd);
+        for (let i = 0; i < parts.length; i += 2) {
+          const frag = (parts[i] ?? "").trim();
+          const sep = parts[i + 1] ?? "";
+          const sentence = (frag + sep).trim();
+          if (!sentence || this.isMeta(sentence)) continue;
+          // 최근 3문장 내 완전 일치 또는 70% 이상 겹치면 중복으로 판단
+          if (this.isDuplicate(sentence)) continue;
+          this.recentSentences.push(sentence);
+          if (this.recentSentences.length > 3) this.recentSentences.shift();
+          onChunk({
+            text: sentence,
+            ts: Date.now(),
+            speaker: this.config.diarize ? this.speakerTurn + 1 : undefined,
+          });
+        }
       }
+      // [SPEAKER_TURN]은 "이 라인 이후"부터 화자가 바뀐다는 마커
+      if (turn) this.speakerTurn++;
     }
   }
 
@@ -251,8 +291,9 @@ abstract class WhisperBase {
 
 export class WhisperStream extends WhisperBase {
   async start(opts: WhisperOptions): Promise<void> {
+    this.assertDiarizeReady();
     const args = [
-      "-m", this.config.modelPath,
+      "-m", this.effectiveModelPath(),
       "-l", "ko",
       "-t", String(this.config.threads),
       "--step", String(this.config.stepMs),
@@ -262,6 +303,10 @@ export class WhisperStream extends WhisperBase {
       "-fa",
       "-kc",
     ];
+    if (this.config.diarize) {
+      args.push("-tdrz");
+      opts.onStatus?.("⚠️ tinydiarize 모델은 현재 영어 전용입니다 — 한국어 회의는 전사 품질이 크게 떨어집니다");
+    }
     opts.onStatus?.(`whisper-stream 시작: ${this.config.streamBin} ${args.join(" ")}`);
     this.proc = spawn(this.config.streamBin, args, { stdio: ["ignore", "pipe", "pipe"] });
     this.attachStdio(this.proc, opts);
@@ -281,14 +326,19 @@ export class WhisperCLI extends WhisperBase {
   }
 
   async start(opts: WhisperOptions): Promise<void> {
+    this.assertDiarizeReady();
     // -nt: 타임스탬프 포함, -l ko: 한국어, -m: 모델
     const args = [
-      "-m", this.config.modelPath,
+      "-m", this.effectiveModelPath(),
       "-l", "ko",
       "-t", String(this.config.threads),
       "-nt",
       "-f", this.filePath,
     ];
+    if (this.config.diarize) {
+      args.push("-tdrz");
+      opts.onStatus?.("⚠️ tinydiarize 모델은 현재 영어 전용입니다 — 한국어 회의는 전사 품질이 크게 떨어집니다");
+    }
     opts.onStatus?.(`whisper-cli 시작 (파일: ${this.filePath})`);
     this.proc = spawn(this.config.cliBin, args, { stdio: ["ignore", "pipe", "pipe"] });
     this.attachStdio(this.proc, opts);
