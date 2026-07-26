@@ -11,8 +11,9 @@ import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
+import { buildDeckHtml } from "./src/deck.ts";
 import { join, sep } from "node:path";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { spawn, spawnSync } from "child_process";
 import type { ServerWebSocket } from "bun";
 
@@ -182,6 +183,33 @@ const httpServer = Bun.serve({
         }
         if (cmd.action === "transcript") {
           ws.send(JSON.stringify(session.transcript("export")));
+        }
+        if (cmd.action === "exportDeck") {
+          // lecture-deck 템플릿 기반 reveal.js 강의 덱 생성 (회의는 SQLite에서 조회)
+          try {
+            const meta = store.latestMeeting();
+            if (!meta) {
+              broadcast({ type: "status", text: "저장된 회의가 없습니다" });
+            } else {
+              const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+              const dir = join(import.meta.dir, "exports", `deck-${stamp}`);
+              mkdirSync(dir, { recursive: true });
+              copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
+              const html = buildDeckHtml({
+                title: "Meeting Notes",
+                startedAt: meta.started_at,
+                provider: meta.provider,
+                slides: store.slides(meta.id),
+                lines: store.lines(meta.id),
+              });
+              writeFileSync(join(dir, "index.html"), html, "utf-8");
+              broadcast({ type: "status", text: `덱 저장됨: exports/deck-${stamp}/index.html` });
+              openUrl(`file://${join(dir, "index.html")}`);
+            }
+          } catch (e) {
+            const message = e instanceof Error ? e.message : String(e);
+            broadcast({ type: "status", text: `덱 저장 실패: ${message}` });
+          }
         }
         if (cmd.action === "saveNotes") {
           // anarlog 방식: 브라우저 다운로드가 아니라 서버 디스크에 저장 (항상 동작)

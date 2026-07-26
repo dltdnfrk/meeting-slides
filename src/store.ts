@@ -147,6 +147,13 @@ export class MeetingStore {
     return out.join("\n");
   }
 
+  /** 가장 최근 회의 (서버 재시작 후에도 이전 회의 export 가능 — anarlog 방식) */
+  latestMeeting(): { id: number; started_at: number; ended_at: number | null; provider: string | null } | null {
+    return (this.db
+      .query("SELECT id, started_at, ended_at, provider FROM meetings ORDER BY id DESC LIMIT 1")
+      .get() as { id: number; started_at: number; ended_at: number | null; provider: string | null } | null) ?? null;
+  }
+
   close(): void {
     this.db.close();
   }

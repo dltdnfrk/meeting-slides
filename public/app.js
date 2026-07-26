@@ -20,6 +20,7 @@ const statusTextEl = $("status-text");
 const btnExportMdEl = $("btn-export-md");
 const btnExportJsonEl = $("btn-export-json");
 const btnExportTranscriptEl = $("btn-export-transcript");
+const btnExportDeckEl = $("btn-export-deck");
 const btnSettingsEl = $("btn-settings");
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
@@ -348,6 +349,16 @@ btnExportTranscriptEl.onclick = () => {
     renderStatus("전사본 저장 중…");
   } else {
     renderStatus("연결되지 않음 — 저장 불가");
+  }
+};
+
+btnExportDeckEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    // lecture-deck 템플릿으로 reveal.js 강의 덱 생성 → exports/deck-*/
+    ws.send(JSON.stringify({ action: "exportDeck" }));
+    renderStatus("강의 덱 생성 중…");
+  } else {
+    renderStatus("연결되지 않음 — 덱 저장 불가");
   }
 };
 btnResetEl.onclick = () => {

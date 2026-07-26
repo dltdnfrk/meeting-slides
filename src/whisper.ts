@@ -6,8 +6,32 @@
 // 두 포맷 모두 같은 TranscriptChunk 스트림으로 변환.
 
 import { spawn, type ChildProcess } from "child_process";
-import { existsSync } from "node:fs";
+import { appendFileSync, existsSync, writeFileSync } from "node:fs";
 import type { WhisperConfig } from "./config.js";
+
+// 디버그: WHISPER_RAW_LOG 경로가 있으면 whisper의 원시 출력을 전부 기록한다.
+// (서버 필터를 통과하지 못하는 SDL/장치 에러를 잡기 위함)
+function rawLog(data: string): void {
+  const path = process.env.WHISPER_RAW_LOG;
+  if (path) {
+    try {
+      appendFileSync(path, data);
+    } catch {
+      // 로그 실패는 무시
+    }
+  }
+}
+
+function rawLogReset(): void {
+  const path = process.env.WHISPER_RAW_LOG;
+  if (path) {
+    try {
+      writeFileSync(path, "");
+    } catch {
+      // 로그 실패는 무시
+    }
+  }
+}
 
 export interface TranscriptChunk {
   text: string;
@@ -308,11 +332,13 @@ abstract class WhisperBase {
 
   protected attachStdio(proc: ChildProcess, opts: WhisperOptions): void {
     proc.stdout?.on("data", (data: Buffer) => {
+      rawLog(data.toString("utf-8"));
       this.buf += data.toString("utf-8");
       this.drain(opts.onChunk);
     });
     proc.stderr?.on("data", (data: Buffer) => {
       const s = data.toString("utf-8");
+      rawLog(s);
       if (/error|fail|cannot|not found|no such/i.test(s)) {
         opts.onStatus?.(`[whisper stderr] ${s.trim()}`);
       }
@@ -344,6 +370,7 @@ abstract class WhisperBase {
 export class WhisperStream extends WhisperBase {
   async start(opts: WhisperOptions): Promise<void> {
     this.assertDiarizeReady();
+    rawLogReset();
     const args = [
       "-m", this.effectiveModelPath(),
       "-l", "ko",
