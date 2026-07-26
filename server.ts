@@ -9,8 +9,10 @@ import { WhisperStream, WhisperCLI, listCaptureDevices } from "./src/whisper.ts"
 import { LLMClient, type BlockDetector } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate } from "./src/session.ts";
-import { buildProviderEntries, checkCliBin, createDetector } from "./src/providers.ts";
+import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { join, sep } from "node:path";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { spawn } from "child_process";
 import type { ServerWebSocket } from "bun";
 
 const args = process.argv.slice(2);
@@ -56,6 +58,46 @@ const cliTimeoutMs = config.llm.cli?.timeoutMs ?? 120_000;
 
 function providersMessage(): ProvidersUpdate {
   return { type: "providers", list: providerEntries, current: currentProviderId };
+}
+
+function openUrl(url: string): void {
+  const cmd = process.platform === "darwin" ? ["open", url]
+    : process.platform === "win32" ? ["cmd", "/c", "start", "", url]
+    : ["xdg-open", url];
+  Bun.spawn(cmd, { stdout: "ignore", stderr: "ignore" }).exited.catch(() => {});
+}
+
+/**
+ * 카드의 "연결" 버튼 처리. 구독 CLI는 각 CLI의 OAuth 플로우를 열고,
+ * API 키 프로바이더는 키 발급 페이지를 연다 (키는 카드에 붙여넣기).
+ */
+function connectProvider(id: string): void {
+  switch (id) {
+    case "cli:codex": {
+      // codex login: ChatGPT 계정 OAuth 브라우저 플로우 (CLI가 콜백 서버를 띄움)
+      broadcast({ type: "status", text: "ChatGPT 로그인 창을 여는 중… 브라우저에서 승인해주세요" });
+      spawn("codex", ["login"], { stdio: "ignore", detached: true }).unref();
+      break;
+    }
+    case "cli:claude": {
+      // claude CLI는 대화형 /login만 제공 → 터미널을 열어 안내
+      broadcast({ type: "status", text: "열린 터미널의 claude에서 /login 을 실행해 연결하세요" });
+      spawn("osascript", ["-e", 'tell application "Terminal" to do script "claude"'], { stdio: "ignore", detached: true }).unref();
+      break;
+    }
+    case "openai": {
+      broadcast({ type: "status", text: "OpenAI 키 발급 페이지를 엽니다 — 키를 카드에 붙여넣으세요" });
+      openUrl("https://platform.openai.com/api-keys");
+      break;
+    }
+    case "alibaba": {
+      broadcast({ type: "status", text: "Alibaba 콘솔을 엽니다 — 키를 카드에 붙여넣으세요" });
+      openUrl("https://bailian.console.aliyun.com/");
+      break;
+    }
+    default:
+      broadcast({ type: "status", text: "로컬 llama.cpp: 서버를 띄우고 .env의 LOCAL_LLM_BASE_URL을 설정하세요" });
+  }
 }
 
 const whisper = config.input.mode === "file" && config.input.filePath
@@ -137,6 +179,39 @@ const httpServer = Bun.serve({
               });
             }
           }
+        }
+        if (cmd.action === "connectProvider" && typeof cmd.id === "string") {
+          connectProvider(cmd.id);
+        }
+        if (cmd.action === "setProviderKey" && typeof cmd.id === "string" && typeof cmd.key === "string") {
+          const envKey = KEY_BY_PROVIDER[cmd.id];
+          const key = cmd.key.trim();
+          if (!envKey || !key || /[\r\n]/.test(key)) {
+            ws.send(JSON.stringify({ type: "status" as const, text: "잘못된 키 형식입니다" }));
+          } else {
+            // 런타임 즉시 적용 + .env에도 기록 (0600). 기록 실패해도 세션은 동작.
+            process.env[envKey] = key;
+            try {
+              const envPath = join(import.meta.dir, ".env");
+              const current = existsSync(envPath) ? readFileSync(envPath, "utf-8") : "";
+              writeFileSync(envPath, upsertEnvText(current, { [envKey]: key }), { mode: 0o600 });
+            } catch {
+              broadcast({ type: "status", text: "(.env 기록 실패 — 이번 세션에만 적용됩니다)" });
+            }
+            const entry = providerEntries.find((e) => e.id === cmd.id);
+            if (entry) entry.available = true;
+            broadcast(providersMessage());
+            broadcast({ type: "status", text: `${entry?.label ?? cmd.id} 키 저장됨 ✓` });
+          }
+        }
+        if (cmd.action === "recheckProviders") {
+          const claudeOk = checkCliBin("claude");
+          const codexOk = checkCliBin("codex");
+          for (const e of providerEntries) {
+            if (e.id === "cli:claude") e.available = claudeOk;
+            if (e.id === "cli:codex") e.available = codexOk;
+          }
+          broadcast(providersMessage());
         }
       } catch {}
     },

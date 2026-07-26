@@ -23,6 +23,7 @@ const btnExportTranscriptEl = $("btn-export-transcript");
 const btnSettingsEl = $("btn-settings");
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
+const btnRecheckEl = $("btn-recheck");
 const btnResetEl = $("btn-reset");
 
 let currentSlide = null;
@@ -219,16 +220,29 @@ let currentProvider = "";
 function renderProviders(msg) {
   currentProvider = msg.current ?? "";
   const list = Array.isArray(msg.list) ? msg.list : [];
-  providerListEl.innerHTML = list.map((p) => `
-    <button type="button"
-      class="provider-row${p.id === currentProvider ? " provider-row--current" : ""}${p.available ? "" : " provider-row--disabled"}"
-      data-id="${escapeHtml(p.id)}" ${p.available ? "" : "disabled"}>
-      <span class="provider-row__name">${escapeHtml(p.label)}</span>
-      <span class="provider-row__detail">${escapeHtml(p.detail)}</span>
-      ${p.id === currentProvider
-        ? '<span class="provider-row__badge">● 사용 중</span>'
-        : (p.available ? "" : '<span class="provider-row__badge provider-row__badge--off">미설정</span>')}
-    </button>`).join("");
+  providerListEl.innerHTML = list.map((p) => {
+    const isCli = p.id.startsWith("cli:");
+    const keyBased = p.id === "openai" || p.id === "alibaba";
+    const showActions = isCli || !p.available;
+    return `
+    <div class="provider-row${p.id === currentProvider ? " provider-row--current" : ""}${p.available ? "" : " provider-row--disabled"}" data-id="${escapeHtml(p.id)}">
+      <button type="button" class="provider-row__select" ${p.available ? "" : "disabled"}>
+        <span class="provider-row__name">${escapeHtml(p.label)}</span>
+        <span class="provider-row__detail">${escapeHtml(p.detail)}</span>
+        ${p.id === currentProvider
+          ? '<span class="provider-row__badge">● 사용 중</span>'
+          : (p.available ? "" : '<span class="provider-row__badge provider-row__badge--off">미설정</span>')}
+      </button>
+      ${showActions ? `
+        <div class="provider-row__actions">
+          ${isCli ? `<button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">${p.available ? "재인증" : "연결"}</button>` : ""}
+          ${keyBased && !p.available ? `
+            <button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">연결</button>
+            <input class="provider-row__key" type="password" placeholder="API 키 붙여넣기" autocomplete="off">
+            <button type="button" class="provider-row__save" data-id="${escapeHtml(p.id)}">저장</button>` : ""}
+        </div>` : ""}
+    </div>`;
+  }).join("");
 }
 
 btnSettingsEl.onclick = (ev) => {
@@ -237,12 +251,33 @@ btnSettingsEl.onclick = (ev) => {
 };
 
 providerListEl.addEventListener("click", (ev) => {
-  const row = ev.target.closest(".provider-row");
-  if (!row || row.disabled) return;
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "setProvider", id: row.dataset.id }));
+  const connectBtn = ev.target.closest(".provider-row__connect");
+  if (connectBtn && ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "connectProvider", id: connectBtn.dataset.id }));
+    return;
+  }
+  const saveBtn = ev.target.closest(".provider-row__save");
+  if (saveBtn && ws && ws.readyState === WebSocket.OPEN) {
+    const row = saveBtn.closest(".provider-row");
+    const input = row ? row.querySelector(".provider-row__key") : null;
+    if (input && input.value.trim()) {
+      ws.send(JSON.stringify({ action: "setProviderKey", id: saveBtn.dataset.id, key: input.value.trim() }));
+      input.value = "";
+    }
+    return;
+  }
+  const selectBtn = ev.target.closest(".provider-row__select");
+  if (selectBtn && !selectBtn.disabled && ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "setProvider", id: selectBtn.closest(".provider-row").dataset.id }));
   }
 });
+
+btnRecheckEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "recheckProviders" }));
+    renderStatus("프로바이더 재검사 중…");
+  }
+};
 
 document.addEventListener("click", (ev) => {
   if (!providerPanelEl.hidden && !ev.target.closest("#provider-panel") && !ev.target.closest("#btn-settings")) {

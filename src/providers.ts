@@ -77,3 +77,29 @@ export function createDetector(id: string, opts: { cliTimeoutMs: number }): Bloc
     return null;
   }
 }
+
+/** API 키로 연결하는 프로바이더의 env 변수 매핑 (카드의 키 붙여넣기용) */
+export const KEY_BY_PROVIDER: Record<string, string> = {
+  openai: "OPENAI_API_KEY",
+  alibaba: "ALIBABA_TOKEN_PLAN_API_KEY",
+};
+
+/**
+ * .env 텍스트에 키를 upsert한다. 기존 줄은 값만 교체, 없으면 끝에 추가.
+ * 주석·다른 키·개행 구조는 보존.
+ */
+export function upsertEnvText(text: string, entries: Record<string, string>): string {
+  const seen = new Set<string>();
+  const out = text.split("\n").map((line) => {
+    const idx = line.indexOf("=");
+    if (idx <= 0) return line;
+    const key = line.slice(0, idx);
+    if (!(key in entries)) return line;
+    seen.add(key);
+    return `${key}=${entries[key]}`;
+  });
+  for (const [key, value] of Object.entries(entries)) {
+    if (!seen.has(key)) out.push(`${key}=${value}`);
+  }
+  return out.join("\n");
+}
