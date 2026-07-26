@@ -8,6 +8,12 @@ export interface LLMProviderConfig {
   model: string;
 }
 
+export interface CliLLMConfig {
+  bin: string;                    // claude | codex (또는 전체 경로)
+  preset: "claude" | "codex";     // 출력 계약 프리셋
+  timeoutMs: number;
+}
+
 export interface WhisperConfig {
   streamBin: string;   // whisper-stream (마이크)
   cliBin: string;       // whisper-cli (파일)
@@ -29,7 +35,8 @@ export interface Config {
   input: FileInputConfig;
   llm: {
     provider: string;
-    config: LLMProviderConfig;
+    config: LLMProviderConfig | null;  // HTTP 프로바이더 (alibaba|openai|local)
+    cli: CliLLMConfig | null;          // provider=cli (구독 서비스 백엔드)
   };
   block: {
     detectInterval: number;
@@ -80,8 +87,23 @@ function resolveLLMConfig(provider: string): LLMProviderConfig {
         model: env("LOCAL_LLM_MODEL"),
       };
     default:
-      throw new Error(`알 수 없는 LLM_PROVIDER: ${provider}. alibaba|openai|local 중 하나.`);
+      throw new Error(`알 수 없는 LLM_PROVIDER: ${provider}. alibaba|openai|local|cli 중 하나.`);
   }
+}
+
+function resolveCliConfig(): CliLLMConfig {
+  const bin = env("LLM_CLI_BIN", "claude");
+  const presetEnv = env("LLM_CLI_PRESET", "").trim();
+  if (presetEnv && presetEnv !== "claude" && presetEnv !== "codex") {
+    throw new Error(`LLM_CLI_PRESET은 claude|codex 중 하나여야 함: ${presetEnv}`);
+  }
+  // 프리셋 미지정 시 바이너리 이름에서 자동 감지
+  const preset: CliLLMConfig["preset"] = presetEnv === "claude" || presetEnv === "codex"
+    ? presetEnv
+    : bin.includes("codex") ? "codex" : "claude";
+  const timeoutMs = intEnv("LLM_CLI_TIMEOUT_MS", 120_000);
+  if (timeoutMs < 1000) throw new Error(`LLM_CLI_TIMEOUT_MS는 1000 이상이어야 함: ${timeoutMs}`);
+  return { bin, preset, timeoutMs };
 }
 
 export function loadWhisperConfig(): WhisperConfig {
@@ -121,6 +143,9 @@ export function loadConfig(args: string[] = []): Config {
   }
 
   const provider = env("LLM_PROVIDER", "alibaba");
+  const llm = provider === "cli"
+    ? { provider, config: null, cli: resolveCliConfig() }
+    : { provider, config: resolveLLMConfig(provider), cli: null };
   const detectInterval = intEnv("BLOCK_DETECT_SENTENCE_INTERVAL", 4);
   const contextWindow = intEnv("BLOCK_CONTEXT_WINDOW", 12);
   const httpPort = intEnv("HTTP_PORT", 8787);
@@ -134,10 +159,7 @@ export function loadConfig(args: string[] = []): Config {
       mode: finalMode,
       filePath: finalFile,
     },
-    llm: {
-      provider,
-      config: resolveLLMConfig(provider),
-    },
+    llm,
     block: {
       detectInterval,
       contextWindow,

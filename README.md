@@ -42,7 +42,8 @@ WebSocket /ws ── public/app.js ── 슬라이드·자막·히스토리 렌
     https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
   ```
 - LLM 프로바이더 1개 (택일):
-  - **Alibaba Token Plan (Bailian)** — 기본값, GLM-5.2
+  - **구독 서비스 CLI** — API 키 없이 구독 인증 재사용: `claude`(Claude Pro/Max) 또는 `codex`(ChatGPT)
+  - **Alibaba Token Plan (Bailian)** — GLM-5.2
   - **OpenAI** — gpt-4o-mini 등
   - **로컬 llama.cpp 서버** — API 키 없이 완전 오프라인 가능
 
@@ -59,14 +60,18 @@ cp .env.example .env   # 열어서 LLM 키 등을 채워 넣기
 
 | 변수 | 설명 | 기본값 |
 |---|---|---|
-| `LLM_PROVIDER` | `alibaba` \| `openai` \| `local` | `alibaba` |
+| `LLM_PROVIDER` | `alibaba` \| `openai` \| `local` \| `cli` | `alibaba` |
 | `ALIBABA_TOKEN_PLAN_API_KEY` | Alibaba 키 (`sk-sp-...`) | — |
+| `LLM_CLI_BIN` | `cli` 모드 백엔드 CLI (`claude`/`codex`, 구독 인증) | `claude` |
+| `LLM_CLI_TIMEOUT_MS` | `cli` 모드 호출 상한 (ms) | `120000` |
 | `WHISPER_MODEL_PATH` | ggml 모델 경로 | `./models/ggml-medium.bin` |
 | `WHISPER_CAPTURE_ID` | 캡처 장치 ID (`-1`=기본 마이크) | `-1` |
 | `WHISPER_STEP_MS` | 오디오 스텝(ms). 작을수록 실시간성↑ 정확도↓ | `3000` |
 | `BLOCK_DETECT_SENTENCE_INTERVAL` | LLM 호출 간격(문장 수) | `4` |
 | `BLOCK_CONTEXT_WINDOW` | LLM에 보낼 최근 문장 수 | `12` |
 | `HTTP_PORT` | 웹 UI 포트 | `8787` |
+
+> **cli 모드 팁**: CLI는 호출마다 기동 비용(수 초)이 들므로 `BLOCK_DETECT_SENTENCE_INTERVAL=8` 정도로 올리는 걸 권장합니다.
 
 ## 실행
 

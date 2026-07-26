@@ -17,6 +17,35 @@ export interface BlockDetectionResult {
   bullets: string[];
 }
 
+/** HTTP든 CLI든 블록 감지 클라이언트가 만족해야 하는 공통 인터페이스. */
+export interface BlockDetector {
+  detectBlock(sentences: string[]): Promise<BlockDetectionResult>;
+  ping(): Promise<boolean>;
+}
+
+/**
+ * 모델 출력에서 블록 감지 JSON을 추출한다. GLM reasoning_content처럼 앞뒤에
+ * 사고 과정이 붙은 출력도 첫 { 부터 마지막 } 까지 잘라 파싱한다.
+ */
+export function parseBlockDetectionJson(content: string): BlockDetectionResult {
+  const raw = content.trim().length > 0 ? content : "{}";
+  try {
+    const jsonStr = raw.includes("{")
+      ? raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1)
+      : raw;
+    const parsed = JSON.parse(jsonStr) as Partial<BlockDetectionResult>;
+    const bulletsRaw = Array.isArray(parsed.bullets) ? parsed.bullets : [];
+    return {
+      shouldAdvance: Boolean(parsed.shouldAdvance),
+      blockTitle: String(parsed.blockTitle ?? "").slice(0, 50),
+      bullets: bulletsRaw.map((b) => String(b).slice(0, 80)).slice(0, 6),
+    };
+  } catch {
+    console.error("[LLM] JSON 파싱 실패:", raw.slice(0, 200));
+    return { shouldAdvance: false, blockTitle: "(파싱 실패)", bullets: [] };
+  }
+}
+
 interface ChatChoice {
   message?: {
     content?: string;
@@ -28,7 +57,7 @@ interface ChatResponse {
   choices?: ChatChoice[];
 }
 
-const SYSTEM_PROMPT = `당신은 실시간 한국어 회의 전사를 분석하는 어시스턴트입니다.
+export const SYSTEM_PROMPT = `당신은 실시간 한국어 회의 전사를 분석하는 어시스턴트입니다.
 
 입력: 최근 회의 발언 문장들
 출력: JSON 객체 (reasoning_content 없이 content에 JSON만)
@@ -103,23 +132,7 @@ JSON으로만 응답하세요.`;
     const msg = data.choices?.[0]?.message;
     // content 우선; 비어있으면 reasoning_content에서 JSON 추출 (GLM reasoning 대응)
     const raw = msg?.content ?? msg?.reasoning_content ?? "";
-    const content = raw.trim().length > 0 ? raw : "{}";
-
-    try {
-      const jsonStr = content.includes("{")
-        ? content.slice(content.indexOf("{"), content.lastIndexOf("}") + 1)
-        : content;
-      const parsed = JSON.parse(jsonStr) as Partial<BlockDetectionResult>;
-      const bulletsRaw = Array.isArray(parsed.bullets) ? parsed.bullets : [];
-      return {
-        shouldAdvance: Boolean(parsed.shouldAdvance),
-        blockTitle: String(parsed.blockTitle ?? "").slice(0, 50),
-        bullets: bulletsRaw.map((b) => String(b).slice(0, 80)).slice(0, 6),
-      };
-    } catch {
-      console.error("[LLM] JSON 파싱 실패:", content.slice(0, 200));
-      return { shouldAdvance: false, blockTitle: "(파싱 실패)", bullets: [] };
-    }
+    return parseBlockDetectionJson(raw);
   }
 
   async ping(): Promise<boolean> {

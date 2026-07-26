@@ -6,7 +6,8 @@
 
 import { loadConfig, loadWhisperConfig } from "./src/config.ts";
 import { WhisperStream, WhisperCLI, listCaptureDevices } from "./src/whisper.ts";
-import { LLMClient } from "./src/llm.ts";
+import { LLMClient, type BlockDetector } from "./src/llm.ts";
+import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener } from "./src/session.ts";
 import { join, sep } from "node:path";
 import type { ServerWebSocket } from "bun";
@@ -23,7 +24,16 @@ if (args.includes("--devices")) {
 
 const config = loadConfig(args);
 
-const llm = new LLMClient(config.llm.config);
+let llm: BlockDetector;
+let llmLabel: string;
+if (config.llm.cli) {
+  llm = new CliLLMClient(config.llm.cli);
+  llmLabel = `cli:${config.llm.cli.preset}(${config.llm.cli.bin})`;
+} else {
+  if (!config.llm.config) throw new Error(`provider=${config.llm.provider}에 HTTP 설정이 없습니다`);
+  llm = new LLMClient(config.llm.config);
+  llmLabel = config.llm.config.model;
+}
 const listeners = new Set<ClientListener>();
 const session = new MeetingSession(
   llm,
@@ -78,7 +88,7 @@ const httpServer = Bun.serve({
       wsListeners.set(ws, listener);
       ws.send(JSON.stringify({
         type: "status" as const,
-        text: `연결됨. LLM provider=${config.llm.provider} model=${config.llm.config.model}`,
+        text: `연결됨. LLM provider=${config.llm.provider} model=${llmLabel}`,
       }));
       ws.send(JSON.stringify(session.snapshot()));
     },
@@ -171,7 +181,7 @@ void whisper.start({
 
 const ok = await llm.ping();
 if (ok) {
-  console.log(`LLM 연결 OK: ${config.llm.provider} / ${config.llm.config.model}`);
+  console.log(`LLM 연결 OK: ${config.llm.provider} / ${llmLabel}`);
 } else {
   console.warn(`LLM 핑 실패 - 서버는 동작함. provider=${config.llm.provider}`);
 }

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { MeetingSession, type ServerMessage } from "../src/session.ts";
-import type { LLMClient, BlockDetectionResult } from "../src/llm.ts";
+import type { BlockDetector, BlockDetectionResult } from "../src/llm.ts";
 
 function makeSession(opts: {
   detectInterval?: number;
@@ -12,7 +12,7 @@ function makeSession(opts: {
   listeners.add((m) => messages.push(m));
   const llm = {
     detectBlock: opts.detectBlock ?? (async () => ({ shouldAdvance: false, blockTitle: "주제", bullets: ["요점"] })),
-  } as unknown as LLMClient;
+  } as unknown as BlockDetector;
   const session = new MeetingSession(llm, opts.detectInterval ?? 1, 12, listeners);
   return { session, messages };
 }

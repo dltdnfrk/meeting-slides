@@ -4,8 +4,8 @@
 // 전사 청크를 누적하고, 주기적으로 LLM에 블록 감지를 요청한다.
 // 블록 전환 감지 시 WebSocket 클라이언트에 슬라이드 push.
 
-import { LLMClient, BlockDetectionResult } from "./llm.js";
-import { TranscriptChunk } from "./whisper.js";
+import type { BlockDetectionResult, BlockDetector } from "./llm.js";
+import type { TranscriptChunk } from "./whisper.js";
 
 export interface Slide {
   index: number;
@@ -65,7 +65,7 @@ export class MeetingSession {
   private static readonly ADVANCE_THRESHOLD = 2;
 
   constructor(
-    private llm: LLMClient,
+    private llm: BlockDetector,
     private detectInterval: number,
     private contextWindow: number,
     private listeners: Set<ClientListener>,
