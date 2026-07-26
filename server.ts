@@ -67,6 +67,8 @@ const ALLOWED_WS_ORIGINS = new Set([
 
 const httpServer = Bun.serve({
   port: config.server.httpPort,
+  // 로컬 도구: LAN의 다른 기기가 전사 내용에 접근할 필요가 없으므로 루프백만 바인드.
+  hostname: "127.0.0.1",
   websocket: {
     open(ws: ServerWebSocket<undefined>) {
       const listener: ClientListener = (msg: ServerMessage) => {
