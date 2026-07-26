@@ -90,6 +90,38 @@ const BANNER_PATTERNS: readonly RegExp[] = [
   /^0x[0-9a-f]+ +[0-9.]+ +[0-9.]+ +[0-9.]+/,
 ];
 
+// ── 유사 문장 판정 (whisper 윈도우 겹침/리비전 중복 제거용) ──
+// 예전 방식은 문자 "존재 여부"만 세어서, 어순이 완전히 다른 문장도
+// "습니다" 같은 공통 어미 때문에 70% 겹침으로 오탐됐다.
+// bigram Jaccard는 문자 2-gram의 순서 정보를 쓰므로 이 오탐이 없다.
+
+function normalizeForSim(s: string): string {
+  // 띄어쓰기·대소문자 차이는 전사 리비전에서 흔하므로 제거하고 비교.
+  return s.toLowerCase().replace(/\s+/g, "");
+}
+
+function bigrams(s: string): Set<string> {
+  const grams = new Set<string>();
+  for (let i = 0; i < s.length - 1; i++) grams.add(s.slice(i, i + 2));
+  return grams;
+}
+
+/** bigram Jaccard 유사도 (0~1). 같은 전사 리비전은 대략 0.7+, 무관한 문장은 0.2 이하로 나온다. */
+export function bigramSimilarity(a: string, b: string): number {
+  const na = normalizeForSim(a);
+  const nb = normalizeForSim(b);
+  if (na.length === 0 || nb.length === 0) return 0;
+  if (na === nb) return 1;
+  if (na.length < 2 || nb.length < 2) return 0;
+  const A = bigrams(na);
+  const B = bigrams(nb);
+  let inter = 0;
+  for (const g of A) {
+    if (B.has(g)) inter++;
+  }
+  return inter / (A.size + B.size - inter);
+}
+
 abstract class WhisperBase {
   protected proc: ChildProcess | null = null;
   protected buf = "";
@@ -169,6 +201,8 @@ abstract class WhisperBase {
     }
   }
 
+  private static readonly NEAR_DUP_THRESHOLD = 0.5;
+
   private isDuplicate(sentence: string): boolean {
     for (const prev of this.recentSentences) {
       if (prev === sentence) return true;
@@ -176,14 +210,9 @@ abstract class WhisperBase {
       if (sentence.length < 8) continue;
       // 한쪽이 다른 쪽의 prefix/suffix이면 중복 (리비전)
       if (prev.startsWith(sentence) || sentence.startsWith(prev)) return true;
-      // 문자 단위 겹침 비율
+      // bigram Jaccard로 어순까지 비교 — 같은 발화의 재전사/부분 수정을 잡는다
       const shorter = prev.length < sentence.length ? prev : sentence;
-      const longer = prev.length < sentence.length ? sentence : prev;
-      let match = 0;
-      for (let j = 0; j < shorter.length; j++) {
-        if (longer.includes(shorter[j])) match++;
-      }
-      if (match / shorter.length > 0.7 && shorter.length > 10) return true;
+      if (shorter.length > 10 && bigramSimilarity(prev, sentence) >= WhisperBase.NEAR_DUP_THRESHOLD) return true;
     }
     return false;
   }

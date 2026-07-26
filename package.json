@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "bun run server.ts",
     "start": "bun run server.ts",
-    "devices": "bun run server.ts --devices"
+    "devices": "bun run server.ts --devices",
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/bun": "latest",
