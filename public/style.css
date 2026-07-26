@@ -423,8 +423,7 @@ body {
   background: rgba(16,185,129,0.16);
 }
 
-/* ── 화자 칩 (tinydiarize) ── */
-.speaker-chip {
+/* ── 화자 칩 (tinydiarize) ── */.speaker-chip {
   padding: 2px 8px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--chip-color, #10b981) 18%, transparent);
@@ -434,3 +433,67 @@ body {
   font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
   white-space: nowrap;
 }
+
+/* ── 프로바이더 설정 패널 ── */
+.icon-btn {
+  margin-left: 8px;
+  padding: 4px 7px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--z500);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth);
+}
+.icon-btn:hover { color: var(--z100); border-color: rgba(255,255,255,0.25); }
+
+.provider-panel {
+  position: fixed;
+  top: 60px;
+  right: 18px;
+  z-index: 60;
+  width: 300px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 14px;
+  background: var(--z900, #17171a);
+  box-shadow: 0 18px 56px rgba(0,0,0,0.55);
+}
+.provider-panel__head {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
+  color: var(--z500);
+  margin-bottom: 10px;
+}
+.provider-panel__hint {
+  margin-top: 10px;
+  font-size: 10.5px;
+  color: var(--z500);
+}
+.provider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  background: var(--z850);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth);
+}
+.provider-row:hover { border-color: rgba(16,185,129,0.3); background: var(--z800); }
+.provider-row--current { border-color: rgba(16,185,129,0.55); background: rgba(16,185,129,0.07); }
+.provider-row--disabled { opacity: 0.42; cursor: not-allowed; }
+.provider-row__name { font-size: 13px; font-weight: 700; color: var(--z100); }
+.provider-row__detail { font-size: 10.5px; color: var(--z500); }
+.provider-row__badge {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  color: var(--live);
+}
+.provider-row__badge--off { color: var(--z500); }

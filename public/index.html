@@ -34,8 +34,16 @@
       <div class="topbar__status">
         <span class="status__indicator" id="status-indicator"></span>
         <span class="status__text" id="status-text">서버에 연결 중…</span>
+        <button id="btn-settings" class="icon-btn" type="button" title="LLM 프로바이더 설정" aria-label="LLM 프로바이더 설정">⚙</button>
       </div>
     </header>
+
+    <!-- ── LLM 프로바이더 선택 패널 ────────────── -->
+    <div class="provider-panel" id="provider-panel" hidden>
+      <div class="provider-panel__head">LLM 프로바이더</div>
+      <div class="provider-panel__list" id="provider-list"></div>
+      <p class="provider-panel__hint">선택 즉시 다음 블록 감지부터 적용됩니다</p>
+    </div>
 
     <div class="layout">
       <!-- ── 사이드바: 히스토리 ─────────────────── -->

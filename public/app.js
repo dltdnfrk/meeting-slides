@@ -20,6 +20,9 @@ const statusTextEl = $("status-text");
 const btnExportMdEl = $("btn-export-md");
 const btnExportJsonEl = $("btn-export-json");
 const btnExportTranscriptEl = $("btn-export-transcript");
+const btnSettingsEl = $("btn-settings");
+const providerPanelEl = $("provider-panel");
+const providerListEl = $("provider-list");
 const btnResetEl = $("btn-reset");
 
 let currentSlide = null;
@@ -210,6 +213,43 @@ function exportTranscript(entries) {
   renderStatus(`전사본 저장 완료 (${entries.length}문장)`);
 }
 
+// ── 프로바이더 선택 패널 ──
+let currentProvider = "";
+
+function renderProviders(msg) {
+  currentProvider = msg.current ?? "";
+  const list = Array.isArray(msg.list) ? msg.list : [];
+  providerListEl.innerHTML = list.map((p) => `
+    <button type="button"
+      class="provider-row${p.id === currentProvider ? " provider-row--current" : ""}${p.available ? "" : " provider-row--disabled"}"
+      data-id="${escapeHtml(p.id)}" ${p.available ? "" : "disabled"}>
+      <span class="provider-row__name">${escapeHtml(p.label)}</span>
+      <span class="provider-row__detail">${escapeHtml(p.detail)}</span>
+      ${p.id === currentProvider
+        ? '<span class="provider-row__badge">● 사용 중</span>'
+        : (p.available ? "" : '<span class="provider-row__badge provider-row__badge--off">미설정</span>')}
+    </button>`).join("");
+}
+
+btnSettingsEl.onclick = (ev) => {
+  ev.stopPropagation();
+  providerPanelEl.hidden = !providerPanelEl.hidden;
+};
+
+providerListEl.addEventListener("click", (ev) => {
+  const row = ev.target.closest(".provider-row");
+  if (!row || row.disabled) return;
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "setProvider", id: row.dataset.id }));
+  }
+});
+
+document.addEventListener("click", (ev) => {
+  if (!providerPanelEl.hidden && !ev.target.closest("#provider-panel") && !ev.target.closest("#btn-settings")) {
+    providerPanelEl.hidden = true;
+  }
+});
+
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
 btnExportMdEl.onclick = () => exportSlides("markdown");
 btnExportJsonEl.onclick = () => exportSlides("json");
@@ -253,6 +293,10 @@ currentSlideEl.addEventListener("click", (ev) => {
 });
 
 window.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape" && !providerPanelEl.hidden) {
+    providerPanelEl.hidden = true;
+    return;
+  }
   if (ev.key === "Escape" && viewingHistory) {
     viewingHistory = null;
     renderMain();
@@ -281,6 +325,8 @@ function connect() {
         renderCaption(msg.text, msg.speaker);
       } else if (msg.type === "transcript") {
         exportTranscript(msg.entries);
+      } else if (msg.type === "providers") {
+        renderProviders(msg);
       } else if (msg.type === "status") {
         renderStatus(msg.text);
       }

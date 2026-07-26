@@ -44,7 +44,20 @@ export interface TranscriptUpdate {
   entries: TranscriptEntry[];
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate;
+export interface ProviderInfo {
+  id: string;
+  label: string;
+  detail: string;
+  available: boolean;
+}
+
+export interface ProvidersUpdate {
+  type: "providers";
+  list: ProviderInfo[];
+  current: string;
+}
+
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 
@@ -90,6 +103,11 @@ export class MeetingSession {
 
   addListener(l: ClientListener) { this.listeners.add(l); }
   removeListener(l: ClientListener) { this.listeners.delete(l); }
+
+  /** 런타임에 LLM 백엔드 교체 (사용자 프로바이더 선택). 다음 감지부터 적용. */
+  setDetector(detector: BlockDetector): void {
+    this.llm = detector;
+  }
 
   snapshot(): SlideUpdate {
     return { type: "slide", current: this.currentSlide, history: [...this.history] };

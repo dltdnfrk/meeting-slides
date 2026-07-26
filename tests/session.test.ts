@@ -124,6 +124,20 @@ describe("MeetingSession", () => {
     expect(session.snapshot().current?.title).toBe("고객 피드백"); // TOPIC_RULES fallback
   });
 
+  test("setDetector로 런타임 LLM 교체 — 다음 감지부터 새 백엔드 사용", async () => {
+    const { session } = makeSession({});
+    let used = "";
+    const other = {
+      detectBlock: async () => { used = "new"; return { shouldAdvance: false, blockTitle: "새 백엔드", bullets: [] }; },
+      ping: async () => true,
+    };
+    session.setDetector(other);
+    session.onChunk(chunk("교체 후 문장"));
+    await Bun.sleep(10);
+    expect(used).toBe("new");
+    expect(session.snapshot().current?.title).toBe("새 백엔드");
+  });
+
   test("전사 로그는 문장+시각+화자를 전부 보관하고 reset에서 비움", async () => {
     const { session } = makeSession({});
     session.onChunk({ text: "첫 문장", ts: 1000, speaker: 1 });

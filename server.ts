@@ -8,7 +8,8 @@ import { loadConfig, loadWhisperConfig } from "./src/config.ts";
 import { WhisperStream, WhisperCLI, listCaptureDevices } from "./src/whisper.ts";
 import { LLMClient, type BlockDetector } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
-import { MeetingSession, type ServerMessage, type ClientListener } from "./src/session.ts";
+import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate } from "./src/session.ts";
+import { buildProviderEntries, checkCliBin, createDetector } from "./src/providers.ts";
 import { join, sep } from "node:path";
 import type { ServerWebSocket } from "bun";
 
@@ -35,12 +36,27 @@ if (config.llm.cli) {
   llmLabel = config.llm.config.model;
 }
 const listeners = new Set<ClientListener>();
+const broadcast = (msg: ServerMessage) => {
+  for (const l of listeners) { try { l(msg); } catch {} }
+};
 const session = new MeetingSession(
   llm,
   config.block.detectInterval,
   config.block.contextWindow,
   listeners,
 );
+
+// ── 프로바이더 런타임 선택 (사용자가 UI에서 교체) ──
+const providerEntries = buildProviderEntries(process.env, {
+  claude: checkCliBin("claude"),
+  codex: checkCliBin("codex"),
+});
+let currentProviderId = config.llm.cli ? `cli:${config.llm.cli.preset}` : config.llm.provider;
+const cliTimeoutMs = config.llm.cli?.timeoutMs ?? 120_000;
+
+function providersMessage(): ProvidersUpdate {
+  return { type: "providers", list: providerEntries, current: currentProviderId };
+}
 
 const whisper = config.input.mode === "file" && config.input.filePath
   ? new WhisperCLI(config.whisper, config.input.filePath)
@@ -91,16 +107,36 @@ const httpServer = Bun.serve({
         text: `연결됨. LLM provider=${config.llm.provider} model=${llmLabel}`,
       }));
       ws.send(JSON.stringify(session.snapshot()));
+      ws.send(JSON.stringify(providersMessage()));
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
       try {
-        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string };
+        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string };
         if (cmd.action === "reset") session.reset();
         if (cmd.action === "status") {
           ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
         }
         if (cmd.action === "transcript") {
           ws.send(JSON.stringify(session.transcript()));
+        }
+        if (cmd.action === "setProvider" && typeof cmd.id === "string") {
+          const entry = providerEntries.find((e) => e.id === cmd.id);
+          if (!entry) {
+            ws.send(JSON.stringify({ type: "status" as const, text: `알 수 없는 프로바이더: ${cmd.id}` }));
+          } else if (!entry.available) {
+            ws.send(JSON.stringify({ type: "status" as const, text: `${entry.label}은(는) 설정되지 않았습니다 (CLI 설치/API 키 확인)` }));
+          } else {
+            const detector = createDetector(entry.id, { cliTimeoutMs });
+            if (detector) {
+              session.setDetector(detector);
+              currentProviderId = entry.id;
+              broadcast(providersMessage());
+              broadcast({ type: "status", text: `LLM 변경됨: ${entry.label}` });
+              void detector.ping().then((ok) => {
+                if (!ok) broadcast({ type: "status", text: `⚠️ ${entry.label} 연결 확인에 실패했습니다` });
+              });
+            }
+          }
         }
       } catch {}
     },

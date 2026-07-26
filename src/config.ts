@@ -68,7 +68,7 @@ function intEnv(key: string, fallback: number): number {
   return n;
 }
 
-function resolveLLMConfig(provider: string): LLMProviderConfig {
+export function resolveLLMConfig(provider: string): LLMProviderConfig {
   switch (provider) {
     case "alibaba":
       return {
