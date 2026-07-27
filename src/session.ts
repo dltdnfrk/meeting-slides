@@ -161,8 +161,16 @@ export class MeetingSession {
 
   async flush(): Promise<void> {
     this.flushCaption();
-    while (this.detecting) {
+    // 진행 중 감지가 끝날 때까지 대기 — LLM 타임아웃(30s) 상한 보다 충분히 큰 40s로 가드.
+    const deadline = Date.now() + 40_000;
+    while (this.detecting && Date.now() < deadline) {
       await Bun.sleep(50);
+    }
+    if (this.detecting) {
+      // 가드 타임아웃 — 감지가 멈추지 않으면 강제로 플래그 해제.
+      this.detecting = false;
+      this.broadcast({ type: "detect", detecting: false });
+      this.broadcast({ type: "status", text: "감지 대기 시간 초과 — 강제 종료" });
     }
     if (this.sentences.length === 0 || this.sentences.length === this.lastDetectCount) {
       return;

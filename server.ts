@@ -175,21 +175,21 @@ const httpServer = Bun.serve({
       try {
         const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string; key?: string };
         if (cmd.action === "startCapture") void startCapture();
-        if (cmd.action === "stopCapture") void stopCapture();
-        if (cmd.action === "reset") {
+        else if (cmd.action === "stopCapture") void stopCapture();
+        else if (cmd.action === "reset") {
           session.reset();
           // 회의 저장소도 새 회의로 전환 (캡처 중이면 이어서 기록)
           store.endMeeting();
           if (capturing) store.startMeeting(currentProviderId);
           broadcast(session.transcript("snapshot"));
         }
-        if (cmd.action === "status") {
+        else if (cmd.action === "status") {
           ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
         }
-        if (cmd.action === "transcript") {
+        else if (cmd.action === "transcript") {
           ws.send(JSON.stringify(session.transcript("export")));
         }
-        if (cmd.action === "exportDeck") {
+        else if (cmd.action === "exportDeck") {
           // lecture-deck 템플릿 기반 reveal.js 강의 덱 생성 (회의는 SQLite에서 조회)
           try {
             const meta = store.latestMeeting();
@@ -218,7 +218,7 @@ const httpServer = Bun.serve({
             broadcast({ type: "status", text: `덱 저장 실패: ${message}` });
           }
         }
-        if (cmd.action === "saveNotes") {
+        else if (cmd.action === "saveNotes") {
           // anarlog 방식: 브라우저 다운로드가 아니라 서버 디스크에 저장 (항상 동작)
           try {
             const dir = join(import.meta.dir, "exports");
@@ -233,7 +233,28 @@ const httpServer = Bun.serve({
             broadcast({ type: "status", text: `저장 실패: ${message}` });
           }
         }
-        if (cmd.action === "setProvider" && typeof cmd.id === "string") {
+        else if (cmd.action === "saveJson") {
+          try {
+            const dir = join(import.meta.dir, "exports");
+            mkdirSync(dir, { recursive: true });
+            const meta = store.latestMeeting();
+            const payload = {
+              exportedAt: new Date().toISOString(),
+              provider: meta?.provider ?? null,
+              slides: meta ? store.slides(meta.id) : [],
+              lines: meta ? store.lines(meta.id) : [],
+            };
+            const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+            writeFileSync(join(dir, filename), JSON.stringify(payload, null, 2), "utf-8");
+            lastSavedPath = `exports/${filename}`;
+            broadcast({ type: "saved", path: lastSavedPath });
+            broadcast({ type: "status", text: `저장됨: ${lastSavedPath}` });
+          } catch (e) {
+            const message = e instanceof Error ? e.message : String(e);
+            broadcast({ type: "status", text: `저장 실패: ${message}` });
+          }
+        }
+        else if (cmd.action === "setProvider" && typeof cmd.id === "string") {
           const entry = providerEntries.find((e) => e.id === cmd.id);
           if (!entry) {
             ws.send(JSON.stringify({ type: "status" as const, text: `알 수 없는 프로바이더: ${cmd.id}` }));
@@ -252,10 +273,10 @@ const httpServer = Bun.serve({
             }
           }
         }
-        if (cmd.action === "connectProvider" && typeof cmd.id === "string") {
+        else if (cmd.action === "connectProvider" && typeof cmd.id === "string") {
           connectProvider(cmd.id);
         }
-        if (cmd.action === "setProviderKey" && typeof cmd.id === "string" && typeof cmd.key === "string") {
+        else if (cmd.action === "setProviderKey" && typeof cmd.id === "string" && typeof cmd.key === "string") {
           const envKey = KEY_BY_PROVIDER[cmd.id];
           const key = cmd.key.trim();
           if (!envKey || !key || /[\r\n]/.test(key)) {
@@ -276,7 +297,7 @@ const httpServer = Bun.serve({
             broadcast({ type: "status", text: `${entry?.label ?? cmd.id} 키 저장됨 ✓` });
           }
         }
-        if (cmd.action === "recheckProviders") {
+        else if (cmd.action === "recheckProviders") {
           const claudeOk = checkCliBin("claude");
           const codexOk = checkCliBin("codex");
           for (const e of providerEntries) {
@@ -285,7 +306,14 @@ const httpServer = Bun.serve({
           }
           broadcast(providersMessage());
         }
-      } catch {}
+      } catch (e) {
+        // JSON 파싱 실패 또는 핸들러 내부 예외 — 클라이언트에 피드백.
+        const message = e instanceof Error ? e.message : String(e);
+        console.error("[ws] 메시지 처리 실패:", message);
+        try {
+          ws.send(JSON.stringify({ type: "status" as const, text: `요청 처리 실패: ${message}` }));
+        } catch { /* ws 이미 닫힘 */ }
+      }
     },
     close(ws: ServerWebSocket<undefined>) {
       const listener = wsListeners.get(ws);

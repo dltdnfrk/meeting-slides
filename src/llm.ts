@@ -41,7 +41,8 @@ export function parseBlockDetectionJson(content: string): BlockDetectionResult {
       bullets: bulletsRaw.map((b) => String(b).slice(0, 80)).slice(0, 6),
     };
   } catch {
-    console.error("[LLM] JSON 파싱 실패:", raw.slice(0, 200));
+    // 빈 출력은 정상 no-op(문장 없음 등). 비어있지 않은 비-JSON만 경고로 기록.
+    if (raw.trim().length > 0) console.warn("[LLM] 블록 감지 JSON 파싱 실패:", raw.slice(0, 200));
     return { shouldAdvance: false, blockTitle: "(파싱 실패)", bullets: [] };
   }
 }

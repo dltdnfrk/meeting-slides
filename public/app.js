@@ -40,6 +40,10 @@ const glanceProviderEl = $("glance-provider");
 const glanceDetectEl = $("glance-detect");
 const glanceRecEl = $("glance-rec");
 const captureTimerEl = $("capture-timer");
+const lastSavedEl = $("last-saved");
+const docTitleEl = $("doc-title");
+const docMetaEl = $("doc-meta");
+const pillMetaEl = $("pill-meta");
 
 // 하단 도크 탭
 const tabHistoryEl = $("tab-history");
@@ -132,7 +136,7 @@ function renderThumbnails(history) {
     return;
   }
   thumbnailsEl.innerHTML = history.map((s) => `
-    <div class="thumbnail${viewingHistory && viewingHistory.index === s.index ? " thumbnail--viewing" : ""}" data-index="${escapeHtml(String(s.index))}">
+    <div class="thumbnail${viewingHistory && viewingHistory.index === s.index ? " thumbnail--viewing" : ""}" data-index="${escapeHtml(String(s.index))}" tabindex="0" role="button" aria-label="슬라이드 ${escapeHtml(String(s.index))} 미리보기">
       <div class="thumbnail__index">SLIDE ${escapeHtml(String(s.index).padStart(2, "0"))}</div>
       <div class="thumbnail__title">${escapeHtml(s.title)}</div>
       <ul class="thumbnail__bullets">
@@ -145,6 +149,7 @@ const SPEAKER_COLORS = ["#10b981", "#60a5fa", "#f59e0b", "#f472b6"];
 
 function renderCaption(text, speaker) {
   const live = !!text;
+  if (live) lastCaptionAt = Date.now();
   captionTextEl.textContent = text || "대기 중…";
   islandEl.classList.toggle("island--live", live);
   if (live && speaker) {
@@ -154,6 +159,53 @@ function renderCaption(text, speaker) {
   } else {
     speakerChipEl.hidden = true;
   }
+  renderPill();
+}
+
+// ── Granola식 단일 상태 필 + 문서 헤드 ──
+// 상태 우선순위: 신선한 자막 > AI 생성 중 > 녹음 중 > 대기.
+// 글랜스 메트릭은 필 오른쪽 메타 한 줄에 압축한다.
+let lastCaptionAt = 0;
+let detecting = false;
+let meetingStartTs = 0;
+let providerLabelCur = "";
+
+function fmtMMSS(ms) {
+  const s = Math.floor(ms / 1000);
+  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function renderPill() {
+  const fresh = Date.now() - lastCaptionAt < 2500;
+  if (!fresh) {
+    let text = "대기 중…";
+    if (detecting) text = "✦ AI 슬라이드 만드는 중…";
+    else if (capturing) text = `● 녹음 중 ${fmtMMSS(Date.now() - captureStartedAt)}`;
+    captionTextEl.textContent = text;
+  }
+  islandEl.classList.toggle("island--live", fresh);
+  islandEl.classList.toggle("island--recording", capturing && !fresh);
+  islandEl.classList.toggle("island--detecting", detecting && !fresh);
+  const total = slideHistory.length + (currentSlide ? 1 : 0);
+  pillMetaEl.textContent = [
+    currentSlide ? `SLIDE ${currentSlide.index}/${String(total).padStart(2, "0")}` : null,
+    `LINES ${feedCount}`,
+    providerLabelCur || null,
+  ].filter(Boolean).join(" · ");
+}
+
+function renderDocHead() {
+  // 문서 제목은 회의 정체성 — 슬라이드 제목과 중복되지 않게 회의 단위로
+  docTitleEl.textContent = currentSlide ? "오늘의 회의" : (capturing ? "회의 진행 중" : "회의 준비 중");
+  const total = slideHistory.length + (currentSlide ? 1 : 0);
+  const parts = [];
+  if (meetingStartTs) {
+    parts.push(new Date(meetingStartTs).toLocaleTimeString("ko-KR", { hour12: false, hour: "2-digit", minute: "2-digit" }));
+  }
+  parts.push(`${feedCount}문장`);
+  if (total > 0) parts.push(`${total}슬라이드`);
+  if (providerLabelCur) parts.push(providerLabelCur);
+  docMetaEl.textContent = parts.join(" · ");
 }
 
 function setOnAir(active) {
@@ -176,28 +228,6 @@ function renderStatus(text) {
   }
 }
 
-// ── Export ──
-function getSlidesForExport() {
-  return [...slideHistory, ...(currentSlide ? [currentSlide] : [])];
-}
-
-function exportMarkdown(slides) {
-  const exportedAt = new Date().toISOString();
-  const lines = ["# Meeting Slides", "", `Exported: ${exportedAt}`, ""];
-  for (const slide of slides) {
-    lines.push(`## ${String(slide.index).padStart(2, "0")}. ${slide.title}`, "");
-    for (const bullet of slide.bullets ?? []) {
-      lines.push(`- ${bullet}`);
-    }
-    lines.push("");
-  }
-  return lines.join("\n");
-}
-
-function exportJson(slides) {
-  return JSON.stringify({ exportedAt: new Date().toISOString(), slides }, null, 2);
-}
-
 function downloadText(filename, mime, text) {
   const blob = new Blob([text], { type: mime });
   const url = URL.createObjectURL(blob);
@@ -208,22 +238,6 @@ function downloadText(filename, mime, text) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-}
-
-function exportSlides(format) {
-  const slides = getSlidesForExport();
-  if (slides.length === 0) {
-    renderStatus("저장할 슬라이드 없음");
-    return;
-  }
-  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  if (format === "markdown") {
-    downloadText(`meeting-slides-${stamp}.md`, "text/markdown;charset=utf-8", exportMarkdown(slides));
-    renderStatus(`Markdown 저장 완료 (${slides.length}장)`);
-  } else {
-    downloadText(`meeting-slides-${stamp}.json`, "application/json;charset=utf-8", exportJson(slides));
-    renderStatus(`JSON 저장 완료 (${slides.length}장)`);
-  }
 }
 
 // ── 전사본(원문)보내기 ──
@@ -251,7 +265,10 @@ function renderProviders(msg) {
   currentProvider = msg.current ?? "";
   // 글랜서블: 현재 선택된 프로바이더 라벨 노출
   const curRow = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === currentProvider);
+  providerLabelCur = curRow ? curRow.label : currentProvider;
   glanceProviderEl.textContent = curRow ? curRow.label : (currentProvider || "—");
+  renderDocHead();
+  renderPill();
   const list = Array.isArray(msg.list) ? msg.list : [];
   providerListEl.innerHTML = list.map((p) => {
     const isCli = p.id.startsWith("cli:");
@@ -336,7 +353,10 @@ function renderFeedLine(entry) {
   feedListEl.appendChild(row);
   feedCount += 1;
   feedCountEl.textContent = String(feedCount);
+  if (!meetingStartTs) meetingStartTs = entry.ts;
   renderGlance();
+  renderDocHead();
+  renderPill();
   feedListEl.scrollTop = feedListEl.scrollHeight;
 }
 function renderFeedBacklog(entries) {
@@ -382,6 +402,7 @@ function startCaptureTimer() {
     const s = Math.floor((Date.now() - captureStartedAt) / 1000);
     if (captureTimerEl) captureTimerEl.textContent =
       `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+    renderPill();
   };
   tick();
   captureTimerId = setInterval(tick, 1000);
@@ -408,8 +429,22 @@ btnRecordEl.onclick = () => {
 renderCaptureButton();
 
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
-btnExportMdEl.onclick = () => exportSlides("markdown");
-btnExportJsonEl.onclick = () => exportSlides("json");
+btnExportMdEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "saveNotes" }));
+    renderStatus("Markdown 저장 중…");
+  } else {
+    renderStatus("연결되지 않음 — 저장 불가");
+  }
+};
+btnExportJsonEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "saveJson" }));
+    renderStatus("JSON 저장 중…");
+  } else {
+    renderStatus("연결되지 않음 — 저장 불가");
+  }
+};
 btnExportTranscriptEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     // anarlog 방식: 서버 디스크(exports/)에 저장 — 브라우저 다운로드 차단과 무관
@@ -446,16 +481,26 @@ btnResetEl.onclick = () => {
   renderGlance();
 };
 
-// ── 히스토리 썸네일 클릭 → 과거 슬라이드 미리보기 ──
+// ── 히스토리 썸네일 클릭/키보드 → 과거 슬라이드 미리보기 ──
 // 같은 썸네일 재클릭 / 안내 바 클릭 / Esc 로 라이브 복귀.
-thumbnailsEl.addEventListener("click", (ev) => {
-  const card = ev.target.closest(".thumbnail");
-  if (!card) return;
+/** @param {HTMLElement} card */
+function toggleThumbnailPreview(card) {
   const idx = Number(card.dataset.index);
   const slide = slideHistory.find((s) => s.index === idx);
   if (!slide) return;
   viewingHistory = viewingHistory && viewingHistory.index === slide.index ? null : slide;
   renderMain();
+}
+thumbnailsEl.addEventListener("click", (ev) => {
+  const card = ev.target.closest(".thumbnail");
+  if (card) toggleThumbnailPreview(card);
+});
+thumbnailsEl.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Enter" && ev.key !== " ") return;
+  const card = (ev.target instanceof HTMLElement ? ev.target.closest(".thumbnail") : null);
+  if (!card) return;
+  ev.preventDefault();
+  toggleThumbnailPreview(card);
 });
 
 currentSlideEl.addEventListener("click", (ev) => {
@@ -473,6 +518,17 @@ window.addEventListener("keydown", (ev) => {
   if (ev.key === "Escape" && viewingHistory) {
     viewingHistory = null;
     renderMain();
+    return;
+  }
+  // 입력 필드/패널 안에서는 단축키 무시
+  const tag = (ev.target instanceof HTMLElement ? ev.target.tagName : "").toLowerCase();
+  if (tag === "input" || tag === "textarea" || !providerPanelEl.hidden) return;
+  if (ev.key === "h" || ev.key === "1") setDockTab("history");
+  else if (ev.key === "f" || ev.key === "2") setDockTab("feed");
+  else if (ev.key === "r" && inputMode !== "file") {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
+    }
   }
 });
 
@@ -507,6 +563,8 @@ function connect() {
         }
         renderMain();
         renderThumbnails(slideHistory);
+        renderDocHead();
+        renderPill();
         setOnAir(capturing || !!currentSlide);
       } else if (msg.type === "caption") {
         renderCaption(msg.text, msg.speaker);
@@ -530,10 +588,14 @@ function connect() {
         if (capturing && !wasCapturing && !viewingHistory) setDockTab("feed");
         renderCaptureButton();
         renderCaptureState();
+        renderPill();
+        renderDocHead();
         // ON AIR 표시도 캡처 상태와 연동
         setOnAir(capturing || !!currentSlide);
       } else if (msg.type === "detect") {
+        detecting = !!msg.detecting;
         if (glanceDetectEl) glanceDetectEl.hidden = !msg.detecting;
+        renderPill();
       } else if (msg.type === "saved") {
         renderStatus(`저장됨: ${msg.path}`);
         // 상시 표시 (관찰성: 마지막 저장물 경로를 도크에 고정)

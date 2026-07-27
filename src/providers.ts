@@ -93,7 +93,7 @@ export function upsertEnvText(text: string, entries: Record<string, string>): st
   const out = text.split("\n").map((line) => {
     const idx = line.indexOf("=");
     if (idx <= 0) return line;
-    const key = line.slice(0, idx);
+    const key = line.slice(0, idx).trim();
     if (!(key in entries)) return line;
     seen.add(key);
     return `${key}=${entries[key]}`;

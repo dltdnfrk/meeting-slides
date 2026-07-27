@@ -31,6 +31,10 @@ export class MeetingStore {
     this.db = new Database(path);
     // WAL: 동시 읽기(export/lines) 중 쓰기(addLine)가 블로킹되지 않음. 동기화 비용 ↓.
     this.db.run("PRAGMA journal_mode = WAL");
+    // 락 경합 시 즉시 실패 대신 최대 5초 대기 (WS 핸들러 + whisper 콜백 동시 쓰기).
+    this.db.run("PRAGMA busy_timeout = 5000");
+    // WAL 모드에서 NORMAL은 crash-safe하면서 FULL보다 fsync 횟수가 적어 빠름.
+    this.db.run("PRAGMA synchronous = NORMAL");
     this.db.run(`
       CREATE TABLE IF NOT EXISTS meetings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

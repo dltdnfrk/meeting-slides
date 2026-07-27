@@ -79,9 +79,13 @@
       </div>
     </div>
 
-    <!-- ── 메인: 현재 슬라이드 (히어로) ─────────── -->
+    <!-- ── 메인: 현재 슬라이드 (문서 히어로) ───── -->
     <main class="stage">
       <section class="slide-frame" id="slide-frame">
+        <div class="doc-head">
+          <h1 class="doc-title" id="doc-title">회의 준비 중</h1>
+          <p class="doc-meta" id="doc-meta">녹음을 시작하면 문서가 만들어집니다</p>
+        </div>
         <div class="slide" id="current-slide">
           <div class="slide__placeholder">
             <div class="placeholder__mic">
@@ -98,11 +102,13 @@
         </div>
       </section>
 
-      <!-- 캡션 -->
+      <!-- 상태 필: 캡처/AI/자막/대기 + 핵심 메트릭을 한 줄로 -->
       <section class="island" id="island">
         <span class="island__dot"></span>
         <span class="speaker-chip" id="speaker-chip" hidden></span>
         <span class="island__text" id="caption-text">대기 중…</span>
+        <span class="island__sep"></span>
+        <span class="island__meta" id="pill-meta"></span>
       </section>
     </main>
 

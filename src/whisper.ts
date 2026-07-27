@@ -339,26 +339,37 @@ abstract class WhisperBase {
     proc.stderr?.on("data", (data: Buffer) => {
       const s = data.toString("utf-8");
       rawLog(s);
-      if (/error|fail|cannot|not found|no such/i.test(s)) {
+      // 장치/권한/바이너리 실패 포괄 — no audio device, permission denied 등.
+      if (/error|fail|cannot|not found|no such|no audio|device|permission|denied|unavailable|no capture/i.test(s)) {
         opts.onStatus?.(`[whisper stderr] ${s.trim()}`);
       }
     });
-    proc.on("error", (err) => opts.onError?.(err));
+    // spawn 실패(바이너리 없음/권한) 시 onError 호출 → start() Promise reject로 전파.
+    proc.on("error", (err) => {
+      opts.onError?.(err);
+    });
   }
 
-  protected waitForExit(proc: ChildProcess, opts: WhisperOptions, label: string): Promise<void> {
+  protected waitForExit(proc: ChildProcess, opts: WhisperOptions, label: string, timeoutMs = 0): Promise<void> {
     const { promise, resolve } = Promise.withResolvers<void>();
-    // "close"는 stdio 스트림이 모두 닫힌 후 fire — "exit"는 stdout 데이터가
-    // 아직 도착 전일 수 있어 전사 출력을 잃을 수 있음.
+    let settled = false;
+    const finish = () => { if (!settled) { settled = true; resolve(); } };
     proc.on("close", (code) => {
       this.buf += "\n";
       this.drain(opts.onChunk);
-      // 종료 시 보류 중인 미완결 조각도 버리지 않고 방출
       const rest = this.assembler.flush();
       if (rest) this.emitSentence(rest, opts.onChunk);
       opts.onStatus?.(`${label} 종료 (code=${code})`);
-      resolve();
+      finish();
     });
+    proc.on("error", () => {
+      // attachStdio에서 onError를 이미 호출했으므로 여기서는 회수만.
+      opts.onStatus?.(`${label} spawn 실패 — 프로세스 회수`);
+      finish();
+    });
+    if (timeoutMs > 0) {
+      setTimeout(() => { if (!settled) { finish(); opts.onStatus?.(`${label} 타임아웃 (${timeoutMs}ms)`); } }, timeoutMs);
+    }
     return promise;
   }
 }

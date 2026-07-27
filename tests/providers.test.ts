@@ -41,6 +41,11 @@ describe("upsertEnvText", () => {
     const after = upsertEnvText("A=1\nC=3", { A: "10", B: "2" });
     expect(after).toBe("A=10\nC=3\nB=2");
   });
+
+  test("키 주변 공백이 있어도 매칭", () => {
+    const after = upsertEnvText("FOO = old\nBAR=keep", { FOO: "new" });
+    expect(after).toBe("FOO=new\nBAR=keep");
+  });
 });
 
 describe("createDetector", () => {
