@@ -12,6 +12,8 @@ export interface CliLLMConfig {
   bin: string;                    // claude | codex (또는 전체 경로)
   preset: "claude" | "codex";     // 출력 계약 프리셋
   timeoutMs: number;
+  model?: string;                 // 미지정 시 CLI 기본 모델
+  effort?: string;                // codex: model_reasoning_effort (low|medium|high)
 }
 
 export interface WhisperConfig {

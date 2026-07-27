@@ -23,6 +23,16 @@ describe("buildProviderEntries", () => {
     const list = buildProviderEntries({}, {});
     expect(list.map((p) => p.id)).toEqual(["cli:claude", "cli:codex", "alibaba", "openai", "local"]);
   });
+
+  test("모델/effort 옵션 목록 제공", () => {
+    const list = buildProviderEntries({}, {});
+    // codex는 ChatGPT 계정에서 명시 모델을 거부하므로 프리셋 없음, effort만 제공
+    expect(list.find((p) => p.id === "cli:codex")?.models).toEqual([]);
+    expect(list.find((p) => p.id === "cli:codex")?.efforts).toEqual(["low", "medium", "high"]);
+    expect(list.find((p) => p.id === "cli:claude")?.models).toEqual(["opus", "sonnet", "haiku"]);
+    expect(list.find((p) => p.id === "cli:claude")?.efforts).toBeUndefined();
+    expect(list.find((p) => p.id === "alibaba")?.models).toContain("glm-5.2");
+  });
 });
 
 describe("upsertEnvText", () => {

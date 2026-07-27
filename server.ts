@@ -67,12 +67,20 @@ const providerEntries = buildProviderEntries(process.env, {
   codex: checkCliBin("codex"),
 });
 let currentProviderId = config.llm.cli ? `cli:${config.llm.cli.preset}` : config.llm.provider;
+let currentModel: string | undefined;
+let currentEffort: string | undefined;
 const cliTimeoutMs = config.llm.cli?.timeoutMs ?? 120_000;
 // 관찰성: 마지막 저장 경로를 유지해 클라이언트에 상시 표시
 let lastSavedPath: string | null = null;
 
 function providersMessage(): ProvidersUpdate {
-  return { type: "providers", list: providerEntries, current: currentProviderId };
+  return {
+    type: "providers",
+    list: providerEntries,
+    current: currentProviderId,
+    currentModel,
+    currentEffort,
+  };
 }
 
 function openUrl(url: string): void {
@@ -173,7 +181,7 @@ const httpServer = Bun.serve({
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
       try {
-        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string; key?: string };
+        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string; key?: string; model?: string; effort?: string };
         if (cmd.action === "startCapture") void startCapture();
         else if (cmd.action === "stopCapture") void stopCapture();
         else if (cmd.action === "reset") {
@@ -261,12 +269,20 @@ const httpServer = Bun.serve({
           } else if (!entry.available) {
             ws.send(JSON.stringify({ type: "status" as const, text: `${entry.label}은(는) 설정되지 않았습니다 (CLI 설치/API 키 확인)` }));
           } else {
-            const detector = createDetector(entry.id, { cliTimeoutMs });
+            // 모델/effort 오버라이드 (빈 문자열이면 기본값, effort는 지원 프로바이더만)
+            const model = typeof cmd.model === "string" && cmd.model.trim() ? cmd.model.trim() : undefined;
+            const effort = typeof cmd.effort === "string" && cmd.effort.trim() && (entry.efforts ?? []).includes(cmd.effort.trim())
+              ? cmd.effort.trim()
+              : undefined;
+            const detector = createDetector(entry.id, { cliTimeoutMs, model, effort });
             if (detector) {
               session.setDetector(detector);
               currentProviderId = entry.id;
+              currentModel = model;
+              currentEffort = effort;
+              llmLabel = `${entry.label}${model ? `/${model}` : ""}${effort ? `·${effort}` : ""}`;
               broadcast(providersMessage());
-              broadcast({ type: "status", text: `LLM 변경됨: ${entry.label}` });
+              broadcast({ type: "status", text: `LLM 변경됨: ${llmLabel}` });
               void detector.ping().then((ok) => {
                 if (!ok) broadcast({ type: "status", text: `⚠️ ${entry.label} 연결 확인에 실패했습니다` });
               });

@@ -138,6 +138,10 @@ body {
 .provider-row__connect:hover, .provider-row__save:hover { background: rgba(16,185,129,0.16); }
 .provider-row__key { flex: 1; min-width: 0; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.12); border-radius: 7px; background: var(--z900); color: var(--z100); font-size: 11px; }
 
+.provider-config { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; flex-direction: column; gap: 8px; }
+.provider-config__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--z500); }
+.provider-config__select { flex: 1; max-width: 190px; padding: 5px 8px; border: 1px solid rgba(255,255,255,0.12); border-radius: 7px; background: var(--z900); color: var(--z100); font-size: 11px; }
+
 /* ── 글랜서블 상태 스트립 ── */
 .glance {
   display: flex;

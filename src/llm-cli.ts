@@ -23,9 +23,16 @@ import type { CliLLMConfig } from "./config.js";
 
 export function buildCliArgs(cfg: CliLLMConfig, prompt: string, outFile?: string): string[] {
   if (cfg.preset === "codex") {
-    return ["exec", "--skip-git-repo-check", "-o", outFile ?? join(tmpdir(), "codex-last.txt"), prompt];
+    const args = ["exec", "--skip-git-repo-check"];
+    if (cfg.model) args.push("-m", cfg.model);
+    // reasoning effort는 codex config 오버라이드로 전달 (TOML 문자열)
+    if (cfg.effort) args.push("-c", `model_reasoning_effort="${cfg.effort}"`);
+    args.push("-o", outFile ?? join(tmpdir(), "codex-last.txt"), prompt);
+    return args;
   }
-  return ["-p", prompt, "--output-format", "text"];
+  const args = ["-p", prompt, "--output-format", "text"];
+  if (cfg.model) args.push("--model", cfg.model);
+  return args;
 }
 
 function runCli(cfg: CliLLMConfig, prompt: string): Promise<string> {

@@ -44,6 +44,9 @@ const lastSavedEl = $("last-saved");
 const docTitleEl = $("doc-title");
 const docMetaEl = $("doc-meta");
 const pillMetaEl = $("pill-meta");
+const selectModelEl = $("select-model");
+const selectEffortEl = $("select-effort");
+const effortRowEl = $("effort-row");
 
 // 하단 도크 탭
 const tabHistoryEl = $("tab-history");
@@ -265,8 +268,11 @@ function renderProviders(msg) {
   currentProvider = msg.current ?? "";
   // 글랜서블: 현재 선택된 프로바이더 라벨 노출
   const curRow = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === currentProvider);
-  providerLabelCur = curRow ? curRow.label : currentProvider;
+  providerLabelCur = curRow
+    ? curRow.label + (msg.currentModel ? `/${msg.currentModel}` : "") + (msg.currentEffort ? `·${msg.currentEffort}` : "")
+    : currentProvider;
   glanceProviderEl.textContent = curRow ? curRow.label : (currentProvider || "—");
+  renderProviderConfig(msg);
   renderDocHead();
   renderPill();
   const list = Array.isArray(msg.list) ? msg.list : [];
@@ -294,6 +300,35 @@ function renderProviders(msg) {
     </div>`;
   }).join("");
 }
+
+// ── 현재 프로바이더의 모델/effort 선택 ──
+function renderProviderConfig(msg) {
+  const entry = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === msg.current);
+  const models = entry?.models ?? [];
+  selectModelEl.disabled = models.length === 0;
+  selectModelEl.innerHTML = `<option value="">기본값</option>` + models.map((m) =>
+    `<option value="${escapeHtml(m)}"${m === msg.currentModel ? " selected" : ""}>${escapeHtml(m)}</option>`,
+  ).join("");
+
+  const efforts = entry?.efforts ?? [];
+  effortRowEl.hidden = efforts.length === 0;
+  selectEffortEl.innerHTML = `<option value="">기본값</option>` + efforts.map((e) =>
+    `<option value="${e}"${e === msg.currentEffort ? " selected" : ""}>${e}</option>`,
+  ).join("");
+}
+
+function sendProviderSelection() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      action: "setProvider",
+      id: currentProvider,
+      model: selectModelEl.value,
+      effort: effortRowEl.hidden ? "" : selectEffortEl.value,
+    }));
+  }
+}
+selectModelEl.onchange = sendProviderSelection;
+selectEffortEl.onchange = sendProviderSelection;
 
 btnSettingsEl.onclick = (ev) => {
   ev.stopPropagation();

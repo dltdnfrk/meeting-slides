@@ -66,12 +66,16 @@ export interface ProviderInfo {
   label: string;
   detail: string;
   available: boolean;
+  models?: string[];
+  efforts?: string[];
 }
 
 export interface ProvidersUpdate {
   type: "providers";
   list: ProviderInfo[];
   current: string;
+  currentModel?: string;
+  currentEffort?: string;
 }
 
 export interface CaptureUpdate {

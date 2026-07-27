@@ -17,6 +17,25 @@ describe("buildCliArgs", () => {
     expect(args[args.indexOf("-o") + 1]).toBe("/tmp/out.txt");
     expect(args[args.length - 1]).toBe("프롬프트");
   });
+
+  test("codex: 모델/effort 오버라이드 인자", () => {
+    const args = buildCliArgs(
+      { bin: "codex", preset: "codex", timeoutMs: 1000, model: "gpt-5.2", effort: "high" },
+      "프롬프트",
+      "/tmp/out.txt",
+    );
+    expect(args[args.indexOf("-m") + 1]).toBe("gpt-5.2");
+    expect(args[args.indexOf("-c") + 1]).toBe('model_reasoning_effort="high"');
+  });
+
+  test("claude: 모델 오버라이드 인자", () => {
+    const args = buildCliArgs(
+      { bin: "claude", preset: "claude", timeoutMs: 1000, model: "opus" },
+      "프롬프트",
+    );
+    expect(args).toContain("--model");
+    expect(args[args.indexOf("--model") + 1]).toBe("opus");
+  });
 });
 
 describe("parseBlockDetectionJson", () => {

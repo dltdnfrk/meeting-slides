@@ -35,48 +35,76 @@ export function buildProviderEntries(
       label: "Claude (구독)",
       detail: "claude CLI — Claude Pro/Max 구독 인증",
       available: cliAvailable["claude"] ?? false,
+      models: PROVIDER_MODELS["cli:claude"],
     },
     {
       id: "cli:codex",
       label: "GPT (구독)",
       detail: "codex CLI — ChatGPT 구독 인증",
       available: cliAvailable["codex"] ?? false,
+      models: PROVIDER_MODELS["cli:codex"],
+      efforts: PROVIDER_EFFORTS["cli:codex"],
     },
     {
       id: "alibaba",
       label: "Alibaba GLM",
       detail: env.ALIBABA_TOKEN_PLAN_MODEL ?? "glm-5.2",
       available: Boolean(env.ALIBABA_TOKEN_PLAN_API_KEY),
+      models: PROVIDER_MODELS["alibaba"],
     },
     {
       id: "openai",
       label: "OpenAI API",
       detail: env.OPENAI_MODEL ?? "gpt-4o-mini",
       available: Boolean(env.OPENAI_API_KEY),
+      models: PROVIDER_MODELS["openai"],
     },
     {
       id: "local",
       label: "로컬 llama.cpp",
       detail: env.LOCAL_LLM_BASE_URL ?? "미설정",
       available: Boolean(env.LOCAL_LLM_BASE_URL),
+      models: [],
     },
   ];
 }
 
-/** id로 BlockDetector 생성. 알 수 없거나 설정 누락이면 null. */
-export function createDetector(id: string, opts: { cliTimeoutMs: number }): BlockDetector | null {
+/** id로 BlockDetector 생성. model/effort 오버라이드 지원, 알 수 없거나 설정 누락이면 null. */
+export function createDetector(
+  id: string,
+  opts: { cliTimeoutMs: number; model?: string; effort?: string },
+): BlockDetector | null {
   if (id === "cli:claude") {
-    return new CliLLMClient({ bin: "claude", preset: "claude", timeoutMs: opts.cliTimeoutMs });
+    return new CliLLMClient({ bin: "claude", preset: "claude", timeoutMs: opts.cliTimeoutMs, model: opts.model });
   }
   if (id === "cli:codex") {
-    return new CliLLMClient({ bin: "codex", preset: "codex", timeoutMs: opts.cliTimeoutMs });
+    return new CliLLMClient({ bin: "codex", preset: "codex", timeoutMs: opts.cliTimeoutMs, model: opts.model, effort: opts.effort });
   }
   try {
-    return new LLMClient(resolveLLMConfig(id));
+    const cfg = resolveLLMConfig(id);
+    if (opts.model) cfg.model = opts.model;
+    return new LLMClient(cfg);
   } catch {
     return null;
   }
 }
+
+/** 프로바이더별 선택 가능 모델 프리셋 (빈 배열 = 프리셋 없음/기본 모델만)
+ *  주의: ChatGPT 계정의 codex는 명시 모델(-m gpt-5.2/5.1/5)을 전부 거부한다
+ *  ("not supported when using Codex with a ChatGPT account") — 기본 모델만
+ *  사용 가능하고, 대신 reasoning effort는 조절할 수 있다. */
+export const PROVIDER_MODELS: Record<string, string[]> = {
+  "cli:codex": [],
+  "cli:claude": ["opus", "sonnet", "haiku"],
+  alibaba: ["glm-5.2", "glm-5.1", "glm-4.7"],
+  openai: ["gpt-4o-mini", "gpt-4o"],
+  local: [],
+};
+
+/** reasoning effort를 지원하는 프로바이더와 수준 */
+export const PROVIDER_EFFORTS: Record<string, string[]> = {
+  "cli:codex": ["low", "medium", "high"],
+};
 
 /** API 키로 연결하는 프로바이더의 env 변수 매핑 (카드의 키 붙여넣기용) */
 export const KEY_BY_PROVIDER: Record<string, string> = {
