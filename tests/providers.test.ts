@@ -26,8 +26,8 @@ describe("buildProviderEntries", () => {
 
   test("모델/effort 옵션 목록 제공", () => {
     const list = buildProviderEntries({}, {});
-    // codex는 ChatGPT 계정에서 명시 모델을 거부하므로 프리셋 없음, effort만 제공
-    expect(list.find((p) => p.id === "cli:codex")?.models).toEqual([]);
+    // codex는 이 계정에서 검증된 gpt-5.6 시리즈 + effort 제공
+    expect(list.find((p) => p.id === "cli:codex")?.models).toEqual(["gpt-5.6-sol", "gpt-5.6-luna", "gpt-5.6-terra"]);
     expect(list.find((p) => p.id === "cli:codex")?.efforts).toEqual(["low", "medium", "high"]);
     expect(list.find((p) => p.id === "cli:claude")?.models).toEqual(["opus", "sonnet", "haiku"]);
     expect(list.find((p) => p.id === "cli:claude")?.efforts).toBeUndefined();

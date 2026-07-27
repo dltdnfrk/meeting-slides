@@ -90,11 +90,10 @@ export function createDetector(
 }
 
 /** 프로바이더별 선택 가능 모델 프리셋 (빈 배열 = 프리셋 없음/기본 모델만)
- *  주의: ChatGPT 계정의 codex는 명시 모델(-m gpt-5.2/5.1/5)을 전부 거부한다
- *  ("not supported when using Codex with a ChatGPT account") — 기본 모델만
- *  사용 가능하고, 대신 reasoning effort는 조절할 수 있다. */
+ *  이 계정의 codex가 지원하는 모델을 실제 호출로 검증한 목록이다
+ *  (gpt-5.2/5.1/5는 거부됨, gpt-5.6 sol/luna/terra는 지원 확인). */
 export const PROVIDER_MODELS: Record<string, string[]> = {
-  "cli:codex": [],
+  "cli:codex": ["gpt-5.6-sol", "gpt-5.6-luna", "gpt-5.6-terra"],
   "cli:claude": ["opus", "sonnet", "haiku"],
   alibaba: ["glm-5.2", "glm-5.1", "glm-4.7"],
   openai: ["gpt-4o-mini", "gpt-4o"],
