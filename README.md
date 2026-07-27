@@ -35,11 +35,11 @@ WebSocket /ws ── public/app.js ── 슬라이드·자막·히스토리 렌
   ```bash
   brew install whisper.cpp   # whisper-stream, whisper-cli 제공
   ```
-- ggml 모델 파일 (medium 권장, 한국어 품질은 large-v3가 더 좋음):
+- ggml 모델 파일 (**large-v3-turbo 권장** — large급 정확도 + 실시간 속도):
   ```bash
   mkdir -p models
-  curl -L -o models/ggml-medium.bin \
-    https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+  curl -L -o models/ggml-large-v3-turbo.bin \
+    https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
   ```
 - LLM 프로바이더 1개 (택일):
   - **구독 서비스 CLI** — API 키 없이 구독 인증 재사용: `claude`(Claude Pro/Max) 또는 `codex`(ChatGPT)
