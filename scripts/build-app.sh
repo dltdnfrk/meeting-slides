@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 # ============================================================
-# build-app.sh — Meeting Slides.app 번들 생성
+# build-app.sh — Meeting Slides.app 번들 생성 (네이티브 런처)
 # ============================================================
-# anarlog 방식: 앱 번들이 마이크 권한(TCC)의 주체가 되어 터미널 없이
-# 더블클릭으로 서버를 실행한다. 권한 프롬프트는 최초 1회만 뜬다.
+# macOS는 Mach-O 네이티브 바이너리 + 번들 조합만 마이크 권한(TCC)의
+# 주체로 인정한다. 그래서 macos/launcher.swift를 컴파일해 넣고
+# ad-hoc 코드사인으로 번들 정체성을 고정한다.
 set -euo pipefail
 
 APP="Meeting Slides.app"
 PROJ="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJ"
+
+if ! command -v swiftc >/dev/null 2>&1; then
+  echo "swiftc가 필요합니다 (Xcode Command Line Tools: xcode-select --install)"
+  exit 1
+fi
 
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
@@ -31,58 +37,18 @@ cat > "$APP/Contents/Info.plist" <<'EOF'
 </plist>
 EOF
 
-cat > "$APP/Contents/MacOS/meeting-slides" <<'EOF'
-#!/bin/bash
-# Meeting Slides 런처 — 앱 번들이 프로세스 트리의 뿌리라
-# 마이크 권한이 "Meeting Slides" 앱에 귀속된다.
-APP_BUNDLE="$(cd "$(dirname "$0")/../.." && pwd)"
-PROJ="$(cd "$APP_BUNDLE/.." && pwd)"
-cd "$PROJ" || exit 1
-
-find_bun() {
-  if command -v bun >/dev/null 2>&1; then command -v bun; return; fi
-  for p in "$HOME/.bun/bin/bun" /opt/homebrew/bin/bun /usr/local/bin/bun; do
-    [ -x "$p" ] && { echo "$p"; return; }
-  done
-  return 1
-}
-
-BUN="$(find_bun)" || {
-  osascript -e 'display dialog "bun이 필요합니다. https://bun.sh 에서 설치 후 다시 실행해주세요." buttons {"확인"} default button 1 with icon stop with title "Meeting Slides"' >/dev/null 2>&1 || true
-  exit 1
-}
-
-if [ "${1:-}" = "--mic-check" ]; then
-  # 마이크 권한 프롬프트를 앱 이름으로 한 번 띄우기 위한 트리거.
-  STREAM_BIN="${WHISPER_STREAM_BIN:-/opt/homebrew/bin/whisper-stream}"
-  MODEL="${WHISPER_MODEL_PATH:-./models/ggml-medium.bin}"
-  if [ -x "$STREAM_BIN" ] && [ -f "$MODEL" ]; then
-    "$STREAM_BIN" -m "$MODEL" -l ko -t 2 --step 1000 --length 3000 --keep 200 -c "${WHISPER_CAPTURE_ID:--1}" -fa >/dev/null 2>&1 &
-    PID=$!
-    sleep 5
-    kill "$PID" 2>/dev/null || true
-  fi
-  exit 0
-fi
-
-# 이미 서버가 떠 있으면 브라우저만 연다
-PORT="${HTTP_PORT:-8787}"
-if curl -s -m 1 -o /dev/null "http://127.0.0.1:$PORT/"; then
-  open "http://localhost:$PORT/"
-  exit 0
-fi
-
-exec "$BUN" run server.ts
-EOF
-
+echo "▶ 런처 컴파일 중 (macos/launcher.swift)…"
+swiftc -O -o "$APP/Contents/MacOS/meeting-slides" macos/launcher.swift \
+  -framework AVFoundation -framework AppKit -framework Foundation
 chmod +x "$APP/Contents/MacOS/meeting-slides"
 
+echo "▶ ad-hoc 코드사인 중…"
+codesign --force --deep --sign - "$APP"
+
+echo ""
 echo "✅ 빌드 완료: $PROJ/$APP"
 echo ""
 echo "사용법:"
 echo "  1. 최초 1회: Finder에서 '$APP' 우클릭 → 열기 (Gatekeeper)"
-echo "  2. 마이크 권한 프롬프트가 뜨면 허용 (이후 영구 적용)"
-echo "  3. 이후에는 더블클릭/Spotlight로 바로 실행"
-echo ""
-echo "권한 프롬프트를 미리 띄우려면:"
-echo "  open -a \"$APP\" --args --mic-check"
+echo "  2. \"Meeting Slides\" 마이크 권한 프롬프트 → 허용 (영구 적용)"
+echo "  3. 이후 더블클릭/Spotlight로 실행하면 서버 + 브라우저 자동 오픈"
