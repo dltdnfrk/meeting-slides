@@ -43,6 +43,8 @@ export interface TranscriptUpdate {
   type: "transcript";
   entries: TranscriptEntry[];
   reason?: "snapshot" | "export";
+  /** 로그 상한 도달로 예전 문장이 잘렸는지 여부 (내보내기 시 경고 표시용) */
+  truncated?: boolean;
 }
 
 /** 실시간 전사 피드용 확정 문장 한 줄 */
@@ -78,7 +80,19 @@ export interface CaptureUpdate {
   mode: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | LineUpdate;
+/** LLM 블록 감지 진행 표시 (관찰성: 사람·AI 모두 "지금 만드는 중"을 읽을 수 있게) */
+export interface DetectUpdate {
+  type: "detect";
+  detecting: boolean;
+}
+
+/** 저장 완료 경로 표시 */
+export interface SavedUpdate {
+  type: "saved";
+  path: string;
+}
+
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | LineUpdate | DetectUpdate | SavedUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 
@@ -101,6 +115,7 @@ export class MeetingSession {
   // 전사본보내기용 전체 로그. sentences[]는 LLM 컨텍스트용이라 상한(200)을
   // 두지만, 전사 원문은 회의 끝까지 전부 보관한다 (50k 안전 상한).
   private transcriptLog: TranscriptEntry[] = [];
+  private transcriptTruncated = false;
   private static readonly MAX_TRANSCRIPT_ENTRIES = 50_000;
   private currentSlide: Slide | null = null;
   private history: Slide[] = [];
@@ -136,7 +151,12 @@ export class MeetingSession {
   }
 
   transcript(reason: "snapshot" | "export" = "export"): TranscriptUpdate {
-    return { type: "transcript", entries: [...this.transcriptLog], reason };
+    return {
+      type: "transcript",
+      entries: [...this.transcriptLog],
+      reason,
+      truncated: this.transcriptTruncated,
+    };
   }
 
   async flush(): Promise<void> {
@@ -171,6 +191,7 @@ export class MeetingSession {
     }
     if (this.transcriptLog.length > MeetingSession.MAX_TRANSCRIPT_ENTRIES) {
       this.transcriptLog.shift();
+      this.transcriptTruncated = true;
     }
     // 장시간 회의 메모리 상한
     if (this.sentences.length > MeetingSession.MAX_SENTENCES) {
@@ -218,6 +239,7 @@ export class MeetingSession {
     const context = this.sentences.slice(-this.contextWindow);
     this.lastDetectCount = this.sentences.length;
     this.detecting = true;
+    this.broadcast({ type: "detect", detecting: true });
     const epoch = this.epoch;
     try {
       const result = await this.llm.detectBlock(context);
@@ -231,6 +253,7 @@ export class MeetingSession {
       this.applyDetection(this.fallbackDetect(context));
     } finally {
       this.detecting = false;
+      this.broadcast({ type: "detect", detecting: false });
     }
   }
 
@@ -336,6 +359,7 @@ export class MeetingSession {
     }
     this.sentences = [];
     this.transcriptLog = [];
+    this.transcriptTruncated = false;
     this.currentSlide = null;
     this.history = [];
     this.slideIndex = 0;

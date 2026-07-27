@@ -25,9 +25,12 @@ export class MeetingStore {
   private db: Database;
   private meetingId: number | null = null;
   private lineSeq = 0;
+  private addSlideTx!: (slide: { idx: number; title: string; bullets: string[]; startedAt: number }) => void;
 
   constructor(path = "meetings.db") {
     this.db = new Database(path);
+    // WAL: 동시 읽기(export/lines) 중 쓰기(addLine)가 블로킹되지 않음. 동기화 비용 ↓.
+    this.db.run("PRAGMA journal_mode = WAL");
     this.db.run(`
       CREATE TABLE IF NOT EXISTS meetings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,6 +57,17 @@ export class MeetingStore {
       CREATE INDEX IF NOT EXISTS idx_lines_meeting ON transcript_lines(meeting_id, seq);
       CREATE INDEX IF NOT EXISTS idx_slides_meeting ON slides(meeting_id, idx);
     `);
+
+    this.addSlideTx = this.db.transaction((slide: { idx: number; title: string; bullets: string[]; startedAt: number }): void => {
+      if (this.meetingId === null) return;
+      this.db.run("INSERT INTO slides (meeting_id, idx, title, bullets, started_at) VALUES (?, ?, ?, ?, ?)", [
+        this.meetingId,
+        slide.idx,
+        slide.title,
+        JSON.stringify(slide.bullets),
+        slide.startedAt,
+      ]);
+    });
   }
 
   /** 캡처 시작 = 새 회의 */
@@ -82,16 +96,11 @@ export class MeetingStore {
     ]);
   }
 
+  /** 한 슬라이드를 원자적으로 기록 (트랜잭션: idx 중복 방지는 호출자 책임) */
   addSlide(slide: { idx: number; title: string; bullets: string[]; startedAt: number }): void {
-    if (this.meetingId === null) return;
-    this.db.run("INSERT INTO slides (meeting_id, idx, title, bullets, started_at) VALUES (?, ?, ?, ?, ?)", [
-      this.meetingId,
-      slide.idx,
-      slide.title,
-      JSON.stringify(slide.bullets),
-      slide.startedAt,
-    ]);
+    this.addSlideTx(slide);
   }
+
 
   lines(meetingId?: number): StoredLine[] {
     const id = meetingId ?? this.meetingId;
@@ -112,10 +121,10 @@ export class MeetingStore {
 
   /** anarlog식 Markdown export: 헤더 + 슬라이드 요약 + 전체 전사본 */
   exportMarkdown(meetingId?: number): string {
-    const id = meetingId ?? this.meetingId;
+    const id = meetingId ?? this.meetingId ?? undefined;
     const lines = this.lines(id);
     const slides = this.slides(id);
-    const meta = id === null
+    const meta = id === undefined
       ? null
       : (this.db.query("SELECT started_at, ended_at, provider FROM meetings WHERE id = ?").get(id) as
           { started_at: number; ended_at: number | null; provider: string | null } | null);

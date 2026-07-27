@@ -6,11 +6,10 @@
 //
 // 출력 계약:
 //   claude: `claude -p <prompt> --output-format text` → 최종 텍스트가 stdout
-//   codex:  `codex exec -o <file> <prompt>` → 진행 로그가 stdout에 섞이므로
-//           최종 메시지만 파일로 받아 읽는다 (실행 후 임시 디렉터리 삭제).
+//           최종 메시지만 파일로 받아 읽는다 (서버 종료 시 자동 정리되는 단일 재사용 파일).
 
 import { spawn } from "child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -30,31 +29,42 @@ export function buildCliArgs(cfg: CliLLMConfig, prompt: string, outFile?: string
 }
 
 function runCli(cfg: CliLLMConfig, prompt: string): Promise<string> {
-  const dir = cfg.preset === "codex" ? mkdtempSync(join(tmpdir(), "meeting-slides-codex-")) : null;
-  const outFile = dir ? join(dir, "last.txt") : undefined;
+  // codex preset만 임시 출력 파일이 필요. 매 호출마다 mkdtempSync/rmSync 하면
+  // 회의 한 번에 수십~수백 회 I/O 발생 → 파일 하나 재사용 (서버 종료 시 OS가 정리).
+  const outFile = cfg.preset === "codex" ? join(tmpdir(), `meeting-slides-codex-${process.pid}.txt`) : undefined;
   const cleanup = () => {
-    if (dir) rmSync(dir, { recursive: true, force: true });
+    if (outFile) try { rmSync(outFile, { force: true }); } catch {}
   };
 
   return new Promise<string>((resolve, reject) => {
     const proc = spawn(cfg.bin, buildCliArgs(cfg, prompt, outFile), { stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
     let stderrTail = "";
+    let settled = false;
     const timer = setTimeout(() => {
+      if (settled) return;
       proc.kill("SIGKILL");
+      // 타임아웃 후에도 stdout/stderr 'data' 콜백이 들어와 메모리/CPU 낭비 → 파괴.
+      proc.stdout?.destroy();
+      proc.stderr?.destroy();
       cleanup();
+      settled = true;
       reject(new Error(`CLI 타임아웃 (${cfg.timeoutMs}ms): ${cfg.bin}`));
     }, cfg.timeoutMs);
 
     proc.stdout?.on("data", (d: Buffer) => { stdout += d.toString("utf-8"); });
     proc.stderr?.on("data", (d: Buffer) => { stderrTail = (stderrTail + d.toString("utf-8")).slice(-500); });
     proc.on("error", (err) => {
+      if (settled) return;
       clearTimeout(timer);
       cleanup();
+      settled = true;
       reject(err);
     });
     proc.on("close", (code) => {
+      if (settled) return;
       clearTimeout(timer);
+      settled = true;
       try {
         if (code !== 0) {
           reject(new Error(`${cfg.bin} 종료 코드 ${code}: ${stderrTail.trim() || "(stderr 없음)"}`));

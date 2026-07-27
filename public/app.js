@@ -30,6 +30,24 @@ const feedListEl = $("feed-list");
 const feedCountEl = $("feed-count");
 const btnResetEl = $("btn-reset");
 
+// 글랜서블 상태 스트립
+const appEl = document.querySelector(".app");
+const glanceCaptureEl = $("glance-capture");
+const glanceCaptureLabelEl = glanceCaptureEl.querySelector(".glance__label");
+const glanceSlideEl = $("glance-slide");
+const glanceLinesEl = $("glance-lines");
+const glanceProviderEl = $("glance-provider");
+const glanceDetectEl = $("glance-detect");
+const glanceRecEl = $("glance-rec");
+const captureTimerEl = $("capture-timer");
+
+// 하단 도크 탭
+const tabHistoryEl = $("tab-history");
+const tabFeedEl = $("tab-feed");
+const dockHistoryEl = $("dock-history");
+const dockFeedEl = $("dock-feed");
+const feedTruncEl = $("feed-trunc");
+
 let currentSlide = null;
 let slideHistory = [];
 let ws = null;
@@ -79,20 +97,27 @@ function renderSlide(slide) {
   setOnAir(true);
   currentSlideEl.innerHTML = slideHtml(slide);
 }
-
-// 메인 스테이지 렌더: 히스토리 미리보기 중이면 그 슬라이드 + 복귀 안내를,
-// 아니면 라이브 슬라이드를 보여준다.
 function renderMain() {
   if (!viewingHistory) {
     renderSlide(currentSlide);
-    return;
+  } else {
+    setOnAir(true);
+    currentSlideEl.innerHTML = `
+      <button type="button" class="slide__notice">
+        SLIDE ${escapeHtml(String(viewingHistory.index).padStart(2, "0"))} 미리보기 · 클릭하면 라이브로 복귀 (Esc)
+      </button>
+      ${slideHtml(viewingHistory)}`;
   }
-  setOnAir(true);
-  currentSlideEl.innerHTML = `
-    <button type="button" class="slide__notice">
-      SLIDE ${escapeHtml(String(viewingHistory.index).padStart(2, "0"))} 미리보기 · 클릭하면 라이브로 복귀 (Esc)
-    </button>
-    ${slideHtml(viewingHistory)}`;
+  renderGlance();
+}
+
+// 글랜서블 스트립: 현재 슬라이드 인덱스 + 히스토리 수 + 전사 줄 수.
+function renderGlance() {
+  const cur = viewingHistory ?? currentSlide;
+  const total = slideHistory.length + (currentSlide ? 1 : 0);
+  const idx = cur ? String(cur.index).padStart(2, "0") : "00";
+  glanceSlideEl.textContent = `${idx}/${String(total).padStart(2, "0")}`;
+  glanceLinesEl.textContent = String(feedCount);
 }
 
 function renderThumbnails(history) {
@@ -102,7 +127,7 @@ function renderThumbnails(history) {
     thumbnailsEl.innerHTML = `
       <div class="filmstrip__empty">
         <span class="filmstrip__empty-ring"></span>
-        아직 슬라이드가<br>없습니다
+        <span>슬라이드가 없습니다</span>
       </div>`;
     return;
   }
@@ -119,9 +144,10 @@ function renderThumbnails(history) {
 const SPEAKER_COLORS = ["#10b981", "#60a5fa", "#f59e0b", "#f472b6"];
 
 function renderCaption(text, speaker) {
-  captionTextEl.textContent = text;
-  islandEl.classList.toggle("island--live", !!text);
-  if (speaker) {
+  const live = !!text;
+  captionTextEl.textContent = text || "대기 중…";
+  islandEl.classList.toggle("island--live", live);
+  if (live && speaker) {
     speakerChipEl.hidden = false;
     speakerChipEl.textContent = `화자 ${speaker}`;
     speakerChipEl.style.setProperty("--chip-color", SPEAKER_COLORS[(speaker - 1) % SPEAKER_COLORS.length]);
@@ -223,6 +249,9 @@ let currentProvider = "";
 
 function renderProviders(msg) {
   currentProvider = msg.current ?? "";
+  // 글랜서블: 현재 선택된 프로바이더 라벨 노출
+  const curRow = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === currentProvider);
+  glanceProviderEl.textContent = curRow ? curRow.label : (currentProvider || "—");
   const list = Array.isArray(msg.list) ? msg.list : [];
   providerListEl.innerHTML = list.map((p) => {
     const isCli = p.id.startsWith("cli:");
@@ -307,27 +336,66 @@ function renderFeedLine(entry) {
   feedListEl.appendChild(row);
   feedCount += 1;
   feedCountEl.textContent = String(feedCount);
+  renderGlance();
   feedListEl.scrollTop = feedListEl.scrollHeight;
 }
-
 function renderFeedBacklog(entries) {
   feedListEl.innerHTML = "";
   feedCount = 0;
   feedCountEl.textContent = "0";
+  feedListEl.scrollTop = 0;
   if (!entries || entries.length === 0) {
     feedListEl.innerHTML = `<div class="feed__empty">녹음을 시작하면<br>전사가 여기에 흐릅니다</div>`;
     return;
   }
+  // 각 line은 renderFeedLine이 feedCount를 증가시키고 renderGlance를 갱신한다.
+  // backlog 시작점에서 카운트/스크롤을 리셋하고, 한 번만 끝단에서 정리.
   for (const e of entries) renderFeedLine(e);
+  renderGlance();
+  feedListEl.scrollTop = feedListEl.scrollHeight;
 }
 
 // ── 녹음 시작/중지 버튼 ──
 let capturing = false;
 let inputMode = "mic";
 
+function renderCaptureState() {
+  if (capturing) {
+    appEl.classList.add("app--capturing");
+    if (glanceCaptureLabelEl) glanceCaptureLabelEl.textContent = "녹음 중";
+    startCaptureTimer();
+  } else {
+    appEl.classList.remove("app--capturing");
+    if (glanceCaptureLabelEl) glanceCaptureLabelEl.textContent = currentSlide ? "진행 중" : "대기";
+    stopCaptureTimer();
+  }
+}
+
+// ── 녹음 경과 타이머 (클라이언트 기준: capture 시작 시각 추정) ──
+let captureStartedAt = 0;
+let captureTimerId = null;
+function startCaptureTimer() {
+  if (captureTimerId !== null) return;
+  captureStartedAt = Date.now();
+  if (glanceRecEl) glanceRecEl.hidden = false;
+  const tick = () => {
+    const s = Math.floor((Date.now() - captureStartedAt) / 1000);
+    if (captureTimerEl) captureTimerEl.textContent =
+      `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+  };
+  tick();
+  captureTimerId = setInterval(tick, 1000);
+}
+function stopCaptureTimer() {
+  if (captureTimerId !== null) { clearInterval(captureTimerId); captureTimerId = null; }
+  if (glanceRecEl) glanceRecEl.hidden = true;
+}
+
 function renderCaptureButton() {
   btnRecordEl.hidden = inputMode === "file";
   btnRecordEl.classList.toggle("record-btn--on", capturing);
+  btnRecordEl.setAttribute("aria-pressed", String(capturing));
+  btnRecordEl.setAttribute("aria-label", capturing ? "녹음 중지" : "녹음 시작");
   const label = btnRecordEl.querySelector(".record-btn__label");
   if (label) label.textContent = capturing ? "중지" : "녹음 시작";
 }
@@ -365,12 +433,17 @@ btnResetEl.onclick = () => {
   currentSlide = null;
   slideHistory = [];
   viewingHistory = null;
+  feedCount = 0;
+  feedCountEl.textContent = "0";
+  feedTruncEl.hidden = true;
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "reset" }));
     renderStatus("세션 초기화 요청됨");
   } else {
     renderStatus("연결되지 않음 — 초기화 불가");
   }
+  renderMain();
+  renderGlance();
 };
 
 // ── 히스토리 썸네일 클릭 → 과거 슬라이드 미리보기 ──
@@ -403,6 +476,19 @@ window.addEventListener("keydown", (ev) => {
   }
 });
 
+// ── 하단 도크 탭 전환 ──
+function setDockTab(which) {
+  const toFeed = which === "feed";
+  tabHistoryEl.classList.toggle("dock__tab--active", !toFeed);
+  tabHistoryEl.setAttribute("aria-selected", String(!toFeed));
+  tabFeedEl.classList.toggle("dock__tab--active", toFeed);
+  tabFeedEl.setAttribute("aria-selected", String(toFeed));
+  dockHistoryEl.hidden = toFeed;
+  dockFeedEl.hidden = !toFeed;
+}
+tabHistoryEl.addEventListener("click", () => setDockTab("history"));
+tabFeedEl.addEventListener("click", () => setDockTab("feed"));
+
 // ── WebSocket ──
 function connect() {
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
@@ -421,11 +507,13 @@ function connect() {
         }
         renderMain();
         renderThumbnails(slideHistory);
+        setOnAir(capturing || !!currentSlide);
       } else if (msg.type === "caption") {
         renderCaption(msg.text, msg.speaker);
       } else if (msg.type === "transcript") {
         if (msg.reason === "snapshot") {
           renderFeedBacklog(msg.entries);
+          feedTruncEl.hidden = !msg.truncated;
         } else {
           exportTranscript(msg.entries);
         }
@@ -434,11 +522,26 @@ function connect() {
       } else if (msg.type === "providers") {
         renderProviders(msg);
       } else if (msg.type === "capture") {
+        const wasCapturing = capturing;
         capturing = !!msg.capturing;
         inputMode = msg.mode ?? "mic";
+        // 녹음 시작 시 전사 탭으로 전환해 진행 과정이 바로 보이도록.
+        // 단, 슬라이드 미리보기 중에는 사용자의 시선을 끊지 않는다.
+        if (capturing && !wasCapturing && !viewingHistory) setDockTab("feed");
         renderCaptureButton();
+        renderCaptureState();
         // ON AIR 표시도 캡처 상태와 연동
         setOnAir(capturing || !!currentSlide);
+      } else if (msg.type === "detect") {
+        if (glanceDetectEl) glanceDetectEl.hidden = !msg.detecting;
+      } else if (msg.type === "saved") {
+        renderStatus(`저장됨: ${msg.path}`);
+        // 상시 표시 (관찰성: 마지막 저장물 경로를 도크에 고정)
+        if (lastSavedEl) {
+          lastSavedEl.hidden = false;
+          lastSavedEl.textContent = `저장: ${msg.path}`;
+          lastSavedEl.title = msg.path;
+        }
       } else if (msg.type === "status") {
         renderStatus(msg.text);
       }

@@ -68,6 +68,8 @@ const providerEntries = buildProviderEntries(process.env, {
 });
 let currentProviderId = config.llm.cli ? `cli:${config.llm.cli.preset}` : config.llm.provider;
 const cliTimeoutMs = config.llm.cli?.timeoutMs ?? 120_000;
+// 관찰성: 마지막 저장 경로를 유지해 클라이언트에 상시 표시
+let lastSavedPath: string | null = null;
 
 function providersMessage(): ProvidersUpdate {
   return { type: "providers", list: providerEntries, current: currentProviderId };
@@ -165,11 +167,14 @@ const httpServer = Bun.serve({
       ws.send(JSON.stringify(providersMessage()));
       ws.send(JSON.stringify(captureMessage()));
       ws.send(JSON.stringify(session.transcript("snapshot")));
+      if (lastSavedPath) {
+        ws.send(JSON.stringify({ type: "saved" as const, path: lastSavedPath }));
+      }
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
       try {
-        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string };
-        if (cmd.action === "startCapture") startCapture();
+        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string; key?: string };
+        if (cmd.action === "startCapture") void startCapture();
         if (cmd.action === "stopCapture") void stopCapture();
         if (cmd.action === "reset") {
           session.reset();
@@ -203,7 +208,9 @@ const httpServer = Bun.serve({
                 lines: store.lines(meta.id),
               });
               writeFileSync(join(dir, "index.html"), html, "utf-8");
-              broadcast({ type: "status", text: `덱 저장됨: exports/deck-${stamp}/index.html` });
+              lastSavedPath = `exports/deck-${stamp}/index.html`;
+              broadcast({ type: "saved", path: lastSavedPath });
+              broadcast({ type: "status", text: `덱 저장됨: ${lastSavedPath}` });
               openUrl(`file://${join(dir, "index.html")}`);
             }
           } catch (e) {
@@ -218,7 +225,9 @@ const httpServer = Bun.serve({
             mkdirSync(dir, { recursive: true });
             const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.md`;
             writeFileSync(join(dir, filename), store.exportMarkdown(), "utf-8");
-            broadcast({ type: "status", text: `저장됨: exports/${filename}` });
+            lastSavedPath = `exports/${filename}`;
+            broadcast({ type: "saved", path: lastSavedPath });
+            broadcast({ type: "status", text: `저장됨: ${lastSavedPath}` });
           } catch (e) {
             const message = e instanceof Error ? e.message : String(e);
             broadcast({ type: "status", text: `저장 실패: ${message}` });
@@ -333,6 +342,7 @@ if (config.server.openBrowser) {
 // 시작하지 않음 — 마이크 권한 요청 시점도 사용자 클릭에 맞춤). 파일 모드는
 // 데모용으로 부팅 즉시 자동 시작.
 let capturing = false;
+let stopPromise: Promise<void> | null = null;
 
 function captureMessage(): CaptureUpdate {
   return { type: "capture", capturing, mode: config.input.mode };
@@ -350,9 +360,12 @@ const whisperHandlers = {
   },
 };
 
-function startCapture(): void {
+async function startCapture(): Promise<void> {
   if (capturing) return;
   capturing = true;
+  // 빠른 시작/중지 반복 시 이전 whisper 자식이 완전히 종료되기 전에
+  // 새 start가 들어오면 마이크 장치 경쟁이 발생한다. stop이 끝날 때까지 대기.
+  if (stopPromise) await stopPromise;
   // 이전 실행의 고아 whisper-stream이 마이크 장치를 점유하면 새 캡처는 무음이
   // 된다. 우리 바이너리+모델 경로 조합의 잔재만 정리하고 시작한다.
   if (config.input.mode === "mic") {
@@ -386,15 +399,21 @@ async function stopCapture(): Promise<void> {
   if (!capturing) return;
   capturing = false;
   broadcast(captureMessage());
-  await whisper.stop();
-  // 중지 시점의 남은 문장까지 마지막으로 블록 감지
-  await session.flush();
-  store.endMeeting();
-  broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
+  // startCapture가 await stopPromise로 기다릴 수 있도록 promise를 노출.
+  const p = whisper.stop();
+  stopPromise = p;
+  try {
+    await p;
+    await session.flush();
+    store.endMeeting();
+    broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
+  } finally {
+    stopPromise = null;
+  }
 }
 
 if (config.input.mode === "file") {
-  startCapture();
+  void startCapture();
 }
 
 const ok = await llm.ping();
