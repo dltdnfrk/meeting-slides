@@ -75,6 +75,25 @@ cp .env.example .env   # 열어서 LLM 키 등을 채워 넣기
 
 ## 실행
 
+### macOS 앱으로 실행 (권장 — 터미널 불필요)
+
+```bash
+bun install
+bash scripts/build-app.sh      # Meeting Slides.app 생성 (1회)
+```
+
+1. Finder에서 `Meeting Slides.app` **우클릭 → 열기** (최초 1회, Gatekeeper)
+2. 마이크 권한 프롬프트 **허용** (앱 단위로 영구 귀속 — 이후 어떤 실행 경로로든 녹음 동작)
+3. 이후 **더블클릭/Spotlight**로 실행 → 서버 기동 + 브라우저 자동 오픈
+
+```bash
+open -a "Meeting Slides.app" --args --mic-check   # 권한 프롬프트 미리 띄우기
+bash scripts/install-login-item.sh                # 로그인 시 자동 시작 (선택)
+bash scripts/install-login-item.sh --remove       # 자동 시작 해제
+```
+
+### 터미널에서 실행
+
 ```bash
 # 마이크 실시간 모드 (브라우저 자동 오픈)
 bun run dev

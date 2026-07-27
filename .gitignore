@@ -4,3 +4,4 @@ models/*.bin
 meetings.db
 meetings.db-*
 exports/
+Meeting Slides.app/
