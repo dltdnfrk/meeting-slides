@@ -345,6 +345,7 @@ export class MeetingSession {
       changed = true;
     } else if (this.currentSlide) {
       // 같은 블록 — 실제 표시 내용이 달라진 경우만 업데이트
+      // 라이브 UI뿐 아니라 SQLite/export도 최신 불렛을 보려면 sink에 반드시 반영.
       const current = this.currentSlide;
       const nextTitle = result.blockTitle || current.title;
       const nextBullets = result.bullets.length > 0 ? result.bullets : current.bullets;
@@ -354,6 +355,11 @@ export class MeetingSession {
         current.title = nextTitle;
         current.bullets = nextBullets;
         current.sentenceCount = this.sentences.length;
+        try {
+          this.sink?.onSlide(current);
+        } catch (e) {
+          console.error("[store] 슬라이드 갱신 저장 실패:", e);
+        }
         changed = true;
       }
     }

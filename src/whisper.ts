@@ -193,6 +193,22 @@ export class SentenceAssembler {
   }
 }
 
+/**
+ * 반복 루프 환각 필터. whisper가 무음/노이즈에서 내는 전형적 패턴:
+ * 같은 토큰이 4회 이상 연속 반복되는 문장 ("노시들대원 노시들대원 …")은
+ * 실제 발화가 아니라 루프 환각이다. 실제 강조("그래서 그래서 그래서")는
+ * 3회 이하가 대부분이라 4회부터 잡는다.
+ */
+export function isHallucinationLoop(sentence: string): boolean {
+  const tokens = sentence.split(/\s+/).filter(Boolean);
+  let run = 1;
+  for (let i = 1; i < tokens.length; i++) {
+    run = tokens[i] === tokens[i - 1] ? run + 1 : 1;
+    if (run >= 4) return true;
+  }
+  return false;
+}
+
 abstract class WhisperBase {
   protected proc: ChildProcess | null = null;
   protected buf = "";
@@ -305,6 +321,8 @@ abstract class WhisperBase {
 
   private emitSentence(sentence: string, onChunk: (c: TranscriptChunk) => void): void {
     if (!sentence || this.isMeta(sentence)) return;
+    // 반복 루프 환각 차단 (노이즈/무음 구간의 토큰 연쇄 반복)
+    if (isHallucinationLoop(sentence)) return;
     // 최근 3문장 내 완전 일치 또는 bigram 유사 시 중복으로 판단
     if (this.isDuplicate(sentence)) return;
     this.recentSentences.push(sentence);

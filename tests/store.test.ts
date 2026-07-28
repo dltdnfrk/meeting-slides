@@ -48,4 +48,32 @@ describe("MeetingStore", () => {
     expect(md).toContain("안녕하세요");
     store.close();
   });
+
+  test("같은 idx 슬라이드 갱신은 upsert되어 export에 최신 불렛이 남는다", () => {
+    const store = new MeetingStore(":memory:");
+    store.startMeeting("cli:codex");
+    store.addSlide({
+      idx: 1,
+      title: "출시 일정",
+      bullets: ["초기 초안"],
+      startedAt: 1000,
+    });
+    store.upsertSlide({
+      idx: 1,
+      title: "출시 일정 (확정)",
+      bullets: ["베타 금요일", "QA 목요일"],
+      startedAt: 1000,
+    });
+
+    const slides = store.slides();
+    expect(slides).toHaveLength(1);
+    expect(slides[0].title).toBe("출시 일정 (확정)");
+    expect(slides[0].bullets).toEqual(["베타 금요일", "QA 목요일"]);
+
+    const md = store.exportMarkdown();
+    expect(md).toContain("베타 금요일");
+    expect(md).toContain("QA 목요일");
+    expect(md).not.toContain("초기 초안");
+    store.close();
+  });
 });

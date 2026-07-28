@@ -6,6 +6,7 @@ import type { BlockDetector, BlockDetectionResult } from "../src/llm.ts";
 function makeSession(opts: {
   detectInterval?: number;
   detectBlock?: (sentences: string[]) => Promise<BlockDetectionResult>;
+  sink?: { onLine: (e: { text: string; ts: number; speaker?: number }) => void; onSlide: (s: unknown) => void };
 }) {
   const messages: ServerMessage[] = [];
   const listeners = new Set<(m: ServerMessage) => void>();
@@ -13,7 +14,7 @@ function makeSession(opts: {
   const llm = {
     detectBlock: opts.detectBlock ?? (async () => ({ shouldAdvance: false, blockTitle: "주제", bullets: ["요점"] })),
   } as unknown as BlockDetector;
-  const session = new MeetingSession(llm, opts.detectInterval ?? 1, 12, listeners);
+  const session = new MeetingSession(llm, opts.detectInterval ?? 1, 12, listeners, opts.sink ?? null);
   return { session, messages };
 }
 
@@ -166,5 +167,38 @@ describe("MeetingSession", () => {
     const all = messages.filter((m) => m.type === "caption");
     expect(all).toHaveLength(2);
     expect(all[1].type === "caption" && all[1].speaker).toBe(2);
+  });
+
+  test("같은 토픽 불렛 갱신도 sink.onSlide로 영속화된다", async () => {
+    const slides: Array<{ index: number; title: string; bullets: string[] }> = [];
+    let call = 0;
+    const { session } = makeSession({
+      detectBlock: async () => {
+        call++;
+        return {
+          shouldAdvance: false,
+          blockTitle: "출시 일정",
+          bullets: call === 1 ? ["초기 초안"] : ["베타 금요일", "QA 목요일"],
+        };
+      },
+      sink: {
+        onLine: () => {},
+        onSlide: (s) => {
+          const slide = s as { index: number; title: string; bullets: string[] };
+          slides.push({ index: slide.index, title: slide.title, bullets: [...slide.bullets] });
+        },
+      },
+    });
+
+    session.onChunk(chunk("문장1"));
+    await Bun.sleep(20);
+    session.onChunk(chunk("문장2"));
+    await Bun.sleep(20);
+
+    expect(slides.length).toBeGreaterThanOrEqual(2);
+    expect(slides[0].bullets).toEqual(["초기 초안"]);
+    expect(slides.at(-1)?.bullets).toEqual(["베타 금요일", "QA 목요일"]);
+    expect(slides.every((s) => s.index === slides[0].index)).toBe(true);
+    expect(session.snapshot().current?.bullets).toEqual(["베타 금요일", "QA 목요일"]);
   });
 });

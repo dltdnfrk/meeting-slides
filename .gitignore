@@ -5,3 +5,4 @@ meetings.db
 meetings.db-*
 exports/
 Meeting Slides.app/
+vendor/ms-playwright/

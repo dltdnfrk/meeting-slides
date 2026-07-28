@@ -62,15 +62,20 @@ export class MeetingStore {
       CREATE INDEX IF NOT EXISTS idx_slides_meeting ON slides(meeting_id, idx);
     `);
 
+    // (meeting_id, idx) 단위 upsert: 같은 토픽 슬라이드 갱신이 INSERT 중복으로 쌓이지 않게.
+    // 기존 DB에 중복 행이 있어도 UPDATE는 전부 갱신하고, 없을 때만 INSERT.
     this.addSlideTx = this.db.transaction((slide: { idx: number; title: string; bullets: string[]; startedAt: number }): void => {
       if (this.meetingId === null) return;
-      this.db.run("INSERT INTO slides (meeting_id, idx, title, bullets, started_at) VALUES (?, ?, ?, ?, ?)", [
-        this.meetingId,
-        slide.idx,
-        slide.title,
-        JSON.stringify(slide.bullets),
-        slide.startedAt,
-      ]);
+      const bulletsJson = JSON.stringify(slide.bullets);
+      const updated = this.db.run(
+        "UPDATE slides SET title = ?, bullets = ?, started_at = ? WHERE meeting_id = ? AND idx = ?",
+        [slide.title, bulletsJson, slide.startedAt, this.meetingId, slide.idx],
+      );
+      if (Number(updated.changes) > 0) return;
+      this.db.run(
+        "INSERT INTO slides (meeting_id, idx, title, bullets, started_at) VALUES (?, ?, ?, ?, ?)",
+        [this.meetingId, slide.idx, slide.title, bulletsJson, slide.startedAt],
+      );
     });
   }
 
@@ -100,11 +105,15 @@ export class MeetingStore {
     ]);
   }
 
-  /** 한 슬라이드를 원자적으로 기록 (트랜잭션: idx 중복 방지는 호출자 책임) */
+  /** 한 슬라이드를 원자적으로 upsert (meeting_id + idx 기준). 신규·같은 토픽 갱신 모두 이 경로. */
   addSlide(slide: { idx: number; title: string; bullets: string[]; startedAt: number }): void {
     this.addSlideTx(slide);
   }
 
+  /** addSlide와 동일. 호출부 가독성용 별칭. */
+  upsertSlide(slide: { idx: number; title: string; bullets: string[]; startedAt: number }): void {
+    this.addSlideTx(slide);
+  }
 
   lines(meetingId?: number): StoredLine[] {
     const id = meetingId ?? this.meetingId;
@@ -117,8 +126,20 @@ export class MeetingStore {
   slides(meetingId?: number): StoredSlide[] {
     const id = meetingId ?? this.meetingId;
     if (id === null) return [];
+    // 과거 INSERT-only 경로로 같은 idx가 여러 번 쌓였을 수 있어,
+    // idx별 최신 row(id MAX)만 노출한다. upsert 이후에는 보통 1행.
     const rows = this.db
-      .query("SELECT idx, title, bullets, started_at as startedAt FROM slides WHERE meeting_id = ? ORDER BY idx")
+      .query(`
+        SELECT s.idx, s.title, s.bullets, s.started_at as startedAt
+        FROM slides s
+        INNER JOIN (
+          SELECT meeting_id, idx, MAX(id) AS max_id
+          FROM slides
+          WHERE meeting_id = ?
+          GROUP BY meeting_id, idx
+        ) latest ON s.id = latest.max_id
+        ORDER BY s.idx
+      `)
       .all(id) as { idx: number; title: string; bullets: string; startedAt: number }[];
     return rows.map((r) => ({ ...r, bullets: JSON.parse(r.bullets) as string[] }));
   }

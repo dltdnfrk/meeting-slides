@@ -11,9 +11,12 @@ import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
-import { buildDeckHtml } from "./src/deck.ts";
+import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
+import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
+import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
+import { createHash } from "node:crypto";
 import { join, sep } from "node:path";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { spawn, spawnSync } from "child_process";
 import type { ServerWebSocket } from "bun";
 
@@ -197,8 +200,9 @@ const httpServer = Bun.serve({
         else if (cmd.action === "transcript") {
           ws.send(JSON.stringify(session.transcript("export")));
         }
-        else if (cmd.action === "exportDeck") {
-          // lecture-deck 템플릿 기반 reveal.js 강의 덱 생성 (회의는 SQLite에서 조회)
+        else if (cmd.action === "exportDeck" || cmd.action === "exportPdf" || cmd.action === "exportPng") {
+          // lecture-deck 템플릿 기반 reveal.js 덱 + slides-grab 계약 파일 생성
+          // PDF/PNG는 초안 경로: validate 후 렌더. 가짜 design-gate proceed 영수증은 쓰지 않는다.
           try {
             const meta = store.latestMeeting();
             if (!meta) {
@@ -206,24 +210,145 @@ const httpServer = Bun.serve({
             } else {
               const stamp = new Date().toISOString().replace(/[:.]/g, "-");
               const dir = join(import.meta.dir, "exports", `deck-${stamp}`);
-              mkdirSync(dir, { recursive: true });
+              const slidesDir = join(dir, "slides");
+              mkdirSync(slidesDir, { recursive: true });
               copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
-              const html = buildDeckHtml({
+              copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(slidesDir, "theme.css"));
+              const input = {
                 title: "Meeting Notes",
                 startedAt: meta.started_at,
                 provider: meta.provider,
                 slides: store.slides(meta.id),
                 lines: store.lines(meta.id),
-              });
-              writeFileSync(join(dir, "index.html"), html, "utf-8");
-              lastSavedPath = `exports/deck-${stamp}/index.html`;
-              broadcast({ type: "saved", path: lastSavedPath });
-              broadcast({ type: "status", text: `덱 저장됨: ${lastSavedPath}` });
-              openUrl(`file://${join(dir, "index.html")}`);
+              };
+              writeFileSync(join(dir, "index.html"), buildDeckHtml(input), "utf-8");
+              for (const f of buildSlideFiles(input)) {
+                writeFileSync(join(slidesDir, f.filename), f.html, "utf-8");
+              }
+
+              // slides-grab CLI 실행 헬퍼 (프로젝트 로컬 chromium 사용)
+              const runGrab = (args: string[], onDone: (code: number | null, tail: string) => void) => {
+                const proc = spawn(process.execPath, ["x", "slides-grab", ...args], {
+                  env: { ...process.env, PLAYWRIGHT_BROWSERS_PATH: join(import.meta.dir, "vendor", "ms-playwright") },
+                  stdio: ["ignore", "pipe", "pipe"],
+                });
+                let tail = "";
+                proc.stderr?.on("data", (d: Buffer) => { tail = (tail + d.toString("utf-8")).slice(-400); });
+                proc.on("close", (code) => onDone(code, tail));
+              };
+
+              if (cmd.action === "exportDeck") {
+                lastSavedPath = `exports/deck-${stamp}/index.html`;
+                broadcast({ type: "saved", path: lastSavedPath });
+                broadcast({ type: "status", text: `덱 저장됨: ${lastSavedPath}` });
+                openUrl(`file://${join(dir, "index.html")}`);
+              } else if (cmd.action === "exportPng") {
+                // 초안 PNG: slides-grab png는 design-gate 대상이 아니라 validate 후 바로 렌더.
+                const out = join(import.meta.dir, "exports", `deck-${stamp}-png`);
+                broadcast({ type: "status", text: "초안 PNG 준비 중… (design-gate 불필요)" });
+                runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
+                  if (vcode !== 0) {
+                    broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
+                    return;
+                  }
+                  broadcast({ type: "status", text: "초안 PNG 렌더 중… (chromium)" });
+                  runGrab(["png", "--slides-dir", slidesDir, "--output-dir", out], (code, tail) => {
+                    if (code === 0) {
+                      lastSavedPath = `exports/deck-${stamp}-png`;
+                      broadcast({ type: "saved", path: lastSavedPath });
+                      broadcast({ type: "status", text: `초안 PNG 저장됨: ${lastSavedPath} (미검토)` });
+                    } else {
+                      broadcast({ type: "status", text: `PNG 실패: ${tail.trim().slice(0, 160)}` });
+                    }
+                  });
+                });
+              } else {
+                // 정식 PDF: slides-grab pdf는 design-gate proceed 영수증을 CLI 레벨에서 요구한다.
+                // 체인: validate → 정직한 Pass A/B 리포트(실제 수행한 검사를 기록) → design-gate → pdf.
+                const out = join(import.meta.dir, "exports", `deck-${stamp}.pdf`);
+                broadcast({ type: "status", text: "PDF 준비 중… (design-gate)" });
+                const slideFiles = buildSlideFiles(input);
+                const fingerprints = slideFiles.map((f) => ({
+                  file: f.filename,
+                  sha256: createHash("sha256").update(f.html, "utf-8").digest("hex"),
+                }));
+                runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
+                  if (vcode !== 0) {
+                    broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
+                    return;
+                  }
+                  // 1) 미리보기 PNG 렌더 → 2) 독립 비전 리뷰 → 3) proceed면 게이트 기록 → 4) PDF
+                  broadcast({ type: "status", text: "PDF 미리보기 렌더 중… (chromium)" });
+                  runGrab(["png", "--slides-dir", slidesDir, "--output-dir", join(slidesDir, ".slides-grab", "gate-preview")], (_pcode, _ptail) => {
+                    void (async () => {
+                      try {
+                        broadcast({ type: "status", text: "독립 시각 리뷰 중… (codex)" });
+                        const previewDir = join(slidesDir, ".slides-grab", "gate-preview");
+                        const previewFiles = readdirSync(previewDir)
+                          .filter((f) => f.endsWith(".png"));
+                        // 리뷰 모델은 비전 검증된 기본값 사용 (사용자 선택 모델이
+                        // 이미지 입력을 거부할 수 있어 슬라이드 생성 모델과 분리)
+                        const reviewOpts = { images: previewFiles.map((f) => join(previewDir, f)) };
+                        const review = await runVisualReview(
+                          buildReviewPrompt(reviewOpts),
+                          reviewOpts,
+                        );
+                        if (review.verdict !== "proceed") {
+                          appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-REVISE ${review.summary} ${review.blockingFindings.join("; ")}\n`);
+                          broadcast({
+                            type: "status",
+                            text: `시각 리뷰 revise: ${review.blockingFindings.join("; ").slice(0, 160) || review.summary}`,
+                          });
+                          return;
+                        }
+                        appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-PROCEED ${review.confidence}\n`);
+                        const gateInput = {
+                          slideFiles: fingerprints,
+                          previewFiles,
+                          slideCount: input.slides.length,
+                          maxBullets: Math.max(0, ...input.slides.map((s) => s.bullets.length)),
+                          lineCount: input.lines.length,
+                          reviewed: true,
+                          confidence: review.confidence,
+                          notes: `독립 시각 리뷰 요약: ${review.summary}`,
+                        };
+                        writeFileSync(join(slidesDir, ".pass-a.md"), buildPassAReport(gateInput), "utf-8");
+                        writeFileSync(join(slidesDir, ".pass-b.md"), buildPassBReport(gateInput), "utf-8");
+                        broadcast({ type: "status", text: `리뷰 통과 (${review.confidence}) — 게이트 기록 중…` });
+                        runGrab(
+                          ["design-gate", "--slides-dir", slidesDir, "--verdict", "proceed",
+                            "--pass-a-report", join(slidesDir, ".pass-a.md"),
+                            "--pass-b-report", join(slidesDir, ".pass-b.md")],
+                          (gcode, gtail) => {
+                            if (gcode !== 0) {
+                              broadcast({ type: "status", text: `design-gate 실패: ${gtail.trim().slice(0, 160)}` });
+                              return;
+                            }
+                            broadcast({ type: "status", text: "PDF 렌더 중… (chromium)" });
+                            runGrab(["pdf", "--slides-dir", slidesDir, "--output", out], (code, tail) => {
+                              if (code === 0) {
+                                lastSavedPath = `exports/deck-${stamp}.pdf`;
+                                broadcast({ type: "saved", path: lastSavedPath });
+                                broadcast({ type: "status", text: `PDF 저장됨: ${lastSavedPath}` });
+                              } else {
+                                broadcast({ type: "status", text: `PDF 실패: ${tail.trim().slice(0, 160)}` });
+                              }
+                            });
+                          },
+                        );
+                      } catch (e) {
+                        const message = e instanceof Error ? e.message : String(e);
+                        appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-ERROR ${message.slice(0, 400)}\n`);
+                        broadcast({ type: "status", text: `시각 리뷰 실패: ${message.slice(0, 160)}` });
+                      }
+                    })();
+                  });
+                });
+              }
             }
           } catch (e) {
             const message = e instanceof Error ? e.message : String(e);
-            broadcast({ type: "status", text: `덱 저장 실패: ${message}` });
+            broadcast({ type: "status", text: `저장 실패: ${message}` });
           }
         }
         else if (cmd.action === "saveNotes") {

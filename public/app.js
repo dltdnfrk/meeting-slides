@@ -21,6 +21,8 @@ const btnExportMdEl = $("btn-export-md");
 const btnExportJsonEl = $("btn-export-json");
 const btnExportTranscriptEl = $("btn-export-transcript");
 const btnExportDeckEl = $("btn-export-deck");
+const btnExportPdfEl = $("btn-export-pdf");
+const btnExportPngEl = $("btn-export-png");
 const btnSettingsEl = $("btn-settings");
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
@@ -497,6 +499,24 @@ btnExportDeckEl.onclick = () => {
     renderStatus("강의 덱 생성 중…");
   } else {
     renderStatus("연결되지 않음 — 덱 저장 불가");
+  }
+};
+
+btnExportPdfEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "exportPdf" }));
+    renderStatus("초안 PDF 준비 중… (design-gate 미적용)");
+  } else {
+    renderStatus("연결되지 않음 — PDF 저장 불가");
+  }
+};
+
+btnExportPngEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "exportPng" }));
+    renderStatus("초안 PNG 준비 중… (design-gate 미적용)");
+  } else {
+    renderStatus("연결되지 않음 — PNG 저장 불가");
   }
 };
 btnResetEl.onclick = () => {

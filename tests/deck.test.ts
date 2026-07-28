@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { buildDeckHtml, linesForSlide } from "../src/deck.ts";
+import { buildDeckHtml, buildSlideFiles, linesForSlide } from "../src/deck.ts";
 
 const slides = [
   { idx: 1, title: "출시 일정", bullets: ["베타 금요일", "QA 수요일"], startedAt: 1000 },
@@ -52,5 +52,23 @@ describe("buildDeckHtml", () => {
     });
     expect(evil).not.toContain("<script>alert");
     expect(evil).toContain("&lt;script&gt;");
+  });
+});
+
+describe("buildSlideFiles (slides-grab 계약)", () => {
+  const files = buildSlideFiles({ title: "Meeting Notes", startedAt: 1000, provider: "cli:codex", slides, lines });
+
+  test("타이틀+블록+마무리 개별 파일 생성", () => {
+    expect(files.map((f) => f.filename)).toEqual(["slide-00.html", "slide-01.html", "slide-02.html", "slide-03.html"]);
+    expect(files[0].html).toContain("MEETING SLIDES");
+    expect(files[1].html).toContain("01");
+    expect(files[1].html).toContain("출시 일정");
+    expect(files[1].html).toContain("베타 금요일");
+    expect(files[3].html).toContain("회의 정리");
+  });
+
+  test("16:9 고정 프레임과 로컬 테마 링크", () => {
+    expect(files[1].html).toContain("width: 1280px; height: 720px");
+    expect(files[1].html).toContain('href="./theme.css"');
   });
 });
