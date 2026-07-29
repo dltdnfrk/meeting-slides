@@ -17,6 +17,7 @@ export interface DeckInput {
 
 const DENSE_TOPIC_MIN_BULLETS = 5;
 const DENSE_TOPIC_MIN_CHARACTERS = 180;
+const LONG_COVER_TITLE_MIN_CHARACTERS = 24;
 
 function esc(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({
@@ -34,6 +35,10 @@ function isDenseTopic(slide: Pick<StoredSlide, "bullets">): boolean {
   return slide.bullets.length >= DENSE_TOPIC_MIN_BULLETS || characterCount >= DENSE_TOPIC_MIN_CHARACTERS;
 }
 
+function isLongCoverTitle(title: string): boolean {
+  return [...title].length >= LONG_COVER_TITLE_MIN_CHARACTERS;
+}
+
 /** 블록 시작 시각 구간으로 전사 라인을 각 슬라이드에 배정한다. */
 export function linesForSlide(slides: StoredSlide[], lines: StoredLine[], index: number): StoredLine[] {
   const start = slides[index]?.startedAt ?? 0;
@@ -43,6 +48,7 @@ export function linesForSlide(slides: StoredSlide[], lines: StoredLine[], index:
 
 export function buildDeckHtml(input: DeckInput): string {
   const date = new Date(input.startedAt).toLocaleString("ko-KR", { hour12: false });
+  const coverClass = isLongCoverTitle(input.title) ? "title-slide is-long-cover" : "title-slide";
   const sections = input.slides.map((slide, i) => {
     const notes = linesForSlide(input.slides, input.lines, i)
       .map((l) => `[${fmtTime(l.ts)}] ${l.speaker ? `화자 ${l.speaker}: ` : ""}${l.text}`)
@@ -77,7 +83,7 @@ ${bullets}
     <div class="reveal">
       <div class="slides">
 
-        <section class="title-slide">
+        <section class="${coverClass}">
           <img class="cover-visual" src="./assets/meeting-cover.png" alt="" aria-hidden="true" />
           <div class="title-block">
             <p class="eyebrow">MEETING SLIDES</p>
@@ -125,7 +131,7 @@ export interface SlideFile {
 
 type SlidePageKind = "closing" | "cover" | "topic";
 
-function slidePageHtml(inner: string, kind: SlidePageKind, dense = false): string {
+function slidePageHtml(inner: string, kind: SlidePageKind, dense = false, longCover = false): string {
   return `<!doctype html>
 <html lang="ko">
 <head>
@@ -155,6 +161,7 @@ function slidePageHtml(inner: string, kind: SlidePageKind, dense = false): strin
   .slide-page .eyebrow, .slide-page .idx { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .slide-page .cover-visual { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
   .slide-page.is-cover::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(10,10,10,.96), rgba(10,10,10,.62) 58%, rgba(10,10,10,.2)); }
+  .slide-page.is-long-cover h1 { max-width: 720px; font-size: 46px; line-height: 1.14; }
   .slide-page .topic-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr); align-items: center; gap: 54px; width: 100%; }
   .slide-page .topic-copy { min-width: 0; }
   .slide-page .topic-map { width: 100%; max-height: 530px; object-fit: contain; }
@@ -168,7 +175,7 @@ function slidePageHtml(inner: string, kind: SlidePageKind, dense = false): strin
 </style>
 </head>
 <body>
-<div class="slide-page is-${kind}${dense ? " is-dense" : ""}">
+<div class="slide-page is-${kind}${dense ? " is-dense" : ""}${longCover ? " is-long-cover" : ""}">
 ${inner}
 </div>
 </body>
@@ -180,6 +187,7 @@ ${inner}
 export function buildSlideFiles(input: DeckInput): SlideFile[] {
   const files: SlideFile[] = [];
   const date = new Date(input.startedAt).toLocaleString("ko-KR", { hour12: false });
+  const longCover = isLongCoverTitle(input.title);
 
   files.push({
     filename: "slide-00.html",
@@ -187,7 +195,7 @@ export function buildSlideFiles(input: DeckInput): SlideFile[] {
   <img class="cover-visual" src="./assets/meeting-cover.png" alt="" aria-hidden="true" />
   <p class="eyebrow">MEETING SLIDES</p>
   <h1>${esc(input.title)}</h1>
-  <p class="meta">${esc(date)}${input.provider ? ` · ${esc(input.provider)}` : ""}</p>`, "cover"),
+  <p class="meta">${esc(date)}${input.provider ? ` · ${esc(input.provider)}` : ""}</p>`, "cover", false, longCover),
   });
 
   input.slides.forEach((slide, i) => {

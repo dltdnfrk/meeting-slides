@@ -200,6 +200,8 @@ html { color-scheme: dark; background: var(--wg-bg); }
 }
 .title-slide .title-block .eyebrow { font-size: 0.8em; }
 .title-slide h1 { font-size: 5em; color: var(--fg-strong); }
+.title-slide.is-long-cover .title-block { max-width: 62%; }
+.title-slide.is-long-cover h1 { font-size: 2.9em; line-height: 1.08; }
 .title-slide h1 .accent,
 .title-slide h1 em { color: var(--accent); }
 .title-slide .subtitle {

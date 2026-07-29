@@ -121,4 +121,20 @@ describe("buildSlideFiles (slides-grab 계약)", () => {
     expect(revealHtml).toContain(denseBullet);
     expect(standaloneHtml).toContain(denseBullet);
   });
+
+  test("Given a long Korean cover title, When deck outputs are built, Then both cover surfaces use the readable long-title contract without deleting text", () => {
+    // Given
+    const title = "분기별 제품 출시 준비와 고객 안내 정책 검토 회의";
+    const input = { title, startedAt: 1000, slides: [], lines: [] };
+
+    // When
+    const revealHtml = buildDeckHtml(input);
+    const standaloneHtml = buildSlideFiles(input)[0]?.html ?? "";
+
+    // Then
+    expect(revealHtml).toContain('class="title-slide is-long-cover"');
+    expect(standaloneHtml).toContain('class="slide-page is-cover is-long-cover"');
+    expect(revealHtml).toContain(title);
+    expect(standaloneHtml).toContain(title);
+  });
 });
