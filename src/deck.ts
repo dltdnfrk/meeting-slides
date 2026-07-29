@@ -133,7 +133,7 @@ type SlidePageKind = "closing" | "cover" | "topic";
 
 function slidePageHtml(inner: string, kind: SlidePageKind, dense = false, longCover = false): string {
   return `<!doctype html>
-<html lang="ko">
+<html lang="ko" class="standalone-slide">
 <head>
 <meta charset="utf-8" />
 <link rel="stylesheet" href="./theme.css" />

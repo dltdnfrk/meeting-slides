@@ -116,6 +116,22 @@ describe("buildSlideFiles (slides-grab 계약)", () => {
     expect(standaloneThemeCss).toContain("height: 720px");
   });
 
+  test("Given slides-grab's 960x540 presentation viewport, When standalone slide files are built, Then the shared frame adapter preserves the 1280x720 design surface", () => {
+    // Given
+    const standalonePages = files.map((file) => file.html);
+
+    // When
+    const rootDocuments = standalonePages.filter((page) => page.includes('<html lang="ko" class="standalone-slide">'));
+
+    // Then
+    expect(rootDocuments).toHaveLength(standalonePages.length);
+    expect(standaloneThemeCss).toContain("html.standalone-slide, html.standalone-slide body");
+    expect(standaloneThemeCss).toContain("width: 960px; height: 540px");
+    expect(standaloneThemeCss).toContain("width: 1280px; height: 720px");
+    expect(standaloneThemeCss).toContain("transform: scale(0.75)");
+    expect(standaloneThemeCss).toContain("transform-origin: top left");
+  });
+
   test("Given topic slide pages, When standalone files are built, Then cover and topics use their matching local decorative assets while closing remains typography-only", () => {
     // Given
     const [cover, firstTopic, secondTopic, closing] = files;
