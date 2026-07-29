@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { buildDeckHtml, buildSlideFiles, linesForSlide } from "../src/deck.ts";
 
@@ -11,6 +13,7 @@ const lines = [
   { seq: 2, ts: 5200, speaker: 2, text: "이탈률이 문제예요" },
   { seq: 3, ts: 5400, speaker: null, text: "동의합니다" },
 ];
+const standaloneThemeCss = readFileSync(join(import.meta.dir, "..", "deck", "theme.css"), "utf-8");
 
 describe("linesForSlide", () => {
   test("블록 시작 시각 구간으로 라인 배정", () => {
@@ -87,8 +90,30 @@ describe("buildSlideFiles (slides-grab 계약)", () => {
   });
 
   test("16:9 고정 프레임과 로컬 테마 링크", () => {
-    expect(files[1].html).toContain("width: 1280px; height: 720px");
     expect(files[1].html).toContain('href="./theme.css"');
+    expect(standaloneThemeCss).toContain("width: 1280px");
+    expect(standaloneThemeCss).toContain("height: 720px");
+  });
+
+  test("Given standalone slide files, When normal and empty decks are built, Then every page delegates styling and geometry to the shared theme", () => {
+    // Given
+    const emptyFiles = buildSlideFiles({ title: "T", startedAt: 0, slides: [], lines: [] });
+    const allFiles = [...files, ...emptyFiles];
+
+    // When
+    const standalonePages = allFiles.map((file) => file.html);
+
+    // Then
+    expect(emptyFiles).toHaveLength(2);
+    expect(standalonePages).toHaveLength(6);
+    for (const page of standalonePages) {
+      expect(page).toContain('<meta charset="utf-8" />');
+      expect((page.match(/<link rel="stylesheet" href="\.\/theme\.css" \/>/g) ?? [])).toHaveLength(1);
+      expect(page).not.toMatch(/<style\b/);
+      expect(page).not.toMatch(/#[0-9A-Fa-f]{3,8}\b/);
+    }
+    expect(standaloneThemeCss).toContain("width: 1280px");
+    expect(standaloneThemeCss).toContain("height: 720px");
   });
 
   test("Given topic slide pages, When standalone files are built, Then cover and topics use their matching local decorative assets while closing remains typography-only", () => {

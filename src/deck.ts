@@ -137,42 +137,6 @@ function slidePageHtml(inner: string, kind: SlidePageKind, dense = false, longCo
 <head>
 <meta charset="utf-8" />
 <link rel="stylesheet" href="./theme.css" />
-<style>
-  html, body { margin: 0; height: 100%; overflow: hidden; }
-  .slide-page {
-    position: relative;
-    isolation: isolate;
-    box-sizing: border-box;
-    width: 1280px; height: 720px;
-    padding: 72px 88px;
-    display: flex; flex-direction: column; justify-content: center;
-    background: #0A0A0A;
-    color: #f4f4f5;
-    font-family: "Pretendard", "Noto Sans KR", sans-serif;
-  }
-  .slide-page h1 { font-size: 64px; margin: 0 0 18px; letter-spacing: -0.02em; }
-  .slide-page h2 { font-size: 48px; margin: 0 0 28px; letter-spacing: -0.01em; }
-  .slide-page h2 .idx { color: #10b981; font-size: 20px; display: block; letter-spacing: 0.16em; margin-bottom: 10px; }
-  .slide-page ul { font-size: 27px; line-height: 1.6; padding-left: 28px; }
-  .slide-page li { margin-bottom: 10px; }
-  .slide-page .meta { color: #a1a1aa; font-size: 20px; }
-  .slide-page .eyebrow { color: #10b981; font-size: 18px; letter-spacing: 0.2em; margin-bottom: 14px; }
-  .slide-page h1, .slide-page h2, .slide-page p, .slide-page li { word-break: keep-all; overflow-wrap: anywhere; }
-  .slide-page .eyebrow, .slide-page .idx { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .slide-page .cover-visual { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
-  .slide-page.is-cover::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(10,10,10,.96), rgba(10,10,10,.62) 58%, rgba(10,10,10,.2)); }
-  .slide-page.is-long-cover h1 { max-width: 720px; font-size: 46px; line-height: 1.14; }
-  .slide-page .topic-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr); align-items: center; gap: 54px; width: 100%; }
-  .slide-page .topic-copy { min-width: 0; }
-  .slide-page .topic-map { width: 100%; max-height: 530px; object-fit: contain; }
-  .slide-page.is-dense { padding: 44px 56px; }
-  .slide-page.is-dense .topic-layout { grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; }
-  .slide-page.is-dense h2 { min-height: 86px; font-size: 36px; margin-bottom: 14px; line-height: 40px; }
-  .slide-page.is-dense h2 .idx { font-size: 15px; margin-bottom: 4px; }
-  .slide-page.is-dense ul { font-size: 18px; line-height: 1.28; padding-left: 20px; margin: 0; }
-  .slide-page.is-dense li { margin-bottom: 6px; }
-  .slide-page.is-dense .topic-map { max-height: 360px; }
-</style>
 </head>
 <body>
 <div class="slide-page is-${kind}${dense ? " is-dense" : ""}${longCover ? " is-long-cover" : ""}">
