@@ -130,6 +130,8 @@ html { color-scheme: dark; background: var(--wg-bg); }
   font-size: 1.0em;
   line-height: 1.65;
   color: var(--fg);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 .reveal .muted { color: var(--fg-muted); }
 .reveal .small { font-size: 0.74em; }
@@ -177,6 +179,24 @@ html { color-scheme: dark; background: var(--wg-bg); }
   justify-content: center;
   align-items: flex-start;
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.title-slide .cover-visual {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.58;
+}
+.title-slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(10,10,10,.96), rgba(10,10,10,.68) 55%, rgba(10,10,10,.25));
 }
 .title-slide .title-block .eyebrow { font-size: 0.8em; }
 .title-slide h1 { font-size: 5em; color: var(--fg-strong); }
@@ -196,6 +216,35 @@ html { color-scheme: dark; background: var(--wg-bg); }
   font-size: 0.6em;
   color: var(--fg-muted);
   letter-spacing: 0.1em;
+  white-space: nowrap;
+  max-width: calc(100% - 120px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Meeting topics: semantic text + local diagram anchor -------- */
+.reveal .slides > section.topic-slide {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(250px, .92fr);
+  align-items: center;
+  gap: 40px;
+}
+.topic-slide .topic-copy { min-width: 0; }
+.topic-slide .topic-map { width: 100%; max-height: 480px; object-fit: contain; }
+.topic-slide h2 { word-break: keep-all; overflow-wrap: anywhere; }
+.reveal .slides > section.topic-slide.is-dense {
+  grid-template-columns: minmax(0, 1fr) minmax(160px, .4fr);
+  gap: 24px;
+}
+.topic-slide.is-dense h2 { font-size: 1.48em; margin-bottom: 0.3em; line-height: 1.08; }
+.topic-slide.is-dense .bullets { margin: 0.15em 0; }
+.topic-slide.is-dense .bullets.big li { font-size: 0.7em; line-height: 1.28; margin: 0.22em 0; }
+.topic-slide.is-dense .topic-map { max-height: 300px; }
+.reveal .eyebrow {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* corner wordmark */
 .wordmark {

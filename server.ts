@@ -12,6 +12,7 @@ import { MeetingSession, type ServerMessage, type ClientListener, type Providers
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
 import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
+import { copyDeckAssets } from "./src/deck-assets.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
 import { createHash } from "node:crypto";
@@ -214,6 +215,11 @@ const httpServer = Bun.serve({
               mkdirSync(slidesDir, { recursive: true });
               copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
               copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(slidesDir, "theme.css"));
+              copyDeckAssets({
+                sourceDirectory: join(import.meta.dir, "deck", "assets"),
+                exportDirectory: dir,
+                slidesDirectory: slidesDir,
+              });
               const input = {
                 title: "Meeting Notes",
                 startedAt: meta.started_at,

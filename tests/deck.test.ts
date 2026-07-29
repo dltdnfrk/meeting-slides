@@ -53,6 +53,25 @@ describe("buildDeckHtml", () => {
     expect(evil).not.toContain("<script>alert");
     expect(evil).toContain("&lt;script&gt;");
   });
+
+  test("Given meeting imagery assets, When reveal deck is built, Then semantic cover and topic content reference only local decorative images", () => {
+    // Given
+    const sections = html.match(/<section[\s\S]*?<\/section>/g) ?? [];
+
+    // When
+    const cover = sections[0] ?? "";
+    const topics = sections.slice(1, -1);
+
+    // Then
+    expect(cover).toContain('src="./assets/meeting-cover.png"');
+    expect(cover).toContain('alt=""');
+    expect(topics).toHaveLength(2);
+    expect(topics.every((topic) => topic.includes('src="./assets/meeting-topic-map.png"'))).toBe(true);
+    expect(sections.at(-1)).not.toContain("meeting-cover.png");
+    expect(sections.at(-1)).not.toContain("meeting-topic-map.png");
+    expect(html).not.toMatch(/<img[^>]+src=["']https?:\/\//);
+    expect(html).not.toMatch(/<img[^>]+src=["'][^"']*(?:\/Users\/|file:)/);
+  });
 });
 
 describe("buildSlideFiles (slides-grab 계약)", () => {
@@ -70,5 +89,36 @@ describe("buildSlideFiles (slides-grab 계약)", () => {
   test("16:9 고정 프레임과 로컬 테마 링크", () => {
     expect(files[1].html).toContain("width: 1280px; height: 720px");
     expect(files[1].html).toContain('href="./theme.css"');
+  });
+
+  test("Given topic slide pages, When standalone files are built, Then cover and topics use their matching local decorative assets while closing remains typography-only", () => {
+    // Given
+    const [cover, firstTopic, secondTopic, closing] = files;
+
+    // When
+    const topicPages = [firstTopic?.html ?? "", secondTopic?.html ?? ""];
+
+    // Then
+    expect(cover?.html).toContain('src="./assets/meeting-cover.png"');
+    expect(topicPages.every((page) => page.includes('src="./assets/meeting-topic-map.png"'))).toBe(true);
+    expect(closing?.html).not.toContain("meeting-topic-map.png");
+    expect(closing?.html).not.toContain("meeting-cover.png");
+  });
+
+  test("Given six product-limit Korean bullets, When a dense topic is built, Then both outputs use the compact presentation contract without losing text", () => {
+    // Given
+    const denseBullet = "핵심 실행 항목을 담당 부서와 함께 확인하고 다음 회의까지 책임자와 완료 기준을 명확하게 정리합니다 ".repeat(3).slice(0, 80);
+    const denseTopic = { idx: 1, title: "장문 한국어 안건", bullets: Array.from({ length: 6 }, () => denseBullet), startedAt: 1000 };
+    const input = { title: "Meeting Notes", startedAt: 1000, slides: [denseTopic], lines: [] };
+
+    // When
+    const revealHtml = buildDeckHtml(input);
+    const standaloneHtml = buildSlideFiles(input)[1]?.html ?? "";
+
+    // Then
+    expect(revealHtml).toContain('class="topic-slide is-dense"');
+    expect(standaloneHtml).toContain('class="slide-page is-topic is-dense"');
+    expect(revealHtml).toContain(denseBullet);
+    expect(standaloneHtml).toContain(denseBullet);
   });
 });
