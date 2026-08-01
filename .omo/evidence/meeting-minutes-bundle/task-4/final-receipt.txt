@@ -1,0 +1,11 @@
+T4 FINAL RECEIPT
+verified_at=2026-08-01T00:00:00Z
+commit=6ec8905e686bd23ee351cfb08795ec2f959d291b
+commit_subject=feat(server): add setAttendees WS action and AttendeesUpdate message
+focused_test=bun test tests/attendees-action.test.ts: PASS
+full_test=bun test: PASS (190 pass, 0 fail, 708 expectations)
+tsc=bunx tsc -p tsconfig.json --noEmit: PASS
+diff_check=git diff --check: PASS
+cleanup_probe=bounded SIGTERM/SIGKILL teardown in tests/attendees-action.test.ts passed; no fake-whisper orphan observed on the exercised path
+real_driver=PASS using a real Bun server, WebSocket, and SQLite lifecycle; stale-ID, cross-meeting, no-attendee, and invalid-name checks passed; SIGTERM shutdown exited cleanly
+main_status_fingerprint=35b59aa4f02aa5f0ba93b45ae49a37af82cbe2ef1e44f88ad1c241646ef34f3e  -

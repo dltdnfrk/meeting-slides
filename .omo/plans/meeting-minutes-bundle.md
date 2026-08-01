@@ -221,7 +221,7 @@ Your next move: 승인하면 `$start-work meeting-minutes-bundle`로 실행 세�
 
 ## Final verification wave
 > Runs in parallel after ALL todos. ALL must APPROVE. Surface results and wait for the user's explicit okay before declaring complete.
-- [x] F1. Plan compliance audit
+- [ ] F1. Plan compliance audit
   References: `.omo/plans/meeting-minutes-bundle.md` 전체 투두·성공 기준, `docs/PRODUCT_SPEC.md` D1-D9/AC-01-06, `docs/ouroboros-seed.yaml` ontology_schema
   Acceptance criteria: `bun test`와 신규 테스트가 exit 0; `tsc` exit 0; `git diff --check` clean; 각 AC가 passing todo/test에 매핑되고 AC-02 provenance rejection, AC-04 six-artifact bundle, AC-05 version-scoped coordinates, AC-06 conclusion judgment가 단정된다.
   QA scenarios: happy — 모든 투두와 AC 매핑 통과. failure — 투두 누락 또는 AC 미매핑이면 F1 FAIL하고 정확한 행을 기록한다. Evidence `<attemptDir>/F1-meeting-minutes-bundle.txt`
@@ -242,7 +242,7 @@ Your next move: 승인하면 `$start-work meeting-minutes-bundle`로 실행 세�
   Commit: Y | test(verify): F3 real manual QA
   What: 로컬 서버(`bun run server.ts`)에서 마이크/파일 모드 회의 1건 → 참석자 지정 → 종료 → 검토 화면 → 드롭다운 귀속 → 확정 → 번들(6 산출물) → PDF 첫 페이지 결정·액션만 확인; 재전사 1건(새 버전, 기존 보존); 같은 오디오 2회 중복 감지; 회귀(실시간 슬라이드/오버레이/export).
   VERIFY: 브라우저/Aside 스크린샷; PDF 첫 페이지 단정; 기존 export 회귀.
-- [x] F4. Scope fidelity
+- [ ] F4. Scope fidelity
   References: plan Scope/Must NOT have, `docs/PRODUCT_SPEC.md` 비범위, baseline `921a01513593c0e10181cf01e535a7abe995deb3`
   Acceptance criteria: 별도 dirty-worktree 절차 후 `git status --porcelain`가 이 계획 커밋만 포함; `git rev-parse HEAD`가 baseline의 descendant; `grep -rn 'nodemailer\|smtp\|INSERT INTO.*crm\|speakerLabel.*realtime' src/ server.ts public/`가 0 hit.
   QA scenarios: happy — 비범위 동작 0 hit, unrelated dirty file 0. failure — 금지 통합 또는 dirty file 혼입이면 F4 FAIL하고 경로를 기록한다. Evidence `<attemptDir>/F4-meeting-minutes-bundle.txt`

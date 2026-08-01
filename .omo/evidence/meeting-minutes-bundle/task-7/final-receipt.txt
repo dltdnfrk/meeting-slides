@@ -1,0 +1,40 @@
+T7 FINAL RECEIPT
+verified_at=2026-08-01T16:46:22Z
+task_id=st_019fbe30
+target_commit=b12706c2b1099f315f19c6bf528880789be18bbe
+commit_subject=feat(server): add startReview action running extraction to version-scoped review payload
+baseline_t6=9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367
+baseline_t6_is_ancestor=yes
+
+committed_files:
+server.ts
+src/start-review.ts
+tests/start-review-action.test.ts
+tests/start-review.test.ts
+
+verification:
+red_contract=1 fail, timeout proving missing dispatch behavior
+focused=4 pass, 0 fail
+full_bun_test=194 pass, 0 fail, 722 expect calls
+tsc=exit 0
+git_diff_check=exit 0
+lsp=0 errors/warnings across four changed files; informational hints only in pre-existing code
+real_ws_sqlite_driver=exit 0
+
+real_driver_coverage:
+happy self-contained broadcast to 2 clients
+no-current, prepared, capturing, and no-canonical lifecycle failures
+capture remains capturing after rejected startReview
+forced LLM transport failure uses grounded local fallback
+concurrent and repeated startReview use one extractor call and stable reviewId
+requester-only lifecycle/malformed failures do not leak to observer
+untrusted meeting_id/transcriptVersionId/reviewId are ignored
+canonical transcript and persisted attendees are used
+meeting_reviews=0 decisions=0 action_items=0 open_items=0 before confirmation
+
+main_repository_fingerprint:
+head=921a01513593c0e10181cf01e535a7abe995deb3
+status_sha256=bbb59d8dfa97579799c653bdd683ae1b69097ae582588856f7dd00ea31a6403f
+diff_sha256=bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9
+
+scope_note=Only the four T7 source/test files were committed. Task-local evidence remains uncommitted by instruction. Unrelated pre-existing worktree changes were preserved.

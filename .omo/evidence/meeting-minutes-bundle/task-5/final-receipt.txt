@@ -1,0 +1,115 @@
+T5 FINAL RECEIPT — 참석자 지정 프론트엔드 (캡처 전 입력 폼)
+task: st_019fbe18   plan: meeting-minutes-bundle   checkbox: T5
+worktree: /Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes
+branch: meeting-minutes-bundle-work
+verified_by: senpi-task-st_019fbe18
+receipt_reconciled_by: st_019fbeea
+receipt_reconciled_at: 2026-08-01T20:12:43Z
+target_commit: dff8ea5bc92bdf454622c29b1748ef21d2300100
+
+COMMIT
+  dff8ea5bc92bdf454622c29b1748ef21d2300100
+  feat(public): add attendee registration form and attendees state
+  public/app.js                    | 17 ++
+  public/style.css                 | 42 +-
+  server.ts                        | 19 ++
+  tests/attendees-action.test.ts   |  8 ++
+  tests/public-attendees.test.ts   | 57 ++
+  tests/server-handler-map.test.ts |  3 ++
+  6 files changed, 125 insertions(+), 21 deletions(-)
+
+STARTING STATE
+  T5-shaped UI already existed (commit 8636b97) with a real Chromium contract
+  suite: 22 pass / 0 fail baseline. Plan checkbox was still unchecked, so this
+  task verified the surface against the T5 contract instead of rebuilding it.
+  Two genuine lifecycle defects were found and fixed test-first.
+
+DEFECTS FOUND AND FIXED (both RED before, GREEN after)
+  #1 Reconnect restoration was a silent no-op.
+     app.js sent {action:"attendees"} on every reconnect, but server.ts
+     handlerMap had no "attendees" key. Dispatch only runs when a handler
+     exists, so the restore request was dropped with no error — draft
+     attendees/meeting_id were never restored after a real WS reconnect.
+     RED: 01-red.txt  (unroutable actions = ["attendees"])
+     FIX: server.ts handleAttendeesQuery — read-only, replies to the
+          requesting socket only, returns {meeting_id:null, attendees:[]}
+          when nothing is prepared.
+
+  #2 Stale meeting ID after reset made recording fail silently.
+     handleReset ends the prepared meeting and nulls currentMeetingId, but the
+     client kept attendeeState.meetingId. The next record click sent the dead
+     ID and startCapture rejected it — recording appeared to do nothing.
+     RED: 02-red-stale-id.txt  (client never cleared the ID; wait timed out)
+     FIX: app.js clearPreparedMeeting() called from btnResetEl.onclick.
+
+DESIGN SYSTEM
+  style.css :root already defines --line/--line-faint/--line-strong,
+  --radius-sm/md/lg, --shadow-panel, --space-1..6, --text-label/xs/sm/body/md,
+  --err-line/--err-soft, --live-line. The review panel (newest UI) consumes
+  them; the attendee panel predated them and duplicated the same values as
+  literals. Migrated the attendee block onto the existing tokens. Only exact
+  equivalents were substituted; genuine one-offs (999px pill, 13px pill
+  padding, rgba(...,0.12) shared with provider-config, 9px micro-label) were
+  left alone. No new tokens invented, no values changed.
+
+  PIXEL-NEUTRALITY PROOF (real Chromium, transitions disabled and
+  hover/aria-expanded pinned for determinism):
+    diff before-computed-style.json after-computed-style.json -> EMPTY
+    diff before-driver.txt          after-driver.txt          -> EMPTY
+
+VERIFICATION (all green)
+  focused    bun test tests/public-attendees.test.ts     24 pass / 0 fail
+  trio       + attendees-action + server-handler-map     26 pass / 0 fail
+  full       bun test                 192 pass / 0 fail across 26 files
+  types      bunx tsc -p tsconfig.json --noEmit          exit 0
+  whitespace git diff --check                            exit 0 (no output)
+
+BROWSER / MANUAL QA (headless Chromium via puppeteer, real public/ shell over
+HTTP with a fake WebSocket; deviceScaleFactor 2)
+  happy path      3 names -> setAttendees wire payload -> attendees ack ->
+                  window.__attendeeState {meetingId:4242, attendees:[3]} ->
+                  startCapture {"action":"startCapture","meeting_id":4242}
+                  after-01-three-drafts.png / after-02-saved-roster.png
+  empty name      blocked, sent=[] , error "이름을 입력하세요"
+                  after-03-empty-name-blocked.png
+  outside click   panel hidden=true    after-04-outside-click-closed.png
+  reconnect       restore query sent [{"action":"attendees"}] -> roster
+                  ["김현준","박지민","이서연"] restored
+                  after-05-reconnect-restored.png
+
+ADVERSARIAL CHECKS
+  duplicate names ......... rejected, existing draft untouched
+  whitespace-only name .... blocked, nothing sent
+  malformed attendees ..... non-array / missing / null / 42 / display_name:null
+                            filtered; meeting_id:"nope" ignored; panel usable
+  stale meeting IDs ....... DEFECT #2 — fixed
+  WS disconnect/reconnect . DEFECT #1 — fixed (client + real server round-trip)
+  capture hard-gating ..... NOT gated; zero attendees still starts capture
+  XSS rendering ........... escapeHtml; <img onerror>/<script> render as text,
+                            0 injected nodes, window.__pwned undefined
+  submit race vs capture .. at most one setAttendees; surface locks
+  no prepared meeting ..... server returns {meeting_id:null, attendees:[]};
+                            client finite-number guard keeps state coherent
+  free-text assignee ...... none added; assignee stays a T8 dropdown
+
+SCOPE FIDELITY
+  committed: only the 6 T5 product/test files above.
+  untouched (left dirty, belong to other tasks):
+    .env.example, src/minutes-store.ts, src/session.ts,
+    tests/minutes-store.test.ts, tests/review-actions.test.ts,
+    .omo/evidence/** , public/app 2.js, public/index 2.html,
+    public/style 2.css, meetings*.db*
+  No test was weakened. server-handler-map.test.ts grew by one entry only
+  because a genuinely new WS action was added to the registry.
+
+MAIN WORKTREE FINGERPRINT (/Users/hyunjun/Documents/MUNI/meeting-slides)
+  HEAD  921a01513593c0e10181cf01e535a7abe995deb3
+        fix(deck): align slides-grab capture frame
+  dirty entries: 19 (pre-existing, exactly the plan-documented "미커밋 변경 19건")
+  proof of non-contamination:
+    grep clearPreparedMeeting public/app.js  -> 0
+    grep handleAttendeesQuery server.ts      -> 0
+    grep attendee-panel public/index.html    -> 0
+    mtimes public/app.js 2026-07-31T15:49, server.ts 2026-07-30T00:15,
+           public/style.css 2026-07-31T15:47  (all predate this session)
+  => main repository was never written to.

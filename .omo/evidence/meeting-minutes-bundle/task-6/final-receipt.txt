@@ -1,0 +1,62 @@
+T6 FINAL RECEIPT
+
+Task: st_019fbe24
+Status: DONE
+Target commit: 9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367
+Parent: dff8ea5bc92bdf454622c29b1748ef21d2300100
+Subject: feat(extract): add MinutesExtractor with versioned source-segment provenance and precision fallback
+Committed paths (exact):
+- src/extract.ts
+- tests/extract.test.ts
+
+Outcome
+- Closed the highest-risk strict-parser gap: a model-proposed deadline is never promoted to a normalized fact unless deadlineText is verbatim in the cited immutable source span and contains an explicit absolute date.
+- Relative deadline text remains reviewable, but its normalized deadline stays null.
+- Existing T6 contracts remain intact: local post-validation IDs, immutable version+seq source refs, evidence/attendee checks, sibling survival, diagnostic-only rejection, deterministic fallback, and no BlockDetector/session-memory sharing.
+
+Exact verification commands and results
+1. bun test tests/extract.test.ts (red)
+   Expected exit 1: 8 pass, 1 fail. The new test observed the old parser trusting 2026-08-08 and inferred 2026-08-02.
+   Evidence: 09-red-deadline-grounding.txt
+2. bun test tests/extract.test.ts (green)
+   Exit 0: 9 pass, 0 fail, 53 expect() calls.
+   Evidence: 10-focused-green.txt
+3. bun test
+   Exit 0: 193 pass, 0 fail, 714 expect() calls across 26 files.
+   Evidence: 11-full-bun-test.txt
+4. bunx tsc -p tsconfig.json --noEmit
+   Exit 0: no TypeScript errors.
+   Evidence: 12-tsc.txt
+5. git diff --check
+   Exit 0.
+   Evidence: 13-diff-check.txt
+6. bun run .omo/evidence/meeting-minutes-bundle/task-6/14-adversarial-driver.ts
+   Exit 0. Fake chat() transport exercised wrong top-level/candidate versions, absent/out-of-request/noncontiguous seqs, quote mismatch, unknown attendee, malformed JSON, duplicate candidates, deadline conflict/inference, and untrusted text.
+   Observable result: all seven rejection codes; one valid sibling survived; malformed and stale top-level batches fell back; explicit 2026-08-07 normalized; relative inferred date stayed null; two duplicates received two local IDs; one valid SQLite row and zero rejected rows persisted.
+   Evidence: 14-adversarial-driver.ts, 14-adversarial-driver.txt
+7. ! rg -n 'BlockDetector|MeetingSession|session-memory' src/extract.ts; wc -l src/extract.ts
+   Exit 0: no forbidden dependency; src/extract.ts is 231 lines.
+   Evidence: 16-static-contract.txt
+8. git add -- src/extract.ts tests/extract.test.ts; staged-path assertion; git diff --cached --check; git commit
+   Exit 0: exact two-path commit created.
+   Evidence: 15-scoped-commit.txt
+
+Project lint gate
+- No lint script is configured. package.json scripts are dev, start, devices, and test. Type checking was run through the project tsconfig.
+
+Read-only main worktree fingerprint
+- Path: /Users/hyunjun/Documents/MUNI/meeting-slides
+- Branch: main
+- HEAD: 921a01513593c0e10181cf01e535a7abe995deb3
+- status --porcelain=v1 -z entries: 19
+- status --porcelain=v1 -z SHA-256: 0449b9120369b2fa40d76bab57d842702d576ae05aa4705a572f24acc4127bc8
+- tracked binary diff SHA-256: bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9
+- Main worktree was read only; no files there were changed.
+
+Residual risks
+- Duplicate grounded suggestions remain separate because the plan defines no duplicate rejection code; downstream review must merge or reject them.
+- Conservative grounding can leave deadline=null when the model omits a verbatim deadlineText, even if a broad source span contains a date.
+
+Unrelated state
+- Pre-existing modified/untracked files in the task worktree were not staged or changed by this T6 commit.
+- Plan, ledger, other-task evidence, and unrelated product changes were not committed.

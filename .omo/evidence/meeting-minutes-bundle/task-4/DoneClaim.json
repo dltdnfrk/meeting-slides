@@ -1,0 +1,31 @@
+{
+  "task_id": "st_019fbe14",
+  "task": "T4 setAttendees WebSocket action and AttendeesUpdate lifecycle contract",
+  "status": "DONE",
+  "commit": "6ec8905e686bd23ee351cfb08795ec2f959d291b",
+  "target_commit": "6ec8905e686bd23ee351cfb08795ec2f959d291b",
+  "commit_subject": "feat(server): add setAttendees WS action and AttendeesUpdate message",
+  "verified_by": "senpi-task-st_019fbe14",
+  "receipt_reconciled_by": "st_019fbeea",
+  "receipt_reconciled_at": "2026-08-01T20:12:43Z",
+  "claims": {
+    "cleanup": "tests/attendees-action.test.ts now uses bounded SIGTERM/SIGKILL teardown for the server child and only asserts a fake-whisper orphan when the pid file exists",
+    "focused_test": "bun test tests/attendees-action.test.ts: 1 pass, 0 fail",
+    "full_test": "bun test: 190 pass, 0 fail, 708 expectations",
+    "types": "bunx tsc -p tsconfig.json --noEmit: exit 0",
+    "diff": "git diff --check: exit 0",
+    "real_driver": "PASS using a real Bun server, WebSocket, and SQLite lifecycle; stale-id, cross-meeting, no-attendee, and invalid-name checks passed; shutdown exited cleanly without an orphaned fake-whisper child",
+    "scope": "only tests/attendees-action.test.ts was amended in this takeover; evidence files were not staged"
+  },
+  "evidence_refs": [
+    "tests/attendees-action.test.ts",
+    "focused-bun.txt",
+    "full-bun.txt",
+    "tsc.txt",
+    "diff-check.txt",
+    "22-real-ws-sqlite-driver.ts",
+    "22-real-ws-sqlite-driver.txt",
+    "final-receipt.txt"
+  ],
+  "main_status_fingerprint_sha256": "35b59aa4f02aa5f0ba93b45ae49a37af82cbe2ef1e44f88ad1c241646ef34f3e"
+}
