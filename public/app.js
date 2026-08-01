@@ -28,6 +28,16 @@ const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
 const btnRecheckEl = $("btn-recheck");
 const btnRecordEl = $("btn-record");
+const btnAttendeesEl = $("btn-attendees");
+const attendeePanelEl = $("attendee-panel");
+const attendeeFormEl = $("attendee-form");
+const attendeeNameEl = $("attendee-name");
+const attendeeCrmEl = $("attendee-crm");
+const attendeeListEl = $("attendee-list");
+const attendeeErrorEl = $("attendee-error");
+const attendeeCountEl = $("attendee-count");
+const btnAttendeeAddEl = $("btn-attendee-add");
+const btnAttendeeSaveEl = $("btn-attendee-save");
 const feedListEl = $("feed-list");
 const feedCountEl = $("feed-count");
 const btnResetEl = $("btn-reset");
@@ -459,11 +469,204 @@ function renderCaptureButton() {
 }
 
 btnRecordEl.onclick = () => {
-  if (!ws || ws.readyState !== WebSocket.OPEN) return;
-  ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
+  sendCaptureToggle();
 };
 
 renderCaptureButton();
+
+// ── 참석자 지정 (캡처 전 준비) ──
+// 로컬 초안(drafts)은 아직 서버에 없는 편집 상태, attendeeState는 서버가 확정해
+// 에코한 명단이다. 저장 버튼이 초안을 setAttendees로 보내고, attendees 메시지가
+// 오면 attendeeState(+meeting_id)를 교체한 뒤 초안을 서버 명단으로 되맞춘다.
+// meeting_id는 startCapture가 같은 draft meeting을 활성화하도록 함께 보낸다.
+let attendeeDrafts = [];
+let attendeeDirty = false;
+const attendeeState = { meetingId: null, attendees: [] };
+// 테스트/디버깅용 관찰 지점 — 드롭다운(T8)이 읽을 원천과 동일한 객체.
+window.__attendeeState = attendeeState;
+
+function setAttendeeError(text) {
+  attendeeErrorEl.textContent = text ?? "";
+  attendeeErrorEl.hidden = !text;
+}
+
+function renderAttendeeList() {
+  attendeeCountEl.textContent = String(attendeeState.attendees.length);
+  attendeeCountEl.hidden = attendeeState.attendees.length === 0;
+  if (attendeeDrafts.length === 0) {
+    attendeeListEl.innerHTML = `<p class="attendee-list__empty">아직 참석자가 없습니다</p>`;
+    return;
+  }
+  attendeeListEl.innerHTML = attendeeDrafts.map((a, i) => `
+    <div class="attendee-row${a.saved ? " attendee-row--saved" : ""}" data-index="${i}">
+      <span class="attendee-row__body">
+        <span class="attendee-row__name">${escapeHtml(a.name)}</span>
+        ${a.crmPersonId ? `<span class="attendee-row__crm">${escapeHtml(a.crmPersonId)}</span>` : ""}
+      </span>
+      <button type="button" class="attendee-row__edit" aria-label="${escapeHtml(a.name)} 수정">수정</button>
+      <button type="button" class="attendee-row__remove" aria-label="${escapeHtml(a.name)} 삭제">삭제</button>
+    </div>`).join("");
+}
+
+function openAttendeePanel() {
+  if (btnAttendeesEl.disabled) return;
+  attendeePanelEl.hidden = false;
+  btnAttendeesEl.setAttribute("aria-expanded", "true");
+  attendeeNameEl.focus();
+}
+
+function closeAttendeePanel(restoreFocus = false) {
+  attendeePanelEl.hidden = true;
+  btnAttendeesEl.setAttribute("aria-expanded", "false");
+  if (restoreFocus) btnAttendeesEl.focus();
+}
+
+/** 캡처 중에는 명단을 잠근다 (서버가 draft meeting을 활성화한 뒤이므로 편집 불가). */
+function renderAttendeeLock() {
+  btnAttendeesEl.disabled = capturing;
+  attendeeNameEl.disabled = capturing;
+  attendeeCrmEl.disabled = capturing;
+  btnAttendeeAddEl.disabled = capturing;
+  btnAttendeeSaveEl.disabled = capturing;
+  if (capturing) closeAttendeePanel();
+}
+
+/** 초안 한 명 추가/수정 — 빈 이름·중복 이름은 거부하고 초안을 그대로 둔다. */
+function commitAttendeeDraft() {
+  if (capturing) return;
+  const name = attendeeNameEl.value.trim();
+  const crmPersonId = attendeeCrmEl.value.trim();
+  if (!name) {
+    setAttendeeError("이름을 입력하세요");
+    attendeeNameEl.focus();
+    return;
+  }
+  if (attendeeDrafts.some((a) => a.name === name)) {
+    setAttendeeError(`이미 추가된 참석자입니다: ${name}`);
+    attendeeNameEl.focus();
+    return;
+  }
+  attendeeDrafts.push({ name, crmPersonId, saved: false });
+  attendeeDirty = true;
+  attendeeNameEl.value = "";
+  attendeeCrmEl.value = "";
+  setAttendeeError("");
+  renderAttendeeList();
+  attendeeNameEl.focus();
+}
+
+attendeeFormEl.addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  commitAttendeeDraft();
+});
+
+attendeeListEl.addEventListener("click", (ev) => {
+  if (capturing) return;
+  const row = ev.target.closest(".attendee-row");
+  if (!row) return;
+  const index = Number(row.dataset.index);
+  if (ev.target.closest(".attendee-row__remove")) {
+    attendeeDrafts.splice(index, 1);
+    attendeeDirty = true;
+    setAttendeeError("");
+    renderAttendeeList();
+    return;
+  }
+  if (ev.target.closest(".attendee-row__edit")) {
+    // 수정은 행을 폼으로 되돌린다 — 확정(Enter)하면 원래 위치가 아닌 끝에 다시 붙는다.
+    const [entry] = attendeeDrafts.splice(index, 1);
+    attendeeNameEl.value = entry.name;
+    attendeeCrmEl.value = entry.crmPersonId ?? "";
+    attendeeDirty = true;
+    setAttendeeError("");
+    renderAttendeeList();
+    attendeeNameEl.focus();
+  }
+});
+
+/** 초안을 setAttendees 와이어 페이로드로 직렬화해 보낸다. */
+function sendAttendees() {
+  if (capturing) return;
+  if (attendeeDrafts.length === 0) {
+    setAttendeeError("참석자를 한 명 이상 추가하세요");
+    return;
+  }
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    setAttendeeError("연결되지 않음 — 참석자 저장 불가");
+    return;
+  }
+  ws.send(JSON.stringify({
+    action: "setAttendees",
+    attendees: attendeeDrafts.map((a) => (
+      a.crmPersonId ? { name: a.name, crmPersonId: a.crmPersonId } : { name: a.name }
+    )),
+  }));
+  setAttendeeError("");
+  renderStatus("참석자 저장 중…");
+}
+
+btnAttendeeSaveEl.onclick = sendAttendees;
+
+btnAttendeesEl.onclick = (ev) => {
+  ev.stopPropagation();
+  if (attendeePanelEl.hidden) openAttendeePanel();
+  else closeAttendeePanel();
+};
+
+document.addEventListener("click", (ev) => {
+  if (attendeePanelEl.hidden) return;
+  // 패널 안 버튼(수정/삭제)은 핸들러가 리스트를 다시 그려 버리므로, 이벤트가
+  // document까지 올라올 때 ev.target은 이미 DOM에서 떨어져 closest()가 패널을
+  // 찾지 못한다. 그런 분리된 타겟을 "바깥 클릭"으로 오인하지 않도록 제외한다.
+  if (ev.target instanceof Node && !ev.target.isConnected) return;
+  if (!ev.target.closest("#attendee-panel") && !ev.target.closest("#btn-attendees")) {
+    closeAttendeePanel();
+  }
+});
+
+/** 서버가 확정한 명단으로 상태와 초안을 되맞춘다 (재연결 복원 포함). */
+function applyAttendeesMessage(msg) {
+  const rows = Array.isArray(msg.attendees) ? msg.attendees : [];
+  const attendees = rows
+    .filter((a) => a && typeof a === "object" && typeof a.display_name === "string" && a.display_name.trim())
+    .map((a) => ({
+      attendeeId: typeof a.attendee_id === "string" ? a.attendee_id : "",
+      displayName: a.display_name,
+      crmPersonEntityId: typeof a.crm_person_entity_id === "string" ? a.crm_person_entity_id : null,
+    }));
+  if (typeof msg.meeting_id === "number" && Number.isFinite(msg.meeting_id)) {
+    attendeeState.meetingId = msg.meeting_id;
+  }
+  attendeeState.attendees = attendees;
+  attendeeDrafts = attendees.map((a) => ({
+    name: a.displayName,
+    crmPersonId: a.crmPersonEntityId ?? "",
+    saved: true,
+  }));
+  attendeeDirty = false;
+  setAttendeeError("");
+  renderAttendeeList();
+  renderStatus(`참석자 ${attendees.length}명 저장됨`);
+}
+
+/** 준비된 meeting_id가 있으면 startCapture에 실어 같은 draft 회의를 활성화한다. */
+function sendCaptureToggle() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  if (capturing) {
+    ws.send(JSON.stringify({ action: "stopCapture" }));
+    return;
+  }
+  if (attendeeDirty) {
+    setAttendeeError("저장하지 않은 참석자가 있습니다 — 저장 후 시작하세요");
+  }
+  // 참석자는 하드 게이트가 아니다 — 지정하지 않아도 캡처는 시작된다.
+  ws.send(JSON.stringify(attendeeState.meetingId === null
+    ? { action: "startCapture" }
+    : { action: "startCapture", meeting_id: attendeeState.meetingId }));
+}
+
+renderAttendeeList();
+renderAttendeeLock();
 
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
 btnExportMdEl.onclick = () => {
@@ -566,6 +769,10 @@ currentSlideEl.addEventListener("click", (ev) => {
 });
 
 window.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape" && !attendeePanelEl.hidden) {
+    closeAttendeePanel(true);
+    return;
+  }
   if (ev.key === "Escape" && !providerPanelEl.hidden) {
     providerPanelEl.hidden = true;
     return;
@@ -577,14 +784,10 @@ window.addEventListener("keydown", (ev) => {
   }
   // 입력 필드/패널 안에서는 단축키 무시
   const tag = (ev.target instanceof HTMLElement ? ev.target.tagName : "").toLowerCase();
-  if (tag === "input" || tag === "textarea" || !providerPanelEl.hidden) return;
+  if (tag === "input" || tag === "textarea" || !providerPanelEl.hidden || !attendeePanelEl.hidden) return;
   if (ev.key === "h" || ev.key === "1") setDockTab("history");
   else if (ev.key === "f" || ev.key === "2") setDockTab("feed");
-  else if (ev.key === "r" && inputMode !== "file") {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
-    }
-  }
+  else if (ev.key === "r" && inputMode !== "file") sendCaptureToggle();
 });
 
 // ── 하단 도크 탭 전환 ──
@@ -605,7 +808,13 @@ function connect() {
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
   ws = new WebSocket(`${proto}//${location.host}/ws`);
 
-  ws.onopen = () => renderStatus("서버 연결됨");
+  ws.onopen = () => {
+    renderStatus("서버 연결됨");
+    // 재연결: 서버가 보관 중인 draft 참석자/meeting_id를 다시 요청한다.
+    // 서버가 이 액션을 아직 모르면 무시되고(미등록 액션은 핸들러 없음),
+    // 클라이언트는 마지막으로 받은 명단을 그대로 유지한다.
+    ws.send(JSON.stringify({ action: "attendees" }));
+  };
   ws.onmessage = (ev) => {
     try {
       const msg = JSON.parse(ev.data);
@@ -634,6 +843,8 @@ function connect() {
         renderFeedLine(msg);
       } else if (msg.type === "providers") {
         renderProviders(msg);
+      } else if (msg.type === "attendees") {
+        applyAttendeesMessage(msg);
       } else if (msg.type === "capture") {
         const wasCapturing = capturing;
         capturing = !!msg.capturing;
@@ -643,6 +854,7 @@ function connect() {
         if (capturing && !wasCapturing && !viewingHistory) setDockTab("feed");
         renderCaptureButton();
         renderCaptureState();
+        renderAttendeeLock();
         renderPill();
         renderDocHead();
         // ON AIR 표시도 캡처 상태와 연동
