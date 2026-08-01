@@ -8,7 +8,9 @@ import { join } from "node:path";
 import puppeteer, { type Browser, type Page } from "puppeteer";
 
 const PUBLIC_DIR = join(import.meta.dir, "..", "public");
-const PUBLIC_FILES = new Set(["/index.html", "/style.css", "/app.js", "/review-panel.js"]);
+const PUBLIC_FILES = new Set([
+  "/index.html", "/style.css", "/app.js", "/review-panel-render.js", "/review-panel.js",
+]);
 
 type FakeSocket = { emit(value: unknown): void; close(): void };
 
