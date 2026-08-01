@@ -25,6 +25,7 @@ function fixture() {
   store.addTranscriptVersionLines(version.transcriptVersionId, [
     { seq: 1, text: "Ship Friday was confirmed." },
     { seq: 2, text: "Alice will run QA by 2026-08-07." },
+    { seq: 3, text: "Bob agreed to verify the result." },
   ]);
   store.finalizeTranscriptVersion(version.transcriptVersionId, transcriptContentSha256(store, version.transcriptVersionId));
   store.setCanonical(meetingId, version.transcriptVersionId);
@@ -39,7 +40,7 @@ function fixture() {
     actionItems: [{
       id: "action-1",
       description: "Run QA",
-      source: { transcriptVersionId: version.transcriptVersionId, startSeq: 2, endSeq: 2 },
+      source: { transcriptVersionId: version.transcriptVersionId, startSeq: 1, endSeq: 3 },
     }],
   });
   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
@@ -124,6 +125,59 @@ describe("MinutesStore review mutation transaction", () => {
 
     expectCode(() => fx.store.confirmReview(fx.reviewId), "TRANSCRIPT_INTEGRITY_FAILED");
     expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
+    expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
+    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
+    fx.legacy.close();
+  });
+
+  test("revalidates persisted attendee identities inside the confirmation transaction", () => {
+    const fx = fixture();
+    fx.store.updateItem(fx.reviewId, "decision", "decision-1", { reviewState: "rejected" });
+    fx.store.updateItem(fx.reviewId, "action_item", "action-1", {
+      assigneeAttendeeId: "alice", attributedAttendeeId: "bob", deadline: "2026-08-07", reviewState: "confirmed",
+    });
+    const db = fx.store.databaseHandle();
+    db.run("PRAGMA foreign_keys = OFF");
+    db.run("UPDATE action_items SET assignee_attendee_id = 'mallory' WHERE review_id = ?", [fx.reviewId]);
+    db.run("PRAGMA foreign_keys = ON");
+
+    expectCode(() => fx.store.confirmReview(fx.reviewId), "ATTENDEE_NOT_IN_MEETING");
+    expect(fx.store.review(fx.reviewId)).toMatchObject({ status: "draft", confirmedAt: null });
+    expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
+    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
+    fx.legacy.close();
+  });
+
+  test("rolls back confirmation when a confirmed source range has an interior gap", () => {
+    const fx = fixture();
+    fx.store.updateItem(fx.reviewId, "decision", "decision-1", { reviewState: "rejected" });
+    fx.store.updateItem(fx.reviewId, "action_item", "action-1", {
+      assigneeAttendeeId: "alice", attributedAttendeeId: "bob", deadline: "2026-08-07", reviewState: "confirmed",
+    });
+    const db = fx.store.databaseHandle();
+    db.run("DROP TRIGGER trg_finalized_transcript_lines_no_delete");
+    db.run("DELETE FROM transcript_version_lines WHERE transcript_version_id = ? AND seq = 2", [fx.transcriptVersionId]);
+    db.run("UPDATE transcript_versions SET content_sha256 = ? WHERE transcript_version_id = ?", [
+      transcriptContentSha256(fx.store, fx.transcriptVersionId), fx.transcriptVersionId,
+    ]);
+
+    expectCode(() => fx.store.confirmReview(fx.reviewId), "INVALID_SOURCE_SEGMENT");
+    expect(fx.store.review(fx.reviewId)).toMatchObject({ status: "draft", confirmedAt: null });
+    expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
+    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
+    fx.legacy.close();
+  });
+
+  test("rolls back the status and timestamp when the confirmation transaction fails", () => {
+    const fx = fixture();
+    fx.store.updateItem(fx.reviewId, "decision", "decision-1", { reviewState: "rejected" });
+    fx.store.updateItem(fx.reviewId, "action_item", "action-1", { reviewState: "rejected" });
+    const db = fx.store.databaseHandle();
+    db.run(`CREATE TRIGGER fail_review_confirmation BEFORE UPDATE OF status ON meeting_reviews
+      WHEN NEW.status = 'confirmed' BEGIN SELECT RAISE(ABORT, 'forced transaction failure'); END`);
+
+    expect(() => fx.store.confirmReview(fx.reviewId)).toThrow("forced transaction failure");
+    expect(fx.store.review(fx.reviewId)).toMatchObject({ status: "draft", confirmedAt: null });
     expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
     expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
     fx.legacy.close();
@@ -262,6 +316,13 @@ afterAll(async () => {
 
 test("real WS actions reject adversarial patches, persist valid changes, and confirm without artifacts", async () => {
   await wsError({ action: "confirmReview", reviewId: "not-started" }, "REVIEW_NOT_DRAFT");
+  await wsError({ action: "confirmReview" }, "INVALID_REVIEW_REQUEST");
+  await wsError({ action: "confirmReview", reviewId }, "PENDING_REVIEW_ITEMS");
+  await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", patch: {} }, "INVALID_REVIEW_REQUEST");
+  await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", kind: "action_item" }, "INVALID_REVIEW_PATCH");
+  await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", kind: "action_item", patch: {
+    attributedAttendeeId: "bob", reviewState: "confirmed",
+  } }, "INCOMPLETE_REVIEW_ITEM");
   await wsError({
     action: "updateItem", reviewId, itemId: "ws-action-1", kind: "decision", patch: { reviewState: "rejected" },
   }, "UNKNOWN_REVIEW_ITEM");
@@ -278,7 +339,7 @@ test("real WS actions reject adversarial patches, persist valid changes, and con
     action: "updateItem", reviewId, itemId: "ws-action-1", kind: "action_item",
     patch: {
       description: "Run release QA", assigneeAttendeeId: "alice", attributedAttendeeId: "bob",
-      deadline: "2026-08-07", reviewState: "confirmed",
+      deadline: "2026-08-07", deadlineText: "next Friday", reviewState: "confirmed",
     },
   }, (message) => message.type === "reviewItemUpdated" && message.reviewId === reviewId);
   expect(updated).toEqual({ type: "reviewItemUpdated", reviewId, itemId: "ws-action-1", kind: "action_item" });
@@ -290,14 +351,19 @@ test("real WS actions reject adversarial patches, persist valid changes, and con
   expect(confirmed).toMatchObject({ type: "reviewConfirmed", reviewId, transcriptVersionId: "ws-canonical-v1" });
 
   const db = new Database(dbPath, { readonly: true });
-  expect(db.query("SELECT description, assignee_attendee_id, attributed_attendee_id, deadline, review_state FROM action_items WHERE action_item_id = 'ws-action-1'").get()).toEqual({
+  expect(db.query("SELECT description, assignee_attendee_id, attributed_attendee_id, deadline, deadline_text, review_state FROM action_items WHERE action_item_id = 'ws-action-1'").get()).toEqual({
     description: "Run release QA",
     assignee_attendee_id: "alice",
     attributed_attendee_id: "bob",
     deadline: "2026-08-07",
+    deadline_text: "next Friday",
     review_state: "confirmed",
   });
-  expect(db.query("SELECT status FROM meeting_reviews WHERE review_id = ?").get(reviewId)).toEqual({ status: "confirmed" });
+  const persistedReview = db.query("SELECT status, confirmed_at FROM meeting_reviews WHERE review_id = ?").get(reviewId) as {
+    status: string; confirmed_at: number | null;
+  };
+  expect(persistedReview.status).toBe("confirmed");
+  expect(persistedReview.confirmed_at).toBeGreaterThan(0);
   expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
   expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
   db.close();

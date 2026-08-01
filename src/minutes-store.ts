@@ -773,17 +773,28 @@ export class MinutesStore {
         if (pending.count > 0) {
           throw reviewError("PENDING_REVIEW_ITEMS", "all review items must be confirmed or rejected");
         }
-        const sourced = this.db.query(`
-          SELECT source_transcript_version_id, source_start_seq, source_end_seq FROM ${table}
-          WHERE review_id = ? AND review_state = 'confirmed' AND source_transcript_version_id IS NOT NULL
+        const attendeeColumns = table === "action_items"
+          ? "attributed_attendee_id, assignee_attendee_id"
+          : table === "decisions" || table === "open_items"
+            ? "attributed_attendee_id, NULL AS assignee_attendee_id"
+            : "NULL AS attributed_attendee_id, NULL AS assignee_attendee_id";
+        const confirmed = this.db.query(`
+          SELECT source_transcript_version_id, source_start_seq, source_end_seq, ${attendeeColumns}
+          FROM ${table} WHERE review_id = ? AND review_state = 'confirmed'
         `).all(reviewId) as Array<{
-          source_transcript_version_id: string; source_start_seq: number; source_end_seq: number;
+          source_transcript_version_id: string | null; source_start_seq: number | null; source_end_seq: number | null;
+          attributed_attendee_id: string | null; assignee_attendee_id: string | null;
         }>;
-        for (const source of sourced) this.validateSource(review.meeting_id, review.transcript_version_id, {
-          transcriptVersionId: source.source_transcript_version_id,
-          startSeq: source.source_start_seq,
-          endSeq: source.source_end_seq,
-        });
+        for (const item of confirmed) {
+          if (item.source_transcript_version_id !== null) this.validateSource(review.meeting_id, review.transcript_version_id, {
+            transcriptVersionId: item.source_transcript_version_id,
+            startSeq: item.source_start_seq!,
+            endSeq: item.source_end_seq!,
+          });
+          for (const attendeeId of [item.attributed_attendee_id, item.assignee_attendee_id]) {
+            if (attendeeId !== null) this.validateAttendee(review.meeting_id, attendeeId);
+          }
+        }
       }
       const now = Date.now();
       this.db.run(`

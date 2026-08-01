@@ -1,0 +1,7 @@
+cleanup_check:
+  checked_at=2026-08-01T17:38:01Z
+  t9_temp_dirs=0
+  index_gate_temp_dirs=0
+  driver_cleanup=socket closed; child SIGKILL awaited; temporary SQLite directory recursively removed in finally
+  index_gate_cleanup=temporary archive removed by EXIT trap
+  unrelated_dirty_files=preserved

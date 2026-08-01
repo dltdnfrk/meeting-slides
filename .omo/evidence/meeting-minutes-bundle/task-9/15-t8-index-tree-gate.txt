@@ -1,0 +1,21 @@
+target_parent=524292a3a23584bacf6787ccfce3e318293b0e47
+index_tree=41ebf32a8ef3b99ba1f10ef82ccd7ba5d2e45180
+$ bun test tests/review-actions.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/review-actions.test.ts:
+(pass) MinutesStore review mutation transaction > validates candidate ownership, attendee membership, and the whole patch before mutating [1.56ms]
+(pass) MinutesStore review mutation transaction > atomically transitions draft to confirmed only after every item is reviewed [1.13ms]
+(pass) MinutesStore review mutation transaction > rejects a review whose transcript version is no longer canonical [0.82ms]
+(pass) MinutesStore review mutation transaction > detects changed canonical transcript bytes and leaves review/artifact rows untouched [0.84ms]
+(pass) MinutesStore review mutation transaction > revalidates persisted attendee identities inside the confirmation transaction [0.82ms]
+(pass) MinutesStore review mutation transaction > rolls back confirmation when a confirmed source range has an interior gap [1.24ms]
+(pass) MinutesStore review mutation transaction > rolls back the status and timestamp when the confirmation transaction fails [1.22ms]
+(pass) real WS actions reject adversarial patches, persist valid changes, and confirm without artifacts [2.75ms]
+
+ 8 pass
+ 0 fail
+ 33 expect() calls
+Ran 8 tests across 1 file. [151.00ms]
+$ bunx tsc -p tsconfig.json --noEmit
+PASS staged tree is compatible with T8 parent

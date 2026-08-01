@@ -1,11 +1,19 @@
 {
-  "taskId": "st_019fbdbc",
-  "task": "Finish T9 in meeting-minutes worktree",
+  "taskId": "st_019fbe63",
+  "task": "Finish T9 only on top of T8",
   "status": "done",
-  "verified": {
-    "focusedTests": "bun test tests/minutes-store.test.ts tests/review-actions.test.ts",
-    "tsc": "bunx tsc -p tsconfig.json --noEmit",
-    "fullSuite": "bun test"
+  "targetCommit": "524292a3a23584bacf6787ccfce3e318293b0e47",
+  "verifiedBy": "hephaestus/st_019fbe63",
+  "verifiedAt": "2026-08-01T17:38:01Z",
+  "gates": {
+    "focusedReviewActions": "8 pass, 0 fail",
+    "fullBunTest": "198 pass, 0 fail",
+    "tsc": "pass",
+    "diffCheck": "pass",
+    "realWsSqliteDriver": "10 probes, pass",
+    "stagedT8Compatibility": "pass"
   },
-  "limitation": "Full suite still fails in unrelated tests/public-attendees.test.ts"
+  "cleanup": "pass",
+  "mainWorktree": "fingerprint unchanged",
+  "caveat": "unrelated T10+ dirty changes preserved and excluded"
 }

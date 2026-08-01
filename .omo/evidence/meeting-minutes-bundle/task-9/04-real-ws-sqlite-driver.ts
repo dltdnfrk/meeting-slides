@@ -74,7 +74,11 @@ function seed(legacy: MeetingStore, store: MinutesStore, label: string) {
     { attendeeId: "bob", displayName: "Bob" },
   ]);
   const version = store.addTranscriptVersion(meetingId, { transcriptVersionId: `${label}-v1`, sourceKind: "import" });
-  store.addTranscriptVersionLines(version.transcriptVersionId, [{ seq: 1, text: `${label}: Alice will run QA by 2026-08-07.` }]);
+  store.addTranscriptVersionLines(version.transcriptVersionId, [
+    { seq: 1, text: `${label}: Alice will run QA by 2026-08-07.` },
+    { seq: 2, text: `${label}: Bob will verify the release.` },
+    { seq: 3, text: `${label}: The team accepted the plan.` },
+  ]);
   store.finalizeTranscriptVersion(version.transcriptVersionId, transcriptContentSha256(store, version.transcriptVersionId));
   store.setCanonical(meetingId, version.transcriptVersionId);
   const reviewId = store.saveCandidates({
@@ -82,7 +86,7 @@ function seed(legacy: MeetingStore, store: MinutesStore, label: string) {
     transcriptVersionId: version.transcriptVersionId,
     actionItems: [{
       id: `${label}-action`, description: "Run QA",
-      source: { transcriptVersionId: version.transcriptVersionId, startSeq: 1, endSeq: 1 },
+      source: { transcriptVersionId: version.transcriptVersionId, startSeq: 1, endSeq: 3 },
     }],
   });
   return { meetingId, transcriptVersionId: version.transcriptVersionId, reviewId, itemId: `${label}-action` };
@@ -117,6 +121,9 @@ try {
   const patchCase = seed(legacy, store, "patch");
   const staleCase = seed(legacy, store, "stale");
   const changedCase = seed(legacy, store, "changed");
+  const attendeeCase = seed(legacy, store, "attendee");
+  const gapCase = seed(legacy, store, "gap");
+  const transactionCase = seed(legacy, store, "transaction");
   const happyCase = seed(legacy, store, "happy");
 
   const before = store.itemsForReview(patchCase.reviewId)[0]!.description;
@@ -129,7 +136,10 @@ try {
   console.log("PASS wrong-attendee + partial-patch: deterministic rejection, zero mutation");
 
   await error({ action: "confirmReview", reviewId: "before-review-exists" }, "REVIEW_NOT_DRAFT");
-  console.log("PASS confirm-before-review: deterministic REVIEW_NOT_DRAFT");
+  await error({ action: "confirmReview" }, "INVALID_REVIEW_REQUEST");
+  await error({ action: "updateItem", reviewId: happyCase.reviewId, itemId: happyCase.itemId, patch: {} }, "INVALID_REVIEW_REQUEST");
+  await error({ action: "updateItem", reviewId: happyCase.reviewId, itemId: happyCase.itemId, kind: "action_item" }, "INVALID_REVIEW_PATCH");
+  console.log("PASS malformed/missing requests: deterministic boundary rejection");
 
   store.updateItem(staleCase.reviewId, "action_item", staleCase.itemId, { reviewState: "rejected" });
   const staleV2 = store.addTranscriptVersion(staleCase.meetingId, { transcriptVersionId: "stale-v2", sourceKind: "retranscription" });
@@ -148,6 +158,37 @@ try {
   if (store.review(changedCase.reviewId)?.status !== "draft") throw new Error("tampered review transitioned");
   console.log("PASS changed-transcript: hash mismatch rejected, review remains draft");
 
+  store.updateItem(attendeeCase.reviewId, "action_item", attendeeCase.itemId, {
+    assigneeAttendeeId: "alice", attributedAttendeeId: "bob", deadline: "2026-08-07", reviewState: "confirmed",
+  });
+  db.run("PRAGMA foreign_keys = OFF");
+  db.run("UPDATE action_items SET assignee_attendee_id = 'mallory' WHERE review_id = ?", [attendeeCase.reviewId]);
+  db.run("PRAGMA foreign_keys = ON");
+  await error({ action: "confirmReview", reviewId: attendeeCase.reviewId }, "ATTENDEE_NOT_IN_MEETING");
+  if (store.review(attendeeCase.reviewId)?.status !== "draft") throw new Error("invalid-attendee review transitioned");
+  console.log("PASS persisted attendee tamper: roster revalidation rejected and review remains draft");
+
+  store.updateItem(gapCase.reviewId, "action_item", gapCase.itemId, {
+    assigneeAttendeeId: "alice", attributedAttendeeId: "bob", deadline: "2026-08-07", reviewState: "confirmed",
+  });
+  db.run("DROP TRIGGER trg_finalized_transcript_lines_no_delete");
+  db.run("DELETE FROM transcript_version_lines WHERE transcript_version_id = ? AND seq = 2", [gapCase.transcriptVersionId]);
+  db.run("UPDATE transcript_versions SET content_sha256 = ? WHERE transcript_version_id = ?", [
+    transcriptContentSha256(store, gapCase.transcriptVersionId), gapCase.transcriptVersionId,
+  ]);
+  await error({ action: "confirmReview", reviewId: gapCase.reviewId }, "INVALID_SOURCE_SEGMENT");
+  if (store.review(gapCase.reviewId)?.status !== "draft") throw new Error("interior-gap review transitioned");
+  console.log("PASS source interior-gap: full range revalidation rejected and review remains draft");
+
+  store.updateItem(transactionCase.reviewId, "action_item", transactionCase.itemId, { reviewState: "rejected" });
+  db.run(`CREATE TRIGGER fail_driver_confirmation BEFORE UPDATE OF status ON meeting_reviews
+    WHEN OLD.review_id = '${transactionCase.reviewId}' AND NEW.status = 'confirmed'
+    BEGIN SELECT RAISE(ABORT, 'forced transaction failure'); END`);
+  await send({ action: "confirmReview", reviewId: transactionCase.reviewId },
+    (message) => message.type === "status" && String(message.text).includes("forced transaction failure"));
+  if (store.review(transactionCase.reviewId)?.status !== "draft") throw new Error("failed transaction transitioned");
+  console.log("PASS transaction failure: trigger abort rolled back status and timestamp");
+
   await send({
     action: "updateItem", reviewId: happyCase.reviewId, itemId: happyCase.itemId, kind: "action_item",
     patch: {
@@ -162,7 +203,7 @@ try {
   const artifacts = db.query("SELECT COUNT(*) AS count FROM artifacts").get() as { count: number };
   if (artifactBundles.count !== 0 || artifacts.count !== 0) throw new Error("T9 created artifacts");
   console.log("PASS happy WS/SQLite: draft->confirmed atomically; artifact_bundles=0 artifacts=0");
-  console.log(JSON.stringify({ database: "temporary", probes: 6, result: "PASS" }));
+  console.log(JSON.stringify({ database: "temporary", probes: 10, result: "PASS" }));
   legacy.close();
 } finally {
   socket?.close();

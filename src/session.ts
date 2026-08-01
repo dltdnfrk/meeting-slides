@@ -120,6 +120,20 @@ export interface ReviewUpdate {
   }>;
 }
 
+export interface ReviewItemUpdated {
+  type: "reviewItemUpdated";
+  reviewId: string;
+  itemId: string;
+  kind: "decision" | "action_item" | "open_item";
+}
+
+export interface ReviewConfirmed {
+  type: "reviewConfirmed";
+  reviewId: string;
+  transcriptVersionId: string;
+  confirmedAt: number;
+}
+
 /** LLM 블록 감지 진행 표시 (관찰성: 사람·AI 모두 "지금 만드는 중"을 읽을 수 있게) */
 export interface DetectUpdate {
   type: "detect";
@@ -132,7 +146,7 @@ export interface SavedUpdate {
   path: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | LineUpdate | DetectUpdate | SavedUpdate;
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | ReviewItemUpdated | ReviewConfirmed | LineUpdate | DetectUpdate | SavedUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 
