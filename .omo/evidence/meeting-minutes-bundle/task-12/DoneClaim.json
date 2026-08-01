@@ -1,0 +1,11 @@
+{
+  "task": "T12",
+  "status": "done",
+  "summary": "Atomic bundle export is implemented and verified: confirmed/canonical review validation, minutes HTML/PDF and provenance-bearing minutes.json, transcript/audio/attendees/items, manifest hashes/sizes/content types, identity/deduplication, temp-dir atomic rename, cleanup, and hostile-input safety.",
+  "notes": [
+    "Focused bundle test suite passes.",
+    "Full bun test suite passes.",
+    "TypeScript check passes.",
+    "Real filesystem/PDF bundle driver and adversarial probes were run and passed."
+  ]
+}

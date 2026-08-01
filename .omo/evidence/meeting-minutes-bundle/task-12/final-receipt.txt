@@ -1,0 +1,18 @@
+task=T12 commit pending
+scope=meeting-minutes-bundle/task-12
+worktree=/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes
+
+commands:
+- bun test tests/bundle.test.ts --reporter=dot
+- bun test --reporter=dot
+- bunx tsc -p tsconfig.json --noEmit
+- run real filesystem/PDF bundle driver
+- run adversarial stale/partial/path traversal/failure cleanup/repeat probes
+- git status --short
+
+results:
+- PASS focused bundle tests: 6/6
+- PASS full bun suite: 182/182
+- PASS tsc: no output
+- PASS bundle verification probes completed
+- PASS receipts written under .omo/evidence/meeting-minutes-bundle/task-12
