@@ -1,0 +1,61 @@
+F4 SCOPE FIDELITY RERUN - PASS
+
+Audited committed HEAD: b86610058e2cff22319976b23dd6d48282f7d678
+Parent: 7123fd986fceb981c358ad1b73531fab6bd8dc16
+Tree: 5e9c65aa72f9c59c7ae4554d137a069c56f12bd0
+Product implementation HEAD: 6711ecfcb47f75b1bb22377d97dd551538568ad7
+Baseline: 921a01513593c0e10181cf01e535a7abe995deb3
+Verified by: st_019fbeeb / PI session 019fbef7-f7a6-720a-8e50-d04b3b110c62
+Verified at: 2026-08-01T20:18:17Z
+
+VERDICT: PASS
+
+Resolved blocker
+----------------
+The prior BLOCKED report audited 7123fd9 while the coordinator-owned governance repair was still uncommitted. That repair now exists atomically as b86610058e2cff22319976b23dd6d48282f7d678. Its T4-T7 immutable receipt pairs are committed, its T4-T14 targets are ancestors, and the task worktree has no staged or tracked dirty paths. F4 was stale evidence only; no product fix or product commit was required.
+
+Scope and ancestry
+------------------
+1. Baseline 921a015 is the merge base and an ancestor of b866100; the 36-commit range has zero merges.
+2. git diff --check passes for baseline..HEAD, the worktree, and the index.
+3. git diff --quiet 6711ecf..b866100 excluding .omo exits 0: product and test bytes are unchanged after the immutable F2/product repair.
+4. Commits after 6711ecf are evidence/governance-only: 67dbb92, 17d0914, 7123fd9, and b866100.
+5. The semantic prohibited-integration scan has zero hits for SMTP/email delivery, CRM database writes, realtime speaker labeling, or transcript-wide identity integration.
+6. The plan's broad literal grep reports one false-positive line: INSERT INTO attendees includes the local crm_person_entity_id column required by the plan's attendee model. It does not write to a CRM table or external system and is therefore in scope. Removing it would violate the approved product contract.
+
+Receipt freshness and preservation
+----------------------------------
+1. Every T4-T14 DoneClaim.json parses, every DoneClaim/final-receipt pair is tracked, and every immutable task target is an ancestor of b866100.
+2. Governance repair b866100 is the exact audited HEAD; the previous non-existent-target blocker is gone.
+3. Staging is empty, tracked task-worktree status is clean, and untracked non-evidence paths are zero. Pre-existing untracked evidence was preserved.
+4. Main worktree HEAD remains 921a01513593c0e10181cf01e535a7abe995deb3. Its worktree diff fingerprint remains bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9 and its index diff is empty.
+5. No plan, ledger, todo, product, or test path was modified by this rerun.
+
+Fresh command results
+---------------------
+- git merge-base --is-ancestor 921a015 b866100: exit 0.
+- git rev-list --merges --count 921a015..b866100: 0.
+- git diff --check 921a015..b866100: exit 0.
+- git diff --check and git diff --cached --check: exit 0.
+- git diff --quiet 6711ecf..b866100 -- . ':(exclude).omo': exit 0.
+- semantic prohibited-scope rg: exit 1 / zero hits (expected no-match exit).
+- bunx tsc -p tsconfig.json --noEmit --strict: exit 0.
+- browser checkJs for public/app.js, review-panel.js, review-panel-render.js: exit 0.
+- bun test tests/server-handler-map.test.ts tests/server-ws-dispatch.test.ts tests/minutes-store.test.ts: 12 pass, 0 fail.
+- isolated full suite, one tracked test file per Bun process: 209 pass, 0 fail, exit 0.
+
+Evidence
+--------
+- 11-current-head-ancestry-scope.txt
+- 11-current-head-full-isolated.txt
+- 12-current-head-prohibited-scope.txt
+- 13-current-head-preservation.txt
+- 14-current-head-receipt-freshness.txt
+- 15-current-head-strict-typescript.txt
+- 16-current-head-browser-checkjs.txt
+- 17-current-head-focused-tests.txt
+- receipt.json
+
+Commit
+------
+No commit created. This was an evidence-freshness repair only. The refreshed report and receipts remain untracked evidence as requested; plan, ledger, and todo state are unchanged.

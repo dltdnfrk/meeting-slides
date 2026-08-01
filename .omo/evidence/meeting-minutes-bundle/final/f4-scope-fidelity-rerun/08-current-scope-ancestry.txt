@@ -1,0 +1,51 @@
+F4 CURRENT TARGET / ANCESTRY / SCOPE
+CAPTURED_AT=2026-08-01T20:18:36Z
+HEAD=b86610058e2cff22319976b23dd6d48282f7d678
+PARENT=7123fd986fceb981c358ad1b73531fab6bd8dc16
+TREE=5e9c65aa72f9c59c7ae4554d137a069c56f12bd0
+BASELINE=921a01513593c0e10181cf01e535a7abe995deb3
+ANCESTRY_EXIT=0
+COMMITS=36
+MERGES=0
+COMMITS:
+b86610058e2cff22319976b23dd6d48282f7d678 parent=7123fd986fceb981c358ad1b73531fab6bd8dc16 subject=chore(verify): reconcile final governance state
+7123fd986fceb981c358ad1b73531fab6bd8dc16 parent=17d09149bc5248652573142bc6e9ebd2eafcc8fd subject=test(verify): finalize meeting minutes compliance ledger
+17d09149bc5248652573142bc6e9ebd2eafcc8fd parent=67dbb92179e7dd8ba703a2940e69c10c8d56949f subject=test(verify): seal meeting minutes scope fidelity
+67dbb92179e7dd8ba703a2940e69c10c8d56949f parent=6711ecfcb47f75b1bb22377d97dd551538568ad7 subject=chore(minutes): repair immutable verification receipts
+6711ecfcb47f75b1bb22377d97dd551538568ad7 parent=87805376884df35f76fb52093f521584e7da4300 subject=refactor(minutes): split review renderer and audio recorder
+87805376884df35f76fb52093f521584e7da4300 parent=b23ee2aac5203c29a7355d838c9e0680853599ef subject=refactor(minutes): modularize store and tighten browser types
+b23ee2aac5203c29a7355d838c9e0680853599ef parent=0f1588a453328f471c057ff9032007cad6cb5d5f subject=fix meeting conclusion transaction and recorder cleanup
+0f1588a453328f471c057ff9032007cad6cb5d5f parent=c2736c81fe6ca04167b4f2ded7e67804226471ce subject=Finalize remediation review-flow evidence cleanup
+c2736c81fe6ca04167b4f2ded7e67804226471ce parent=0c0d5aa55f4def8f8cd79ee398417b7acf8788d4 subject=feat(server): conclude meetings after atomic bundle publication
+0c0d5aa55f4def8f8cd79ee398417b7acf8788d4 parent=f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc subject=feat(store): add canonical transcript versioning, raw audio persistence, and audio-hash dedup
+f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc parent=f64fb18c83659dd6732d9481434d8758f98c231a subject=feat(bundle): add atomic meeting bundle export with version-scoped provenance and manifest
+f64fb18c83659dd6732d9481434d8758f98c231a parent=94fea038c0ca47e8b32950a8d666550bd9dea448 subject=feat(pdf): add chromium A4 portrait print with first-page overflow measure-and-shrink
+94fea038c0ca47e8b32950a8d666550bd9dea448 parent=a29d0d4856e7020edf031317ab9a91f0afa54218 subject=feat(minutes): add portrait minutes HTML template with first-page-complete structure
+a29d0d4856e7020edf031317ab9a91f0afa54218 parent=524292a3a23584bacf6787ccfce3e318293b0e47 subject=feat(server): add updateItem/confirmReview with attendee validation and re-verification transaction
+524292a3a23584bacf6787ccfce3e318293b0e47 parent=b12706c2b1099f315f19c6bf528880789be18bbe subject=feat(public): add review-panel overlay with attendee dropdown attribution
+b12706c2b1099f315f19c6bf528880789be18bbe parent=9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367 subject=feat(server): add startReview action running extraction to version-scoped review payload
+9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367 parent=dff8ea5bc92bdf454622c29b1748ef21d2300100 subject=feat(extract): add MinutesExtractor with versioned source-segment provenance and precision fallback
+dff8ea5bc92bdf454622c29b1748ef21d2300100 parent=6ec8905e686bd23ee351cfb08795ec2f959d291b subject=feat(public): add attendee registration form and attendees state
+6ec8905e686bd23ee351cfb08795ec2f959d291b parent=6eac728c512d8c5aa86b200631df367c80693c11 subject=feat(server): add setAttendees WS action and AttendeesUpdate message
+6eac728c512d8c5aa86b200631df367c80693c11 parent=0c56aa683f58b2be44835aaef2d3517b46d5a33a subject=feat(server): conclude meetings after atomic bundle publication
+0c56aa683f58b2be44835aaef2d3517b46d5a33a parent=cde7e1902e6a79565c5b010e4cb76fe64a4317e4 subject=fix(minutes): eliminate PDF temp leaks on all failure paths
+cde7e1902e6a79565c5b010e4cb76fe64a4317e4 parent=c4a6f5777a5f558f99f42b037ef1413fb13b3438 subject=fix(minutes): clean PDF temp directories on every exit
+c4a6f5777a5f558f99f42b037ef1413fb13b3438 parent=df18be508637aef83c8be3159a2a0433bdf1303c subject=T12 atomic bundle exporter
+df18be508637aef83c8be3159a2a0433bdf1303c parent=3572a19d73d1de6f20819bb57fac2d0b3291fafd subject=fix(ui): preserve attendee panel behavior with review panel
+3572a19d73d1de6f20819bb57fac2d0b3291fafd parent=419b07a6c514021d2a5c9322df99fbedd24a3a9a subject=feat(minutes): harden PDF export with portrait A4 first-page fit
+419b07a6c514021d2a5c9322df99fbedd24a3a9a parent=82ed28d87297ac568047a7d93c4e9048f65062d5 subject=feat(server): add updateItem/confirmReview with attendee validation and re-verification transaction
+82ed28d87297ac568047a7d93c4e9048f65062d5 parent=bed3d815d1b153653af4110f995b3091c98fd456 subject=feat(ui): add review panel for version-scoped candidates
+bed3d815d1b153653af4110f995b3091c98fd456 parent=22576ee5cd374523266f04c238b3c5df379b6877 subject=feat(server): add startReview action running extraction to version-scoped review payload
+22576ee5cd374523266f04c238b3c5df379b6877 parent=f77a7bb3bb5a2ca182c2e26e03647afd28972d24 subject=feat(minutes): add portrait minutes HTML template with first-page-complete structure
+f77a7bb3bb5a2ca182c2e26e03647afd28972d24 parent=5cb0bc85384beb31e61a86e5e1a492fe763fce72 subject=feat(store): add canonical transcript versioning, raw audio persistence, and audio-hash dedup
+5cb0bc85384beb31e61a86e5e1a492fe763fce72 parent=20070c03bbe242140d11b72ea0cfc014bc733cdd subject=feat(extract): add MinutesExtractor with versioned source-segment provenance and precision fallback
+20070c03bbe242140d11b72ea0cfc014bc733cdd parent=8636b973c953de4f272e3cf1ed32938bd1df38ef subject=feat(server): add pre-capture attendee registration lifecycle
+8636b973c953de4f272e3cf1ed32938bd1df38ef parent=3b826b1a26baecfde14c06971e84974a5a9dcf8d subject=feat(ui): add pre-capture attendee registration form
+3b826b1a26baecfde14c06971e84974a5a9dcf8d parent=7a3894e0fc8c67ff99cc297553f46096b455c5ba subject=feat(llm): expose generic chat() transport for non-block extraction
+7a3894e0fc8c67ff99cc297553f46096b455c5ba parent=856ac697c3da2975c089a3cffd9ef7499088f290 subject=feat(store): add minutes domain schema with composite-FK provenance and review workflow
+856ac697c3da2975c089a3cffd9ef7499088f290 parent=921a01513593c0e10181cf01e535a7abe995deb3 subject=refactor(server): extract WS action dispatch to handler map
+NON_EVIDENCE_PATHS_SINCE_PRODUCT_HEAD:
+PROHIBITED_SCOPE_SCAN:
+src/minutes-store-meetings.ts:126:      INSERT INTO attendees (meeting_id, attendee_id, display_name, crm_person_entity_id, sort_order, created_at)
+DIFF_CHECKS:
+DIFF_CHECK_EXIT=0
