@@ -93,85 +93,81 @@ export async function renderMinutesPdf(
   let launchAttempted = false;
 
   try {
-    try {
-      const [minutesCss, themeCss] = await Promise.all([
-        readFile(join(deckDirectory, "minutes.css"), "utf8"),
-        readFile(join(deckDirectory, "theme.css"), "utf8"),
-      ]);
-      await Promise.all([
-        writeFile(htmlPath, html, "utf8"),
-        writeFile(join(temporaryDirectory, "minutes.css"), minutesCss, "utf8"),
-        writeFile(join(temporaryDirectory, "theme.css"), themeCss, "utf8"),
-      ]);
-
-      launchAttempted = true;
-      browser = await puppeteer.launch({
-        headless: true,
-        ...(options.executablePath ? { executablePath: options.executablePath } : {}),
-      });
-
-      const page = await browser.newPage();
-      await page.setJavaScriptEnabled(false);
-      await page.emulateMediaType("print");
-
-      const allowedDirectoryUrl = pathToFileURL(`${temporaryDirectory}/`).href;
-      await page.setRequestInterception(true);
-      page.on("request", (request) => {
-        const url = request.url();
-        if (url.startsWith(allowedDirectoryUrl) || url === "about:blank") void request.continue();
-        else void request.abort("blockedbyclient");
-      });
-
-      await page.goto(pathToFileURL(htmlPath).href, { waitUntil: "load" });
-      await page.addStyleTag({ content: FIT_CSS });
-      await page.evaluate(() => document.fonts.ready);
-
-      let measurement: FirstPageMeasurement | undefined;
-      for (const level of FIT_LEVELS) {
-        measurement = await page.evaluate(({ fitLevel, printableHeightMm }) => {
-          const firstPage = document.querySelector<HTMLElement>(".first-page");
-          if (!firstPage) throw new Error('Minutes HTML must contain a ".first-page" section.');
-          document.documentElement.dataset.minutesFit = fitLevel;
-
-          const probe = document.createElement("div");
-          probe.style.cssText = `position:absolute;visibility:hidden;height:${printableHeightMm}mm`;
-          document.body.append(probe);
-          const available = probe.getBoundingClientRect().height;
-          probe.remove();
-
-          const firstRect = firstPage.getBoundingClientRect();
-          const descendantBottom = Array.from(firstPage.querySelectorAll<HTMLElement>("*"))
-            .reduce((bottom, element) => Math.max(bottom, element.getBoundingClientRect().bottom), firstRect.bottom);
-          return {
-            height: Math.max(firstPage.scrollHeight, descendantBottom - firstRect.top),
-            available,
-          };
-        }, { fitLevel: level, printableHeightMm: A4_PRINTABLE_HEIGHT_MM });
-
-        if (measurement.height <= measurement.available + FIT_TOLERANCE_PX) break;
-      }
-
-      if (!measurement || measurement.height > measurement.available + FIT_TOLERANCE_PX) {
-        throw new MinutesPdfOverflowError(measurement?.height ?? Number.POSITIVE_INFINITY, measurement?.available ?? 0);
-      }
-
-      const pdf = await page.pdf({
-        format: "A4",
-        landscape: false,
-        printBackground: true,
-        preferCSSPageSize: true,
-      });
-      result = new Uint8Array(pdf);
-    } catch (error) {
-      operationError = launchAttempted && !browser
-        ? new Error(`Chromium launch failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
-        : error;
-    }
-  } finally {
-    const [browserCleanupError, tempCleanupError] = await Promise.all([
-      closeBrowser(browser),
-      removeTemporaryDirectory(temporaryDirectory),
+    const [minutesCss, themeCss] = await Promise.all([
+      readFile(join(deckDirectory, "minutes.css"), "utf8"),
+      readFile(join(deckDirectory, "theme.css"), "utf8"),
     ]);
+    await Promise.all([
+      writeFile(htmlPath, html, "utf8"),
+      writeFile(join(temporaryDirectory, "minutes.css"), minutesCss, "utf8"),
+      writeFile(join(temporaryDirectory, "theme.css"), themeCss, "utf8"),
+    ]);
+
+    launchAttempted = true;
+    browser = await puppeteer.launch({
+      headless: true,
+      ...(options.executablePath ? { executablePath: options.executablePath } : {}),
+    });
+
+    const page = await browser.newPage();
+    await page.setJavaScriptEnabled(false);
+    await page.emulateMediaType("print");
+
+    const allowedDirectoryUrl = pathToFileURL(`${temporaryDirectory}/`).href;
+    await page.setRequestInterception(true);
+    page.on("request", (request) => {
+      const url = request.url();
+      if (url.startsWith(allowedDirectoryUrl) || url === "about:blank") void request.continue();
+      else void request.abort("blockedbyclient");
+    });
+
+    await page.goto(pathToFileURL(htmlPath).href, { waitUntil: "load" });
+    await page.addStyleTag({ content: FIT_CSS });
+    await page.evaluate(() => document.fonts.ready);
+
+    let measurement: FirstPageMeasurement | undefined;
+    for (const level of FIT_LEVELS) {
+      measurement = await page.evaluate(({ fitLevel, printableHeightMm }) => {
+        const firstPage = document.querySelector<HTMLElement>(".first-page");
+        if (!firstPage) throw new Error('Minutes HTML must contain a ".first-page" section.');
+        document.documentElement.dataset.minutesFit = fitLevel;
+
+        const probe = document.createElement("div");
+        probe.style.cssText = `position:absolute;visibility:hidden;height:${printableHeightMm}mm`;
+        document.body.append(probe);
+        const available = probe.getBoundingClientRect().height;
+        probe.remove();
+
+        const firstRect = firstPage.getBoundingClientRect();
+        const descendantBottom = Array.from(firstPage.querySelectorAll<HTMLElement>("*"))
+          .reduce((bottom, element) => Math.max(bottom, element.getBoundingClientRect().bottom), firstRect.bottom);
+        return {
+          height: Math.max(firstPage.scrollHeight, descendantBottom - firstRect.top),
+          available,
+        };
+      }, { fitLevel: level, printableHeightMm: A4_PRINTABLE_HEIGHT_MM });
+
+      if (measurement.height <= measurement.available + FIT_TOLERANCE_PX) break;
+    }
+
+    if (!measurement || measurement.height > measurement.available + FIT_TOLERANCE_PX) {
+      throw new MinutesPdfOverflowError(measurement?.height ?? Number.POSITIVE_INFINITY, measurement?.available ?? 0);
+    }
+
+    const pdf = await page.pdf({
+      format: "A4",
+      landscape: false,
+      printBackground: true,
+      preferCSSPageSize: true,
+    });
+    result = new Uint8Array(pdf);
+  } catch (error) {
+    operationError = launchAttempted && !browser
+      ? new Error(`Chromium launch failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
+      : error;
+  } finally {
+    const browserCleanupError = await closeBrowser(browser);
+    const tempCleanupError = await removeTemporaryDirectory(temporaryDirectory);
     if (!operationError) {
       const cleanupError = browserCleanupError ?? tempCleanupError;
       if (cleanupError) {

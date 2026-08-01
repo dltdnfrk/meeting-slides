@@ -91,13 +91,33 @@ describe("renderMinutesPdf", () => {
     expectNoTempLeak(before, await rendererTemps());
   }, 30_000);
 
-  test("removes its temporary directory after overflow and measurement failures", async () => {
+  test("removes its temporary directory after overflow, launch failure, and measurement failure", async () => {
     const before = await rendererTemps();
 
     await expect(renderMinutesPdf(buildMinutesHtml(input(30, 20)))).rejects.toBeInstanceOf(MinutesPdfOverflowError);
     expectNoTempLeak(before, await rendererTemps());
 
+    await expect(renderMinutesPdf(buildMinutesHtml(input()), {
+      executablePath: "/definitely/missing/meeting-minutes-chromium",
+    })).rejects.toThrow(/Chromium launch failed/i);
+    expectNoTempLeak(before, await rendererTemps());
+
     await expect(renderMinutesPdf("<html><body><main>missing first page</main></body></html>")).rejects.toThrow(/first-page/i);
+    expectNoTempLeak(before, await rendererTemps());
+  }, 30_000);
+
+  test("matches the exact leak probe without leaving meeting-minutes-pdf temp directories", async () => {
+    const before = await rendererTemps();
+
+    await renderMinutesPdf(buildMinutesHtml(input(40, 40))).catch(() => undefined);
+    expectNoTempLeak(before, await rendererTemps());
+
+    await renderMinutesPdf(buildMinutesHtml(input(40, 40)), {
+      executablePath: "/definitely/missing/meeting-minutes-chromium",
+    }).catch(() => undefined);
+    expectNoTempLeak(before, await rendererTemps());
+
+    await renderMinutesPdf("<html><body><main>missing first page</main></body></html>").catch(() => undefined);
     expectNoTempLeak(before, await rendererTemps());
   }, 30_000);
 });
