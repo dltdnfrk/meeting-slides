@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import type { MinutesExtractionInput, MinutesExtractionResult } from "./extract.ts";
 import type { MinutesStore } from "./minutes-store.ts";
 import type { ReviewUpdate } from "./session.ts";
@@ -64,6 +66,10 @@ function itemPayload(
 }
 
 export async function startReview(input: StartReviewInput): Promise<ReviewUpdate> {
+  const meeting = input.store.meetingMeta(input.meetingId);
+  if (!meeting) throw new Error(`unknown meeting ${input.meetingId}`);
+  if (meeting.phase !== "ended") throw new Error(`meeting ${input.meetingId} must be ended before review`);
+
   const canonical = input.store.canonicalVersion(input.meetingId);
   if (!canonical) throw new Error(`meeting ${input.meetingId} has no canonical transcript version`);
 
@@ -89,45 +95,9 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
     throw new Error(`extractor returned wrong transcript version ${result.transcriptVersionId}`);
   }
 
-  const source = (item: { sourceSegment: {
-    transcript_version_id: string; start_seq: number; end_seq: number;
-  } }) => ({
-    transcriptVersionId: item.sourceSegment.transcript_version_id,
-    startSeq: item.sourceSegment.start_seq,
-    endSeq: item.sourceSegment.end_seq,
-  });
-  const reviewId = input.store.saveCandidates({
-    meetingId: input.meetingId,
-    transcriptVersionId: canonical.transcriptVersionId,
-    decisions: result.decisions.map((item) => ({
-      id: item.id,
-      description: item.description,
-      source: source(item),
-      attributedAttendeeId: item.suggestedAttributionAttendeeId,
-      origin: item.origin,
-    })),
-    actionItems: result.actionItems.map((item) => ({
-      id: item.id,
-      description: item.description,
-      source: source(item),
-      attributedAttendeeId: item.suggestedAttributionAttendeeId,
-      assigneeAttendeeId: item.suggestedAssigneeAttendeeId,
-      deadline: item.deadline,
-      deadlineText: item.deadlineText,
-      origin: item.origin,
-    })),
-    openItems: result.openItems.map((item) => ({
-      id: item.id,
-      description: item.description,
-      source: source(item),
-      attributedAttendeeId: item.suggestedAttributionAttendeeId,
-      origin: item.origin,
-    })),
-  });
-
   return {
     type: "review",
-    reviewId,
+    reviewId: randomUUID(),
     transcriptVersionId: canonical.transcriptVersionId,
     items: itemPayload(result, lines),
     attendees,

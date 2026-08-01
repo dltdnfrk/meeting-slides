@@ -26,6 +26,7 @@ function fixture(lines: Array<{ seq: number; speakerTurn?: number | null; text: 
   })));
   store.finalizeTranscriptVersion(version.transcriptVersionId, transcriptContentSha256(store, version.transcriptVersionId));
   store.setCanonical(meetingId, version.transcriptVersionId);
+  store.endMeeting(meetingId);
   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId };
 }
 
@@ -42,7 +43,7 @@ function emptyResult(transcriptVersionId: string): MinutesExtractionResult {
 }
 
 describe("startReview", () => {
-  test("extracts canonical version lines, persists candidates, and returns a self-contained review payload", async () => {
+  test("extracts canonical version lines without persistence and returns a self-contained review payload", async () => {
     const fx = fixture([
       { seq: 1, speakerTurn: 3, text: "We discussed the rollout." },
       { seq: 2, speakerTurn: 4, text: "Ship Friday was confirmed." },
@@ -130,12 +131,8 @@ describe("startReview", () => {
         },
       ],
     });
-    expect(fx.store.review(payload.reviewId)).toMatchObject({
-      meetingId: fx.meetingId,
-      transcriptVersionId: fx.transcriptVersionId,
-      status: "draft",
-    });
-    expect(fx.store.itemsForReview(payload.reviewId)).toHaveLength(2);
+    expect(fx.store.review(payload.reviewId)).toBeNull();
+    expect(fx.store.itemsForReview(payload.reviewId)).toEqual([]);
     fx.legacy.close();
   });
 
@@ -153,7 +150,7 @@ describe("startReview", () => {
     expect(calls).toBe(1);
     expect(payload.items).toEqual([]);
     expect(payload.transcript).toEqual({ lines: [] });
-    expect(fx.store.review(payload.reviewId)?.transcriptVersionId).toBe(fx.transcriptVersionId);
+    expect(fx.store.review(payload.reviewId)).toBeNull();
     fx.legacy.close();
   });
 

@@ -11,7 +11,7 @@ import { CliLLMClient } from "./src/llm-cli.ts";
 import { MinutesExtractor } from "./src/extract.ts";
 import { startReview } from "./src/start-review.ts";
 import { concludeMeeting, type ConclusionState } from "./src/conclusion.ts";
-import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
+import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ReviewUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
 import { MinutesStore, type AttendeeInput, type ReviewState } from "./src/minutes-store.ts";
@@ -328,7 +328,13 @@ const handleStopCapture: WsActionHandler = ({ ws, cmd }) => {
   void stopCapture();
 };
 
-const handleStartReview: WsActionHandler = ({ ws, cmd }) => {
+const reviewRuns = new Map<string, {
+  promise: Promise<ReviewUpdate>;
+  requesters: Set<ServerWebSocket<undefined>>;
+}>();
+const completedReviews = new Map<string, ReviewUpdate>();
+
+const handleStartReview: WsActionHandler = ({ ws }) => {
   if (capturing) {
     requestError(ws, new Error("capture must be stopped before starting review"));
     return;
@@ -337,15 +343,51 @@ const handleStartReview: WsActionHandler = ({ ws, cmd }) => {
     requestError(ws, new Error("no current meeting to review"));
     return;
   }
+
+  const meetingId = currentMeetingId;
+  const meta = minutesStore.meetingMeta(meetingId);
+  if (meta?.phase !== "ended") {
+    requestError(ws, new Error(`meeting ${meetingId} must be ended before review`));
+    return;
+  }
+  const canonical = minutesStore.canonicalVersion(meetingId);
+  if (!canonical) {
+    requestError(ws, new Error(`meeting ${meetingId} has no canonical transcript version`));
+    return;
+  }
+  const key = `${meetingId}:${canonical.transcriptVersionId}`;
+  const completed = completedReviews.get(key);
+  if (completed) {
+    broadcast(completed);
+    return;
+  }
+  const active = reviewRuns.get(key);
+  if (active) {
+    active.requesters.add(ws);
+    return;
+  }
+
   broadcast({ type: "status", text: "회의록 후보 추출 중…" });
-  void startReview({
-    meetingId: currentMeetingId,
+  const promise = startReview({
+    meetingId,
     store: minutesStore,
     extractor: new MinutesExtractor(extractionTransport),
-  }).then((review) => broadcast(review)).catch((error: unknown) => {
+  });
+  const run = { promise, requesters: new Set([ws]) };
+  reviewRuns.set(key, run);
+  void promise.then((review) => {
+    completedReviews.set(key, review);
+    broadcast(review);
+  }).catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[review] 추출 실패: ${message}`);
-    broadcast({ type: "status", text: "회의록 후보 추출 실패·재시도" });
+    for (const requester of run.requesters) {
+      try {
+        requester.send(JSON.stringify({ type: "status" as const, text: "회의록 후보 추출 실패·재시도" }));
+      } catch { /* requester disconnected */ }
+    }
+  }).finally(() => {
+    if (reviewRuns.get(key) === run) reviewRuns.delete(key);
   });
 };
 
