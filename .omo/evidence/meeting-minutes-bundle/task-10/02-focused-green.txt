@@ -1,0 +1,13 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/minutes.test.ts:
+(pass) buildMinutesHtml > keeps metadata, every decision, and every action in the first-page section, including empty states [0.52ms]
+(pass) buildMinutesHtml > starts appendix content after a forced page break [0.16ms]
+(pass) buildMinutesHtml > prints immutable provenance coordinates for every sourced item [0.26ms]
+(pass) buildMinutesHtml > displays the canonical transcript version independently of item coordinates [0.03ms]
+(pass) buildMinutesHtml > escapes all untrusted text and attribute values [0.16ms]
+
+ 5 pass
+ 0 fail
+ 28 expect() calls
+Ran 5 tests across 1 file. [12.00ms]

@@ -60,6 +60,10 @@ describe("buildMinutesHtml", () => {
     expect(firstPage).toContain("Run final QA");
     expect(firstPage).toContain("담당자");
     expect(firstPage).toContain("기한");
+    expect(firstPage).toContain("발언자");
+    const actionsTable = firstPage.match(/<div class="minutes-block actions-block">[\s\S]*?<\/div>/)?.[0] ?? "";
+    expect(actionsTable).toContain("Alice");
+    expect(actionsTable).toContain("Bob");
     expect(firstPage).not.toContain("Confirm launch budget");
 
     const emptyFirstPage = buildMinutesHtml(input({ decisions: [], actions: [] }))
@@ -76,7 +80,7 @@ describe("buildMinutesHtml", () => {
     expect(css).toMatch(/\.first-page\s*\{[^}]*break-after:\s*page/s);
     expect(css).toMatch(/\.appendix-page\s*\{[^}]*break-before:\s*page/s);
     expect(html).toContain("논의 및 미결 사항");
-    expect(html).toContain("발언 귀속 및 전사 원문");
+    expect(html).toContain("발언 귀속 및 정본 전사 원문");
     expect(html).toContain("참조 자료");
   });
 
@@ -86,11 +90,15 @@ describe("buildMinutesHtml", () => {
       .map((match) => match[1]);
 
     expect(coordinates).toEqual([
-      "transcript-v1, 1, 2",
-      "transcript-v1, 2, 2",
-      "transcript-v1, 3, 3",
-      "transcript-v1, 3, 4",
+      "transcript-v1,1,2",
+      "transcript-v1,2,2",
+      "transcript-v1,3,3",
+      "transcript-v1,3,4",
+      "transcript-v1,1,1",
+      "transcript-v1,2,2",
     ]);
+    expect(html).toContain('data-source-coordinate="(transcript-v1,1,2)"');
+    expect(html).toContain('data-source-coordinate="(transcript-v1,1,1)"');
   });
 
   test("displays the canonical transcript version independently of item coordinates", () => {
@@ -99,7 +107,10 @@ describe("buildMinutesHtml", () => {
       transcriptVersionId: "canonical-retranscription-v2",
     }));
 
-    expect(html).toContain('<span class="transcript-version">canonical-retranscription-v2</span>');
+    expect(html).toContain('class="transcript-version"');
+    expect(html).toContain('>canonical-retranscription-v2</span>');
+    expect(html).toContain('data-transcript-version-id="canonical-retranscription-v2"');
+    expect(html).toContain('class="minutes-block transcript-block canonical-transcript"');
   });
 
   test("escapes all untrusted text and attribute values", () => {

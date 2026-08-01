@@ -1,0 +1,15 @@
+{
+  "hostileLength": 5552,
+  "emptyLength": 2190,
+  "checks": {
+    "rawImageTagAbsent": true,
+    "rawEventHandlerAbsent": true,
+    "injectedAttributeAbsent": true,
+    "hostileMarkupEscaped": true,
+    "unsafeUriIsNotClickable": true,
+    "emptyDecisionStatePresent": true,
+    "emptyActionStatePresent": true,
+    "emptyAppendixStatesPresent": true,
+    "noUndefinedLeak": true
+  }
+}

@@ -1,0 +1,35 @@
+T10 STATIC AND SCOPE CHECK
+verified_by=hephaestus-st_019fbe6e
+verified_at=2026-08-01T17:47:54Z
+baseline=a29d0d4856e7020edf031317ab9a91f0afa54218
+baseline_is_HEAD=PASS
+
+product_paths:
+- src/minutes.ts
+- deck/minutes.css
+- tests/minutes.test.ts
+
+evidence_path:
+- .omo/evidence/meeting-minutes-bundle/task-10/
+
+contract_scan:
+- pure buildMinutesHtml export present
+- first-page metadata, decisions, actions, assignee, deadline, and empty table structure present
+- .first-page and .appendix-page forced page break present
+- open/discussion, speaker attribution, references, and canonical transcript appendices present
+- exact source tuple text and coordinate data attributes present for sourced items and canonical transcript lines
+- esc used for generated untrusted text and attributes
+- no imports or side effects in src/minutes.ts
+- no PDF, bundle, or conclusion implementation changed
+
+preserved_unrelated_tracked_paths:
+- .env.example
+- src/minutes-store.ts
+- src/session.ts
+- tests/minutes-store.test.ts
+
+main_worktree:
+head=921a01513593c0e10181cf01e535a7abe995deb3
+status_sha256=6c4f788dd1ca722616c93650f5dd97da57ee2cad60589e9e222293fb498ba0d4
+
+result=PASS

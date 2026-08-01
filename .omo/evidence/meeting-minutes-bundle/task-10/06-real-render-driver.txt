@@ -1,0 +1,59 @@
+{
+  "driver": "buildMinutesHtml -> file URL -> real headless Chromium DOM",
+  "synchronization": "page load plus document.fonts.ready; no sleeps or polling",
+  "normal": {
+    "sections": 2,
+    "firstPageBreakAfter": "page",
+    "appendixBreakBefore": "page",
+    "firstPageDecisionRows": 1,
+    "firstPageActionRows": 1,
+    "actionHeaders": [
+      "액션",
+      "발언자",
+      "담당자",
+      "기한",
+      "근거 좌표"
+    ],
+    "firstPageText": "\n        \n          MEETING MINUTES\n          Release council\n          Final approval\n          \n            일시2026-08-01 · Asia/Seoul\n            참석자Alice, Bob\n            전사 버전canonical-v2\n          \n        \n        \n        결정 사항\n        \n          결정발언자근거 좌표\n          \n          \n            Release approved\n            Alice\n            (canonical-v2,1,1)\n          \n          \n        \n      \n        \n        액션 항목\n        \n          액션발언자담당자기한근거 좌표\n          \n          \n            Publish notes\n            Alice\n            Bob\n            2026-08-02\n            (canonical-v2,2,2)\n          \n          \n        \n      \n      ",
+    "appendixText": "\n        \n          APPENDIX\n          논의 및 근거 기록\n          정본 전사 버전 canonical-v2\n        \n        \n          논의 및 미결 사항\n          \n          Observe launch metrics발언자 Bob · (canonical-v2,3,3)\n        \n        \n        \n          참조 자료\n          \n          document Runbook · (canonical-v2,3,4)\n        \n        \n        \n          발언 귀속 및 정본 전사 원문\n          \n          AliceRelease approved.(canonical-v2,1,1)\n          BobI will publish notes.(canonical-v2,2,2)\n        \n        \n      ",
+    "provenanceCoordinates": [
+      "(canonical-v2,1,1)",
+      "(canonical-v2,2,2)",
+      "(canonical-v2,3,3)",
+      "(canonical-v2,3,4)",
+      "(canonical-v2,1,1)",
+      "(canonical-v2,2,2)"
+    ],
+    "coordinateData": [
+      "(canonical-v2,1,1)",
+      "(canonical-v2,2,2)",
+      "(canonical-v2,3,3)",
+      "(canonical-v2,3,4)",
+      "(canonical-v2,1,1)",
+      "(canonical-v2,2,2)"
+    ],
+    "canonicalTranscriptVersion": "canonical-v2",
+    "scriptElements": 0
+  },
+  "empty": {
+    "sections": 2,
+    "firstPageBreakAfter": "page",
+    "appendixBreakBefore": "page",
+    "firstPageDecisionRows": 1,
+    "firstPageActionRows": 1,
+    "actionHeaders": [
+      "액션",
+      "발언자",
+      "담당자",
+      "기한",
+      "근거 좌표"
+    ],
+    "firstPageText": "\n        \n          MEETING MINUTES\n          Release council\n          Final approval\n          \n            일시2026-08-01 · Asia/Seoul\n            참석자Alice, Bob\n            전사 버전canonical-v2\n          \n        \n        \n        결정 사항\n        \n          결정발언자근거 좌표\n          \n          결정 사항 없음\n          \n        \n      \n        \n        액션 항목\n        \n          액션발언자담당자기한근거 좌표\n          \n          액션 항목 없음\n          \n        \n      \n      ",
+    "appendixText": "\n        \n          APPENDIX\n          논의 및 근거 기록\n          정본 전사 버전 canonical-v2\n        \n        \n          논의 및 미결 사항\n          미결 또는 다음 안건 없음\n        \n        \n          참조 자료\n          참조 자료 없음\n        \n        \n          발언 귀속 및 정본 전사 원문\n          전사 원문 없음\n        \n      ",
+    "provenanceCoordinates": [],
+    "coordinateData": [],
+    "canonicalTranscriptVersion": "canonical-v2",
+    "scriptElements": 0
+  },
+  "cleanup": "removed /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/minutes-render-aRBIE6 and closed Chromium"
+}

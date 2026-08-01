@@ -1,16 +1,22 @@
 {
-  "task_id": "st_019fbdaa",
+  "task_id": "st_019fbe6e",
+  "worker": "hephaestus",
   "task": "T10 portrait minutes HTML template with first-page-complete structure",
   "status": "DONE",
-  "target_commit": "d9775a3dbb4449c17fdac0b78795bc43ae296aeb",
+  "target_commit": "a29d0d4856e7020edf031317ab9a91f0afa54218",
+  "target_commit_role": "required T9 baseline and direct parent",
+  "result_commit_resolution": "git log -1 --format=%H -- .omo/evidence/meeting-minutes-bundle/task-10/DoneClaim.json",
   "commit_subject": "feat(minutes): add portrait minutes HTML template with first-page-complete structure",
-  "verified_by": "senpi-task-st_019fbdaa",
-  "verified_at": "2026-08-01T00:00:00Z",
+  "verified_by": "hephaestus-st_019fbe6e",
+  "verified_at": "2026-08-01T17:47:54Z",
   "claims": {
-    "implementation": "portrait A4 minutes template with first-page decision/action summary and appendix page split",
-    "regression": "empty states, transcript provenance coordinates, escaping, and appendix break behavior preserved",
-    "tests": "focused minutes test evidence already present in task-10 receipts 01..07",
-    "scope": "only src/minutes.ts, deck/minutes.css, tests/minutes.test.ts and task-10 evidence/receipt files are in scope"
+    "implementation": "pure portrait minutes HTML template with structurally complete metadata, decision, and action first page; forced appendix; open items, references, speaker attribution, and canonical transcript",
+    "provenance": "all sourced review items and every canonical transcript line expose exact visible (transcript_version_id,start_seq,end_seq) tuples and matching data attributes",
+    "escaping": "all generated untrusted text and attribute values pass through esc",
+    "tests": "focused 5/0; full 198/0 with 742 expectations; TypeScript and deterministic test bundle diagnostics clean",
+    "browser_qa": "real headless Chromium inspected populated and empty DOM after load and document.fonts.ready without sleeps or polling",
+    "scope": "only src/minutes.ts, deck/minutes.css, tests/minutes.test.ts, and task-10 evidence are committed",
+    "main_worktree_preservation": "main HEAD and dirty-status fingerprint remained unchanged"
   },
   "evidence_refs": [
     "01-red-proof.txt",
@@ -21,7 +27,12 @@
     "06-real-render-driver.ts",
     "06-real-render-driver.txt",
     "06-real-render.png",
+    "06-real-render-empty.png",
     "07-adversarial-driver.ts",
-    "07-adversarial-driver.txt"
-  ]
+    "07-adversarial-driver.txt",
+    "08-diagnostics.txt",
+    "09-diff-check.txt",
+    "final-receipt.txt"
+  ],
+  "caveat": "T9 already contains earlier T10 commit 22576ee; this is the minimal contract repair requested on top of T9."
 }

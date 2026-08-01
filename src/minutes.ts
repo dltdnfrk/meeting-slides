@@ -67,7 +67,12 @@ function esc(value: string | number): string {
 }
 
 function coordinate(source: MinutesSourceSegment): string {
-  return `<span class="source-coordinate" data-transcript-version-id="${esc(source.transcript_version_id)}" data-start-seq="${esc(source.start_seq)}" data-end-seq="${esc(source.end_seq)}">(${esc(source.transcript_version_id)}, ${esc(source.start_seq)}, ${esc(source.end_seq)})</span>`;
+  const tuple = `(${source.transcript_version_id},${source.start_seq},${source.end_seq})`;
+  return `<span class="source-coordinate" data-source-coordinate="${esc(tuple)}" data-transcript-version-id="${esc(source.transcript_version_id)}" data-start-seq="${esc(source.start_seq)}" data-end-seq="${esc(source.end_seq)}">${esc(tuple)}</span>`;
+}
+
+function transcriptVersion(transcriptVersionId: string): string {
+  return `<span class="transcript-version" data-transcript-version-id="${esc(transcriptVersionId)}">${esc(transcriptVersionId)}</span>`;
 }
 
 function attendeeName(input: MinutesInput, attendeeId: string | null | undefined): string {
@@ -98,15 +103,16 @@ function actionsTable(input: MinutesInput): string {
   const rows = input.actions.length
     ? input.actions.map((item) => `          <tr>
             <td>${esc(item.description)}</td>
+            <td>${esc(attendeeName(input, item.attributedAttendeeId))}</td>
             <td>${esc(attendeeName(input, item.assigneeAttendeeId))}</td>
             <td>${esc(item.deadline ?? item.deadlineText ?? "미정")}</td>
             <td>${coordinate(item.sourceSegment)}</td>
           </tr>`).join("\n")
-    : '          <tr><td class="empty" colspan="4">액션 항목 없음</td></tr>';
+    : '          <tr><td class="empty" colspan="5">액션 항목 없음</td></tr>';
   return `<div class="minutes-block actions-block">
         <h2>액션 항목</h2>
         <table>
-          <thead><tr><th>액션</th><th>담당자</th><th>기한</th><th>근거 좌표</th></tr></thead>
+          <thead><tr><th>액션</th><th>발언자</th><th>담당자</th><th>기한</th><th>근거 좌표</th></tr></thead>
           <tbody>
 ${rows}
           </tbody>
@@ -140,7 +146,8 @@ ${input.transcript.map((line) => {
     const speaker = line.attributedAttendeeId
       ? attendeeName(input, line.attributedAttendeeId)
       : line.speakerTurn === null ? "화자 미상" : `화자 ${line.speakerTurn}`;
-    return `          <li value="${esc(line.seq)}"><span class="speaker">${esc(speaker)}</span><span>${esc(line.text)}</span></li>`;
+    const source = { transcript_version_id: input.transcriptVersionId, start_seq: line.seq, end_seq: line.seq };
+    return `          <li value="${esc(line.seq)}"><span class="speaker">${esc(speaker)}</span><span class="transcript-text">${esc(line.text)}</span>${coordinate(source)}</li>`;
   }).join("\n")}
         </ol>`;
 }
@@ -171,7 +178,7 @@ export function buildMinutesHtml(input: MinutesInput): string {
           <dl class="meeting-meta">
             <div><dt>일시</dt><dd>${esc(input.meta.meetingDate)} · ${esc(input.meta.timeZone)}${provider}</dd></div>
             <div><dt>참석자</dt><dd>${attendeeList}</dd></div>
-            <div><dt>전사 버전</dt><dd><span class="transcript-version">${esc(input.transcriptVersionId)}</span></dd></div>
+            <div><dt>전사 버전</dt><dd>${transcriptVersion(input.transcriptVersionId)}</dd></div>
           </dl>
         </header>
         ${decisionsTable(input)}
@@ -181,7 +188,7 @@ export function buildMinutesHtml(input: MinutesInput): string {
         <header class="appendix-header">
           <p class="eyebrow">APPENDIX</p>
           <h2>논의 및 근거 기록</h2>
-          <p>정본 전사 버전 <span class="transcript-version">${esc(input.transcriptVersionId)}</span></p>
+          <p>정본 전사 버전 ${transcriptVersion(input.transcriptVersionId)}</p>
         </header>
         <div class="minutes-block">
           <h2>논의 및 미결 사항</h2>
@@ -191,8 +198,8 @@ export function buildMinutesHtml(input: MinutesInput): string {
           <h2>참조 자료</h2>
           ${materials(input)}
         </div>
-        <div class="minutes-block transcript-block">
-          <h2>발언 귀속 및 전사 원문</h2>
+        <div class="minutes-block transcript-block canonical-transcript" data-transcript-version-id="${esc(input.transcriptVersionId)}">
+          <h2>발언 귀속 및 정본 전사 원문</h2>
           ${transcript(input)}
         </div>
       </section>

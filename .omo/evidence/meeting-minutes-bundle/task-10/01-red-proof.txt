@@ -1,0 +1,55 @@
+target_baseline=a29d0d4856e7020edf031317ab9a91f0afa54218
+command=bun test tests/minutes.test.ts
+
+bun test v1.3.14 (0d9b296a)
+
+tests/minutes.test.ts:
+(pass) buildMinutesHtml > keeps metadata, every decision, and every action in the first-page section, including empty states [0.43ms]
+(pass) buildMinutesHtml > starts appendix content after a forced page break [0.16ms]
+85 |   test("prints immutable provenance coordinates for every sourced item", () => {
+86 |     const html = buildMinutesHtml(input());
+87 |     const coordinates = [...html.matchAll(/<span class="source-coordinate"[^>]*>\(([^<]+)\)<\/span>/g)]
+88 |       .map((match) => match[1]);
+89 |
+90 |     expect(coordinates).toEqual([
+                             ^
+error: expect(received).toEqual(expected)
+
+  [
+-   "transcript-v1,1,2",
+-   "transcript-v1,2,2",
+-   "transcript-v1,3,3",
+-   "transcript-v1,3,4",
+-   "transcript-v1,1,1",
+-   "transcript-v1,2,2",
++   "transcript-v1, 1, 2",
++   "transcript-v1, 2, 2",
++   "transcript-v1, 3, 3",
++   "transcript-v1, 3, 4",
+  ]
+
+- Expected  - 6
++ Received  + 4
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/minutes.test.ts:90:25)
+(fail) buildMinutesHtml > prints immutable provenance coordinates for every sourced item [0.27ms]
+104 |       decisions: [], actions: [], open: [], referencedMaterials: [],
+105 |       transcriptVersionId: "canonical-retranscription-v2",
+106 |     }));
+107 |
+108 |     expect(html).toContain('<span class="transcript-version">canonical-retranscription-v2</span>');
+109 |     expect(html).toContain('data-transcript-version-id="canonical-retranscription-v2"');
+                       ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "data-transcript-version-id=\"canonical-retranscription-v2\""
+Received: "<!doctype html>\n<html lang=\"ko\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <meta name=\"referrer\" content=\"no-referrer\" />\n    <title>Release planning · 회의록</title>\n    <link rel=\"stylesheet\" href=\"minutes.css\" />\n  </head>\n  <body>\n    <main class=\"minutes-document\">\n      <section class=\"first-page\" aria-label=\"결정 및 액션 요약\">\n        <header class=\"minutes-header\">\n          <p class=\"eyebrow\">MEETING MINUTES</p>\n          <h1>Release planning</h1>\n          <p class=\"purpose\">Approve the release</p>\n          <dl class=\"meeting-meta\">\n            <div><dt>일시</dt><dd>2026-08-01 · Asia/Seoul</dd></div>\n            <div><dt>참석자</dt><dd>Alice, Bob</dd></div>\n            <div><dt>전사 버전</dt><dd><span class=\"transcript-version\">canonical-retranscription-v2</span></dd></div>\n          </dl>\n        </header>\n        <div class=\"minutes-block decisions-block\">\n        <h2>결정 사항</h2>\n        <table>\n          <thead><tr><th>결정</th><th>발언자</th><th>근거 좌표</th></tr></thead>\n          <tbody>\n          <tr><td class=\"empty\" colspan=\"3\">결정 사항 없음</td></tr>\n          </tbody>\n        </table>\n      </div>\n        <div class=\"minutes-block actions-block\">\n        <h2>액션 항목</h2>\n        <table>\n          <thead><tr><th>액션</th><th>담당자</th><th>기한</th><th>근거 좌표</th></tr></thead>\n          <tbody>\n          <tr><td class=\"empty\" colspan=\"4\">액션 항목 없음</td></tr>\n          </tbody>\n        </table>\n      </div>\n      </section>\n      <section class=\"appendix-page\" aria-label=\"회의록 부록\">\n        <header class=\"appendix-header\">\n          <p class=\"eyebrow\">APPENDIX</p>\n          <h2>논의 및 근거 기록</h2>\n          <p>정본 전사 버전 <span class=\"transcript-version\">canonical-retranscription-v2</span></p>\n        </header>\n        <div class=\"minutes-block\">\n          <h2>논의 및 미결 사항</h2>\n          <p class=\"empty\">미결 또는 다음 안건 없음</p>\n        </div>\n        <div class=\"minutes-block\">\n          <h2>참조 자료</h2>\n          <p class=\"empty\">참조 자료 없음</p>\n        </div>\n        <div class=\"minutes-block transcript-block\">\n          <h2>발언 귀속 및 전사 원문</h2>\n          <ol class=\"transcript-list\">\n          <li value=\"1\"><span class=\"speaker\">Alice</span><span>We will ship on Friday.</span></li>\n          <li value=\"2\"><span class=\"speaker\">Bob</span><span>I will run final QA.</span></li>\n        </ol>\n        </div>\n      </section>\n    </main>\n  </body>\n</html>\n"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/minutes.test.ts:109:18)
+(fail) buildMinutesHtml > displays the canonical transcript version independently of item coordinates [0.08ms]
+(pass) buildMinutesHtml > escapes all untrusted text and attribute values [0.10ms]
+
+ 3 pass
+ 2 fail
+ 23 expect() calls
+Ran 5 tests across 1 file. [12.00ms]

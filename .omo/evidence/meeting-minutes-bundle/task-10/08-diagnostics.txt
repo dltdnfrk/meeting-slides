@@ -1,0 +1,10 @@
+relevant_diagnostics:
+- LSP diagnostics tool unavailable because target worktree is outside tool request cwd.
+- source diagnostic: bunx tsc -p tsconfig.json --noEmit (see 04-tsc.txt)
+- test diagnostic/bundle: bun build tests/minutes.test.ts --target=bun --outfile=/tmp/task-10-minutes-test.XXXXXX.js
+Bundled 2 modules in 3ms
+
+  task-10-minutes-test.XXXXXX.js  13.36 KB  (entry point)
+
+exit_code=0
+cleanup=removed temporary bundle
