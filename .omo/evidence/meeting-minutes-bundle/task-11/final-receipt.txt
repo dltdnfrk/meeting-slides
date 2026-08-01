@@ -1,0 +1,10 @@
+task=T11 PDF export hardening
+commit_subject=feat(minutes): harden PDF export with portrait A4 first-page fit
+focused_bun=pass
+global_bun=fail-known-public-attendees
+public_attendees_failure=tests/public-attendees.test.ts timing out/TargetCloseError during unrelated pre-capture attendee registration
+ctsc=pass
+diff_check=pass
+real_pdf_driver=pass
+adversarial_driver=pass
+cleanup=pass

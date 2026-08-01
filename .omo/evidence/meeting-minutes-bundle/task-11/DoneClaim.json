@@ -1,0 +1,16 @@
+{
+  "task": "T11 PDF export hardening",
+  "status": "done",
+  "commit_subject": "feat(minutes): harden PDF export with portrait A4 first-page fit",
+  "summary": "Chromium PDF rendering now measures the first page before export, shrinks within bounded readable levels, rejects impossible overflow, and cleans up temp/browser resources on success and failure.",
+  "evidence": [
+    "01-red-proof.txt",
+    "02-focused-green.txt",
+    "03-full-bun-test.txt",
+    "04-tsc.txt",
+    "05-diff-check.txt",
+    "06-real-pdf-driver.ts",
+    "06-real-pdf-driver.txt",
+    "07-adversarial-driver.ts"
+  ]
+}

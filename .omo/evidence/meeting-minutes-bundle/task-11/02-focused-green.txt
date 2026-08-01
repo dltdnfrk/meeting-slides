@@ -1,0 +1,12 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/pdf.test.ts:
+(pass) renderMinutesPdf > prints a non-empty portrait A4 PDF with the complete summary before the appendix [1396.77ms]
+(pass) renderMinutesPdf > uses bounded shrink-to-fit for a dense summary without splitting its first page [756.25ms]
+(pass) renderMinutesPdf > rejects impossible first pages instead of emitting a split PDF [539.75ms]
+(pass) renderMinutesPdf > reports Chromium launch failures and removes its temporary directory [7.46ms]
+
+ 4 pass
+ 0 fail
+ 11 expect() calls
+Ran 4 tests across 1 file. [2.78s]

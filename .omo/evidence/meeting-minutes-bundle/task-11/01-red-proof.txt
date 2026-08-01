@@ -1,0 +1,17 @@
+$ bun test tests/pdf.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/pdf.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module '../src/pdf.ts' from '/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/pdf.test.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [81.00ms]
+
+exit_code=1
