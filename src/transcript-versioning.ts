@@ -19,28 +19,24 @@ export interface FinalizedTranscriptVersion {
 function canonicalLineJson(line: {
   seq: number;
   capturedAtMs: number | null;
-  audioStartMs: number | null;
-  audioEndMs: number | null;
   speakerTurn: number | null;
   text: string;
 }): string {
   return JSON.stringify({
     seq: line.seq,
-    captured_at_ms: line.capturedAtMs,
-    audio_start_ms: line.audioStartMs,
-    audio_end_ms: line.audioEndMs,
+    ts: line.capturedAtMs,
     speaker_turn: line.speakerTurn,
     text: line.text,
   });
 }
 
+export function canonicalTranscriptJsonl(store: MinutesStore, transcriptVersionId: string): string {
+  const lines = store.transcriptVersionLines(transcriptVersionId);
+  return lines.map(canonicalLineJson).join("\n") + (lines.length > 0 ? "\n" : "");
+}
+
 export function transcriptContentSha256(store: MinutesStore, transcriptVersionId: string): string {
-  const hash = createHash("sha256");
-  for (const line of store.transcriptVersionLines(transcriptVersionId)) {
-    hash.update(canonicalLineJson(line));
-    hash.update("\n");
-  }
-  return hash.digest("hex");
+  return createHash("sha256").update(canonicalTranscriptJsonl(store, transcriptVersionId)).digest("hex");
 }
 
 export class TranscriptVersionWriter {
@@ -85,6 +81,69 @@ export class TranscriptVersionWriter {
 
   activeVersionId(): string | null {
     return this.active?.transcriptVersionId ?? null;
+  }
+}
+
+export interface StoppedAudioRecording {
+  path: string;
+  sha256: string;
+  byteLength: number;
+}
+
+export interface AudioRecorderHandle {
+  stop(): Promise<StoppedAudioRecording>;
+}
+
+export type FinalizedAudio =
+  | { status: "available"; path: string; sha256: string; byteLength: number }
+  | { status: "unavailable"; reason: "recorder_failed" };
+
+export class CaptureFinalizer {
+  private completion: Promise<FinalizedTranscriptVersion & { audio: FinalizedAudio }> | null = null;
+
+  constructor(
+    private readonly store: MinutesStore,
+    private readonly writer: TranscriptVersionWriter,
+    private readonly meetingId: number,
+    private readonly recorder: AudioRecorderHandle | null,
+  ) {}
+
+  finish(): Promise<FinalizedTranscriptVersion & { audio: FinalizedAudio }> {
+    this.completion ??= this.finishOnce();
+    return this.completion;
+  }
+
+  private async finishOnce(): Promise<FinalizedTranscriptVersion & { audio: FinalizedAudio }> {
+    let audio: FinalizedAudio = { status: "unavailable", reason: "recorder_failed" };
+    let duplicateError: Error | null = null;
+    if (this.recorder) {
+      let recording: StoppedAudioRecording | null = null;
+      try {
+        recording = await this.recorder.stop();
+        const duplicateMeetingId = this.store.findMeetingByAudioHash(recording.sha256);
+        if (duplicateMeetingId !== null && duplicateMeetingId !== this.meetingId) {
+          duplicateError = new Error(`[DUPLICATE_AUDIO] audio already belongs to meeting ${duplicateMeetingId}`);
+        } else {
+          this.store.addAudioSource(this.meetingId, {
+            originalAudioPath: recording.path,
+            originalAudioSha256: recording.sha256,
+            byteLength: recording.byteLength,
+          });
+          audio = { status: "available", ...recording };
+        }
+      } catch {
+        if (recording) {
+          const duplicateMeetingId = this.store.findMeetingByAudioHash(recording.sha256);
+          if (duplicateMeetingId !== null && duplicateMeetingId !== this.meetingId) {
+            duplicateError = new Error(`[DUPLICATE_AUDIO] audio already belongs to meeting ${duplicateMeetingId}`);
+          }
+        }
+        // Recorder failures leave no row; transcript finalization remains independent.
+      }
+    }
+    const transcript = this.writer.finalize({ selectCanonical: true });
+    if (duplicateError) throw duplicateError;
+    return { ...transcript, audio };
   }
 }
 
@@ -152,7 +211,7 @@ function removeIfPresent(path: string): void {
   if (existsSync(path)) rmSync(path, { force: true });
 }
 
-export class RawAudioRecorder {
+export class RawAudioRecorder implements AudioRecorderHandle {
   private constructor(private readonly proc: ChildProcess, private readonly outputPath: string) {}
 
   static async start(input: { bin: string; captureId: number; outputPath: string }): Promise<RawAudioRecorder> {

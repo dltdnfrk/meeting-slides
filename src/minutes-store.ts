@@ -295,6 +295,19 @@ CREATE TABLE IF NOT EXISTS artifacts (
   UNIQUE (bundle_id, artifact_type),
   FOREIGN KEY (bundle_id) REFERENCES artifact_bundles(bundle_id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS meeting_conclusions (
+  meeting_id INTEGER PRIMARY KEY,
+  review_id TEXT NOT NULL UNIQUE,
+  transcript_version_id TEXT NOT NULL,
+  bundle_id TEXT NOT NULL UNIQUE,
+  bundle_path TEXT NOT NULL,
+  manifest_sha256 TEXT NOT NULL CHECK (length(manifest_sha256) = 64),
+  target_commit TEXT NOT NULL CHECK (length(target_commit) = 40),
+  concluded_at INTEGER NOT NULL,
+  FOREIGN KEY (meeting_id, review_id, transcript_version_id)
+    REFERENCES meeting_reviews(meeting_id, review_id, transcript_version_id),
+  FOREIGN KEY (bundle_id) REFERENCES artifact_bundles(bundle_id)
+);
 `;
 
 function nonBlank(value: string, label: string): string {
@@ -324,14 +337,11 @@ function reviewError(code: ReviewMutationErrorCode, message: string): Error {
 }
 
 function canonicalLineJson(line: {
-  seq: number; captured_at_ms: number | null; audio_start_ms: number | null;
-  audio_end_ms: number | null; speaker_turn: number | null; text: string;
+  seq: number; captured_at_ms: number | null; speaker_turn: number | null; text: string;
 }): string {
   return JSON.stringify({
     seq: line.seq,
-    captured_at_ms: line.captured_at_ms,
-    audio_start_ms: line.audio_start_ms,
-    audio_end_ms: line.audio_end_ms,
+    ts: line.captured_at_ms,
     speaker_turn: line.speaker_turn,
     text: line.text,
   });

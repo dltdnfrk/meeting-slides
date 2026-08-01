@@ -7,8 +7,10 @@ import { join } from "node:path";
 import { MinutesStore } from "../src/minutes-store.ts";
 import { MeetingStore } from "../src/store.ts";
 import {
+  CaptureFinalizer,
   RawAudioRecorder,
   TranscriptVersionWriter,
+  canonicalTranscriptJsonl,
   claimFileAudioSource,
   sha256File,
   snapshotLegacyTranscript,
@@ -41,6 +43,16 @@ describe("canonical transcript versioning", () => {
     expect(minutes.transcriptVersionLines(version.transcriptVersionId).map(({ seq, text }) => ({ seq, text }))).toEqual([
       { seq: 1, text: "First canonical line" },
       { seq: 2, text: "Second canonical line" },
+    ]);
+    const canonicalLines = canonicalTranscriptJsonl(minutes, version.transcriptVersionId)
+      .trim().split("\n").map((line) => JSON.parse(line));
+    expect(canonicalLines.map(Object.keys)).toEqual([
+      ["seq", "ts", "speaker_turn", "text"],
+      ["seq", "ts", "speaker_turn", "text"],
+    ]);
+    expect(canonicalLines).toEqual([
+      { seq: 1, ts: 1000, speaker_turn: 1, text: "First canonical line" },
+      { seq: 2, ts: 2000, speaker_turn: null, text: "Second canonical line" },
     ]);
     expect(() => minutes.databaseHandle().run(
       "UPDATE transcript_version_lines SET text = 'tampered' WHERE transcript_version_id = ? AND seq = 1",
@@ -111,7 +123,7 @@ describe("canonical transcript versioning", () => {
 });
 
 describe("raw audio hash and recorder contract", () => {
-  test("file audio claims are hash-deduplicated and preserve the first meeting on unique collision", () => {
+  test("file audio claims reject same bytes without duplicate persistence and allow different bytes", () => {
     const dir = mkdtempSync(join(tmpdir(), "meeting-audio-hash-"));
     const audio = join(dir, "sample.wav");
     writeFileSync(audio, "same source bytes");
@@ -120,13 +132,57 @@ describe("raw audio hash and recorder contract", () => {
     const secondMeetingId = legacy.startMeeting("cli:test");
     minutes.registerCapturingMeeting(secondMeetingId);
     const duplicate = claimFileAudioSource(minutes, secondMeetingId, audio);
+    const differentAudio = join(dir, "different.wav");
+    writeFileSync(differentAudio, "different source bytes");
+    const thirdMeetingId = legacy.startMeeting("cli:test");
+    minutes.registerCapturingMeeting(thirdMeetingId);
+    const different = claimFileAudioSource(minutes, thirdMeetingId, differentAudio);
 
     expect(first).toEqual({ duplicateMeetingId: null, sha256: sha256File(audio), byteLength: 17 });
     expect(duplicate).toEqual({ duplicateMeetingId: meetingId, sha256: first.sha256, byteLength: 17 });
+    expect(different).toEqual({ duplicateMeetingId: null, sha256: sha256File(differentAudio), byteLength: 22 });
     expect(minutes.findMeetingByAudioHash(first.sha256)).toBe(meetingId);
-    expect(minutes.databaseHandle().query("SELECT COUNT(*) AS count FROM meeting_audio_sources").get()).toEqual({ count: 1 });
+    expect(minutes.databaseHandle().query("SELECT COUNT(*) AS count FROM meeting_audio_sources").get()).toEqual({ count: 2 });
     legacy.close();
     rmSync(dir, { recursive: true, force: true });
+  });
+
+  test("capture finalization stops the recorder exactly once on success and failure", async () => {
+    const successful = stores();
+    const successWriter = new TranscriptVersionWriter(successful.minutes);
+    successWriter.begin(successful.meetingId, { sourceKind: "live_capture" });
+    successWriter.append({ ts: 1, text: "saved" });
+    let successStops = 0;
+    const successPath = "/configured/raw-success.wav";
+    const successHash = "a".repeat(64);
+    const successFinalizer = new CaptureFinalizer(successful.minutes, successWriter, successful.meetingId, {
+      stop: async () => { successStops++; return { path: successPath, sha256: successHash, byteLength: 51 }; },
+    });
+    const success = successFinalizer.finish();
+    expect(await success).toMatchObject({
+      transcriptVersionId: expect.any(String),
+      audio: { status: "available", path: successPath, sha256: successHash, byteLength: 51 },
+    });
+    expect(await successFinalizer.finish()).toEqual(await success);
+    expect(successStops).toBe(1);
+    expect(successful.minutes.databaseHandle().query("SELECT original_audio_path, original_audio_sha256, byte_length FROM meeting_audio_sources").get()).toEqual({
+      original_audio_path: successPath, original_audio_sha256: successHash, byte_length: 51,
+    });
+    successful.legacy.close();
+
+    const failed = stores();
+    const failedWriter = new TranscriptVersionWriter(failed.minutes);
+    const version = failedWriter.begin(failed.meetingId, { sourceKind: "live_capture" });
+    failedWriter.append({ ts: 1, text: "still finalized" });
+    let failedStops = 0;
+    const failure = await new CaptureFinalizer(failed.minutes, failedWriter, failed.meetingId, {
+      stop: async () => { failedStops++; throw new Error("recorder close failed"); },
+    }).finish();
+    expect(failure.audio).toEqual({ status: "unavailable", reason: "recorder_failed" });
+    expect(failedStops).toBe(1);
+    expect(failed.minutes.canonicalVersion(failed.meetingId)?.transcriptVersionId).toBe(version.transcriptVersionId);
+    expect(failed.minutes.databaseHandle().query("SELECT COUNT(*) AS count FROM meeting_audio_sources").get()).toEqual({ count: 0 });
+    failed.legacy.close();
   });
 
   test("recorder waits for closure, hashes a valid WAV, and removes failed partial output", async () => {

@@ -243,7 +243,7 @@ describe("MinutesStore SQLite contracts", () => {
       "meeting_audio_sources", "transcript_versions", "transcript_version_lines",
       "meeting_transcript_state", "transcript_line_attributions", "meeting_reviews",
       "decisions", "action_items", "open_items", "referenced_materials",
-      "artifact_bundles", "artifacts",
+      "artifact_bundles", "artifacts", "meeting_conclusions",
     ]) expect(names).toContain(required);
     legacy.close();
   });
