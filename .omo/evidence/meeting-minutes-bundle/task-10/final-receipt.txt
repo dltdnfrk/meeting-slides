@@ -1,0 +1,16 @@
+T10 FINAL RECEIPT
+verified_at=2026-08-01T00:00:00Z
+target_commit=d9775a3dbb4449c17fdac0b78795bc43ae296aeb
+commit_subject=feat(minutes): add portrait minutes HTML template with first-page-complete structure
+staged_files_in_commit:
+src/minutes.ts
+deck/minutes.css
+tests/minutes.test.ts
+.omo/evidence/meeting-minutes-bundle/task-10/DoneClaim.json
+.omo/evidence/meeting-minutes-bundle/task-10/final-receipt.txt
+status:
+?? .omo/evidence/meeting-minutes-bundle/task-10/
+diff_check:
+none run in this closeout pass
+scope:
+bounded cleanup only; no plan/ledger/boulder edits; no broad rerun

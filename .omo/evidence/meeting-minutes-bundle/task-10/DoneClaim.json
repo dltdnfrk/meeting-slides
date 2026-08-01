@@ -1,0 +1,27 @@
+{
+  "task_id": "st_019fbdaa",
+  "task": "T10 portrait minutes HTML template with first-page-complete structure",
+  "status": "DONE",
+  "target_commit": "d9775a3dbb4449c17fdac0b78795bc43ae296aeb",
+  "commit_subject": "feat(minutes): add portrait minutes HTML template with first-page-complete structure",
+  "verified_by": "senpi-task-st_019fbdaa",
+  "verified_at": "2026-08-01T00:00:00Z",
+  "claims": {
+    "implementation": "portrait A4 minutes template with first-page decision/action summary and appendix page split",
+    "regression": "empty states, transcript provenance coordinates, escaping, and appendix break behavior preserved",
+    "tests": "focused minutes test evidence already present in task-10 receipts 01..07",
+    "scope": "only src/minutes.ts, deck/minutes.css, tests/minutes.test.ts and task-10 evidence/receipt files are in scope"
+  },
+  "evidence_refs": [
+    "01-red-proof.txt",
+    "02-focused-green.txt",
+    "03-full-bun-test.txt",
+    "04-tsc.txt",
+    "05-static-scope-check.txt",
+    "06-real-render-driver.ts",
+    "06-real-render-driver.txt",
+    "06-real-render.png",
+    "07-adversarial-driver.ts",
+    "07-adversarial-driver.txt"
+  ]
+}
