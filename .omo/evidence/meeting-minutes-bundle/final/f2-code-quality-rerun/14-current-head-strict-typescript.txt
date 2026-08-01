@@ -1,0 +1,3 @@
+COMMAND: bunx tsc -p tsconfig.json --noEmit --strict --pretty false
+VERIFIED_HEAD: 6711ecfcb47f75b1bb22377d97dd551538568ad7
+EXIT_CODE: 0

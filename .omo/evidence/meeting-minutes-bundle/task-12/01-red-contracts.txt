@@ -2,9 +2,9 @@ bun test v1.3.14 (0d9b296a)
 
 tests/bundle.test.ts:
 103 |     fx.store.confirmReview(fx.reviewId, "bundle-test");
-104 | 
+104 |
 105 |     const result = await run(fx);
-106 | 
+106 |
 107 |     expect(outputNames(fx.outputRoot)).toEqual([basename(result.bundlePath)]);
 108 |     expect(outputNames(result.bundlePath)).toEqual([
                                                  ^
@@ -42,7 +42,7 @@ TypeError: undefined is not an object (evaluating 'source.transcript_version_id'
 155 |     const lines = transcriptBytes.toString("utf8").trim().split("\n").map(JSON.parse);
 156 |     const minutes = JSON.parse(readFileSync(join(result.bundlePath, "minutes.json"), "utf8"));
 157 |     const manifest = JSON.parse(readFileSync(join(result.bundlePath, "manifest.json"), "utf8")) as BundleManifest;
-158 | 
+158 |
 159 |     expect(lines.map(Object.keys)).toEqual([
                                          ^
 error: expect(received).toEqual(expected)

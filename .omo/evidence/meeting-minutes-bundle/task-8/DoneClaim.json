@@ -1,7 +1,7 @@
 {
   "task": 8,
   "base_commit": "b12706c2b1099f315f19c6bf528880789be18bbe",
-  "target_commit": "self (the commit carrying this receipt)",
+  "target_commit": "524292a3a23584bacf6787ccfce3e318293b0e47",
   "target_subject": "feat(public): add review-panel overlay with attendee dropdown attribution",
   "verified_by": "hephaestus / st_019fbe5a / gpt-5.6-sol",
   "verified_at": "2026-08-01T17:25:46Z",

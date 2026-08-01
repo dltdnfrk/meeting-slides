@@ -1,7 +1,9 @@
 # F2 code-quality rerun - final repair
 
 - **Verdict: PASS**
+- **Verified result HEAD:** `6711ecfcb47f75b1bb22377d97dd551538568ad7`
 - **Parent HEAD:** `87805376884df35f76fb52093f521584e7da4300`
+- **Verified result tree:** `21b372277d9f142d7321b0554ef456fdf480cb1b`
 - **Repair source fingerprint:** `21438d3d33b5eba01ec7449751f0e6a7fabcffd6c2838a40bcfaf7d830ede6cb`
 - **Fingerprint input:** SHA-256 lines for `public/index.html`, `public/review-panel.js`, `public/review-panel-render.js`, `src/transcript-versioning.ts`, `src/audio-recorder.ts`, and `tests/public-review.test.ts`, aggregated with SHA-256
 - **verified_by:** `senpi task st_019fbecf` (`PI_SESSION_ID=019fbecf-803f-71ba-a514-1a755d98ec65`, `PI_MODEL=gpt-5.6-sol`)

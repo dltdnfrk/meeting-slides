@@ -4,7 +4,7 @@ tests/review-actions.test.ts:
 44 |   });
 45 |   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
 46 | }
-47 | 
+47 |
 48 | function expectCode(fn: () => unknown, code: string): void {
 49 |   expect(fn).toThrow(`[${code}]`);
                   ^
@@ -19,7 +19,7 @@ Received message: "unknown decision action-1"
 44 |   });
 45 |   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
 46 | }
-47 | 
+47 |
 48 | function expectCode(fn: () => unknown, code: string): void {
 49 |   expect(fn).toThrow(`[${code}]`);
                   ^
@@ -34,7 +34,7 @@ Received message: "all review items must be confirmed or rejected"
 44 |   });
 45 |   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
 46 | }
-47 | 
+47 |
 48 | function expectCode(fn: () => unknown, code: string): void {
 49 |   expect(fn).toThrow(`[${code}]`);
                   ^
@@ -51,7 +51,7 @@ Received value: undefined
 44 |   });
 45 |   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
 46 | }
-47 | 
+47 |
 48 | function expectCode(fn: () => unknown, code: string): void {
 49 |   expect(fn).toThrow(`[${code}]`);
                   ^
@@ -67,7 +67,7 @@ Received value: undefined
 (fail) MinutesStore review mutation transaction > detects changed canonical transcript bytes and leaves review/artifact rows untouched [1.37ms]
 141 | let reviewId: string;
 142 | const messages: Record<string, unknown>[] = [];
-143 | 
+143 |
 144 | function waitFor<T>(subscribe: (done: (value: T) => void, fail: (error: Error) => void) => void): Promise<T> {
 145 |   return new Promise<T>((resolve, reject) => {
 146 |     const timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);

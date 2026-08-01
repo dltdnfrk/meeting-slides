@@ -1,6 +1,7 @@
 Task 9 full-gate receipt
 
 target_parent=524292a3a23584bacf6787ccfce3e318293b0e47
+target_commit=a29d0d4856e7020edf031317ab9a91f0afa54218
 subject=feat(server): add updateItem/confirmReview with attendee validation and re-verification transaction
 verified_by=hephaestus/st_019fbe63
 verified_at=2026-08-01T17:38:01Z

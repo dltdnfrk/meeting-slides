@@ -1,6 +1,7 @@
 Task: 8 - public review-panel overlay with attendee dropdown attribution
 Base commit: b12706c2b1099f315f19c6bf528880789be18bbe
-Target commit: the commit carrying this receipt, with exact subject feat(public): add review-panel overlay with attendee dropdown attribution
+Target commit: 524292a3a23584bacf6787ccfce3e318293b0e47
+Target subject: feat(public): add review-panel overlay with attendee dropdown attribution
 Target source blob: public/review-panel.js ea8ccf9c3969387bb3af6dc708940e37bd42b066
 Target test blob: tests/public-review.test.ts 334bf122ed7358bab0a23f94bcd6f80331f741cb
 Verified by: hephaestus (senpi task st_019fbe5a; PI_SESSION_ID 019fbe5a-01d4-70fb-9238-c398c8ec1992; model gpt-5.6-sol)

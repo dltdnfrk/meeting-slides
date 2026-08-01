@@ -1,6 +1,8 @@
 # F2 module-size repair receipt
 
 - result: **PASS**
+- verified_result_head: `6711ecfcb47f75b1bb22377d97dd551538568ad7`
+- verified_result_tree: `21b372277d9f142d7321b0554ef456fdf480cb1b`
 - parent_head: `87805376884df35f76fb52093f521584e7da4300`
 - repair_source_fingerprint_sha256: `21438d3d33b5eba01ec7449751f0e6a7fabcffd6c2838a40bcfaf7d830ede6cb`
 - verified_by: `senpi task st_019fbecf` / PI session `019fbecf-803f-71ba-a514-1a755d98ec65`

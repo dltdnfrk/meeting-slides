@@ -5,7 +5,7 @@ tests/server-handler-map.test.ts:
 43 |       WHISPER_INPUT_MODE: "mic",
 44 |     },
 45 |   });
-46 | 
+46 |
 47 |   expect(result.status, result.stderr).toBe(0);
                                             ^
 error: SyntaxError: Export named 'handlerMap' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/server.ts'.

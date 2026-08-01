@@ -1,6 +1,9 @@
 {
   "taskId": "st_019fbde5",
   "status": "done",
+  "parent_commit": "0c0d5aa55f4def8f8cd79ee398417b7acf8788d4",
+  "target_commit": "c2736c81fe6ca04167b4f2ded7e67804226471ce",
+  "transaction_remediation_commit": "b23ee2aac5203c29a7355d838c9e0680853599ef",
   "summary": "Conclusion flow now atomically confirms reviews only after a successful bundle publish and persists the concluded meeting identity.",
   "verification": [
     "bun test tests/conclusion.test.ts tests/review-actions.test.ts tests/bundle.test.ts",

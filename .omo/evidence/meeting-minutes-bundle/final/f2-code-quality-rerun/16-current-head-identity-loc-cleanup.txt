@@ -1,0 +1,35 @@
+COMMAND: pure LOC, commit identity, scope, and cleanup
+VERIFIED_HEAD: 6711ecfcb47f75b1bb22377d97dd551538568ad7
+VERIFIED_COMMIT_TREE: 21b372277d9f142d7321b0554ef456fdf480cb1b
+PARENT_HEAD: 87805376884df35f76fb52093f521584e7da4300
+235 pure / 266 total  public/review-panel.js  PASS
+145 pure / 153 total  public/review-panel-render.js  PASS
+145 pure / 166 total  src/transcript-versioning.ts  PASS
+143 pure / 154 total  src/audio-recorder.ts  PASS
+
+SCOPED COMMIT:
+6711ecf refactor(minutes): split review renderer and audio recorder
+ .../f2-code-quality-rerun/01-focused-tests.txt     |  76 ++++++
+ .../02-full-bun-test-unbounded-exit-137.txt        | 245 ++++++++++++++++++
+ .../03-full-bun-test-bounded.txt                   | 282 +++++++++++++++++++++
+ .../f2-code-quality-rerun/04-strict-typescript.txt |   2 +
+ .../f2-code-quality-rerun/05-browser-checkjs.txt   |   2 +
+ .../06-pdf-timeout-isolation.txt                   |  16 ++
+ .../f2-code-quality-rerun/07-loc-scope-diff.txt    |  17 ++
+ .../08-real-chromium-smoke.txt                     |  43 ++++
+ .../09-full-bun-test-serial.txt                    | 277 ++++++++++++++++++++
+ .../10-final-repair-receipt.md                     |  32 +++
+ .../f2-code-quality-rerun/F2-code-quality-rerun.md |  70 +++++
+ public/index.html                                  |   1 +
+ public/review-panel-render.js                      | 153 +++++++++++
+ public/review-panel.js                             | 176 +------------
+ src/audio-recorder.ts                              | 154 +++++++++++
+ src/transcript-versioning.ts                       | 158 +-----------
+ tests/public-review.test.ts                        |   4 +-
+ 17 files changed, 1389 insertions(+), 319 deletions(-)
+
+DIFF CHECK:
+DIFF_CHECK_EXIT: 0
+
+OWNED PROCESSES:
+OWNED RECENT TEMPS:
