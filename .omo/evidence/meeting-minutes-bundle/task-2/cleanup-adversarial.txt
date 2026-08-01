@@ -1,0 +1,26 @@
+T2 cleanup and adversarial receipt
+recorded_at: 2026-08-01T12:55:27Z
+
+cleanup:
+- temporary QA script removed: true
+- temporary QA database directories removed: true
+- generated SQLite files in worktree: 0
+
+adversarial classes:
+- dirty_worktree: isolated worktree status inspected; explicit path staging only; parent worktree untouched.
+- stale_state: first direct-QA ordering intentionally exposed one-review-per-version uniqueness; failed receipt retained and corrected scenario used a fresh DB.
+- malformed_input: malformed audio hash rejected and independent row count remained zero.
+- transaction interruption/rollback: duplicate attendee batch, interior-gap candidate batch, and confirmation revalidation all proved rollback by independent queries.
+- misleading_success_output: method returns were checked against persisted rows and PRAGMA foreign_key_check.
+- flaky tests/no sleeps: Bun suite passed once; QA uses synchronous DB assertions and no sleeps.
+- bounded long commands: tool-enforced 120s Bun/tsc and 30s diff bounds; all completed.
+- prompt injection: N/A; T2 consumes no prompts or external content.
+- generated_artifacts: N/A; T2 creates schema/persistence only; temporary QA script/database were removed.
+- LSP: unavailable for isolated worktree because validator is rooted at parent; recorded once in validator-limitation.txt; tsc substituted.
+- GNU timeout: not required; execution tool supplied hard command timeouts.
+
+pre-stage status:
+ M src/store.ts
+?? .omo/evidence/meeting-minutes-bundle/task-2/
+?? src/minutes-store.ts
+?? tests/minutes-store.test.ts

@@ -1,0 +1,3 @@
+validator_limitation: lsp_diagnostics rejected task-worktree paths because tool workspace is rooted at the parent worktree
+closure: bounded tsc --noEmit plus Bun tests are used; limitation will not be retried
+recorded_at: 2026-08-01T12:49:18Z

@@ -1,0 +1,42 @@
+command: fresh bun:sqlite driver scenario (temporary script/database)
+started_at: 2026-08-01T12:54:28Z
+34 |   assert.equal(store.itemsForReview(reviewId).length, 1);
+35 |
+36 |   store.databaseHandle().run("DELETE FROM transcript_version_lines WHERE transcript_version_id = ? AND seq = 2", [v1.transcriptVersionId]);
+37 |   const beforeReviews = scalar("SELECT COUNT(*) AS n FROM meeting_reviews");
+38 |   const beforeDecisions = scalar("SELECT COUNT(*) AS n FROM decisions");
+39 |   assert.throws(() => store.saveCandidates({ meetingId, transcriptVersionId: v1.transcriptVersionId, decisions: [
+              ^
+AssertionError: The input did not match the regular expression /contiguous/. Input:
+
+'SQLiteError: UNIQUE constraint failed: meeting_reviews.meeting_id, meeting_reviews.transcript_version_id'
+
+ generatedMessage: true,
+   expected: /contiguous/,
+   operator: "throws",
+       code: "ERR_ASSERTION"
+
+      at /private/tmp/t2-sqlite-qa.XXXXXX.ts:39:10
+
+501 |
+502 |   saveCandidates(input: SaveCandidatesInput): string {
+503 |     return this.db.transaction(() => {
+504 |       const reviewId = input.reviewId ?? randomUUID();
+505 |       const now = Date.now();
+506 |       this.db.run(`
+                    ^
+SQLiteError: UNIQUE constraint failed: meeting_reviews.meeting_id, meeting_reviews.transcript_version_id
+      errno: 2067,
+ byteOffset: -1,
+       code: "SQLITE_CONSTRAINT_UNIQUE"
+
+      at run (bun:sqlite:341:14)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/src/minutes-store.ts:506:15)
+      at transaction (bun:sqlite:416:27)
+      at getActual (node:assert:394:7)
+      at throws (node:assert:484:33)
+      at /private/tmp/t2-sqlite-qa.XXXXXX.ts:39:10
+
+Bun v1.3.14 (macOS arm64)
+temporary_qa_cleanup: script_removed=true database_dir_removed=true
+exit_code: 1

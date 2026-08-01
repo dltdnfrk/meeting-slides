@@ -79,6 +79,11 @@ export class MeetingStore {
     });
   }
 
+  /** MinutesStore 등 형제 도메인이 같은 SQLite 연결과 트랜잭션 설정을 공유한다. */
+  databaseHandle(): Database {
+    return this.db;
+  }
+
   /** 캡처 시작 = 새 회의 */
   startMeeting(provider: string): number {
     const res = this.db.run("INSERT INTO meetings (started_at, provider) VALUES (?, ?)", [Date.now(), provider]);

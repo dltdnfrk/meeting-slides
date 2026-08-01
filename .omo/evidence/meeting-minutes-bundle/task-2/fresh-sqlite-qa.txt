@@ -1,0 +1,20 @@
+command: fresh bun:sqlite driver scenario (corrected ordering after documented stale-review probe)
+started_at: 2026-08-01T12:55:02Z
+{
+  "preparedMeeting": 1,
+  "attendeeConstraintRollback": true,
+  "validSourceRangePersisted": true,
+  "invalidInteriorRangeRolledBack": true,
+  "confirmationRollback": true,
+  "versionsPreserved": [
+    1,
+    2
+  ],
+  "canonicalUnchanged": "qa-v1",
+  "audioSuccessMeeting": 1,
+  "malformedAudioRows": 0,
+  "duplicateAudioRows": 0,
+  "foreignKeyCheck": "clean"
+}
+temporary_qa_cleanup: script_removed=true database_dir_removed=true
+exit_code: 0
