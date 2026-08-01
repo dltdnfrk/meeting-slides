@@ -1,0 +1,4 @@
+T3 edit attempt receipt
+The first append attempt used oldText `});\n`, which matched 15 locations in tests/llm-transport.test.ts.
+Tool result: "Found 15 occurrences ... The text must be unique. Please provide more context to make it unique."
+No file was changed by that failed attempt. The next edit used the unique final CLI error-test block and succeeded.

@@ -1,0 +1,13 @@
+T3 cleanup receipt
+- QA scratch script /tmp/t3-chat-qa.ts removed: yes
+- QA temp dir t3-chat-qa-* removed by script itself (see 04 tail); leftover check: 0 matches
+- stub Bun.serve stopped in-script (server.stop(true))
+- no paid provider contacted; all traffic to 127.0.0.1 stub / temp shell stubs
+--- git diff --stat (T3 scope) ---
+ src/llm-cli.ts | 15 ++++++++++++++-
+ src/llm.ts     | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+), 1 deletion(-)
+ M src/llm-cli.ts
+ M src/llm.ts
+?? .omo/evidence/meeting-minutes-bundle/task-3/
+?? tests/llm-transport.test.ts

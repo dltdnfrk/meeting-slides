@@ -18,6 +18,8 @@ import {
   parseBlockDetectionJson,
   type BlockDetectionResult,
   type BlockDetector,
+  type ChatOptions,
+  type ChatTransport,
 } from "./llm.js";
 import type { CliLLMConfig } from "./config.js";
 
@@ -85,8 +87,19 @@ function runCli(cfg: CliLLMConfig, prompt: string): Promise<string> {
   });
 }
 
-export class CliLLMClient implements BlockDetector {
+export class CliLLMClient implements BlockDetector, ChatTransport {
   constructor(private cfg: CliLLMConfig) {}
+
+  /**
+   * 범용 chat: 프롬프트를 CLI에 그대로 전달하고 출력 원문을 반환한다.
+   * detectBlock과 달리 SYSTEM_PROMPT를 붙이지 않음 — 필요하면 options.system 사용.
+   * temperature/maxTokens는 CLI 계약에 없으므로 무시된다.
+   */
+  async chat(prompt: string, options: ChatOptions = {}): Promise<string> {
+    const fullPrompt = options.system ? `${options.system}\n\n${prompt}` : prompt;
+    const cfg = options.timeoutMs ? { ...this.cfg, timeoutMs: options.timeoutMs } : this.cfg;
+    return runCli(cfg, fullPrompt);
+  }
 
   async detectBlock(sentences: string[]): Promise<BlockDetectionResult> {
     if (sentences.length === 0) {

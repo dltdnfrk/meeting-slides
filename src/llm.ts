@@ -23,6 +23,21 @@ export interface BlockDetector {
   ping(): Promise<boolean>;
 }
 
+/** 범용 chat() 호출 옵션. 블록 감지 외 용도(추출 등)에서 프롬프트별로 조정한다. */
+export interface ChatOptions {
+  /** 시스템 프롬프트. 미지정 시 user 메시지만 전송(CLI는 프롬프트 그대로). */
+  system?: string;
+  temperature?: number;
+  maxTokens?: number;
+  /** 요청 상한(ms). 미지정 시 HTTP는 CHAT_TIMEOUT_MS, CLI는 설정 timeoutMs. */
+  timeoutMs?: number;
+}
+
+/** 원문 텍스트를 그대로 돌려주는 범용 chat 전송 인터페이스. */
+export interface ChatTransport {
+  chat(prompt: string, options?: ChatOptions): Promise<string>;
+}
+
 /**
  * 모델 출력에서 블록 감지 JSON을 추출한다. GLM reasoning_content처럼 앞뒤에
  * 사고 과정이 붙은 출력도 첫 { 부터 마지막 } 까지 잘라 파싱한다.
@@ -80,6 +95,8 @@ export const SYSTEM_PROMPT = `당신은 실시간 한국어 회의 전사를 분
 // 행잉 요청이 session.detecting을 영원히 고정하지 않도록 요청에 상한을 둔다.
 const DETECT_TIMEOUT_MS = 30_000;
 const PING_TIMEOUT_MS = 10_000;
+// 범용 chat은 긴 추출 프롬프트를 다룰 수 있어 감지보다 여유 있게 잡는다.
+const CHAT_TIMEOUT_MS = 60_000;
 
 export class LLMClient {
   constructor(private cfg: LLMProviderConfig) {}
@@ -134,6 +151,46 @@ JSON으로만 응답하세요.`;
     // content 우선; 비어있으면 reasoning_content에서 JSON 추출 (GLM reasoning 대응)
     const raw = msg?.content ?? msg?.reasoning_content ?? "";
     return parseBlockDetectionJson(raw);
+  }
+
+  /**
+   * 범용 chat: 프롬프트를 보내고 모델 출력 원문 텍스트를 그대로 반환한다.
+   * detectBlock과 달리 JSON 강제(response_format) 없음 — 파싱은 호출자 몫.
+   */
+  async chat(prompt: string, options: ChatOptions = {}): Promise<string> {
+    const messages = options.system
+      ? [
+          { role: "system", content: options.system },
+          { role: "user", content: prompt },
+        ]
+      : [{ role: "user", content: prompt }];
+
+    const body = {
+      model: this.cfg.model,
+      messages,
+      temperature: options.temperature ?? 0.3,
+      max_tokens: options.maxTokens ?? 4000,
+    };
+
+    const resp = await fetch(this.chatURL(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.cfg.apiKey}`,
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(options.timeoutMs ?? CHAT_TIMEOUT_MS),
+    });
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`LLM API ${resp.status}: ${errText.slice(0, 200)}`);
+    }
+
+    const data = (await resp.json()) as ChatResponse;
+    const msg = data.choices?.[0]?.message;
+    // content 우선; 비어있으면 reasoning_content (GLM reasoning 대응)
+    return msg?.content ?? msg?.reasoning_content ?? "";
   }
 
   async ping(): Promise<boolean> {
