@@ -1,91 +1,145 @@
-import { writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { PDFDocument } from "pdf-lib";
 
 import { buildMinutesHtml, type MinutesInput } from "../../../../src/minutes.ts";
-import { renderMinutesPdf } from "../../../../src/pdf.ts";
+import {
+  MinutesPdfOverflowError,
+  renderMinutesPdf,
+  resolveVendoredChromiumExecutable,
+} from "../../../../src/pdf.ts";
 
-const evidenceDir = import.meta.dir;
-const pdfPath = join(evidenceDir, "minutes-a4.pdf");
-const input: MinutesInput = {
-  meta: {
-    title: "RELEASE COUNCIL 2026",
-    meetingDate: "2026-08-01",
-    timeZone: "Asia/Seoul",
-    purpose: "Approve the production release and record accountable follow-up.",
-    provider: "local",
-  },
-  attendees: [
-    { attendeeId: "alice", displayName: "Alice Kim" },
-    { attendeeId: "bob", displayName: "Bob Park" },
-  ],
-  decisions: Array.from({ length: 6 }, (_, index) => ({
-    description: `DECISION-MARKER-${index + 1}: approve release gate ${index + 1} with documented verification evidence.`,
-    attributedAttendeeId: index % 2 ? "bob" : "alice",
-    sourceSegment: { transcript_version_id: "canonical-v2", start_seq: index + 1, end_seq: index + 1 },
-  })),
-  actions: Array.from({ length: 3 }, (_, index) => ({
-    description: `ACTION-MARKER-${index + 1}: complete owner checklist and publish result.`,
-    assigneeAttendeeId: index % 2 ? "alice" : "bob",
-    deadline: `2026-08-${String(index + 7).padStart(2, "0")}`,
-    sourceSegment: { transcript_version_id: "canonical-v2", start_seq: index + 7, end_seq: index + 7 },
-  })),
-  open: [{
-    description: "APPENDIX-MARKER: confirm the next release train budget.",
-    attributedAttendeeId: "alice",
-    sourceSegment: { transcript_version_id: "canonical-v2", start_seq: 10, end_seq: 10 },
-  }],
-  referencedMaterials: [],
-  transcript: Array.from({ length: 55 }, (_, index) => ({
-    seq: index + 1,
-    speakerTurn: index % 2 + 1,
-    attributedAttendeeId: index % 2 ? "bob" : "alice",
-    text: `Transcript line ${index + 1}: verification discussion retained in the appendix for auditability.`,
-  })),
-  transcriptVersionId: "canonical-v2",
-};
+const evidenceDirectory = import.meta.dir;
+const pdfPath = join(evidenceDirectory, "minutes-a4.pdf");
+const shrinkPdfPath = join(evidenceDirectory, "minutes-a4-shrunk.pdf");
+const overflowDirectory = await mkdtemp(join(tmpdir(), "minutes-pdf-overflow-qa-"));
+const overflowPath = join(overflowDirectory, "must-not-exist.pdf");
+const rendererTemps = async (): Promise<string[]> => (await readdir(tmpdir()))
+  .filter((name) => name.startsWith("meeting-minutes-pdf-"))
+  .sort();
 
-const bytes = await renderMinutesPdf(buildMinutesHtml(input));
-await writeFile(pdfPath, bytes);
-const document = await PDFDocument.load(bytes);
-const size = document.getPage(0).getSize();
+function makeInput(decisions: number, descriptionRepeat: number, transcriptLines: number): MinutesInput {
+  const transcriptVersionId = "qa-canonical-v1";
+  return {
+    meta: {
+      title: "RELEASE COUNCIL QA",
+      meetingDate: "2026-08-01",
+      timeZone: "Asia/Seoul",
+      purpose: "Verify the A4 minutes export invariant.",
+    },
+    attendees: [{ attendeeId: "alice", displayName: "Alice Kim" }],
+    decisions: Array.from({ length: decisions }, (_, index) => ({
+      description: `DECISION-QA-${index + 1}: ${"release evidence ".repeat(descriptionRepeat)}`,
+      attributedAttendeeId: "alice",
+      sourceSegment: { transcript_version_id: transcriptVersionId, start_seq: index + 1, end_seq: index + 1 },
+    })),
+    actions: [{
+      description: "ACTION-QA-1: publish the signed verification report",
+      assigneeAttendeeId: "alice",
+      deadline: "2026-08-07",
+      sourceSegment: { transcript_version_id: transcriptVersionId, start_seq: decisions + 1, end_seq: decisions + 1 },
+    }],
+    open: [{
+      description: "APPENDIX-QA: retain follow-up discussion",
+      sourceSegment: { transcript_version_id: transcriptVersionId, start_seq: decisions + 2, end_seq: decisions + 2 },
+    }],
+    referencedMaterials: [],
+    transcript: Array.from({ length: transcriptLines }, (_, index) => ({
+      seq: decisions + 3 + index,
+      speakerTurn: 1,
+      attributedAttendeeId: "alice",
+      text: `APPENDIX-QA-LINE-${index + 1}: canonical transcript evidence retained for review.`,
+    })),
+    transcriptVersionId,
+  };
+}
 
-async function command(...args: string[]): Promise<string> {
-  const child = Bun.spawn(args, { stdout: "pipe", stderr: "pipe" });
+async function run(...command: string[]): Promise<string> {
+  const child = Bun.spawn(command, { stdout: "pipe", stderr: "pipe" });
   const [stdout, stderr, exitCode] = await Promise.all([
     new Response(child.stdout).text(),
     new Response(child.stderr).text(),
     child.exited,
   ]);
-  if (exitCode !== 0) throw new Error(`${args.join(" ")} failed (${exitCode}): ${stderr}`);
+  if (exitCode !== 0) throw new Error(`${command.join(" ")} failed (${exitCode}): ${stderr}`);
   return stdout;
 }
 
-const pageOnePath = join(evidenceDir, "page-1.txt");
-const pageTwoPath = join(evidenceDir, "page-2.txt");
-await command("pdftotext", "-f", "1", "-l", "1", pdfPath, pageOnePath);
-await command("pdftotext", "-f", "2", "-l", "2", pdfPath, pageTwoPath);
-await command("pdftoppm", "-f", "1", "-singlefile", "-png", "-r", "120", pdfPath, join(evidenceDir, "minutes-a4-page-1"));
-const pageOneText = await Bun.file(pageOnePath).text();
-const pageTwoText = await Bun.file(pageTwoPath).text();
-const decisionMarkers = Array.from({ length: 6 }, (_, index) => `DECISION-MARKER-${index + 1}`);
-const actionMarkers = Array.from({ length: 3 }, (_, index) => `ACTION-MARKER-${index + 1}`);
-const checks = {
-  pdfHeader: new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-",
-  portrait: size.height > size.width,
-  a4Points: Math.abs(size.width - 595.28) < 1 && Math.abs(size.height - 841.89) < 1,
-  everyDecisionOnPageOne: decisionMarkers.every((marker) => pageOneText.includes(marker)),
-  everyActionOnPageOne: actionMarkers.every((marker) => pageOneText.includes(marker)),
-  appendixNotOnPageOne: !pageOneText.includes("APPENDIX-MARKER"),
-  appendixStartsOnPageTwo: pageTwoText.includes("APPENDIX-MARKER"),
-};
-if (Object.values(checks).some((passed) => !passed)) throw new Error(`real PDF checks failed: ${JSON.stringify(checks)}`);
-console.log(JSON.stringify({
-  pdfPath,
-  bytes: bytes.byteLength,
-  pages: document.getPageCount(),
-  widthPoints: size.width,
-  heightPoints: size.height,
-  checks,
-}, null, 2));
+try {
+  const executablePath = await resolveVendoredChromiumExecutable();
+  const bytes = await renderMinutesPdf(buildMinutesHtml(makeInput(4, 2, 120)));
+  await writeFile(pdfPath, bytes);
+  const document = await PDFDocument.load(bytes);
+  const pageSize = document.getPage(0).getSize();
+  const text = await run("pdftotext", "-layout", pdfPath, "-");
+  const pages = text.split("\f").map((page) => page.trim()).filter(Boolean);
+  await writeFile(join(evidenceDirectory, "page-1.txt"), `${pages[0]}\n`);
+  await writeFile(join(evidenceDirectory, "page-2.txt"), `${pages[1]}\n`);
+
+  const shrinkHtml = buildMinutesHtml(makeInput(7, 4, 0))
+    .replace(
+      "</head>",
+      `<style>
+        html[data-minutes-fit="normal"] .first-page { min-height: 280mm !important; }
+        .fit-stage-marker::after { content: "FIT-STAGE-NORMAL"; }
+        html:not([data-minutes-fit="normal"]) .fit-stage-marker::after { content: "FIT-STAGE-SHRUNK"; }
+      </style></head>`,
+    )
+    .replace(/(<section class="first-page"[^>]*>)/, '$1<span class="fit-stage-marker"></span>');
+  const shrinkBytes = await renderMinutesPdf(shrinkHtml);
+  await writeFile(shrinkPdfPath, shrinkBytes);
+  const shrinkText = await run("pdftotext", "-layout", shrinkPdfPath, "-");
+
+  const beforeOverflowTemps = await rendererTemps();
+  const overflow = await renderMinutesPdf(buildMinutesHtml(makeInput(30, 20, 0))).then(
+    async (overflowBytes) => {
+      await writeFile(overflowPath, overflowBytes);
+      return undefined;
+    },
+    (error: unknown) => error,
+  );
+  const afterOverflowTemps = await rendererTemps();
+  const overflowOutputExists = await stat(overflowPath).then(() => true, () => false);
+  const checks = {
+    pdfHeader: new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-",
+    nonempty: bytes.byteLength > 1_000,
+    portraitA4: Math.abs(pageSize.width - 595.28) < 1
+      && Math.abs(pageSize.height - 841.89) < 1
+      && pageSize.height > pageSize.width,
+    appendixMultipage: document.getPageCount() > 2,
+    everyDecisionOnPageOne: Array.from({ length: 4 }, (_, index) => `DECISION-QA-${index + 1}`)
+      .every((marker) => pages[0]?.includes(marker)),
+    everyActionOnPageOne: pages[0]?.includes("ACTION-QA-1") === true,
+    appendixAbsentFromPageOne: !pages[0]?.includes("APPENDIX-QA"),
+    appendixPresentAfterPageOne: pages.slice(1).join("\n").includes("APPENDIX-QA-LINE-120"),
+    deterministicShrink: shrinkText.includes("FIT-STAGE-SHRUNK") && !shrinkText.includes("FIT-STAGE-NORMAL"),
+    shrunkSummaryComplete: Array.from({ length: 7 }, (_, index) => `DECISION-QA-${index + 1}`)
+      .every((marker) => shrinkText.split("\f")[0]?.includes(marker))
+      && shrinkText.split("\f")[0]?.includes("ACTION-QA-1") === true,
+    explicitOverflow: overflow instanceof MinutesPdfOverflowError,
+    overflowOutputAbsent: !overflowOutputExists,
+    overflowTempCleanup: JSON.stringify(beforeOverflowTemps) === JSON.stringify(afterOverflowTemps),
+  };
+  if (Object.values(checks).some((passed) => !passed)) {
+    throw new Error(`real PDF QA failed: ${JSON.stringify(checks)}`);
+  }
+
+  console.log(JSON.stringify({
+    verified_at: new Date().toISOString(),
+    verified_by: `senpi/${process.env.PI_MODEL ?? "unknown"}`,
+    target_commit: "94fea038c0ca47e8b32950a8d666550bd9dea448",
+    executablePath,
+    pdfPath,
+    shrinkPdfPath,
+    bytes: bytes.byteLength,
+    pages: document.getPageCount(),
+    pageSize,
+    pageOneTextPreview: pages[0]?.slice(0, 240),
+    overflow: overflow instanceof Error ? overflow.message : String(overflow),
+    checks,
+  }, null, 2));
+} finally {
+  await rm(overflowDirectory, { recursive: true, force: true });
+}

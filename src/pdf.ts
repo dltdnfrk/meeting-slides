@@ -1,9 +1,10 @@
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { constants } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import puppeteer, { type Browser } from "puppeteer";
+import { chromium, type Browser } from "playwright";
 
 const A4_PRINTABLE_HEIGHT_MM = 273;
 const FIT_TOLERANCE_PX = 0.5;
@@ -15,7 +16,12 @@ const FIT_CSS = `
   html[data-minutes-fit="compact"] { --minutes-fit-scale: .95; --minutes-space-scale: .82; }
   html[data-minutes-fit="dense"] { --minutes-fit-scale: .90; --minutes-space-scale: .68; }
   html[data-minutes-fit="minimum"] { --minutes-fit-scale: .84; --minutes-space-scale: .54; }
-  .first-page { font-size: calc(10.5pt * var(--minutes-fit-scale)); line-height: 1.32; }
+  .first-page {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    font-size: calc(10.5pt * var(--minutes-fit-scale));
+    line-height: 1.32;
+  }
   .first-page .minutes-header { padding-top: calc(6mm * var(--minutes-space-scale)); margin-bottom: calc(8mm * var(--minutes-space-scale)); }
   .first-page h1 { margin-bottom: calc(3mm * var(--minutes-space-scale)); font-size: calc(25pt * var(--minutes-fit-scale)); }
   .first-page h2 { margin-bottom: calc(3mm * var(--minutes-space-scale)); font-size: calc(14pt * var(--minutes-fit-scale)); }
@@ -27,7 +33,7 @@ const FIT_CSS = `
 `;
 
 export interface RenderMinutesPdfOptions {
-  /** Override used by packaged builds and for explicit launch diagnostics. */
+  /** Override for packaged builds and explicit launch-failure diagnostics. */
   executablePath?: string;
 }
 
@@ -38,7 +44,7 @@ export class MinutesPdfOverflowError extends Error {
   constructor(measuredHeightPx: number, availableHeightPx: number) {
     super(
       `First-page overflow: decision/action summary is ${measuredHeightPx.toFixed(1)}px high and cannot fit `
-      + `within the ${availableHeightPx.toFixed(1)}px A4 content area at the minimum supported density.`,
+      + `within the ${availableHeightPx.toFixed(1)}px A4 printable area after the minimum typography stage.`,
     );
     this.name = "MinutesPdfOverflowError";
     this.measuredHeightPx = measuredHeightPx;
@@ -49,6 +55,58 @@ export class MinutesPdfOverflowError extends Error {
 interface FirstPageMeasurement {
   height: number;
   available: number;
+}
+
+function chromiumExecutableSuffixes(): string[] {
+  if (process.platform === "darwin") {
+    const architecture = process.arch === "arm64" ? "arm64" : "x64";
+    return [
+      `chrome-headless-shell-mac-${architecture}/chrome-headless-shell`,
+      `chrome-mac-${architecture}/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`,
+    ];
+  }
+  if (process.platform === "win32") {
+    return [
+      "chrome-headless-shell-win64/chrome-headless-shell.exe",
+      "chrome-win64/chrome.exe",
+    ];
+  }
+  return [
+    "chrome-headless-shell-linux64/chrome-headless-shell",
+    "chrome-linux64/chrome",
+    "chrome-linux/chrome",
+  ];
+}
+
+/** Resolve only the Chromium installation vendored under vendor/ms-playwright. */
+export async function resolveVendoredChromiumExecutable(vendorRoot?: string): Promise<string> {
+  const moduleDirectory = dirname(fileURLToPath(import.meta.url));
+  const root = vendorRoot ?? join(moduleDirectory, "..", "vendor", "ms-playwright");
+  let installations: string[];
+  try {
+    installations = (await readdir(root))
+      .filter((entry) => entry.startsWith("chromium_headless_shell-") || entry.startsWith("chromium-"))
+      .sort((left, right) => {
+        const headlessDifference = Number(right.startsWith("chromium_headless_shell-"))
+          - Number(left.startsWith("chromium_headless_shell-"));
+        return headlessDifference || right.localeCompare(left);
+      });
+  } catch (error) {
+    throw new Error(`Vendored Chromium directory is unavailable at ${root}.`, { cause: error });
+  }
+
+  for (const installation of installations) {
+    for (const suffix of chromiumExecutableSuffixes()) {
+      const candidate = join(root, installation, suffix);
+      try {
+        await access(candidate, constants.X_OK);
+        return candidate;
+      } catch {
+        // Continue through the finite set of vendored Playwright layouts.
+      }
+    }
+  }
+  throw new Error(`No executable vendored Chromium was found under ${root}.`);
 }
 
 async function closeBrowser(browser: Browser | undefined): Promise<unknown> {
@@ -74,8 +132,8 @@ async function removeTemporaryDirectory(path: string): Promise<unknown> {
  * Render minutes HTML as a portrait A4 PDF.
  *
  * The decision/action summary is measured under print media before PDF creation.
- * A fixed sequence of density levels is attempted; content that still does not fit
- * is rejected rather than being silently split across pages.
+ * Typography is reduced through a fixed sequence; content that still does not fit
+ * is rejected rather than allowing Chromium to split the first page.
  */
 export async function renderMinutesPdf(
   html: string,
@@ -93,9 +151,10 @@ export async function renderMinutesPdf(
   let launchAttempted = false;
 
   try {
-    const [minutesCss, themeCss] = await Promise.all([
+    const [minutesCss, themeCss, executablePath] = await Promise.all([
       readFile(join(deckDirectory, "minutes.css"), "utf8"),
       readFile(join(deckDirectory, "theme.css"), "utf8"),
+      options.executablePath ? Promise.resolve(options.executablePath) : resolveVendoredChromiumExecutable(),
     ]);
     await Promise.all([
       writeFile(htmlPath, html, "utf8"),
@@ -104,21 +163,15 @@ export async function renderMinutesPdf(
     ]);
 
     launchAttempted = true;
-    browser = await puppeteer.launch({
-      headless: true,
-      ...(options.executablePath ? { executablePath: options.executablePath } : {}),
-    });
-
+    browser = await chromium.launch({ headless: true, executablePath });
     const page = await browser.newPage();
-    await page.setJavaScriptEnabled(false);
-    await page.emulateMediaType("print");
+    await page.emulateMedia({ media: "print" });
 
     const allowedDirectoryUrl = pathToFileURL(`${temporaryDirectory}/`).href;
-    await page.setRequestInterception(true);
-    page.on("request", (request) => {
-      const url = request.url();
-      if (url.startsWith(allowedDirectoryUrl) || url === "about:blank") void request.continue();
-      else void request.abort("blockedbyclient");
+    await page.route("**/*", async (route) => {
+      const url = route.request().url();
+      if (url.startsWith(allowedDirectoryUrl) || url === "about:blank") await route.continue();
+      else await route.abort("blockedbyclient");
     });
 
     await page.goto(pathToFileURL(htmlPath).href, { waitUntil: "load" });
@@ -171,9 +224,10 @@ export async function renderMinutesPdf(
     if (!operationError) {
       const cleanupError = browserCleanupError ?? tempCleanupError;
       if (cleanupError) {
-        operationError = new Error(`Minutes PDF cleanup failed: ${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`, {
-          cause: cleanupError,
-        });
+        operationError = new Error(
+          `Minutes PDF cleanup failed: ${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`,
+          { cause: cleanupError },
+        );
       }
     }
   }

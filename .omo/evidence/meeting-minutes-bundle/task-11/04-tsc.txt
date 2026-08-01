@@ -1,0 +1,3 @@
+target_commit=94fea038c0ca47e8b32950a8d666550bd9dea448
+command=bunx tsc -p tsconfig.json --noEmit
+exit_code=0

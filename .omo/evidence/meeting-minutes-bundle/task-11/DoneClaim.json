@@ -1,16 +1,31 @@
 {
-  "task": "T11 PDF export hardening",
-  "status": "done",
-  "commit_subject": "feat(minutes): harden PDF export with portrait A4 first-page fit",
-  "summary": "Chromium PDF rendering now measures the first page before export, shrinks within bounded readable levels, rejects impossible overflow, and cleans up temp/browser resources on success and failure.",
+  "task": "T11 Chromium A4 portrait minutes PDF",
+  "status": "pass",
+  "target_commit": "94fea038c0ca47e8b32950a8d666550bd9dea448",
+  "commit_subject": "feat(pdf): add chromium A4 portrait print with first-page overflow measure-and-shrink",
+  "verified_by": "senpi/gpt-5.6-sol",
+  "verified_at": "2026-08-01T17:58:54Z",
+  "gates": {
+    "focused": { "passed": 5, "failed": 0, "expectations": 28 },
+    "full": { "passed": 197, "failed": 0, "expectations": 750, "files": 27 },
+    "tsc": "pass",
+    "diff_check": "pass",
+    "real_pdf_qa": { "passed": 13, "failed": 0 }
+  },
+  "cleanup": "pass",
+  "main_worktree_fingerprint": "08-main-worktree-fingerprint.txt",
   "evidence": [
-    "01-red-proof.txt",
     "02-focused-green.txt",
     "03-full-bun-test.txt",
     "04-tsc.txt",
     "05-diff-check.txt",
     "06-real-pdf-driver.ts",
     "06-real-pdf-driver.txt",
-    "07-adversarial-driver.ts"
+    "08-main-worktree-fingerprint.txt",
+    "minutes-a4.pdf",
+    "minutes-a4-shrunk.pdf",
+    "page-1.txt",
+    "page-2.txt",
+    "final-receipt.txt"
   ]
 }
