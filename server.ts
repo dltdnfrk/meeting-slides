@@ -371,6 +371,7 @@ const handleSetAttendees: WsActionHandler = ({ cmd }) => {
   const meetingId = currentMeetingId ?? minutesStore.ensurePreparedMeeting(currentProviderId, purpose ?? null);
   const meta = minutesStore.meetingMeta(meetingId);
   if (!meta) throw new Error(`unknown meeting ${meetingId}`);
+  if (meta.phase !== "prepared") throw new Error(`meeting ${meetingId} is not prepared`);
   minutesStore.replaceAttendees(meetingId, attendees);
   if (purpose !== undefined) minutesStore.setMeetingPurpose(meetingId, purpose);
   currentMeetingId = meetingId;

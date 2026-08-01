@@ -244,7 +244,7 @@ abstract class WhisperBase {
 
   async stop(): Promise<void> {
     const proc = this.proc;
-    if (!proc || proc.exitCode !== null) return;
+    if (!proc || proc.exitCode !== null || proc.signalCode !== null) return;
     proc.kill("SIGTERM");
     const exited = new Promise<void>((resolve) => proc.once("close", () => resolve()));
     // 1초 안에 안 죽으면 SIGKILL로 확실히 회수 (마이크 장치 점유 고아 방지).

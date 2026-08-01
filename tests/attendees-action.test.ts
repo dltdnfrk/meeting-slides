@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
-import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -12,6 +12,7 @@ let socket: WebSocket;
 let tempDir: string;
 let dbPath: string;
 let port: number;
+let fakeWhisperPidPath: string;
 const messages: Record<string, unknown>[] = [];
 
 function waitFor<T>(subscribe: (done: (value: T) => void, fail: (error: Error) => void) => void): Promise<T> {
@@ -74,13 +75,61 @@ function errorFor(payload: Record<string, unknown>, fragment: string): Promise<R
     message.type === "status" && String(message.text).startsWith("요청 처리 실패:") && String(message.text).includes(fragment));
 }
 
+function killProcessTree(pid: number, signal: NodeJS.Signals): void {
+  try {
+    process.kill(-pid, signal);
+  } catch {
+    try {
+      process.kill(pid, signal);
+    } catch {
+      // already gone
+    }
+  }
+}
+
+function waitForProcessExit(proc: ChildProcessWithoutNullStreams): Promise<void> {
+  return waitFor<void>((done) => {
+    if (proc.exitCode !== null || proc.signalCode !== null) return done();
+    proc.once("close", () => done());
+  });
+}
+
+async function teardownChildTree(proc: ChildProcessWithoutNullStreams): Promise<void> {
+  if (proc.exitCode !== null || proc.signalCode !== null) return;
+  killProcessTree(proc.pid!, "SIGTERM");
+  try {
+    await Promise.race([
+      waitForProcessExit(proc),
+      new Promise<void>((_, reject) => setTimeout(() => reject(new Error("server teardown timed out")), 2_000)),
+    ]);
+  } catch {
+    killProcessTree(proc.pid!, "SIGKILL");
+    await waitForProcessExit(proc);
+  }
+}
+
+function processExists(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 beforeAll(async () => {
   tempDir = mkdtempSync(join(tmpdir(), "meeting-slides-attendees-"));
   dbPath = join(tempDir, "attendees.db");
+  fakeWhisperPidPath = join(tempDir, "fake-whisper.pid");
   const fakeCli = join(tempDir, "fake-cli");
   const fakeWhisper = join(tempDir, "fake-whisper");
   writeFileSync(fakeCli, "#!/bin/sh\necho fake-cli-1.0\n");
-  writeFileSync(fakeWhisper, "#!/usr/bin/env bun\nprocess.on('SIGTERM', () => process.exit(0));\nawait new Promise(() => {});\n");
+  writeFileSync(fakeWhisper, `#!/usr/bin/env bun
+import { writeFileSync } from "node:fs";
+writeFileSync(${JSON.stringify(fakeWhisperPidPath)}, String(process.pid));
+process.on('SIGTERM', () => process.exit(0));
+await new Promise(() => {});
+`);
   chmodSync(fakeCli, 0o755);
   chmodSync(fakeWhisper, 0o755);
 
@@ -113,15 +162,21 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (socket?.readyState === WebSocket.OPEN) socket.close();
-  if (child && child.exitCode === null) {
-    const closed = waitFor<void>((done) => child.once("close", () => done()));
-    child.kill("SIGKILL");
-    await closed;
+  if (child) await teardownChildTree(child);
+  if (readFileSync && fakeWhisperPidPath) {
+    try {
+      const fakeWhisperPid = Number(readFileSync(fakeWhisperPidPath, "utf8"));
+      if (Number.isInteger(fakeWhisperPid) && processExists(fakeWhisperPid)) {
+        throw new Error("fake-whisper orphan survived teardown");
+      }
+    } catch (error) {
+      if (!(error instanceof Error) || !String(error.message).includes("ENOENT")) throw error;
+    }
   }
   rmSync(tempDir, { recursive: true, force: true });
 });
 
-test("setAttendees persists replacement rosters and startCapture activates exactly that prepared meeting", async () => {
+test("setAttendees replaces a prepared roster and rejects capturing or ended meetings", async () => {
   await errorFor({ action: "startCapture", meeting_id: 1 }, "does not match the current prepared meeting");
   await errorFor({ action: "setAttendees", attendees: [] }, "attendees must contain at least one attendee");
   await errorFor({ action: "setAttendees", attendees: [{ name: " " }] }, "attendees[0].name must be a non-blank string");
@@ -182,14 +237,12 @@ test("setAttendees persists replacement rosters and startCapture activates exact
   expect(started).toEqual({ type: "capture", capturing: true, mode: "mic" });
   expect(db.query("SELECT phase FROM meeting_meta WHERE meeting_id = ?").get(meetingId)).toEqual({ phase: "capturing" });
 
-  const duringCapture = await sendAndWait({
+  await errorFor({
     action: "setAttendees",
     attendees: [{ attendeeId: "dana-local", name: "Dana Park", crmPersonId: "crm-dana" }],
-  }, (message) => message.type === "attendees" && message.meeting_id === meetingId &&
-    Array.isArray(message.attendees) && message.attendees.length === 1);
-  expect(duringCapture.attendees).toEqual([
-    { attendee_id: "dana-local", display_name: "Dana Park", crm_person_entity_id: "crm-dana" },
-  ]);
+  }, `meeting ${meetingId} is not prepared`);
+  expect(db.query("SELECT display_name, crm_person_entity_id FROM attendees WHERE meeting_id = ? AND attendee_id = ?")
+    .get(meetingId, "dana-local")).toEqual({ display_name: "Dana", crm_person_entity_id: null });
 
   await sendAndWait(
     { action: "stopCapture" },
@@ -197,15 +250,13 @@ test("setAttendees persists replacement rosters and startCapture activates exact
   );
   expect(db.query("SELECT phase FROM meeting_meta WHERE meeting_id = ?").get(meetingId)).toEqual({ phase: "ended" });
 
-  const afterCapture = await sendAndWait({
+  await errorFor({
     action: "setAttendees",
     attendees: [{ attendeeId: "dana-local", name: "Dana Final" }],
-  }, (message) => message.type === "attendees" && message.meeting_id === meetingId &&
-    Array.isArray(message.attendees) && message.attendees.length === 1);
-  expect(afterCapture.attendees).toEqual([
-    { attendee_id: "dana-local", display_name: "Dana Final" },
-  ]);
+  }, `meeting ${meetingId} is not prepared`);
   await errorFor({ action: "startCapture", meeting_id: meetingId }, "is not prepared");
   expect(db.query("SELECT COUNT(*) AS count FROM meetings").get()).toEqual({ count: 1 });
+  expect(db.query("SELECT display_name FROM attendees WHERE meeting_id = ? AND attendee_id = ?")
+    .get(meetingId, "dana-local")).toEqual({ display_name: "Dana" });
   db.close();
 }, 20_000);
