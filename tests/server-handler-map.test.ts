@@ -6,6 +6,7 @@ const root = join(import.meta.dir, "..");
 const existingActions = [
   "startCapture",
   "stopCapture",
+  "startReview",
   "reset",
   "setAttendees",
   "status",

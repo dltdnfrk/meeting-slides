@@ -94,6 +94,32 @@ export interface AttendeesUpdate {
   }>;
 }
 
+export interface ReviewUpdate {
+  type: "review";
+  reviewId: string;
+  transcriptVersionId: string;
+  attendees: Array<{ attendeeId: string; displayName: string }>;
+  transcript: {
+    lines: Array<{ seq: number; speakerTurn: number | null; text: string }>;
+  };
+  items: Array<{
+    id: string;
+    kind: "decision" | "action_item" | "open_item";
+    description: string;
+    sourceSegment: {
+      transcript_version_id: string;
+      start_seq: number;
+      end_seq: number;
+    };
+    evidenceQuote: string;
+    segment_text: string;
+    attributedAttendeeId: string | null;
+    assigneeAttendeeId?: string | null;
+    deadline?: string | null;
+    deadlineText?: string | null;
+  }>;
+}
+
 /** LLM 블록 감지 진행 표시 (관찰성: 사람·AI 모두 "지금 만드는 중"을 읽을 수 있게) */
 export interface DetectUpdate {
   type: "detect";
@@ -106,7 +132,7 @@ export interface SavedUpdate {
   path: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | LineUpdate | DetectUpdate | SavedUpdate;
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | LineUpdate | DetectUpdate | SavedUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 

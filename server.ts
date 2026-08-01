@@ -6,19 +6,22 @@
 
 import { loadConfig, loadWhisperConfig } from "./src/config.ts";
 import { WhisperStream, WhisperCLI, listCaptureDevices, type TranscriptChunk } from "./src/whisper.ts";
-import { LLMClient, type BlockDetector } from "./src/llm.ts";
+import { LLMClient, type BlockDetector, type ChatTransport } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
+import { MinutesExtractor } from "./src/extract.ts";
+import { startReview } from "./src/start-review.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
 import { MinutesStore, type AttendeeInput } from "./src/minutes-store.ts";
+import { RawAudioRecorder, TranscriptVersionWriter, claimFileAudioSource, sha256File } from "./src/transcript-versioning.ts";
 import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
 import { copyDeckAssets } from "./src/deck-assets.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
 import { createHash, randomUUID } from "node:crypto";
 import { join, sep } from "node:path";
-import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { spawn, spawnSync } from "child_process";
 import type { ServerWebSocket } from "bun";
 
@@ -35,13 +38,18 @@ if (args.includes("--devices")) {
 const config = loadConfig(args);
 
 let llm: BlockDetector;
+let extractionTransport: ChatTransport;
 let llmLabel: string;
 if (config.llm.cli) {
-  llm = new CliLLMClient(config.llm.cli);
+  const client = new CliLLMClient(config.llm.cli);
+  llm = client;
+  extractionTransport = client;
   llmLabel = `cli:${config.llm.cli.preset}(${config.llm.cli.bin})`;
 } else {
   if (!config.llm.config) throw new Error(`provider=${config.llm.provider}에 HTTP 설정이 없습니다`);
-  llm = new LLMClient(config.llm.config);
+  const client = new LLMClient(config.llm.config);
+  llm = client;
+  extractionTransport = client;
   llmLabel = config.llm.config.model;
 }
 const listeners = new Set<ClientListener>();
@@ -52,13 +60,14 @@ const broadcast = (msg: ServerMessage) => {
 const databasePath = process.env.MEETINGS_DB_PATH ?? join(import.meta.dir, "meetings.db");
 const store = new MeetingStore(databasePath);
 const minutesStore = new MinutesStore(store.databaseHandle());
+const transcriptWriter = new TranscriptVersionWriter(minutesStore);
 const session = new MeetingSession(
   llm,
   config.block.detectInterval,
   config.block.contextWindow,
   listeners,
   {
-    onLine: (entry) => store.addLine(entry),
+    onLine: (entry) => transcriptWriter.append(entry),
     onSlide: (slide) => store.addSlide({
       idx: slide.index,
       title: slide.title,
@@ -236,6 +245,27 @@ const handleStartCapture: WsActionHandler = ({ ws, cmd }) => {
 
 const handleStopCapture: WsActionHandler = ({ ws, cmd }) => {
   void stopCapture();
+};
+
+const handleStartReview: WsActionHandler = ({ ws, cmd }) => {
+  if (capturing) {
+    requestError(ws, new Error("capture must be stopped before starting review"));
+    return;
+  }
+  if (currentMeetingId === null) {
+    requestError(ws, new Error("no current meeting to review"));
+    return;
+  }
+  broadcast({ type: "status", text: "회의록 후보 추출 중…" });
+  void startReview({
+    meetingId: currentMeetingId,
+    store: minutesStore,
+    extractor: new MinutesExtractor(extractionTransport),
+  }).then((review) => broadcast(review)).catch((error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[review] 추출 실패: ${message}`);
+    broadcast({ type: "status", text: "회의록 후보 추출 실패·재시도" });
+  });
 };
 
 const handleReset: WsActionHandler = ({ ws, cmd }) => {
@@ -493,6 +523,7 @@ const handleSetProvider: WsActionHandler = ({ ws, cmd }) => {
       const detector = createDetector(entry.id, { cliTimeoutMs, model, effort });
       if (detector) {
         session.setDetector(detector);
+        extractionTransport = detector as BlockDetector & ChatTransport;
         currentProviderId = entry.id;
         currentModel = model;
         currentEffort = effort;
@@ -551,6 +582,7 @@ const handleRecheckProviders: WsActionHandler = ({ ws, cmd }) => {
 export const handlerMap = new Map<string, WsActionHandler>([
   ["startCapture", handleStartCapture],
   ["stopCapture", handleStopCapture],
+  ["startReview", handleStartReview],
   ["reset", handleReset],
   ["setAttendees", handleSetAttendees],
   ["status", handleStatus],
@@ -659,6 +691,9 @@ if (config.server.openBrowser) {
 // 데모용으로 부팅 즉시 자동 시작.
 let capturing = false;
 let stopPromise: Promise<void> | null = null;
+let captureRun: Promise<void> | null = null;
+let stopRequested = false;
+let rawAudioRecorder: RawAudioRecorder | null = null;
 
 function captureMessage(): CaptureUpdate {
   return { type: "capture", capturing, mode: config.input.mode };
