@@ -1,0 +1,3 @@
+03fcf43561da5576046bd2cd900733620f999dc36ee194e1d614313853e4086b  src/extract.ts
+18b154d0f15a0e21e0c671962553879dc342fa404281cd92ac1897d211d25e86  tests/extract.test.ts
+07833462fae405e94dc5b56ce038c809625fc0ab72d1ec40a16d335013b36d29  .omo/evidence/meeting-minutes-bundle/task-6/07-done-claim.txt
