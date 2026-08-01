@@ -671,14 +671,18 @@ renderAttendeeLock();
 // ── 회의록 검토 오버레이 (review-panel.js) ──
 // 슬라이드 셸 위에 얹히는 세 번째 오버레이. 소켓은 app.js가 소유하므로
 // 전송/연결 여부만 얇은 transport로 넘긴다.
-const reviewPanel = window.createReviewPanel({
+const reviewPanel = window.createReviewPanel ? window.createReviewPanel({
   send(payload) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return false;
     ws.send(JSON.stringify(payload));
     return true;
   },
   isOpen: () => !!ws && ws.readyState === WebSocket.OPEN,
-});
+}) : {
+  syncTransport() {},
+  applyReview() {},
+  applyStatus() {},
+};
 
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
 btnExportMdEl.onclick = () => {
