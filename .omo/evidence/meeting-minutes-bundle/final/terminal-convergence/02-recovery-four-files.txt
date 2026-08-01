@@ -1,0 +1,66 @@
+RECOVERY MODE: temporary task-worktree vendor symlink -> preserved main vendor; removed by trap
+
+===== tests/meeting-conclusion.test.ts =====
+bun test v1.3.14 (0d9b296a)
+
+tests/meeting-conclusion.test.ts:
+(pass) meeting-conclusion transaction > confirmReview publishes a complete version-linked manifest and only then closes the meeting [28.48ms]
+(pass) meeting-conclusion transaction > rejects unresolved, invalid-source, and stale-version reviews before exporting [12.98ms]
+(pass) meeting-conclusion transaction > PDF failure rolls back review, complete rows, conclusion, and all artifacts, and retry succeeds [20.18ms]
+(pass) meeting-conclusion transaction > post-export hash failure rolls back review state without destructively deleting the published bundle [21.48ms]
+(pass) meeting-conclusion transaction > repeated and concurrent conclusion shares one export and never duplicates bundle state [22.55ms]
+(pass) meeting-conclusion transaction > real WS confirmReview reaches SQLite, bundle publication, and MeetingConcluded [762.19ms]
+
+ 6 pass
+ 0 fail
+ 36 expect() calls
+Ran 6 tests across 1 file. [1047.00ms]
+FILE_EXIT_CODE=0 FILE_PASS=6
+
+===== tests/pdf.test.ts =====
+bun test v1.3.14 (0d9b296a)
+
+tests/pdf.test.ts:
+(pass) renderMinutesPdf > uses the project vendored ms-playwright Chromium executable [2.30ms]
+(pass) renderMinutesPdf > creates a nonempty portrait A4 PDF with every decision and action only on page one [299.43ms]
+(pass) renderMinutesPdf > applies the deterministic shrink stages when normal typography overflows [225.16ms]
+(pass) renderMinutesPdf > rejects unshrinkable first-page overflow without creating an output file [191.65ms]
+(pass) renderMinutesPdf > allows appendices to span multiple pages while keeping the complete summary on page one [228.93ms]
+
+ 5 pass
+ 0 fail
+ 28 expect() calls
+Ran 5 tests across 1 file. [1138.00ms]
+FILE_EXIT_CODE=0 FILE_PASS=5
+
+===== tests/review-actions.test.ts =====
+bun test v1.3.14 (0d9b296a)
+
+tests/review-actions.test.ts:
+(pass) MinutesStore review mutation transaction > validates candidate ownership, attendee membership, and the whole patch before mutating [1.49ms]
+(pass) MinutesStore review mutation transaction > atomically transitions draft to confirmed only after every item is reviewed [1.14ms]
+(pass) MinutesStore review mutation transaction > rejects a review whose transcript version is no longer canonical [0.84ms]
+(pass) MinutesStore review mutation transaction > detects changed canonical transcript bytes and leaves review/artifact rows untouched [0.84ms]
+(pass) MinutesStore review mutation transaction > revalidates persisted attendee identities inside the confirmation transaction [0.82ms]
+(pass) MinutesStore review mutation transaction > rolls back confirmation when a confirmed source range has an interior gap [0.85ms]
+(pass) MinutesStore review mutation transaction > rolls back the status and timestamp when the confirmation transaction fails [0.81ms]
+(pass) real WS actions reject adversarial patches, persist valid changes, and conclude with one complete bundle [218.90ms]
+
+ 8 pass
+ 0 fail
+ 34 expect() calls
+Ran 8 tests across 1 file. [471.00ms]
+FILE_EXIT_CODE=0 FILE_PASS=8
+
+===== tests/start-review-action.test.ts =====
+bun test v1.3.14 (0d9b296a)
+
+tests/start-review-action.test.ts:
+(pass) startReview is ended-only, requester-scoped, and single-flight for one canonical version [559.34ms]
+
+ 1 pass
+ 0 fail
+ 12 expect() calls
+Ran 1 test across 1 file. [802.00ms]
+FILE_EXIT_CODE=0 FILE_PASS=1
+FILES=4 TESTS_PASSED=20 FAILED_FILES=0
