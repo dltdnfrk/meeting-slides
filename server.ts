@@ -10,6 +10,7 @@ import { LLMClient, type BlockDetector, type ChatTransport } from "./src/llm.ts"
 import { CliLLMClient } from "./src/llm-cli.ts";
 import { MinutesExtractor } from "./src/extract.ts";
 import { startReview } from "./src/start-review.ts";
+import { concludeMeeting, type ConclusionState } from "./src/conclusion.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
@@ -58,6 +59,9 @@ const broadcast = (msg: ServerMessage) => {
 };
 // anarlog(fastrepl) 방식: 전사·슬라이드를 로컬 SQLite에 영속 저장
 const databasePath = process.env.MEETINGS_DB_PATH ?? join(import.meta.dir, "meetings.db");
+const bundleOutputRoot = process.env.MEETING_BUNDLE_OUTPUT_ROOT ?? join(import.meta.dir, "exports");
+const bundleTargetCommit = process.env.MEETING_BUNDLE_TARGET_COMMIT
+  ?? spawnSync("git", ["rev-parse", "HEAD"], { cwd: import.meta.dir, encoding: "utf8" }).stdout.trim();
 const store = new MeetingStore(databasePath);
 const minutesStore = new MinutesStore(store.databaseHandle());
 const transcriptWriter = new TranscriptVersionWriter(minutesStore);
@@ -390,16 +394,29 @@ const handleUpdateItem: WsActionHandler = ({ cmd }) => {
   broadcast({ type: "reviewItemUpdated", reviewId, itemId, kind });
 };
 
-const handleConfirmReview: WsActionHandler = ({ cmd }) => {
-  const reviewId = parseReviewId(cmd.reviewId, "reviewId");
-  minutesStore.confirmReview(reviewId);
-  const review = minutesStore.review(reviewId)!;
-  broadcast({
-    type: "reviewConfirmed",
-    reviewId,
-    transcriptVersionId: review.transcriptVersionId,
-    confirmedAt: review.confirmedAt!,
+const conclusionRuns = new Map<string, Promise<ConclusionState>>();
+
+function runConclusion(reviewId: string): Promise<ConclusionState> {
+  const active = conclusionRuns.get(reviewId);
+  if (active) return active;
+  const run = concludeMeeting(reviewId, {
+    store: minutesStore,
+    outputRoot: bundleOutputRoot,
+    projectRoot: import.meta.dir,
+    targetCommit: bundleTargetCommit,
   });
+  conclusionRuns.set(reviewId, run);
+  void run.finally(() => {
+    if (conclusionRuns.get(reviewId) === run) conclusionRuns.delete(reviewId);
+  }).catch(() => {});
+  return run;
+}
+
+const handleConfirmReview: WsActionHandler = ({ ws, cmd }) => {
+  const reviewId = parseReviewId(cmd.reviewId, "reviewId");
+  void runConclusion(reviewId)
+    .then((conclusion) => broadcast(conclusion))
+    .catch((error: unknown) => requestError(ws, error));
 };
 
 const handleStatus: WsActionHandler = ({ ws, cmd }) => {
