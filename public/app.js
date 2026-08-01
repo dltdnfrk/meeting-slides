@@ -668,6 +668,18 @@ function sendCaptureToggle() {
 renderAttendeeList();
 renderAttendeeLock();
 
+// ── 회의록 검토 오버레이 (review-panel.js) ──
+// 슬라이드 셸 위에 얹히는 세 번째 오버레이. 소켓은 app.js가 소유하므로
+// 전송/연결 여부만 얇은 transport로 넘긴다.
+const reviewPanel = window.createReviewPanel({
+  send(payload) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return false;
+    ws.send(JSON.stringify(payload));
+    return true;
+  },
+  isOpen: () => !!ws && ws.readyState === WebSocket.OPEN,
+});
+
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
 btnExportMdEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -810,6 +822,7 @@ function connect() {
 
   ws.onopen = () => {
     renderStatus("서버 연결됨");
+    reviewPanel?.syncTransport();
     // 재연결: 서버가 보관 중인 draft 참석자/meeting_id를 다시 요청한다.
     // 서버가 이 액션을 아직 모르면 무시되고(미등록 액션은 핸들러 없음),
     // 클라이언트는 마지막으로 받은 명단을 그대로 유지한다.
@@ -845,6 +858,8 @@ function connect() {
         renderProviders(msg);
       } else if (msg.type === "attendees") {
         applyAttendeesMessage(msg);
+      } else if (msg.type === "review") {
+        reviewPanel.applyReview(msg);
       } else if (msg.type === "capture") {
         const wasCapturing = capturing;
         capturing = !!msg.capturing;
@@ -873,6 +888,7 @@ function connect() {
         }
       } else if (msg.type === "status") {
         renderStatus(msg.text);
+        reviewPanel.applyStatus(msg.text);
       }
     } catch (e) {
       console.error("parse error", e);
@@ -880,6 +896,7 @@ function connect() {
   };
   ws.onclose = () => {
     renderStatus("연결 끊김. 3초 후 재시도...");
+    reviewPanel?.syncTransport();
     setTimeout(connect, 3000);
   };
   ws.onerror = () => renderStatus("연결 오류");

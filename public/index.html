@@ -37,6 +37,12 @@
           <span class="record-btn__dot"></span>
           <span class="record-btn__label">녹음 시작</span>
         </button>
+
+        <button id="btn-review" class="review-btn" type="button" title="회의록 검토" aria-label="회의록 검토" aria-expanded="false" aria-controls="review-panel" hidden>
+          <span class="review-btn__icon" aria-hidden="true">◈</span>
+          <span class="review-btn__label">검토</span>
+          <span class="review-btn__count" id="review-count" hidden>0</span>
+        </button>
       </div>
 
       <div class="topbar__right">
@@ -190,6 +196,34 @@
     </div>
   </div>
 
+  <!-- ── 회의록 검토 오버레이 (후보 확인·수정·확정) ──────── -->
+  <div class="review-panel" id="review-panel" role="dialog" aria-modal="false" aria-label="회의록 후보 검토" aria-busy="false" data-state="idle" hidden>
+    <div class="review-panel__head">
+      <span class="review-panel__title">회의록 후보 검토</span>
+      <span class="review-panel__version" id="review-version"></span>
+      <button id="btn-review-close" class="icon-btn icon-btn--sm" type="button" title="검토 닫기" aria-label="검토 닫기">✕</button>
+    </div>
+
+    <p class="review-panel__notice" id="review-attendee-notice" hidden></p>
+    <p class="review-panel__error" id="review-error" role="alert" hidden></p>
+
+    <div class="review-loading" id="review-loading" hidden>
+      <span class="review-loading__ring" aria-hidden="true"></span>
+      <span class="review-loading__text">전사에서 결정·액션·미결 후보를 추출하는 중…</span>
+    </div>
+
+    <div class="review-list" id="review-list" role="list"></div>
+
+    <div class="review-panel__foot">
+      <button id="btn-review-retry" class="review-panel__retry" type="button" hidden>↻ 추출 재시도</button>
+      <span class="review-panel__hint">확정하면 이 후보들이 회의록 정본이 됩니다</span>
+      <button id="btn-review-confirm" class="review-panel__confirm" type="button" disabled>
+        검토 확정 <span class="review-panel__confirm-count" id="review-confirm-count">0</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="/review-panel.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
