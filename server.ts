@@ -386,6 +386,24 @@ const handleSetAttendees: WsActionHandler = ({ cmd }) => {
   });
 };
 
+/**
+ * 재연결 복원 질의 — 클라이언트가 보관 중인 draft 명단/meeting_id를 다시 요청한다.
+ * 준비된 회의가 없으면 빈 명단을 돌려 클라이언트 상태를 서버와 맞춘다.
+ * 읽기 전용이라 브로드캐스트하지 않고 요청한 소켓에만 답한다.
+ */
+const handleAttendeesQuery: WsActionHandler = ({ ws }) => {
+  const meetingId = currentMeetingId;
+  ws.send(JSON.stringify({
+    type: "attendees" as const,
+    meeting_id: meetingId,
+    attendees: meetingId === null ? [] : minutesStore.attendeesFor(meetingId).map((attendee) => ({
+      attendee_id: attendee.attendeeId,
+      display_name: attendee.displayName,
+      ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
+    })),
+  }));
+};
+
 const handleUpdateItem: WsActionHandler = ({ cmd }) => {
   const reviewId = parseReviewId(cmd.reviewId, "reviewId");
   const itemId = parseReviewId(cmd.itemId, "itemId");
@@ -701,6 +719,7 @@ export const handlerMap = new Map<string, WsActionHandler>([
   ["startReview", handleStartReview],
   ["reset", handleReset],
   ["setAttendees", handleSetAttendees],
+  ["attendees", handleAttendeesQuery],
   ["updateItem", handleUpdateItem],
   ["confirmReview", handleConfirmReview],
   ["status", handleStatus],

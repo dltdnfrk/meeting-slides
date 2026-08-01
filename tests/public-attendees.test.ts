@@ -3,6 +3,7 @@
 // assertions read actual DOM state and actual wire payloads, never simulated ones.
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 import { createServer, type Server } from "node:http";
 import { join } from "node:path";
 import puppeteer, { type Browser, type Page } from "puppeteer";
@@ -416,6 +417,62 @@ describe("pre-capture attendee registration form", () => {
       name: "<img src=x onerror=\"window.__pwned=1\">",
     });
   });
+
+  test("a reset clears the prepared meeting_id so capture never resends a dead id", async () => {
+    // reset은 서버에서 준비된 회의를 종료하고 currentMeetingId를 비운다.
+    // 클라이언트가 이전 ID를 계속 들고 있으면 다음 startCapture가 거부당해 녹음이 조용히 실패한다.
+    await page.click("#btn-attendees");
+    await addAttendee("김현준");
+    await page.click("#btn-attendee-save");
+    await emit({
+      type: "attendees",
+      meeting_id: 55,
+      attendees: [{ attendee_id: "a-1", display_name: "김현준", crm_person_entity_id: null }],
+    });
+    await page.waitForFunction(() => window.__attendeeState.meetingId === 55);
+
+    await page.click("#btn-reset");
+    await page.waitForFunction(() => window.__attendeeState.meetingId === null);
+
+    await clearSent();
+    await page.click("#btn-record");
+    expect(await sent()).toEqual([{ action: "startCapture" }]);
+  });
+
+  test("the reconnect restore query names an action the real server dispatches", async () => {
+    // 재연결 복원은 클라이언트가 보내는 액션 이름과 서버 handlerMap 키가
+    // 일치할 때만 성립한다. 어긋나면 요청이 조용히 버려져 복원이 죽는다.
+    await page.evaluate(() => window.__sockets.at(-1)!.close());
+    await page.waitForFunction(() => window.__sockets.length >= 2, { timeout: 10_000 });
+    await page.waitForFunction(() => window.__sent.some((m) => m.action === "attendees"), { timeout: 10_000 });
+    const restoreActions = (await sent())
+      .map((message) => message.action)
+      .filter((action): action is string => typeof action === "string");
+
+    const probe = `
+      import { handlerMap } from "./server.ts";
+      const actions = ${JSON.stringify(restoreActions)};
+      console.log(JSON.stringify(actions.filter((action) => !handlerMap.has(action))));
+      process.exit(0);
+    `;
+    const result = spawnSync(process.execPath, ["-e", probe], {
+      cwd: join(import.meta.dir, ".."),
+      encoding: "utf8",
+      timeout: 20_000,
+      env: {
+        ...process.env,
+        HTTP_PORT: String(19_800 + (process.pid % 400)),
+        OPEN_BROWSER: "false",
+        LLM_PROVIDER: "cli",
+        LLM_CLI_BIN: "/usr/bin/true",
+        LLM_CLI_PRESET: "claude",
+        WHISPER_INPUT_MODE: "mic",
+      },
+    });
+    expect(result.status, result.stderr).toBe(0);
+    const unroutable = JSON.parse(result.stdout.trim().split("\n").at(-1)!) as string[];
+    expect(unroutable).toEqual([]);
+  }, 40_000);
 
   test("existing slide rendering and dock controls survive the new panel", async () => {
     await page.click("#btn-attendees");

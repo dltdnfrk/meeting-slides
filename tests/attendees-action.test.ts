@@ -177,6 +177,10 @@ afterAll(async () => {
 });
 
 test("setAttendees replaces a prepared roster and rejects capturing or ended meetings", async () => {
+  // 재연결 복원 질의는 준비된 회의가 없을 때도 답해야 한다 — meeting_id null + 빈 명단.
+  expect(await sendAndWait({ action: "attendees" }, (message) => message.type === "attendees"))
+    .toEqual({ type: "attendees", meeting_id: null, attendees: [] });
+
   await errorFor({ action: "startCapture", meeting_id: 1 }, "does not match the current prepared meeting");
   await errorFor({ action: "setAttendees", attendees: [] }, "attendees must contain at least one attendee");
   await errorFor({ action: "setAttendees", attendees: [{ name: " " }] }, "attendees[0].name must be a non-blank string");
@@ -219,6 +223,10 @@ test("setAttendees replaces a prepared roster and rejects capturing or ended mee
     { attendee_id: firstAttendees[0]!.attendee_id, display_name: "Alice Kim" },
     { attendee_id: "dana-local", display_name: "Dana" },
   ]);
+
+  // 재연결 복원: 새 질의가 영속된 draft 명단과 같은 meeting_id를 그대로 돌려준다.
+  expect(await sendAndWait({ action: "attendees" }, (message) => message.type === "attendees"))
+    .toEqual({ type: "attendees", meeting_id: meetingId, attendees: replaced.attendees });
 
   const db = new Database(dbPath, { readonly: true });
   expect(db.query("SELECT COUNT(*) AS count FROM meetings").get()).toEqual({ count: 1 });

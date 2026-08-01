@@ -624,6 +624,20 @@ document.addEventListener("click", (ev) => {
   }
 });
 
+/**
+ * 준비된 draft 회의 참조를 버린다 (reset 이후). 서버가 그 회의를 이미 종료했으므로
+ * meeting_id는 재사용할 수 없다. 명단 초안은 사용자가 다시 저장할 수 있게 남겨두되
+ * 서버에 확정되지 않은 상태로 되돌린다.
+ */
+function clearPreparedMeeting() {
+  attendeeState.meetingId = null;
+  attendeeState.attendees = [];
+  attendeeDrafts = attendeeDrafts.map((a) => ({ ...a, saved: false }));
+  attendeeDirty = attendeeDrafts.length > 0;
+  setAttendeeError("");
+  renderAttendeeList();
+}
+
 /** 서버가 확정한 명단으로 상태와 초안을 되맞춘다 (재연결 복원 포함). */
 function applyAttendeesMessage(msg) {
   const rows = Array.isArray(msg.attendees) ? msg.attendees : [];
@@ -747,6 +761,9 @@ btnResetEl.onclick = () => {
   feedTruncEl.hidden = true;
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "reset" }));
+    // 서버가 준비된 회의를 종료하고 currentMeetingId를 비우므로, 보관 중인
+    // meeting_id는 즉시 죽은 ID가 된다. 그대로 두면 다음 startCapture가 거부당한다.
+    clearPreparedMeeting();
     renderStatus("세션 초기화 요청됨");
   } else {
     renderStatus("연결되지 않음 — 초기화 불가");
