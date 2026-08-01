@@ -1,0 +1,8 @@
+AC-01 attendee metadata/candidate/dropdown: paths=3 missing=[] evidence_untracked=[] verdict=PASS
+AC-02 extraction/provenance rejection: paths=3 missing=[] evidence_untracked=[] verdict=PASS
+AC-03 review edit/confirm/dropdown: paths=3 missing=[] evidence_untracked=[] verdict=PASS
+AC-04 six-artifact portrait bundle: paths=4 missing=[] evidence_untracked=[] verdict=PASS
+AC-05 canonical preservation/version coordinates: paths=4 missing=[] evidence_untracked=[] verdict=PASS
+AC-06 conclusion judgment: paths=4 missing=[] evidence_untracked=[] verdict=PASS
+D1-D9: mapped through these AC tests plus committed T4-T14 immutable DoneClaim/final-receipt pairs.
+SUMMARY errors=0 verdict=PASS
