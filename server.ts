@@ -13,7 +13,7 @@ import { startReview } from "./src/start-review.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
-import { MinutesStore, type AttendeeInput } from "./src/minutes-store.ts";
+import { MinutesStore, type AttendeeInput, type ReviewState } from "./src/minutes-store.ts";
 import { RawAudioRecorder, TranscriptVersionWriter, claimFileAudioSource, sha256File } from "./src/transcript-versioning.ts";
 import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
 import { copyDeckAssets } from "./src/deck-assets.ts";
@@ -181,6 +181,10 @@ interface WsCommand {
   meeting_id?: unknown;
   purpose?: unknown;
   attendees?: unknown;
+  reviewId?: unknown;
+  itemId?: unknown;
+  kind?: unknown;
+  patch?: unknown;
 }
 
 let currentMeetingId: number | null = null;
@@ -230,6 +234,79 @@ function parsePurpose(value: unknown): string | null | undefined {
   if (value === null) return null;
   if (typeof value !== "string" || !value.trim()) throw new Error("purpose must be a non-blank string or null");
   return value.trim();
+}
+
+type ReviewItemKind = "decision" | "action_item" | "open_item";
+type ReviewItemPatch = Parameters<MinutesStore["updateItem"]>[3];
+
+function reviewRequestError(code: string, message: string): Error {
+  return new Error(`[${code}] ${message}`);
+}
+
+function parseReviewId(value: unknown, field: "reviewId" | "itemId"): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw reviewRequestError("INVALID_REVIEW_REQUEST", `${field} must be a non-blank string`);
+  }
+  return value.trim();
+}
+
+function parseReviewKind(value: unknown): ReviewItemKind {
+  if (value !== "decision" && value !== "action_item" && value !== "open_item") {
+    throw reviewRequestError("INVALID_REVIEW_REQUEST", "kind must be decision, action_item, or open_item");
+  }
+  return value;
+}
+
+function parseReviewPatch(value: unknown, kind: ReviewItemKind): ReviewItemPatch {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw reviewRequestError("INVALID_REVIEW_PATCH", "patch must be an object");
+  }
+  const raw = value as Record<string, unknown>;
+  const allowed = new Set(["description", "attributedAttendeeId", "reviewState"]);
+  if (kind === "action_item") {
+    allowed.add("assigneeAttendeeId");
+    allowed.add("deadline");
+    allowed.add("deadlineText");
+  }
+  const unsupported = Object.keys(raw).filter((key) => !allowed.has(key));
+  if (unsupported.length > 0) {
+    throw reviewRequestError("INVALID_REVIEW_PATCH", `unsupported patch field: ${unsupported.sort()[0]}`);
+  }
+  if (Object.keys(raw).length === 0) throw reviewRequestError("INVALID_REVIEW_PATCH", "patch must not be empty");
+  const patch: ReviewItemPatch = {};
+  if (raw.description !== undefined) {
+    if (typeof raw.description !== "string" || !raw.description.trim()) {
+      throw reviewRequestError("INVALID_REVIEW_PATCH", "description must be a non-blank string");
+    }
+    patch.description = raw.description.trim();
+  }
+  for (const field of ["attributedAttendeeId", "assigneeAttendeeId"] as const) {
+    if (raw[field] !== undefined) {
+      if (raw[field] !== null && (typeof raw[field] !== "string" || !raw[field].trim())) {
+        throw reviewRequestError("INVALID_REVIEW_PATCH", `${field} must be a non-blank string or null`);
+      }
+      patch[field] = raw[field] === null ? null : (raw[field] as string).trim();
+    }
+  }
+  if (raw.deadline !== undefined) {
+    if (raw.deadline !== null && (typeof raw.deadline !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw.deadline))) {
+      throw reviewRequestError("INVALID_REVIEW_PATCH", "deadline must be YYYY-MM-DD or null");
+    }
+    patch.deadline = raw.deadline as string | null;
+  }
+  if (raw.deadlineText !== undefined) {
+    if (raw.deadlineText !== null && (typeof raw.deadlineText !== "string" || !raw.deadlineText.trim())) {
+      throw reviewRequestError("INVALID_REVIEW_PATCH", "deadlineText must be a non-blank string or null");
+    }
+    patch.deadlineText = raw.deadlineText === null ? null : (raw.deadlineText as string).trim();
+  }
+  if (raw.reviewState !== undefined) {
+    if (raw.reviewState !== "candidate" && raw.reviewState !== "confirmed" && raw.reviewState !== "rejected") {
+      throw reviewRequestError("INVALID_REVIEW_PATCH", "reviewState must be candidate, confirmed, or rejected");
+    }
+    patch.reviewState = raw.reviewState as ReviewState;
+  }
+  return patch;
 }
 
 type WsActionContext = {
@@ -301,6 +378,27 @@ const handleSetAttendees: WsActionHandler = ({ cmd }) => {
       display_name: attendee.displayName,
       ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
     })),
+  });
+};
+
+const handleUpdateItem: WsActionHandler = ({ cmd }) => {
+  const reviewId = parseReviewId(cmd.reviewId, "reviewId");
+  const itemId = parseReviewId(cmd.itemId, "itemId");
+  const kind = parseReviewKind(cmd.kind);
+  const patch = parseReviewPatch(cmd.patch, kind);
+  minutesStore.updateItem(reviewId, kind, itemId, patch);
+  broadcast({ type: "reviewItemUpdated", reviewId, itemId, kind });
+};
+
+const handleConfirmReview: WsActionHandler = ({ cmd }) => {
+  const reviewId = parseReviewId(cmd.reviewId, "reviewId");
+  minutesStore.confirmReview(reviewId);
+  const review = minutesStore.review(reviewId)!;
+  broadcast({
+    type: "reviewConfirmed",
+    reviewId,
+    transcriptVersionId: review.transcriptVersionId,
+    confirmedAt: review.confirmedAt!,
   });
 };
 
@@ -585,6 +683,8 @@ export const handlerMap = new Map<string, WsActionHandler>([
   ["startReview", handleStartReview],
   ["reset", handleReset],
   ["setAttendees", handleSetAttendees],
+  ["updateItem", handleUpdateItem],
+  ["confirmReview", handleConfirmReview],
   ["status", handleStatus],
   ["transcript", handleTranscript],
   ["exportDeck", handleDeckExport],

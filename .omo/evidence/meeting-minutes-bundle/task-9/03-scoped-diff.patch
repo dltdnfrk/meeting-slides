@@ -1,0 +1,417 @@
+diff --git a/server.ts b/server.ts
+index 4e3c4b7..bba6b27 100644
+--- a/server.ts
++++ b/server.ts
+@@ -13,7 +13,7 @@ import { startReview } from "./src/start-review.ts";
+ import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
+ import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
+ import { MeetingStore } from "./src/store.ts";
+-import { MinutesStore, type AttendeeInput } from "./src/minutes-store.ts";
++import { MinutesStore, type AttendeeInput, type ReviewState } from "./src/minutes-store.ts";
+ import { RawAudioRecorder, TranscriptVersionWriter, claimFileAudioSource, sha256File } from "./src/transcript-versioning.ts";
+ import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
+ import { copyDeckAssets } from "./src/deck-assets.ts";
+@@ -181,6 +181,10 @@ interface WsCommand {
+   meeting_id?: unknown;
+   purpose?: unknown;
+   attendees?: unknown;
++  reviewId?: unknown;
++  itemId?: unknown;
++  kind?: unknown;
++  patch?: unknown;
+ }
+ 
+ let currentMeetingId: number | null = null;
+@@ -232,6 +236,79 @@ function parsePurpose(value: unknown): string | null | undefined {
+   return value.trim();
+ }
+ 
++type ReviewItemKind = "decision" | "action_item" | "open_item";
++type ReviewItemPatch = Parameters<MinutesStore["updateItem"]>[3];
++
++function reviewRequestError(code: string, message: string): Error {
++  return new Error(`[${code}] ${message}`);
++}
++
++function parseReviewId(value: unknown, field: "reviewId" | "itemId"): string {
++  if (typeof value !== "string" || !value.trim()) {
++    throw reviewRequestError("INVALID_REVIEW_REQUEST", `${field} must be a non-blank string`);
++  }
++  return value.trim();
++}
++
++function parseReviewKind(value: unknown): ReviewItemKind {
++  if (value !== "decision" && value !== "action_item" && value !== "open_item") {
++    throw reviewRequestError("INVALID_REVIEW_REQUEST", "kind must be decision, action_item, or open_item");
++  }
++  return value;
++}
++
++function parseReviewPatch(value: unknown, kind: ReviewItemKind): ReviewItemPatch {
++  if (!value || typeof value !== "object" || Array.isArray(value)) {
++    throw reviewRequestError("INVALID_REVIEW_PATCH", "patch must be an object");
++  }
++  const raw = value as Record<string, unknown>;
++  const allowed = new Set(["description", "attributedAttendeeId", "reviewState"]);
++  if (kind === "action_item") {
++    allowed.add("assigneeAttendeeId");
++    allowed.add("deadline");
++    allowed.add("deadlineText");
++  }
++  const unsupported = Object.keys(raw).filter((key) => !allowed.has(key));
++  if (unsupported.length > 0) {
++    throw reviewRequestError("INVALID_REVIEW_PATCH", `unsupported patch field: ${unsupported.sort()[0]}`);
++  }
++  if (Object.keys(raw).length === 0) throw reviewRequestError("INVALID_REVIEW_PATCH", "patch must not be empty");
++  const patch: ReviewItemPatch = {};
++  if (raw.description !== undefined) {
++    if (typeof raw.description !== "string" || !raw.description.trim()) {
++      throw reviewRequestError("INVALID_REVIEW_PATCH", "description must be a non-blank string");
++    }
++    patch.description = raw.description.trim();
++  }
++  for (const field of ["attributedAttendeeId", "assigneeAttendeeId"] as const) {
++    if (raw[field] !== undefined) {
++      if (raw[field] !== null && (typeof raw[field] !== "string" || !raw[field].trim())) {
++        throw reviewRequestError("INVALID_REVIEW_PATCH", `${field} must be a non-blank string or null`);
++      }
++      patch[field] = raw[field] === null ? null : (raw[field] as string).trim();
++    }
++  }
++  if (raw.deadline !== undefined) {
++    if (raw.deadline !== null && (typeof raw.deadline !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw.deadline))) {
++      throw reviewRequestError("INVALID_REVIEW_PATCH", "deadline must be YYYY-MM-DD or null");
++    }
++    patch.deadline = raw.deadline as string | null;
++  }
++  if (raw.deadlineText !== undefined) {
++    if (raw.deadlineText !== null && (typeof raw.deadlineText !== "string" || !raw.deadlineText.trim())) {
++      throw reviewRequestError("INVALID_REVIEW_PATCH", "deadlineText must be a non-blank string or null");
++    }
++    patch.deadlineText = raw.deadlineText === null ? null : (raw.deadlineText as string).trim();
++  }
++  if (raw.reviewState !== undefined) {
++    if (raw.reviewState !== "candidate" && raw.reviewState !== "confirmed" && raw.reviewState !== "rejected") {
++      throw reviewRequestError("INVALID_REVIEW_PATCH", "reviewState must be candidate, confirmed, or rejected");
++    }
++    patch.reviewState = raw.reviewState as ReviewState;
++  }
++  return patch;
++}
++
+ type WsActionContext = {
+   ws: ServerWebSocket<undefined>;
+   cmd: WsCommand;
+@@ -304,6 +381,27 @@ const handleSetAttendees: WsActionHandler = ({ cmd }) => {
+   });
+ };
+ 
++const handleUpdateItem: WsActionHandler = ({ cmd }) => {
++  const reviewId = parseReviewId(cmd.reviewId, "reviewId");
++  const itemId = parseReviewId(cmd.itemId, "itemId");
++  const kind = parseReviewKind(cmd.kind);
++  const patch = parseReviewPatch(cmd.patch, kind);
++  minutesStore.updateItem(reviewId, kind, itemId, patch);
++  broadcast({ type: "reviewItemUpdated", reviewId, itemId, kind });
++};
++
++const handleConfirmReview: WsActionHandler = ({ cmd }) => {
++  const reviewId = parseReviewId(cmd.reviewId, "reviewId");
++  minutesStore.confirmReview(reviewId);
++  const review = minutesStore.review(reviewId)!;
++  broadcast({
++    type: "reviewConfirmed",
++    reviewId,
++    transcriptVersionId: review.transcriptVersionId,
++    confirmedAt: review.confirmedAt!,
++  });
++};
++
+ const handleStatus: WsActionHandler = ({ ws, cmd }) => {
+   ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
+ };
+@@ -585,6 +683,8 @@ export const handlerMap = new Map<string, WsActionHandler>([
+   ["startReview", handleStartReview],
+   ["reset", handleReset],
+   ["setAttendees", handleSetAttendees],
++  ["updateItem", handleUpdateItem],
++  ["confirmReview", handleConfirmReview],
+   ["status", handleStatus],
+   ["transcript", handleTranscript],
+   ["exportDeck", handleDeckExport],
+diff --git a/src/minutes-store.ts b/src/minutes-store.ts
+index 9a28f8f..1c9c414 100644
+--- a/src/minutes-store.ts
++++ b/src/minutes-store.ts
+@@ -1,5 +1,5 @@
+ import { Database, type SQLQueryBindings } from "bun:sqlite";
+-import { randomUUID } from "node:crypto";
++import { createHash, randomUUID } from "node:crypto";
+ 
+ export type TranscriptSourceKind = "live_capture" | "file_transcription" | "retranscription" | "import";
+ export type ReviewState = "candidate" | "confirmed" | "rejected";
+@@ -308,6 +308,35 @@ function validHash(value: string): string {
+   return value.toLowerCase();
+ }
+ 
++export type ReviewMutationErrorCode =
++  | "REVIEW_NOT_DRAFT"
++  | "UNKNOWN_REVIEW_ITEM"
++  | "INVALID_REVIEW_PATCH"
++  | "ATTENDEE_NOT_IN_MEETING"
++  | "INCOMPLETE_REVIEW_ITEM"
++  | "PENDING_REVIEW_ITEMS"
++  | "STALE_TRANSCRIPT_VERSION"
++  | "TRANSCRIPT_INTEGRITY_FAILED"
++  | "INVALID_SOURCE_SEGMENT";
++
++function reviewError(code: ReviewMutationErrorCode, message: string): Error {
++  return new Error(`[${code}] ${message}`);
++}
++
++function canonicalLineJson(line: {
++  seq: number; captured_at_ms: number | null; audio_start_ms: number | null;
++  audio_end_ms: number | null; speaker_turn: number | null; text: string;
++}): string {
++  return JSON.stringify({
++    seq: line.seq,
++    captured_at_ms: line.captured_at_ms,
++    audio_start_ms: line.audio_start_ms,
++    audio_end_ms: line.audio_end_ms,
++    speaker_turn: line.speaker_turn,
++    text: line.text,
++  });
++}
++
+ export class MinutesStore {
+   private readonly db: Database;
+   private readonly ownsDatabase: boolean;
+@@ -679,42 +708,71 @@ export class MinutesStore {
+     description?: string; assigneeAttendeeId?: string | null; attributedAttendeeId?: string | null;
+     deadline?: string | null; deadlineText?: string | null; reviewState?: ReviewState;
+   }): void {
+-    const config = {
+-      decision: ["decisions", "decision_id"], action_item: ["action_items", "action_item_id"],
+-      open_item: ["open_items", "open_item_id"],
+-    } as const;
+-    const [table, idColumn] = config[kind];
+-    const columns: string[] = [];
+-    const values: SQLQueryBindings[] = [];
+-    const add = (column: string, value: SQLQueryBindings): void => { columns.push(`${column} = ?`); values.push(value); };
+-    if (patch.description !== undefined) add("description", nonBlank(patch.description, "description"));
+-    if (patch.attributedAttendeeId !== undefined) add("attributed_attendee_id", patch.attributedAttendeeId);
+-    if (kind === "action_item") {
+-      if (patch.assigneeAttendeeId !== undefined) add("assignee_attendee_id", patch.assigneeAttendeeId);
+-      if (patch.deadline !== undefined) add("deadline", patch.deadline);
+-      if (patch.deadlineText !== undefined) add("deadline_text", patch.deadlineText);
+-    }
+-    if (patch.reviewState !== undefined) add("review_state", patch.reviewState);
+-    if (!columns.length) return;
+-    add("updated_at", Date.now());
+-    values.push(reviewId, itemId);
+-    const result = this.db.run(
+-      `UPDATE ${table} SET ${columns.join(", ")} WHERE review_id = ? AND ${idColumn} = ?`, values,
+-    );
+-    if (Number(result.changes) !== 1) throw new Error(`unknown ${kind} ${itemId}`);
++    this.db.transaction(() => {
++      const review = this.draftReview(reviewId);
++      this.validateCanonicalReview(review);
++      const config = {
++        decision: ["decisions", "decision_id"], action_item: ["action_items", "action_item_id"],
++        open_item: ["open_items", "open_item_id"],
++      } as const;
++      const [table, idColumn] = config[kind];
++      const item = this.db.query(
++        `SELECT * FROM ${table} WHERE review_id = ? AND ${idColumn} = ?`,
++      ).get(reviewId, itemId) as Record<string, unknown> | null;
++      if (!item) throw reviewError("UNKNOWN_REVIEW_ITEM", `${kind} ${itemId} does not belong to review ${reviewId}`);
++      this.validateSource(review.meeting_id, review.transcript_version_id, {
++        transcriptVersionId: item.source_transcript_version_id as string,
++        startSeq: item.source_start_seq as number,
++        endSeq: item.source_end_seq as number,
++      });
++      if (kind !== "action_item" && (patch.assigneeAttendeeId !== undefined || patch.deadline !== undefined ||
++          patch.deadlineText !== undefined)) {
++        throw reviewError("INVALID_REVIEW_PATCH", `${kind} does not accept action-item fields`);
++      }
++      for (const attendeeId of [patch.assigneeAttendeeId, patch.attributedAttendeeId]) {
++        if (attendeeId !== undefined && attendeeId !== null) this.validateAttendee(review.meeting_id, attendeeId);
++      }
++
++      const columns: string[] = [];
++      const values: SQLQueryBindings[] = [];
++      const add = (column: string, value: SQLQueryBindings): void => { columns.push(`${column} = ?`); values.push(value); };
++      if (patch.description !== undefined) add("description", nonBlank(patch.description, "description"));
++      if (patch.attributedAttendeeId !== undefined) add("attributed_attendee_id", patch.attributedAttendeeId);
++      if (kind === "action_item") {
++        if (patch.assigneeAttendeeId !== undefined) add("assignee_attendee_id", patch.assigneeAttendeeId);
++        if (patch.deadline !== undefined) add("deadline", patch.deadline);
++        if (patch.deadlineText !== undefined) add("deadline_text", patch.deadlineText);
++      }
++      if (patch.reviewState !== undefined) add("review_state", patch.reviewState);
++      if (!columns.length) throw reviewError("INVALID_REVIEW_PATCH", "patch must change at least one supported field");
++
++      const nextState = patch.reviewState ?? item.review_state;
++      if (nextState === "confirmed") {
++        const attributed = patch.attributedAttendeeId !== undefined ? patch.attributedAttendeeId : item.attributed_attendee_id;
++        const assignee = patch.assigneeAttendeeId !== undefined ? patch.assigneeAttendeeId : item.assignee_attendee_id;
++        const deadline = patch.deadline !== undefined ? patch.deadline : item.deadline;
++        if (attributed === null || attributed === undefined ||
++            (kind === "action_item" && (assignee === null || assignee === undefined || deadline === null || deadline === undefined))) {
++          throw reviewError("INCOMPLETE_REVIEW_ITEM", `confirmed ${kind} ${itemId} is missing required attendee or deadline fields`);
++        }
++      }
++      add("updated_at", Date.now());
++      values.push(reviewId, itemId);
++      this.db.run(`UPDATE ${table} SET ${columns.join(", ")} WHERE review_id = ? AND ${idColumn} = ?`, values);
++    })();
+   }
+ 
+   confirmReview(reviewId: string, confirmedBy: string | null = null): void {
+     this.db.transaction(() => {
+-      const review = this.db.query(
+-        "SELECT meeting_id, transcript_version_id, status FROM meeting_reviews WHERE review_id = ?",
+-      ).get(reviewId) as { meeting_id: number; transcript_version_id: string; status: string } | null;
+-      if (!review || review.status !== "draft") throw new Error(`review ${reviewId} is not draft`);
++      const review = this.draftReview(reviewId);
++      this.validateCanonicalReview(review);
+       for (const table of ["decisions", "action_items", "open_items", "referenced_materials"] as const) {
+         const pending = this.db.query(
+           `SELECT COUNT(*) AS count FROM ${table} WHERE review_id = ? AND review_state = 'candidate'`,
+         ).get(reviewId) as { count: number };
+-        if (pending.count > 0) throw new Error("all review items must be confirmed or rejected");
++        if (pending.count > 0) {
++          throw reviewError("PENDING_REVIEW_ITEMS", "all review items must be confirmed or rejected");
++        }
+         const sourced = this.db.query(`
+           SELECT source_transcript_version_id, source_start_seq, source_end_seq FROM ${table}
+           WHERE review_id = ? AND review_state = 'confirmed' AND source_transcript_version_id IS NOT NULL
+@@ -735,6 +793,58 @@ export class MinutesStore {
+     })();
+   }
+ 
++  private draftReview(reviewId: string): {
++    meeting_id: number; transcript_version_id: string; status: string;
++  } {
++    const review = this.db.query(
++      "SELECT meeting_id, transcript_version_id, status FROM meeting_reviews WHERE review_id = ?",
++    ).get(reviewId) as { meeting_id: number; transcript_version_id: string; status: string } | null;
++    if (!review || review.status !== "draft") {
++      throw reviewError("REVIEW_NOT_DRAFT", `review ${reviewId} is missing or not draft`);
++    }
++    return review;
++  }
++
++  private validateAttendee(meetingId: number, attendeeId: string): void {
++    if (!attendeeId.trim() || !this.db.query(
++      "SELECT 1 FROM attendees WHERE meeting_id = ? AND attendee_id = ?",
++    ).get(meetingId, attendeeId)) {
++      throw reviewError("ATTENDEE_NOT_IN_MEETING", `attendee ${attendeeId || "<blank>"} is not registered for meeting ${meetingId}`);
++    }
++  }
++
++  private validateCanonicalReview(review: { meeting_id: number; transcript_version_id: string }): void {
++    const canonical = this.db.query(`
++      SELECT tv.transcript_version_id, tv.content_sha256, tv.finalized_at
++      FROM meeting_transcript_state mts
++      JOIN transcript_versions tv ON tv.transcript_version_id = mts.canonical_transcript_version_id
++      WHERE mts.meeting_id = ?
++    `).get(review.meeting_id) as {
++      transcript_version_id: string; content_sha256: string | null; finalized_at: number | null;
++    } | null;
++    if (!canonical || canonical.transcript_version_id !== review.transcript_version_id) {
++      throw reviewError("STALE_TRANSCRIPT_VERSION", `review transcript ${review.transcript_version_id} is not canonical`);
++    }
++    if (canonical.finalized_at === null || canonical.content_sha256 === null) {
++      throw reviewError("TRANSCRIPT_INTEGRITY_FAILED", `canonical transcript ${canonical.transcript_version_id} is not finalized`);
++    }
++    const lines = this.db.query(`
++      SELECT seq, captured_at_ms, audio_start_ms, audio_end_ms, speaker_turn, text
++      FROM transcript_version_lines WHERE meeting_id = ? AND transcript_version_id = ? ORDER BY seq
++    `).all(review.meeting_id, review.transcript_version_id) as Array<{
++      seq: number; captured_at_ms: number | null; audio_start_ms: number | null;
++      audio_end_ms: number | null; speaker_turn: number | null; text: string;
++    }>;
++    const hash = createHash("sha256");
++    for (const line of lines) {
++      hash.update(canonicalLineJson(line));
++      hash.update("\n");
++    }
++    if (hash.digest("hex") !== canonical.content_sha256) {
++      throw reviewError("TRANSCRIPT_INTEGRITY_FAILED", `canonical transcript ${canonical.transcript_version_id} content hash changed`);
++    }
++  }
++
+   addAudioSource(meetingId: number, input: {
+     originalAudioSha256: string; originalAudioPath?: string | null; byteLength?: number | null;
+   }): void {
+@@ -755,11 +865,11 @@ export class MinutesStore {
+ 
+   private validateSource(meetingId: number, reviewTranscriptVersionId: string, source: SourceRange): void {
+     if (!source || source.transcriptVersionId !== reviewTranscriptVersionId) {
+-      throw new Error("source transcript version must match the review transcript version");
++      throw reviewError("INVALID_SOURCE_SEGMENT", "source transcript version must match the review transcript version");
+     }
+     if (!Number.isInteger(source.startSeq) || !Number.isInteger(source.endSeq) ||
+         source.startSeq < 1 || source.endSeq < source.startSeq) {
+-      throw new Error("source range must contain positive ordered integer seq values");
++      throw reviewError("INVALID_SOURCE_SEGMENT", "source range must contain positive ordered integer seq values");
+     }
+     const summary = this.db.query(`
+       SELECT COUNT(*) AS count,
+@@ -770,7 +880,7 @@ export class MinutesStore {
+       source.startSeq, source.endSeq) as { count: number; max_seq: number | null };
+     const expected = source.endSeq - source.startSeq + 1;
+     if (summary.max_seq === null || source.endSeq > summary.max_seq || summary.count !== expected) {
+-      throw new Error("source range must be within the transcript and contain every contiguous seq");
++      throw reviewError("INVALID_SOURCE_SEGMENT", "source range must be within the transcript and contain every contiguous seq");
+     }
+   }
+ 
+diff --git a/src/session.ts b/src/session.ts
+index 319c0da..7a3d2bf 100644
+--- a/src/session.ts
++++ b/src/session.ts
+@@ -120,6 +120,20 @@ export interface ReviewUpdate {
+   }>;
+ }
+ 
++export interface ReviewItemUpdated {
++  type: "reviewItemUpdated";
++  reviewId: string;
++  itemId: string;
++  kind: "decision" | "action_item" | "open_item";
++}
++
++export interface ReviewConfirmed {
++  type: "reviewConfirmed";
++  reviewId: string;
++  transcriptVersionId: string;
++  confirmedAt: number;
++}
++
+ /** LLM 블록 감지 진행 표시 (관찰성: 사람·AI 모두 "지금 만드는 중"을 읽을 수 있게) */
+ export interface DetectUpdate {
+   type: "detect";
+@@ -132,7 +146,7 @@ export interface SavedUpdate {
+   path: string;
+ }
+ 
+-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | LineUpdate | DetectUpdate | SavedUpdate;
++export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | ReviewItemUpdated | ReviewConfirmed | LineUpdate | DetectUpdate | SavedUpdate;
+ 
+ export type ClientListener = (msg: ServerMessage) => void;
+ 
+diff --git a/tests/server-handler-map.test.ts b/tests/server-handler-map.test.ts
+index 5891d93..3c74e9e 100644
+--- a/tests/server-handler-map.test.ts
++++ b/tests/server-handler-map.test.ts
+@@ -9,6 +9,8 @@ const existingActions = [
+   "startReview",
+   "reset",
+   "setAttendees",
++  "updateItem",
++  "confirmReview",
+   "status",
+   "transcript",
+   "exportDeck",

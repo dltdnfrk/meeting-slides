@@ -1,0 +1,9 @@
+Task 9 complete.
+
+Verified:
+- bun test tests/minutes-store.test.ts tests/review-actions.test.ts -> PASS
+- bunx tsc -p tsconfig.json --noEmit -> PASS
+- bun test (full suite) -> 150 pass, 22 fail, 1 error
+
+Bounded limitation preserved:
+- full suite still has unrelated failures in tests/public-attendees.test.ts (pre-capture attendee registration form)

@@ -1,0 +1,82 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/review-actions.test.ts:
+44 |   });
+45 |   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
+46 | }
+47 | 
+48 | function expectCode(fn: () => unknown, code: string): void {
+49 |   expect(fn).toThrow(`[${code}]`);
+                  ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "[UNKNOWN_REVIEW_ITEM]"
+Received message: "unknown decision action-1"
+
+      at expectCode (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:49:14)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:55:5)
+(fail) MinutesStore review mutation transaction > validates candidate ownership, attendee membership, and the whole patch before mutating [1.39ms]
+44 |   });
+45 |   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
+46 | }
+47 | 
+48 | function expectCode(fn: () => unknown, code: string): void {
+49 |   expect(fn).toThrow(`[${code}]`);
+                  ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "[PENDING_REVIEW_ITEMS]"
+Received message: "all review items must be confirmed or rejected"
+
+      at expectCode (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:49:14)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:86:5)
+(fail) MinutesStore review mutation transaction > atomically transitions draft to confirmed only after every item is reviewed [1.21ms]
+44 |   });
+45 |   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
+46 | }
+47 | 
+48 | function expectCode(fn: () => unknown, code: string): void {
+49 |   expect(fn).toThrow(`[${code}]`);
+                  ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "[STALE_TRANSCRIPT_VERSION]"
+
+Received function did not throw
+Received value: undefined
+
+      at expectCode (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:49:14)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:112:5)
+(fail) MinutesStore review mutation transaction > rejects a review whose transcript version is no longer canonical [1.01ms]
+44 |   });
+45 |   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
+46 | }
+47 | 
+48 | function expectCode(fn: () => unknown, code: string): void {
+49 |   expect(fn).toThrow(`[${code}]`);
+                  ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "[TRANSCRIPT_INTEGRITY_FAILED]"
+
+Received function did not throw
+Received value: undefined
+
+      at expectCode (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:49:14)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:125:5)
+(fail) MinutesStore review mutation transaction > detects changed canonical transcript bytes and leaves review/artifact rows untouched [1.37ms]
+141 | let reviewId: string;
+142 | const messages: Record<string, unknown>[] = [];
+143 | 
+144 | function waitFor<T>(subscribe: (done: (value: T) => void, fail: (error: Error) => void) => void): Promise<T> {
+145 |   return new Promise<T>((resolve, reject) => {
+146 |     const timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);
+                                                    ^
+error: timed out after 10000ms
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/review-actions.test.ts:146:47)
+(fail) real WS actions reject adversarial patches, persist valid changes, and confirm without artifacts [10000.68ms]
+
+ 0 pass
+ 5 fail
+ 4 expect() calls
+Ran 5 tests across 1 file. [10.15s]

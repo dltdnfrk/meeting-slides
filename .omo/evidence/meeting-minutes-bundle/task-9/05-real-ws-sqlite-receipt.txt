@@ -1,0 +1,6 @@
+PASS wrong-attendee + partial-patch: deterministic rejection, zero mutation
+PASS confirm-before-review: deterministic REVIEW_NOT_DRAFT
+PASS wrong-version: canonical switch rejected, review remains draft
+PASS changed-transcript: hash mismatch rejected, review remains draft
+PASS happy WS/SQLite: draft->confirmed atomically; artifact_bundles=0 artifacts=0
+{"database":"temporary","probes":6,"result":"PASS"}

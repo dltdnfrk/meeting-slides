@@ -1,0 +1,11 @@
+{
+  "taskId": "st_019fbdbc",
+  "task": "Finish T9 in meeting-minutes worktree",
+  "status": "done",
+  "verified": {
+    "focusedTests": "bun test tests/minutes-store.test.ts tests/review-actions.test.ts",
+    "tsc": "bunx tsc -p tsconfig.json --noEmit",
+    "fullSuite": "bun test"
+  },
+  "limitation": "Full suite still fails in unrelated tests/public-attendees.test.ts"
+}

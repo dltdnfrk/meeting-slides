@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { MinutesStore } from "../src/minutes-store.ts";
 import { MeetingStore } from "../src/store.ts";
+import { transcriptContentSha256 } from "../src/transcript-versioning.ts";
 
 function stores(): { legacy: MeetingStore; minutes: MinutesStore } {
   const legacy = new MeetingStore(":memory:");
@@ -28,6 +29,11 @@ function preparedTranscript(minutes: MinutesStore): {
     { seq: 3, capturedAtMs: 3000, text: "Budget remains open." },
   ]);
   return { meetingId, transcriptVersionId: version.transcriptVersionId };
+}
+
+function selectCanonical(minutes: MinutesStore, meetingId: number, transcriptVersionId: string): void {
+  minutes.finalizeTranscriptVersion(transcriptVersionId, transcriptContentSha256(minutes, transcriptVersionId));
+  minutes.setCanonical(meetingId, transcriptVersionId);
 }
 
 describe("MinutesStore SQLite contracts", () => {
@@ -82,6 +88,7 @@ describe("MinutesStore SQLite contracts", () => {
     ]);
 
     const reviewId = minutes.saveCandidates({ meetingId, transcriptVersionId });
+    selectCanonical(minutes, meetingId, transcriptVersionId);
     minutes.confirmReview(reviewId, "reviewer");
     expect(() => minutes.replaceAttendees(meetingId, [
       { attendeeId: "alice-local", displayName: "Changed" },
@@ -138,6 +145,7 @@ describe("MinutesStore SQLite contracts", () => {
         reviewState: "rejected",
       }],
     });
+    selectCanonical(minutes, meetingId, transcriptVersionId);
 
     expect(minutes.itemsForReview(reviewId).map((item) => [item.kind, item.description])).toEqual([
       ["decision", "Ship Friday"],
@@ -183,9 +191,15 @@ describe("MinutesStore SQLite contracts", () => {
         reviewState: "confirmed",
       }],
     });
+    selectCanonical(minutes, meetingId, transcriptVersionId);
+    minutes.databaseHandle().run("DROP TRIGGER trg_finalized_transcript_lines_no_delete");
     minutes.databaseHandle().run(
       "DELETE FROM transcript_version_lines WHERE transcript_version_id = ? AND seq = 2",
       [transcriptVersionId],
+    );
+    minutes.databaseHandle().run(
+      "UPDATE transcript_versions SET content_sha256 = ? WHERE transcript_version_id = ?",
+      [transcriptContentSha256(minutes, transcriptVersionId), transcriptVersionId],
     );
 
     expect(() => minutes.confirmReview(reviewId, "reviewer")).toThrow(/contiguous/);
