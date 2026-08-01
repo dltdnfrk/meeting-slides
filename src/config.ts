@@ -25,6 +25,7 @@ export interface WhisperConfig {
   stepMs: number;
   diarize: boolean;     // tinydiarize 화자 전환 감지
   tdrzModelPath: string; // diarize=true일 때 사용하는 tdrz 모델 (현재 영어 전용만 존재)
+  audioRecorderBin: string | null; // 라이브 원본 WAV를 보존할 ffmpeg/rec/sox
 }
 
 export type InputMode = "mic" | "file";
@@ -120,6 +121,7 @@ export function loadWhisperConfig(): WhisperConfig {
     stepMs: intEnv("WHISPER_STEP_MS", 3000),
     diarize: ["true", "1", "yes", "on"].includes(env("WHISPER_DIARIZE", "false").toLowerCase()),
     tdrzModelPath: env("WHISPER_TDRZ_MODEL_PATH", "./models/ggml-small.en-tdrz.bin"),
+    audioRecorderBin: env("AUDIO_RECORDER_BIN", "").trim() || null,
   };
 }
 

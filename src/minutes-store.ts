@@ -123,6 +123,24 @@ CREATE TABLE IF NOT EXISTS transcript_version_lines (
     REFERENCES transcript_versions(meeting_id, transcript_version_id) ON DELETE CASCADE,
   CHECK (audio_end_ms IS NULL OR (audio_start_ms IS NOT NULL AND audio_end_ms >= audio_start_ms))
 );
+CREATE TRIGGER IF NOT EXISTS trg_finalized_transcript_lines_no_update
+BEFORE UPDATE ON transcript_version_lines
+WHEN EXISTS (
+  SELECT 1 FROM transcript_versions
+  WHERE transcript_version_id = OLD.transcript_version_id AND finalized_at IS NOT NULL
+)
+BEGIN
+  SELECT RAISE(ABORT, 'finalized transcript lines are immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS trg_finalized_transcript_lines_no_delete
+BEFORE DELETE ON transcript_version_lines
+WHEN EXISTS (
+  SELECT 1 FROM transcript_versions
+  WHERE transcript_version_id = OLD.transcript_version_id AND finalized_at IS NOT NULL
+)
+BEGIN
+  SELECT RAISE(ABORT, 'finalized transcript lines are immutable');
+END;
 CREATE TABLE IF NOT EXISTS meeting_transcript_state (
   meeting_id INTEGER PRIMARY KEY,
   canonical_transcript_version_id TEXT NOT NULL,
@@ -470,6 +488,34 @@ export class MinutesStore {
           line.audioStartMs ?? null, line.audioEndMs ?? null, line.speakerTurn ?? null,
           nonBlank(line.text, "transcript text")]);
       }
+    })();
+  }
+
+  appendTranscriptLine(transcriptVersionId: string, line: Omit<TranscriptLineInput, "seq">, dualWriteLegacy: boolean): number {
+    return this.db.transaction(() => {
+      const version = this.db.query(
+        "SELECT meeting_id, finalized_at FROM transcript_versions WHERE transcript_version_id = ?",
+      ).get(transcriptVersionId) as { meeting_id: number; finalized_at: number | null } | null;
+      if (!version) throw new Error(`unknown transcript version ${transcriptVersionId}`);
+      if (version.finalized_at !== null) throw new Error(`transcript version ${transcriptVersionId} is finalized`);
+      const latest = this.db.query(
+        "SELECT coalesce(MAX(seq), 0) AS seq FROM transcript_version_lines WHERE transcript_version_id = ?",
+      ).get(transcriptVersionId) as { seq: number };
+      const seq = latest.seq + 1;
+      const text = nonBlank(line.text, "transcript text");
+      this.db.run(`
+        INSERT INTO transcript_version_lines
+          (meeting_id, transcript_version_id, seq, captured_at_ms, audio_start_ms, audio_end_ms, speaker_turn, text)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `, [version.meeting_id, transcriptVersionId, seq, line.capturedAtMs ?? null,
+        line.audioStartMs ?? null, line.audioEndMs ?? null, line.speakerTurn ?? null, text]);
+      if (dualWriteLegacy) {
+        this.db.run(
+          "INSERT INTO transcript_lines (meeting_id, seq, ts, speaker, text) VALUES (?, ?, ?, ?, ?)",
+          [version.meeting_id, seq, line.capturedAtMs ?? Date.now(), line.speakerTurn ?? null, text],
+        );
+      }
+      return seq;
     })();
   }
 

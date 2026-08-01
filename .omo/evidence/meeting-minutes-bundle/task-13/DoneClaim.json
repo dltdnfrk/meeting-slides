@@ -1,0 +1,23 @@
+{
+  "task_id": "st_019fbda4",
+  "task": "T13 canonical transcript versioning, raw audio persistence, and audio-hash dedup",
+  "status": "done",
+  "verified_at": "2026-08-01T00:00:00Z",
+  "scope": [
+    "src/transcript-versioning.ts",
+    "tests/transcript-versioning.test.ts",
+    "src/minutes-store.ts",
+    "src/config.ts"
+  ],
+  "verification": {
+    "bun_test_transcript_versioning": true,
+    "bun_test_minutes_store": true,
+    "tsc_no_emit": true,
+    "diff_check": true,
+    "real_probes": [
+      "03-real-probe.json",
+      "04-adversarial.json"
+    ]
+  },
+  "gap": null
+}

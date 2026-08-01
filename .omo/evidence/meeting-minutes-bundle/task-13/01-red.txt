@@ -1,0 +1,14 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/transcript-versioning.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module '../src/transcript-versioning.ts' from '/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/transcript-versioning.test.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [11.00ms]

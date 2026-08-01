@@ -1,0 +1,14 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/transcript-versioning.test.ts:
+(pass) canonical transcript versioning > live capture dual-writes, finalizes a content hash, and makes canonical lines immutable [2.91ms]
+(pass) canonical transcript versioning > retranscription creates a new immutable coordinate space without changing canonical automatically [1.20ms]
+(pass) canonical transcript versioning > an interrupted retranscription leaves the previous canonical version intact [0.71ms]
+(pass) canonical transcript versioning > legacy snapshot rejects duplicate coordinates instead of guessing [0.54ms]
+(pass) raw audio hash and recorder contract > file audio claims are hash-deduplicated and preserve the first meeting on unique collision [1.00ms]
+(pass) raw audio hash and recorder contract > recorder waits for closure, hashes a valid WAV, and removes failed partial output [781.25ms]
+
+ 6 pass
+ 0 fail
+ 28 expect() calls
+Ran 6 tests across 1 file. [798.00ms]

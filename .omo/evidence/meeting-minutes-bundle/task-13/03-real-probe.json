@@ -1,0 +1,23 @@
+{
+  "canonical": "ee0c6b3d-34db-403e-a6ae-dd048575b76f",
+  "versions": [
+    "ee0c6b3d-34db-403e-a6ae-dd048575b76f",
+    "678aa270-1723-4d27-808c-ee445164e567"
+  ],
+  "claim1": {
+    "duplicateMeetingId": null,
+    "sha256": "9a125616cfc2a7256a198a61218beec7b3fc3d9f126547d1fa4274d1d9923a7d",
+    "byteLength": 17
+  },
+  "claim2": {
+    "duplicateMeetingId": 1,
+    "sha256": "9a125616cfc2a7256a198a61218beec7b3fc3d9f126547d1fa4274d1d9923a7d",
+    "byteLength": 17
+  },
+  "dupErr": "",
+  "recStop": {
+    "path": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/task13-probe-o2z139/rec.wav",
+    "sha256": "9624658b56fab30d4787b90e94f066c57965a8c3335ec0877b3cf9f08bbff028",
+    "byteLength": 47
+  }
+}
