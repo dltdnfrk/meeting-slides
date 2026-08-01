@@ -23,21 +23,21 @@ const btnExportTranscriptEl = $("btn-export-transcript");
 const btnExportDeckEl = $("btn-export-deck");
 const btnExportPdfEl = $("btn-export-pdf");
 const btnExportPngEl = $("btn-export-png");
-const btnSettingsEl = $("btn-settings");
+const btnSettingsEl = /** @type {HTMLButtonElement} */ ($("btn-settings"));
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
-const btnRecheckEl = $("btn-recheck");
-const btnRecordEl = $("btn-record");
-const btnAttendeesEl = $("btn-attendees");
+const btnRecheckEl = /** @type {HTMLButtonElement} */ ($("btn-recheck"));
+const btnRecordEl = /** @type {HTMLButtonElement} */ ($("btn-record"));
+const btnAttendeesEl = /** @type {HTMLButtonElement} */ ($("btn-attendees"));
 const attendeePanelEl = $("attendee-panel");
-const attendeeFormEl = $("attendee-form");
-const attendeeNameEl = $("attendee-name");
-const attendeeCrmEl = $("attendee-crm");
+const attendeeFormEl = /** @type {HTMLFormElement} */ ($("attendee-form"));
+const attendeeNameEl = /** @type {HTMLInputElement} */ ($("attendee-name"));
+const attendeeCrmEl = /** @type {HTMLInputElement} */ ($("attendee-crm"));
 const attendeeListEl = $("attendee-list");
 const attendeeErrorEl = $("attendee-error");
 const attendeeCountEl = $("attendee-count");
-const btnAttendeeAddEl = $("btn-attendee-add");
-const btnAttendeeSaveEl = $("btn-attendee-save");
+const btnAttendeeAddEl = /** @type {HTMLButtonElement} */ ($("btn-attendee-add"));
+const btnAttendeeSaveEl = /** @type {HTMLButtonElement} */ ($("btn-attendee-save"));
 const feedListEl = $("feed-list");
 const feedCountEl = $("feed-count");
 const btnResetEl = $("btn-reset");
@@ -56,8 +56,8 @@ const lastSavedEl = $("last-saved");
 const docTitleEl = $("doc-title");
 const docMetaEl = $("doc-meta");
 const pillMetaEl = $("pill-meta");
-const selectModelEl = $("select-model");
-const selectEffortEl = $("select-effort");
+const selectModelEl = /** @type {HTMLSelectElement} */ ($("select-model"));
+const selectEffortEl = /** @type {HTMLSelectElement} */ ($("select-effort"));
 const effortRowEl = $("effort-row");
 
 // 하단 도크 탭
@@ -348,24 +348,27 @@ btnSettingsEl.onclick = (ev) => {
 };
 
 providerListEl.addEventListener("click", (ev) => {
+  if (!(ev.target instanceof Element)) return;
   const connectBtn = ev.target.closest(".provider-row__connect");
-  if (connectBtn && ws && ws.readyState === WebSocket.OPEN) {
+  if (connectBtn instanceof HTMLElement && ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "connectProvider", id: connectBtn.dataset.id }));
     return;
   }
   const saveBtn = ev.target.closest(".provider-row__save");
-  if (saveBtn && ws && ws.readyState === WebSocket.OPEN) {
+  if (saveBtn instanceof HTMLElement && ws && ws.readyState === WebSocket.OPEN) {
     const row = saveBtn.closest(".provider-row");
-    const input = row ? row.querySelector(".provider-row__key") : null;
-    if (input && input.value.trim()) {
+    const input = row?.querySelector(".provider-row__key");
+    if (input instanceof HTMLInputElement && input.value.trim()) {
       ws.send(JSON.stringify({ action: "setProviderKey", id: saveBtn.dataset.id, key: input.value.trim() }));
       input.value = "";
     }
     return;
   }
   const selectBtn = ev.target.closest(".provider-row__select");
-  if (selectBtn && !selectBtn.disabled && ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "setProvider", id: selectBtn.closest(".provider-row").dataset.id }));
+  const row = selectBtn?.closest(".provider-row");
+  if (selectBtn instanceof HTMLButtonElement && row instanceof HTMLElement &&
+      !selectBtn.disabled && ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "setProvider", id: row.dataset.id }));
   }
 });
 
@@ -377,6 +380,7 @@ btnRecheckEl.onclick = () => {
 };
 
 document.addEventListener("click", (ev) => {
+  if (!(ev.target instanceof Element)) return;
   if (!providerPanelEl.hidden && !ev.target.closest("#provider-panel") && !ev.target.closest("#btn-settings")) {
     providerPanelEl.hidden = true;
   }
@@ -483,7 +487,7 @@ let attendeeDrafts = [];
 let attendeeDirty = false;
 const attendeeState = { meetingId: null, attendees: [] };
 // 테스트/디버깅용 관찰 지점 — 드롭다운(T8)이 읽을 원천과 동일한 객체.
-window.__attendeeState = attendeeState;
+/** @type {Window & typeof globalThis & { __attendeeState: typeof attendeeState }} */ (window).__attendeeState = attendeeState;
 
 function setAttendeeError(text) {
   attendeeErrorEl.textContent = text ?? "";
@@ -561,9 +565,9 @@ attendeeFormEl.addEventListener("submit", (ev) => {
 });
 
 attendeeListEl.addEventListener("click", (ev) => {
-  if (capturing) return;
+  if (capturing || !(ev.target instanceof Element)) return;
   const row = ev.target.closest(".attendee-row");
-  if (!row) return;
+  if (!(row instanceof HTMLElement)) return;
   const index = Number(row.dataset.index);
   if (ev.target.closest(".attendee-row__remove")) {
     attendeeDrafts.splice(index, 1);
@@ -614,11 +618,11 @@ btnAttendeesEl.onclick = (ev) => {
 };
 
 document.addEventListener("click", (ev) => {
-  if (attendeePanelEl.hidden) return;
+  if (attendeePanelEl.hidden || !(ev.target instanceof Element)) return;
   // 패널 안 버튼(수정/삭제)은 핸들러가 리스트를 다시 그려 버리므로, 이벤트가
   // document까지 올라올 때 ev.target은 이미 DOM에서 떨어져 closest()가 패널을
   // 찾지 못한다. 그런 분리된 타겟을 "바깥 클릭"으로 오인하지 않도록 제외한다.
-  if (ev.target instanceof Node && !ev.target.isConnected) return;
+  if (!ev.target.isConnected) return;
   if (!ev.target.closest("#attendee-panel") && !ev.target.closest("#btn-attendees")) {
     closeAttendeePanel();
   }
@@ -783,19 +787,19 @@ function toggleThumbnailPreview(card) {
   renderMain();
 }
 thumbnailsEl.addEventListener("click", (ev) => {
-  const card = ev.target.closest(".thumbnail");
-  if (card) toggleThumbnailPreview(card);
+  const card = ev.target instanceof HTMLElement ? ev.target.closest(".thumbnail") : null;
+  if (card instanceof HTMLElement) toggleThumbnailPreview(card);
 });
 thumbnailsEl.addEventListener("keydown", (ev) => {
   if (ev.key !== "Enter" && ev.key !== " ") return;
   const card = (ev.target instanceof HTMLElement ? ev.target.closest(".thumbnail") : null);
-  if (!card) return;
+  if (!(card instanceof HTMLElement)) return;
   ev.preventDefault();
   toggleThumbnailPreview(card);
 });
 
 currentSlideEl.addEventListener("click", (ev) => {
-  if (ev.target.closest(".slide__notice")) {
+  if (ev.target instanceof Element && ev.target.closest(".slide__notice")) {
     viewingHistory = null;
     renderMain();
   }

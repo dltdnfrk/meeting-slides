@@ -1,0 +1,13 @@
+scope: meeting-minutes quality remediation salvage
+base_commit: b23ee2aac5203c29a7355d838c9e0680853599ef
+source_fingerprint_sha256: 8ce4ee0242e1a5eb5fcce74d0d0c2fd2c752bc3e46c349ce3afac5450c05dadf
+verified_by: hephaestus task st_019fbecc (PI session 019fbecc-3f25-762f-8b76-ba4bec24efcb; model gpt-5.6-sol)
+verified_at: 2026-08-01T19:29:22Z
+
+command: bun .omo/evidence/meeting-minutes-bundle/final/f2-quality-remediation/chromium-dom-smoke.ts
+result: PASS (Chrome/150.0.7871.24; pageErrors=[]; attendeeRows=1; attendeePanelOpen=true; setProvider and setAttendees emitted)
+
+command: git diff --check
+result: PASS (exit 0; no output)
+
+commit: recorded by the Git commit containing this receipt; source fingerprint above identifies the verified delta
