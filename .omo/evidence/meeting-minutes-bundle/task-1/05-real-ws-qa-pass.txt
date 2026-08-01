@@ -1,0 +1,29 @@
+[server] HTTP: http://localhost:20281
+입력 모드: mic
+[server] meeting-slides 서버 시작. 브라우저에서 http://localhost:20281 접속
+[ws] {"type":"status","text":"연결됨. LLM provider=cli model=cli:claude(/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-UhTHEA/fake-cli)"}
+[ws] {"type":"slide","current":null,"history":[]}
+[ws] {"type":"providers","list":[{"id":"cli:claude","label":"Claude (구독)","detail":"claude CLI — Claude Pro/Max 구독 인증","available":true,"models":["opus","sonnet","haiku"]},{"id":"cli:codex","label":"GPT (구독)","detail":"codex CLI — ChatGPT 구독 인증","available":true,"models":["gpt-5.6-sol","gpt-5.6-luna","gpt-5.6-terra"],"efforts":["low","medium","high"]},{"id":"alibaba","label":"Alibaba GLM","detail":"glm-5.2","available":false,"models":["glm-5.2","glm-5.1","glm-4.7"]},{"id":"openai","label":"OpenAI API","detail":"gpt-4o-mini","available":false,"models":["gpt-4o-mini","gpt-4o"]},{"id":"local","label":"로컬 llama.cpp","detail":"미설정","available":false,"models":[]}],"current":"cli:claude"}
+[ws] {"type":"capture","capturing":false,"mode":"mic"}
+[ws] {"type":"transcript","entries":[],"reason":"snapshot","truncated":false}
+[ws] {"type":"status","text":"서버 정상"}
+[server] [whisper] whisper-stream 시작: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-UhTHEA/fake-whisper -m /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-UhTHEA/model.bin -l ko -t 4 --step 3000 --length 5000 --keep 200 -c -1 -fa -kc
+[ws] {"type":"capture","capturing":true,"mode":"mic"}
+[ws] {"type":"status","text":"🎤 녹음 시작 — 말씀하세요"}
+[ws] {"type":"status","text":"whisper-stream 시작: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-UhTHEA/fake-whisper -m /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-UhTHEA/model.bin -l ko -t 4 --step 3000 --length 5000 --keep 200 -c -1 -fa -kc"}
+[ws] {"type":"slide","current":null,"history":[]}
+[ws] {"type":"status","text":"세션 초기화"}
+[ws] {"type":"transcript","entries":[],"reason":"snapshot","truncated":false}
+[ws] {"type":"saved","path":"exports/meeting-2026-08-01T12-37-07-163Z.json"}
+[ws] {"type":"status","text":"저장됨: exports/meeting-2026-08-01T12-37-07-163Z.json"}
+[ws] {"type":"capture","capturing":false,"mode":"mic"}
+[server] [whisper] whisper-stream 종료 (code=null)
+[ws] {"type":"status","text":"whisper-stream 종료 (code=null)"}
+[ws] {"type":"capture","capturing":false,"mode":"mic"}
+[ws] {"type":"status","text":"입력 종료"}
+[ws] {"type":"status","text":"⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다"}
+[ws] {"type":"status","text":"서버 정상"}
+[server] [ws] 메시지 처리 실패: JSON Parse error: Expected '}'
+[ws] {"type":"status","text":"요청 처리 실패: JSON Parse error: Expected '}'"}
+[assert] capture/status/export/reset/unknown/malformed PASS artifact=/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/.omo/evidence/meeting-minutes-bundle/task-1/manual-export.json
+[cleanup] server_exited=true port=20281 db_removed=true exports_removed=true temp_removed=true

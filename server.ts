@@ -160,6 +160,328 @@ const ALLOWED_WS_ORIGINS = new Set([
   `http://[::1]:${config.server.httpPort}`,
 ]);
 
+interface WsCommand {
+  action?: string;
+  id?: string;
+  key?: string;
+  model?: string;
+  effort?: string;
+}
+
+type WsActionContext = {
+  ws: ServerWebSocket<undefined>;
+  cmd: WsCommand;
+};
+
+type WsActionHandler = (ctx: WsActionContext) => void;
+
+const handleStartCapture: WsActionHandler = ({ ws, cmd }) => {
+  void startCapture();
+};
+
+const handleStopCapture: WsActionHandler = ({ ws, cmd }) => {
+  void stopCapture();
+};
+
+const handleReset: WsActionHandler = ({ ws, cmd }) => {
+  session.reset();
+  // 회의 저장소도 새 회의로 전환 (캡처 중이면 이어서 기록)
+  store.endMeeting();
+  if (capturing) store.startMeeting(currentProviderId);
+  broadcast(session.transcript("snapshot"));
+};
+
+const handleStatus: WsActionHandler = ({ ws, cmd }) => {
+  ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
+};
+
+const handleTranscript: WsActionHandler = ({ ws, cmd }) => {
+  ws.send(JSON.stringify(session.transcript("export")));
+};
+
+const handleDeckExport: WsActionHandler = ({ ws, cmd }) => {
+  // lecture-deck 템플릿 기반 reveal.js 덱 + slides-grab 계약 파일 생성
+  // PDF/PNG는 초안 경로: validate 후 렌더. 가짜 design-gate proceed 영수증은 쓰지 않는다.
+  try {
+    const meta = store.latestMeeting();
+    if (!meta) {
+      broadcast({ type: "status", text: "저장된 회의가 없습니다" });
+    } else {
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const dir = join(import.meta.dir, "exports", `deck-${stamp}`);
+      const slidesDir = join(dir, "slides");
+      mkdirSync(slidesDir, { recursive: true });
+      copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
+      copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(slidesDir, "theme.css"));
+      copyDeckAssets({
+        sourceDirectory: join(import.meta.dir, "deck", "assets"),
+        exportDirectory: dir,
+        slidesDirectory: slidesDir,
+      });
+      const input = {
+        title: "Meeting Notes",
+        startedAt: meta.started_at,
+        provider: meta.provider,
+        slides: store.slides(meta.id),
+        lines: store.lines(meta.id),
+      };
+      writeFileSync(join(dir, "index.html"), buildDeckHtml(input), "utf-8");
+      for (const f of buildSlideFiles(input)) {
+        writeFileSync(join(slidesDir, f.filename), f.html, "utf-8");
+      }
+
+      // slides-grab CLI 실행 헬퍼 (프로젝트 로컬 chromium 사용)
+      const runGrab = (args: string[], onDone: (code: number | null, tail: string) => void) => {
+        const proc = spawn(process.execPath, ["x", "slides-grab", ...args], {
+          env: { ...process.env, PLAYWRIGHT_BROWSERS_PATH: join(import.meta.dir, "vendor", "ms-playwright") },
+          stdio: ["ignore", "pipe", "pipe"],
+        });
+        let tail = "";
+        proc.stderr?.on("data", (d: Buffer) => { tail = (tail + d.toString("utf-8")).slice(-400); });
+        proc.on("close", (code) => onDone(code, tail));
+      };
+
+      if (cmd.action === "exportDeck") {
+        lastSavedPath = `exports/deck-${stamp}/index.html`;
+        broadcast({ type: "saved", path: lastSavedPath });
+        broadcast({ type: "status", text: `덱 저장됨: ${lastSavedPath}` });
+        openUrl(`file://${join(dir, "index.html")}`);
+      } else if (cmd.action === "exportPng") {
+        // 초안 PNG: slides-grab png는 design-gate 대상이 아니라 validate 후 바로 렌더.
+        const out = join(import.meta.dir, "exports", `deck-${stamp}-png`);
+        broadcast({ type: "status", text: "초안 PNG 준비 중… (design-gate 불필요)" });
+        runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
+          if (vcode !== 0) {
+            broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
+            return;
+          }
+          broadcast({ type: "status", text: "초안 PNG 렌더 중… (chromium)" });
+          runGrab(["png", "--slides-dir", slidesDir, "--output-dir", out], (code, tail) => {
+            if (code === 0) {
+              lastSavedPath = `exports/deck-${stamp}-png`;
+              broadcast({ type: "saved", path: lastSavedPath });
+              broadcast({ type: "status", text: `초안 PNG 저장됨: ${lastSavedPath} (미검토)` });
+            } else {
+              broadcast({ type: "status", text: `PNG 실패: ${tail.trim().slice(0, 160)}` });
+            }
+          });
+        });
+      } else {
+        // 정식 PDF: slides-grab pdf는 design-gate proceed 영수증을 CLI 레벨에서 요구한다.
+        // 체인: validate → 정직한 Pass A/B 리포트(실제 수행한 검사를 기록) → design-gate → pdf.
+        const out = join(import.meta.dir, "exports", `deck-${stamp}.pdf`);
+        broadcast({ type: "status", text: "PDF 준비 중… (design-gate)" });
+        const slideFiles = buildSlideFiles(input);
+        const fingerprints = slideFiles.map((f) => ({
+          file: f.filename,
+          sha256: createHash("sha256").update(f.html, "utf-8").digest("hex"),
+        }));
+        runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
+          if (vcode !== 0) {
+            broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
+            return;
+          }
+          // 1) 미리보기 PNG 렌더 → 2) 독립 비전 리뷰 → 3) proceed면 게이트 기록 → 4) PDF
+          broadcast({ type: "status", text: "PDF 미리보기 렌더 중… (chromium)" });
+          runGrab(["png", "--slides-dir", slidesDir, "--output-dir", join(slidesDir, ".slides-grab", "gate-preview")], (_pcode, _ptail) => {
+            void (async () => {
+              try {
+                broadcast({ type: "status", text: "독립 시각 리뷰 중… (codex)" });
+                const previewDir = join(slidesDir, ".slides-grab", "gate-preview");
+                const previewFiles = readdirSync(previewDir)
+                  .filter((f) => f.endsWith(".png"));
+                // 리뷰 모델은 비전 검증된 기본값 사용 (사용자 선택 모델이
+                // 이미지 입력을 거부할 수 있어 슬라이드 생성 모델과 분리)
+                const reviewOpts = { images: previewFiles.map((f) => join(previewDir, f)) };
+                const review = await runVisualReview(
+                  buildReviewPrompt(reviewOpts),
+                  reviewOpts,
+                );
+                if (review.verdict !== "proceed") {
+                  appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-REVISE ${review.summary} ${review.blockingFindings.join("; ")}\n`);
+                  broadcast({
+                    type: "status",
+                    text: `시각 리뷰 revise: ${review.blockingFindings.join("; ").slice(0, 160) || review.summary}`,
+                  });
+                  return;
+                }
+                appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-PROCEED ${review.confidence}\n`);
+                const gateInput = {
+                  slideFiles: fingerprints,
+                  previewFiles,
+                  slideCount: input.slides.length,
+                  maxBullets: Math.max(0, ...input.slides.map((s) => s.bullets.length)),
+                  lineCount: input.lines.length,
+                  reviewed: true,
+                  confidence: review.confidence,
+                  notes: `독립 시각 리뷰 요약: ${review.summary}`,
+                };
+                writeFileSync(join(slidesDir, ".pass-a.md"), buildPassAReport(gateInput), "utf-8");
+                writeFileSync(join(slidesDir, ".pass-b.md"), buildPassBReport(gateInput), "utf-8");
+                broadcast({ type: "status", text: `리뷰 통과 (${review.confidence}) — 게이트 기록 중…` });
+                runGrab(
+                  ["design-gate", "--slides-dir", slidesDir, "--verdict", "proceed",
+                    "--pass-a-report", join(slidesDir, ".pass-a.md"),
+                    "--pass-b-report", join(slidesDir, ".pass-b.md")],
+                  (gcode, gtail) => {
+                    if (gcode !== 0) {
+                      broadcast({ type: "status", text: `design-gate 실패: ${gtail.trim().slice(0, 160)}` });
+                      return;
+                    }
+                    broadcast({ type: "status", text: "PDF 렌더 중… (chromium)" });
+                    runGrab(["pdf", "--slides-dir", slidesDir, "--output", out], (code, tail) => {
+                      if (code === 0) {
+                        lastSavedPath = `exports/deck-${stamp}.pdf`;
+                        broadcast({ type: "saved", path: lastSavedPath });
+                        broadcast({ type: "status", text: `PDF 저장됨: ${lastSavedPath}` });
+                      } else {
+                        broadcast({ type: "status", text: `PDF 실패: ${tail.trim().slice(0, 160)}` });
+                      }
+                    });
+                  },
+                );
+              } catch (e) {
+                const message = e instanceof Error ? e.message : String(e);
+                appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-ERROR ${message.slice(0, 400)}\n`);
+                broadcast({ type: "status", text: `시각 리뷰 실패: ${message.slice(0, 160)}` });
+              }
+            })();
+          });
+        });
+      }
+    }
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    broadcast({ type: "status", text: `저장 실패: ${message}` });
+  }
+};
+
+const handleSaveNotes: WsActionHandler = ({ ws, cmd }) => {
+  // anarlog 방식: 브라우저 다운로드가 아니라 서버 디스크에 저장 (항상 동작)
+  try {
+    const dir = join(import.meta.dir, "exports");
+    mkdirSync(dir, { recursive: true });
+    const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.md`;
+    writeFileSync(join(dir, filename), store.exportMarkdown(), "utf-8");
+    lastSavedPath = `exports/${filename}`;
+    broadcast({ type: "saved", path: lastSavedPath });
+    broadcast({ type: "status", text: `저장됨: ${lastSavedPath}` });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    broadcast({ type: "status", text: `저장 실패: ${message}` });
+  }
+};
+
+const handleSaveJson: WsActionHandler = ({ ws, cmd }) => {
+  try {
+    const dir = join(import.meta.dir, "exports");
+    mkdirSync(dir, { recursive: true });
+    const meta = store.latestMeeting();
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      provider: meta?.provider ?? null,
+      slides: meta ? store.slides(meta.id) : [],
+      lines: meta ? store.lines(meta.id) : [],
+    };
+    const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+    writeFileSync(join(dir, filename), JSON.stringify(payload, null, 2), "utf-8");
+    lastSavedPath = `exports/${filename}`;
+    broadcast({ type: "saved", path: lastSavedPath });
+    broadcast({ type: "status", text: `저장됨: ${lastSavedPath}` });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    broadcast({ type: "status", text: `저장 실패: ${message}` });
+  }
+};
+
+const handleSetProvider: WsActionHandler = ({ ws, cmd }) => {
+  if (typeof cmd.id === "string") {
+    const entry = providerEntries.find((e) => e.id === cmd.id);
+    if (!entry) {
+      ws.send(JSON.stringify({ type: "status" as const, text: `알 수 없는 프로바이더: ${cmd.id}` }));
+    } else if (!entry.available) {
+      ws.send(JSON.stringify({ type: "status" as const, text: `${entry.label}은(는) 설정되지 않았습니다 (CLI 설치/API 키 확인)` }));
+    } else {
+      // 모델/effort 오버라이드 (빈 문자열이면 기본값, effort는 지원 프로바이더만)
+      const model = typeof cmd.model === "string" && cmd.model.trim() ? cmd.model.trim() : undefined;
+      const effort = typeof cmd.effort === "string" && cmd.effort.trim() && (entry.efforts ?? []).includes(cmd.effort.trim())
+        ? cmd.effort.trim()
+        : undefined;
+      const detector = createDetector(entry.id, { cliTimeoutMs, model, effort });
+      if (detector) {
+        session.setDetector(detector);
+        currentProviderId = entry.id;
+        currentModel = model;
+        currentEffort = effort;
+        llmLabel = `${entry.label}${model ? `/${model}` : ""}${effort ? `·${effort}` : ""}`;
+        broadcast(providersMessage());
+        broadcast({ type: "status", text: `LLM 변경됨: ${llmLabel}` });
+        void detector.ping().then((ok) => {
+          if (!ok) broadcast({ type: "status", text: `⚠️ ${entry.label} 연결 확인에 실패했습니다` });
+        });
+      }
+    }
+  }
+};
+
+const handleConnectProvider: WsActionHandler = ({ ws, cmd }) => {
+  if (typeof cmd.id === "string") {
+    connectProvider(cmd.id);
+  }
+};
+
+const handleSetProviderKey: WsActionHandler = ({ ws, cmd }) => {
+  if (typeof cmd.id === "string" && typeof cmd.key === "string") {
+    const envKey = KEY_BY_PROVIDER[cmd.id];
+    const key = cmd.key.trim();
+    if (!envKey || !key || /[\r\n]/.test(key)) {
+      ws.send(JSON.stringify({ type: "status" as const, text: "잘못된 키 형식입니다" }));
+    } else {
+      // 런타임 즉시 적용 + .env에도 기록 (0600). 기록 실패해도 세션은 동작.
+      process.env[envKey] = key;
+      try {
+        const envPath = join(import.meta.dir, ".env");
+        const current = existsSync(envPath) ? readFileSync(envPath, "utf-8") : "";
+        writeFileSync(envPath, upsertEnvText(current, { [envKey]: key }), { mode: 0o600 });
+      } catch {
+        broadcast({ type: "status", text: "(.env 기록 실패 — 이번 세션에만 적용됩니다)" });
+      }
+      const entry = providerEntries.find((e) => e.id === cmd.id);
+      if (entry) entry.available = true;
+      broadcast(providersMessage());
+      broadcast({ type: "status", text: `${entry?.label ?? cmd.id} 키 저장됨 ✓` });
+    }
+  }
+};
+
+const handleRecheckProviders: WsActionHandler = ({ ws, cmd }) => {
+  const claudeOk = checkCliBin("claude");
+  const codexOk = checkCliBin("codex");
+  for (const e of providerEntries) {
+    if (e.id === "cli:claude") e.available = claudeOk;
+    if (e.id === "cli:codex") e.available = codexOk;
+  }
+  broadcast(providersMessage());
+};
+
+/** Existing WebSocket actions. Unknown actions intentionally have no handler. */
+export const handlerMap = new Map<string, WsActionHandler>([
+  ["startCapture", handleStartCapture],
+  ["stopCapture", handleStopCapture],
+  ["reset", handleReset],
+  ["status", handleStatus],
+  ["transcript", handleTranscript],
+  ["exportDeck", handleDeckExport],
+  ["exportPdf", handleDeckExport],
+  ["exportPng", handleDeckExport],
+  ["saveNotes", handleSaveNotes],
+  ["saveJson", handleSaveJson],
+  ["setProvider", handleSetProvider],
+  ["connectProvider", handleConnectProvider],
+  ["setProviderKey", handleSetProviderKey],
+  ["recheckProviders", handleRecheckProviders],
+]);
+
 const httpServer = Bun.serve({
   port: config.server.httpPort,
   // 로컬 도구: LAN의 다른 기기가 전사 내용에 접근할 필요가 없으므로 루프백만 바인드.
@@ -185,274 +507,9 @@ const httpServer = Bun.serve({
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
       try {
-        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string; key?: string; model?: string; effort?: string };
-        if (cmd.action === "startCapture") void startCapture();
-        else if (cmd.action === "stopCapture") void stopCapture();
-        else if (cmd.action === "reset") {
-          session.reset();
-          // 회의 저장소도 새 회의로 전환 (캡처 중이면 이어서 기록)
-          store.endMeeting();
-          if (capturing) store.startMeeting(currentProviderId);
-          broadcast(session.transcript("snapshot"));
-        }
-        else if (cmd.action === "status") {
-          ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
-        }
-        else if (cmd.action === "transcript") {
-          ws.send(JSON.stringify(session.transcript("export")));
-        }
-        else if (cmd.action === "exportDeck" || cmd.action === "exportPdf" || cmd.action === "exportPng") {
-          // lecture-deck 템플릿 기반 reveal.js 덱 + slides-grab 계약 파일 생성
-          // PDF/PNG는 초안 경로: validate 후 렌더. 가짜 design-gate proceed 영수증은 쓰지 않는다.
-          try {
-            const meta = store.latestMeeting();
-            if (!meta) {
-              broadcast({ type: "status", text: "저장된 회의가 없습니다" });
-            } else {
-              const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-              const dir = join(import.meta.dir, "exports", `deck-${stamp}`);
-              const slidesDir = join(dir, "slides");
-              mkdirSync(slidesDir, { recursive: true });
-              copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
-              copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(slidesDir, "theme.css"));
-              copyDeckAssets({
-                sourceDirectory: join(import.meta.dir, "deck", "assets"),
-                exportDirectory: dir,
-                slidesDirectory: slidesDir,
-              });
-              const input = {
-                title: "Meeting Notes",
-                startedAt: meta.started_at,
-                provider: meta.provider,
-                slides: store.slides(meta.id),
-                lines: store.lines(meta.id),
-              };
-              writeFileSync(join(dir, "index.html"), buildDeckHtml(input), "utf-8");
-              for (const f of buildSlideFiles(input)) {
-                writeFileSync(join(slidesDir, f.filename), f.html, "utf-8");
-              }
-
-              // slides-grab CLI 실행 헬퍼 (프로젝트 로컬 chromium 사용)
-              const runGrab = (args: string[], onDone: (code: number | null, tail: string) => void) => {
-                const proc = spawn(process.execPath, ["x", "slides-grab", ...args], {
-                  env: { ...process.env, PLAYWRIGHT_BROWSERS_PATH: join(import.meta.dir, "vendor", "ms-playwright") },
-                  stdio: ["ignore", "pipe", "pipe"],
-                });
-                let tail = "";
-                proc.stderr?.on("data", (d: Buffer) => { tail = (tail + d.toString("utf-8")).slice(-400); });
-                proc.on("close", (code) => onDone(code, tail));
-              };
-
-              if (cmd.action === "exportDeck") {
-                lastSavedPath = `exports/deck-${stamp}/index.html`;
-                broadcast({ type: "saved", path: lastSavedPath });
-                broadcast({ type: "status", text: `덱 저장됨: ${lastSavedPath}` });
-                openUrl(`file://${join(dir, "index.html")}`);
-              } else if (cmd.action === "exportPng") {
-                // 초안 PNG: slides-grab png는 design-gate 대상이 아니라 validate 후 바로 렌더.
-                const out = join(import.meta.dir, "exports", `deck-${stamp}-png`);
-                broadcast({ type: "status", text: "초안 PNG 준비 중… (design-gate 불필요)" });
-                runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
-                  if (vcode !== 0) {
-                    broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
-                    return;
-                  }
-                  broadcast({ type: "status", text: "초안 PNG 렌더 중… (chromium)" });
-                  runGrab(["png", "--slides-dir", slidesDir, "--output-dir", out], (code, tail) => {
-                    if (code === 0) {
-                      lastSavedPath = `exports/deck-${stamp}-png`;
-                      broadcast({ type: "saved", path: lastSavedPath });
-                      broadcast({ type: "status", text: `초안 PNG 저장됨: ${lastSavedPath} (미검토)` });
-                    } else {
-                      broadcast({ type: "status", text: `PNG 실패: ${tail.trim().slice(0, 160)}` });
-                    }
-                  });
-                });
-              } else {
-                // 정식 PDF: slides-grab pdf는 design-gate proceed 영수증을 CLI 레벨에서 요구한다.
-                // 체인: validate → 정직한 Pass A/B 리포트(실제 수행한 검사를 기록) → design-gate → pdf.
-                const out = join(import.meta.dir, "exports", `deck-${stamp}.pdf`);
-                broadcast({ type: "status", text: "PDF 준비 중… (design-gate)" });
-                const slideFiles = buildSlideFiles(input);
-                const fingerprints = slideFiles.map((f) => ({
-                  file: f.filename,
-                  sha256: createHash("sha256").update(f.html, "utf-8").digest("hex"),
-                }));
-                runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
-                  if (vcode !== 0) {
-                    broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
-                    return;
-                  }
-                  // 1) 미리보기 PNG 렌더 → 2) 독립 비전 리뷰 → 3) proceed면 게이트 기록 → 4) PDF
-                  broadcast({ type: "status", text: "PDF 미리보기 렌더 중… (chromium)" });
-                  runGrab(["png", "--slides-dir", slidesDir, "--output-dir", join(slidesDir, ".slides-grab", "gate-preview")], (_pcode, _ptail) => {
-                    void (async () => {
-                      try {
-                        broadcast({ type: "status", text: "독립 시각 리뷰 중… (codex)" });
-                        const previewDir = join(slidesDir, ".slides-grab", "gate-preview");
-                        const previewFiles = readdirSync(previewDir)
-                          .filter((f) => f.endsWith(".png"));
-                        // 리뷰 모델은 비전 검증된 기본값 사용 (사용자 선택 모델이
-                        // 이미지 입력을 거부할 수 있어 슬라이드 생성 모델과 분리)
-                        const reviewOpts = { images: previewFiles.map((f) => join(previewDir, f)) };
-                        const review = await runVisualReview(
-                          buildReviewPrompt(reviewOpts),
-                          reviewOpts,
-                        );
-                        if (review.verdict !== "proceed") {
-                          appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-REVISE ${review.summary} ${review.blockingFindings.join("; ")}\n`);
-                          broadcast({
-                            type: "status",
-                            text: `시각 리뷰 revise: ${review.blockingFindings.join("; ").slice(0, 160) || review.summary}`,
-                          });
-                          return;
-                        }
-                        appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-PROCEED ${review.confidence}\n`);
-                        const gateInput = {
-                          slideFiles: fingerprints,
-                          previewFiles,
-                          slideCount: input.slides.length,
-                          maxBullets: Math.max(0, ...input.slides.map((s) => s.bullets.length)),
-                          lineCount: input.lines.length,
-                          reviewed: true,
-                          confidence: review.confidence,
-                          notes: `독립 시각 리뷰 요약: ${review.summary}`,
-                        };
-                        writeFileSync(join(slidesDir, ".pass-a.md"), buildPassAReport(gateInput), "utf-8");
-                        writeFileSync(join(slidesDir, ".pass-b.md"), buildPassBReport(gateInput), "utf-8");
-                        broadcast({ type: "status", text: `리뷰 통과 (${review.confidence}) — 게이트 기록 중…` });
-                        runGrab(
-                          ["design-gate", "--slides-dir", slidesDir, "--verdict", "proceed",
-                            "--pass-a-report", join(slidesDir, ".pass-a.md"),
-                            "--pass-b-report", join(slidesDir, ".pass-b.md")],
-                          (gcode, gtail) => {
-                            if (gcode !== 0) {
-                              broadcast({ type: "status", text: `design-gate 실패: ${gtail.trim().slice(0, 160)}` });
-                              return;
-                            }
-                            broadcast({ type: "status", text: "PDF 렌더 중… (chromium)" });
-                            runGrab(["pdf", "--slides-dir", slidesDir, "--output", out], (code, tail) => {
-                              if (code === 0) {
-                                lastSavedPath = `exports/deck-${stamp}.pdf`;
-                                broadcast({ type: "saved", path: lastSavedPath });
-                                broadcast({ type: "status", text: `PDF 저장됨: ${lastSavedPath}` });
-                              } else {
-                                broadcast({ type: "status", text: `PDF 실패: ${tail.trim().slice(0, 160)}` });
-                              }
-                            });
-                          },
-                        );
-                      } catch (e) {
-                        const message = e instanceof Error ? e.message : String(e);
-                        appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-ERROR ${message.slice(0, 400)}\n`);
-                        broadcast({ type: "status", text: `시각 리뷰 실패: ${message.slice(0, 160)}` });
-                      }
-                    })();
-                  });
-                });
-              }
-            }
-          } catch (e) {
-            const message = e instanceof Error ? e.message : String(e);
-            broadcast({ type: "status", text: `저장 실패: ${message}` });
-          }
-        }
-        else if (cmd.action === "saveNotes") {
-          // anarlog 방식: 브라우저 다운로드가 아니라 서버 디스크에 저장 (항상 동작)
-          try {
-            const dir = join(import.meta.dir, "exports");
-            mkdirSync(dir, { recursive: true });
-            const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.md`;
-            writeFileSync(join(dir, filename), store.exportMarkdown(), "utf-8");
-            lastSavedPath = `exports/${filename}`;
-            broadcast({ type: "saved", path: lastSavedPath });
-            broadcast({ type: "status", text: `저장됨: ${lastSavedPath}` });
-          } catch (e) {
-            const message = e instanceof Error ? e.message : String(e);
-            broadcast({ type: "status", text: `저장 실패: ${message}` });
-          }
-        }
-        else if (cmd.action === "saveJson") {
-          try {
-            const dir = join(import.meta.dir, "exports");
-            mkdirSync(dir, { recursive: true });
-            const meta = store.latestMeeting();
-            const payload = {
-              exportedAt: new Date().toISOString(),
-              provider: meta?.provider ?? null,
-              slides: meta ? store.slides(meta.id) : [],
-              lines: meta ? store.lines(meta.id) : [],
-            };
-            const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
-            writeFileSync(join(dir, filename), JSON.stringify(payload, null, 2), "utf-8");
-            lastSavedPath = `exports/${filename}`;
-            broadcast({ type: "saved", path: lastSavedPath });
-            broadcast({ type: "status", text: `저장됨: ${lastSavedPath}` });
-          } catch (e) {
-            const message = e instanceof Error ? e.message : String(e);
-            broadcast({ type: "status", text: `저장 실패: ${message}` });
-          }
-        }
-        else if (cmd.action === "setProvider" && typeof cmd.id === "string") {
-          const entry = providerEntries.find((e) => e.id === cmd.id);
-          if (!entry) {
-            ws.send(JSON.stringify({ type: "status" as const, text: `알 수 없는 프로바이더: ${cmd.id}` }));
-          } else if (!entry.available) {
-            ws.send(JSON.stringify({ type: "status" as const, text: `${entry.label}은(는) 설정되지 않았습니다 (CLI 설치/API 키 확인)` }));
-          } else {
-            // 모델/effort 오버라이드 (빈 문자열이면 기본값, effort는 지원 프로바이더만)
-            const model = typeof cmd.model === "string" && cmd.model.trim() ? cmd.model.trim() : undefined;
-            const effort = typeof cmd.effort === "string" && cmd.effort.trim() && (entry.efforts ?? []).includes(cmd.effort.trim())
-              ? cmd.effort.trim()
-              : undefined;
-            const detector = createDetector(entry.id, { cliTimeoutMs, model, effort });
-            if (detector) {
-              session.setDetector(detector);
-              currentProviderId = entry.id;
-              currentModel = model;
-              currentEffort = effort;
-              llmLabel = `${entry.label}${model ? `/${model}` : ""}${effort ? `·${effort}` : ""}`;
-              broadcast(providersMessage());
-              broadcast({ type: "status", text: `LLM 변경됨: ${llmLabel}` });
-              void detector.ping().then((ok) => {
-                if (!ok) broadcast({ type: "status", text: `⚠️ ${entry.label} 연결 확인에 실패했습니다` });
-              });
-            }
-          }
-        }
-        else if (cmd.action === "connectProvider" && typeof cmd.id === "string") {
-          connectProvider(cmd.id);
-        }
-        else if (cmd.action === "setProviderKey" && typeof cmd.id === "string" && typeof cmd.key === "string") {
-          const envKey = KEY_BY_PROVIDER[cmd.id];
-          const key = cmd.key.trim();
-          if (!envKey || !key || /[\r\n]/.test(key)) {
-            ws.send(JSON.stringify({ type: "status" as const, text: "잘못된 키 형식입니다" }));
-          } else {
-            // 런타임 즉시 적용 + .env에도 기록 (0600). 기록 실패해도 세션은 동작.
-            process.env[envKey] = key;
-            try {
-              const envPath = join(import.meta.dir, ".env");
-              const current = existsSync(envPath) ? readFileSync(envPath, "utf-8") : "";
-              writeFileSync(envPath, upsertEnvText(current, { [envKey]: key }), { mode: 0o600 });
-            } catch {
-              broadcast({ type: "status", text: "(.env 기록 실패 — 이번 세션에만 적용됩니다)" });
-            }
-            const entry = providerEntries.find((e) => e.id === cmd.id);
-            if (entry) entry.available = true;
-            broadcast(providersMessage());
-            broadcast({ type: "status", text: `${entry?.label ?? cmd.id} 키 저장됨 ✓` });
-          }
-        }
-        else if (cmd.action === "recheckProviders") {
-          const claudeOk = checkCliBin("claude");
-          const codexOk = checkCliBin("codex");
-          for (const e of providerEntries) {
-            if (e.id === "cli:claude") e.available = claudeOk;
-            if (e.id === "cli:codex") e.available = codexOk;
-          }
-          broadcast(providersMessage());
-        }
+        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as WsCommand;
+        const handler = handlerMap.get(cmd.action ?? "");
+        if (handler) handler({ ws, cmd });
       } catch (e) {
         // JSON 파싱 실패 또는 핸들러 내부 예외 — 클라이언트에 피드백.
         const message = e instanceof Error ? e.message : String(e);
