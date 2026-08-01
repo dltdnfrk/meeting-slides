@@ -1,0 +1,60 @@
+F4 AUTHORITATIVE RERUN: IMMUTABLE RECEIPT BINDINGS
+target=b86610058e2cff22319976b23dd6d48282f7d678
+
+[T4-T14 matrix]
+T4 result=PASS target=6ec8905e686bd23ee351cfb08795ec2f959d291b expected_parent=6eac728c512d8c5aa86b200631df367c80693c11 actual_parent=6eac728c512d8c5aa86b200631df367c80693c11 ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=ff4430cb63fa0c70ac6d7e847deab01c15ec6cd9 receipt_blob=fc1cea6191c3bec46e855305f1a34057b2930a12
+T5 result=PASS target=dff8ea5bc92bdf454622c29b1748ef21d2300100 expected_parent=6ec8905e686bd23ee351cfb08795ec2f959d291b actual_parent=6ec8905e686bd23ee351cfb08795ec2f959d291b ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=161ca754b71d4c1df9f6835f651ff3c04572c0cc receipt_blob=4588909c5036855c00b993c278835db0eaee1017
+T6 result=PASS target=9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367 expected_parent=dff8ea5bc92bdf454622c29b1748ef21d2300100 actual_parent=dff8ea5bc92bdf454622c29b1748ef21d2300100 ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=8bf8a292b2ca283f0d2680fe9db8bf6f4d9344d9 receipt_blob=800f53d5dbf0188b6f2065351fa9ddb61c58503f
+T7 result=PASS target=b12706c2b1099f315f19c6bf528880789be18bbe expected_parent=9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367 actual_parent=9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367 ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=ce352ed59804e533facf2e179ec9909776feebd0 receipt_blob=eedab2b85e8a29874a32e02763af84f0bdf8767b
+T8 result=PASS target=524292a3a23584bacf6787ccfce3e318293b0e47 expected_parent=b12706c2b1099f315f19c6bf528880789be18bbe actual_parent=b12706c2b1099f315f19c6bf528880789be18bbe ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=e3400c712fd764a1bb2a38e96bb70a280567ff6c receipt_blob=613650c90b4171300d88fab6d427690afbf02fe0
+T9 result=PASS target=a29d0d4856e7020edf031317ab9a91f0afa54218 expected_parent=524292a3a23584bacf6787ccfce3e318293b0e47 actual_parent=524292a3a23584bacf6787ccfce3e318293b0e47 ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=85f15a661b7b1609cf0a1ed9594456437a31baa3 receipt_blob=3f8abeb662d30e52bfb0d101299c384eb6f83baf
+T10 result=PASS target=94fea038c0ca47e8b32950a8d666550bd9dea448 expected_parent=a29d0d4856e7020edf031317ab9a91f0afa54218 actual_parent=a29d0d4856e7020edf031317ab9a91f0afa54218 ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=853d7b04d38474c5662779c644513c313c70ffc3 receipt_blob=b1da328654451392a0e96534f3d793e8718101d0
+T11 result=PASS target=f64fb18c83659dd6732d9481434d8758f98c231a expected_parent=94fea038c0ca47e8b32950a8d666550bd9dea448 actual_parent=94fea038c0ca47e8b32950a8d666550bd9dea448 ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=6144bf24e86c54da3b9f2f654d0de651efafc1e4 receipt_blob=a82c5f79339c862e5626494b1dc40c478907a709
+T12 result=PASS target=f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc expected_parent=f64fb18c83659dd6732d9481434d8758f98c231a actual_parent=f64fb18c83659dd6732d9481434d8758f98c231a ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=45d5877bf16b5f2652c0d8779632685049635a48 receipt_blob=9b06dcc917fc88725e55e8c59c62a0758c41ebd4
+T13 result=PASS target=0c0d5aa55f4def8f8cd79ee398417b7acf8788d4 expected_parent=f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc actual_parent=f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=1f5fc1a258be8b8aa811e97c85d913b1939ed58d receipt_blob=9809ac26f22b76514dc20cb93058aa5ecde24cb6
+T14 result=PASS target=c2736c81fe6ca04167b4f2ded7e67804226471ce expected_parent=0c0d5aa55f4def8f8cd79ee398417b7acf8788d4 actual_parent=0c0d5aa55f4def8f8cd79ee398417b7acf8788d4 ancestor=True doneclaim_tracked=True receipt_tracked=True doneclaim_binds_target=True receipt_binds_target=True doneclaim_blob=6dbe3d819e81c190d5c359bdf30b0729c146cb49 receipt_blob=138bbb16fece4498da265fbf1efb8711485d360f
+TASK_MATRIX_RESULT=PASS
+TASK_MATRIX_PASS_COUNT=11/11
+
+[F1-F4 immutable ledger state at target]
+F1 result=PASS latest_line=25 event=final-verification-superseded verdict=rerun-required expected_verdict=rerun-required refs=[('audited_parent', '7123fd986fceb981c358ad1b73531fab6bd8dc16', True), ('supersedes_target', '17d09149bc5248652573142bc6e9ebd2eafcc8fd', True)] artifacts=[('.omo/evidence/meeting-minutes-bundle/final/governance-repair/receipt.md', True)]
+F2 result=PASS latest_line=27 event=final-receipt-current-parent-bound verdict=confirmed expected_verdict=confirmed refs=[('audited_parent', '7123fd986fceb981c358ad1b73531fab6bd8dc16', True), ('product_target', '6711ecfcb47f75b1bb22377d97dd551538568ad7', True)] artifacts=[('.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/17-current-head-verification-receipt.md', True)]
+F3 result=PASS latest_line=28 event=final-receipt-current-parent-bound verdict=confirmed expected_verdict=confirmed refs=[('audited_parent', '7123fd986fceb981c358ad1b73531fab6bd8dc16', True), ('product_target', '6711ecfcb47f75b1bb22377d97dd551538568ad7', True)] artifacts=[('.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/F3-real-manual-qa-final.md', True)]
+F4 result=PASS latest_line=26 event=final-verification-superseded verdict=rerun-required expected_verdict=rerun-required refs=[('audited_parent', '7123fd986fceb981c358ad1b73531fab6bd8dc16', True), ('supersedes_target', '17d09149bc5248652573142bc6e9ebd2eafcc8fd', True)] artifacts=[('.omo/evidence/meeting-minutes-bundle/final/governance-repair/receipt.md', True)]
+NOTE: F1/F4 rerun-required is the intentional immutable b866 pre-rerun state; this fresh F4 receipt resolves F4 without rewriting historical b866.
+
+[plan states at target]
+T4 state='x' expected='x' result=PASS
+T5 state='x' expected='x' result=PASS
+T6 state='x' expected='x' result=PASS
+T7 state='x' expected='x' result=PASS
+T8 state='x' expected='x' result=PASS
+T9 state='x' expected='x' result=PASS
+T10 state='x' expected='x' result=PASS
+T11 state='x' expected='x' result=PASS
+T12 state='x' expected='x' result=PASS
+T13 state='x' expected='x' result=PASS
+T14 state='x' expected='x' result=PASS
+F1 state=' ' expected=' ' result=PASS
+F2 state='x' expected='x' result=PASS
+F3 state='x' expected='x' result=PASS
+F4 state=' ' expected=' ' result=PASS
+
+[receipt remediation commits]
+receipt_repair=67dbb92179e7dd8ba703a2940e69c10c8d56949f ancestor=True tree=93a3b67c7574388da7be5b884d3363a9fe50ae88
+scope_seal=17d09149bc5248652573142bc6e9ebd2eafcc8fd ancestor=True tree=8a05e212c358d094fe78a5f66b4f7739f97a704c
+ledger_repair=7123fd986fceb981c358ad1b73531fab6bd8dc16 ancestor=True tree=28d739abc56fc90cd358d14d98d858cede1e3635
+OVERALL_BINDING_RESULT=PASS
+cleanup_remaining_runtime_paths=0
+
+
+[current carrier terminal bindings]
+carrier=359562a6555dffe7e7a374c4dd1d1f7e57f63079
+F1 result=PASS event=final-verification-confirmed verdict=confirmed refs=[('target_commit', '0ebea1f1587f50e300e0ad3856fc54f55eeb338d', True), ('product_target', '6711ecfcb47f75b1bb22377d97dd551538568ad7', True)] artifacts=[('.omo/evidence/meeting-minutes-bundle/final/terminal-convergence/receipt.md', True)]
+F2 result=PASS event=final-receipt-current-parent-bound verdict=confirmed refs=[('audited_parent', '7123fd986fceb981c358ad1b73531fab6bd8dc16', True), ('product_target', '6711ecfcb47f75b1bb22377d97dd551538568ad7', True)] artifacts=[('.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/17-current-head-verification-receipt.md', True)]
+F3 result=PASS event=final-receipt-current-parent-bound verdict=confirmed refs=[('audited_parent', '7123fd986fceb981c358ad1b73531fab6bd8dc16', True), ('product_target', '6711ecfcb47f75b1bb22377d97dd551538568ad7', True)] artifacts=[('.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/F3-real-manual-qa-final.md', True)]
+F4 result=PASS event=final-verification-confirmed verdict=confirmed refs=[('target_commit', '0ebea1f1587f50e300e0ad3856fc54f55eeb338d', True), ('product_target', '6711ecfcb47f75b1bb22377d97dd551538568ad7', True)] artifacts=[('.omo/evidence/meeting-minutes-bundle/final/terminal-convergence/receipt.md', True)]
+carrier_plan_checked=15/15
+carrier_plan_states=[('T4', 'x'), ('T5', 'x'), ('T6', 'x'), ('T7', 'x'), ('T8', 'x'), ('T9', 'x'), ('T10', 'x'), ('T11', 'x'), ('T12', 'x'), ('T13', 'x'), ('T14', 'x'), ('F1', 'x'), ('F2', 'x'), ('F3', 'x'), ('F4', 'x')]
+carrier_non_omo_diff_from_b866=0
+CARRIER_TERMINAL_BINDINGS_RESULT=PASS

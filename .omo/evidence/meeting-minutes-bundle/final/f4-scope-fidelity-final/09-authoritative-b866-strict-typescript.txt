@@ -1,0 +1,6 @@
+COMMAND: bunx tsc -p tsconfig.json --noEmit --strict --pretty false
+BASIS: current carrier product bytes equal b866100 outside .omo (git diff --quiet exit 0)
+TARGET: b86610058e2cff22319976b23dd6d48282f7d678
+STARTED_AT: 2026-08-01T20:34:54Z
+EXIT_CODE: 0
+FINISHED_AT: 2026-08-01T20:34:55Z

@@ -1,0 +1,196 @@
+F4 AUTHORITATIVE RERUN: STATIC / SCOPE / DIFF
+verified_at=2026-08-01T20:33:17Z
+target=b86610058e2cff22319976b23dd6d48282f7d678
+target_parent=7123fd986fceb981c358ad1b73531fab6bd8dc16
+target_tree=5e9c65aa72f9c59c7ae4554d137a069c56f12bd0
+baseline=921a01513593c0e10181cf01e535a7abe995deb3
+product_target=6711ecfcb47f75b1bb22377d97dd551538568ad7
+carrier_head_at_start=359562a6555dffe7e7a374c4dd1d1f7e57f63079
+
+[ancestry]
+baseline_ancestor_exit=0
+merge_base=921a01513593c0e10181cf01e535a7abe995deb3
+commit_count=36
+merge_count=0
+target_parent_count=1
+
+[diff checks]
+baseline_target_diff_check_exit=0
+carrier_worktree_diff_check_exit=0
+carrier_index_diff_check_exit=0
+post_product_non_omo_diff_quiet_exit=0
+post_product_non_omo_paths=0
+
+[staged and tracked state]
+carrier_tracked_status_entries=0
+carrier_staged_entries=0
+carrier_tracked_status:
+carrier_staged_paths:
+
+[committed target paths by commit]
+A	.omo/evidence/meeting-minutes-bundle/final/governance-repair/receipt.md
+A	.omo/evidence/meeting-minutes-bundle/task-4/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-4/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-5/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-5/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-6/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-6/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-7/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-7/final-receipt.txt
+M	.omo/plans/meeting-minutes-bundle.md
+M	.omo/start-work/ledger.jsonl
+
+[post-product commit paths]
+COMMIT b86610058e2cff22319976b23dd6d48282f7d678 chore(verify): reconcile final governance state
+
+A	.omo/evidence/meeting-minutes-bundle/final/governance-repair/receipt.md
+A	.omo/evidence/meeting-minutes-bundle/task-4/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-4/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-5/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-5/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-6/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-6/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-7/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-7/final-receipt.txt
+M	.omo/plans/meeting-minutes-bundle.md
+M	.omo/start-work/ledger.jsonl
+COMMIT 7123fd986fceb981c358ad1b73531fab6bd8dc16 test(verify): finalize meeting minutes compliance ledger
+
+A	.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/01-full-suite-serial.txt
+A	.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/08-current-head-real-targeted-gates.txt
+A	.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/09-current-head-static-scope-pass.txt
+A	.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/F1-plan-compliance-final.md
+A	.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/F3-real-manual-qa-final.md
+A	.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/F4-scope-fidelity-final.md
+A	.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/final-receipt.json
+A	.omo/plans/meeting-minutes-bundle.md
+A	.omo/start-work/ledger.jsonl
+COMMIT 17d09149bc5248652573142bc6e9ebd2eafcc8fd test(verify): seal meeting minutes scope fidelity
+
+A	.omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/01-ancestry-chain.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/02-scope-prohibition.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/03-receipt-identity-check.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/04-diff-receipt-integrity.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/05-cleanup-worktree.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/06-main-worktree-preservation.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/F4-scope-fidelity-final.md
+A	.omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/receipt.json
+COMMIT 67dbb92179e7dd8ba703a2940e69c10c8d56949f chore(minutes): repair immutable verification receipts
+
+M	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/10-final-repair-receipt.md
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/11-current-head-focused-chromium-ws.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/12-current-head-full-suite.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/13-current-head-full-suite-clean-rerun.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/14-current-head-strict-typescript.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/15-current-head-browser-checkjs.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/16-current-head-identity-loc-cleanup.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/17-current-head-verification-receipt.md
+M	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/F2-code-quality-rerun.md
+M	.omo/evidence/meeting-minutes-bundle/task-1/02-red-handler-map.txt
+M	.omo/evidence/meeting-minutes-bundle/task-10/DoneClaim.json
+M	.omo/evidence/meeting-minutes-bundle/task-10/final-receipt.txt
+M	.omo/evidence/meeting-minutes-bundle/task-11/DoneClaim.json
+M	.omo/evidence/meeting-minutes-bundle/task-11/final-receipt.txt
+M	.omo/evidence/meeting-minutes-bundle/task-12/01-red-contracts.txt
+M	.omo/evidence/meeting-minutes-bundle/task-12/DoneClaim.json
+M	.omo/evidence/meeting-minutes-bundle/task-12/final-receipt.txt
+M	.omo/evidence/meeting-minutes-bundle/task-13/DoneClaim.json
+M	.omo/evidence/meeting-minutes-bundle/task-13/final-receipt.txt
+M	.omo/evidence/meeting-minutes-bundle/task-14/DoneClaim.json
+M	.omo/evidence/meeting-minutes-bundle/task-14/final-receipt.txt
+M	.omo/evidence/meeting-minutes-bundle/task-8/DoneClaim.json
+M	.omo/evidence/meeting-minutes-bundle/task-8/final-receipt.txt
+M	.omo/evidence/meeting-minutes-bundle/task-9/01-red-ws-sqlite.txt
+M	.omo/evidence/meeting-minutes-bundle/task-9/DoneClaim.json
+M	.omo/evidence/meeting-minutes-bundle/task-9/final-receipt.txt
+
+[baseline product paths excluding .omo]
+M	.env.example
+A	deck/minutes.css
+M	public/app.js
+M	public/index.html
+A	public/review-panel-render.js
+A	public/review-panel.js
+M	public/style.css
+M	server.ts
+A	src/audio-recorder.ts
+A	src/bundle.ts
+A	src/conclusion.ts
+M	src/config.ts
+A	src/extract.ts
+M	src/llm-cli.ts
+M	src/llm.ts
+A	src/minutes-store-meetings.ts
+A	src/minutes-store-review-mutations.ts
+A	src/minutes-store-review-persistence.ts
+A	src/minutes-store-schema-artifacts.ts
+A	src/minutes-store-schema-core.ts
+A	src/minutes-store-schema-review.ts
+A	src/minutes-store-schema.ts
+A	src/minutes-store-transcripts.ts
+A	src/minutes-store-types.ts
+A	src/minutes-store-utils.ts
+A	src/minutes-store.ts
+A	src/minutes.ts
+A	src/pdf.ts
+M	src/session.ts
+A	src/start-review.ts
+M	src/store.ts
+A	src/transcript-versioning.ts
+M	src/whisper.ts
+A	tests/attendees-action.test.ts
+A	tests/bundle.test.ts
+A	tests/conclusion.test.ts
+A	tests/extract.test.ts
+A	tests/llm-transport.test.ts
+A	tests/meeting-conclusion.test.ts
+A	tests/minutes-store.test.ts
+A	tests/minutes.test.ts
+A	tests/pdf.test.ts
+A	tests/public-attendees.test.ts
+A	tests/public-review.test.ts
+A	tests/review-actions.test.ts
+A	tests/server-handler-map.test.ts
+A	tests/server-recorder-startup.test.ts
+A	tests/server-ws-dispatch.test.ts
+A	tests/start-review-action.test.ts
+A	tests/start-review.test.ts
+A	tests/transcript-versioning.test.ts
+
+[plan literal prohibited scan]
+b86610058e2cff22319976b23dd6d48282f7d678:src/minutes-store-meetings.ts:126:      INSERT INTO attendees (meeting_id, attendee_id, display_name, crm_person_entity_id, sort_order, created_at)
+plan_literal_grep_exit=0 (1 means no match; the allowed local attendee INSERT may produce exit 0)
+
+[semantic prohibited integration scans]
+-- email_delivery --
+hits=0
+-- external_crm_write --
+hits=0
+-- realtime_speaker_identity --
+hits=0
+-- transcript_wide_identity --
+hits=0
+-- out_of_scope_platform --
+hits=0
+
+[allowed local CRM metadata context]
+b86610058e2cff22319976b23dd6d48282f7d678:public/app.js:653:      crmPersonEntityId: typeof a.crm_person_entity_id === "string" ? a.crm_person_entity_id : null,
+b86610058e2cff22319976b23dd6d48282f7d678:server.ts:426:      ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
+b86610058e2cff22319976b23dd6d48282f7d678:server.ts:444:      ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
+b86610058e2cff22319976b23dd6d48282f7d678:src/bundle.ts:83:  return { schema_version: 1, meeting: { meeting_id: s.meeting.id, started_at: s.meeting.started_at, ended_at: s.meeting.ended_at, provider: s.meeting.provider, purpose: s.meta.purpose }, review: { review_id: s.review.review_id, confirmed_at: s.review.confirmed_at, confirmed_by: s.review.confirmed_by }, transcript: { version_id: s.version.transcriptVersionId, version_no: s.version.versionNo, source_kind: s.version.sourceKind, engine: s.version.engine, engine_model: s.version.engineModel, finalized_at: s.version.finalizedAt, content_sha256: hash(s.transcriptBytes), relative_path: transcriptPath }, attendees: s.attendees.map((a) => ({ attendee_id: a.attendeeId, display_name: a.displayName, crm_person_entity_id: a.crmPersonEntityId })), decisions: s.decisions.map((r) => mapItem(r, "decision_id")), action_items: s.actions.map((r) => ({ ...mapItem(r, "action_item_id"), assignee_attendee_id: r.assignee_attendee_id, deadline: r.deadline, deadline_text: r.deadline_text })), open_items: s.open.map((r) => mapItem(r, "open_item_id")), referenced_materials: s.materials.map((r) => ({ material_id: r.item_id, material_type: r.material_type, title: r.title, uri: r.uri, notes: r.notes, source: r.source_transcript_version_id ? source(r) : null, source_segment: r.source_transcript_version_id ? source(r) : null })) };
+b86610058e2cff22319976b23dd6d48282f7d678:src/minutes-store-meetings.ts:126:      INSERT INTO attendees (meeting_id, attendee_id, display_name, crm_person_entity_id, sort_order, created_at)
+b86610058e2cff22319976b23dd6d48282f7d678:src/minutes-store-meetings.ts:130:        crm_person_entity_id = excluded.crm_person_entity_id,
+b86610058e2cff22319976b23dd6d48282f7d678:src/minutes-store-meetings.ts:140:      SELECT attendee_id, display_name, crm_person_entity_id, sort_order
+b86610058e2cff22319976b23dd6d48282f7d678:src/minutes-store-meetings.ts:143:      attendee_id: string; display_name: string; crm_person_entity_id: string | null; sort_order: number;
+b86610058e2cff22319976b23dd6d48282f7d678:src/minutes-store-meetings.ts:147:      crmPersonEntityId: row.crm_person_entity_id, sortOrder: row.sort_order,
+b86610058e2cff22319976b23dd6d48282f7d678:src/minutes-store-schema-core.ts:14:  crm_person_entity_id TEXT,
+b86610058e2cff22319976b23dd6d48282f7d678:src/minutes-store-schema-core.ts:21:  ON attendees(meeting_id, crm_person_entity_id) WHERE crm_person_entity_id IS NOT NULL;
+b86610058e2cff22319976b23dd6d48282f7d678:src/session.ts:93:    crm_person_entity_id?: string;
+
+[untracked cleanup classification]
+untracked_total=119
+untracked_non_evidence=0
+untracked_non_evidence_paths:
+runtime_artifact_scan:
+./meetings.db-shm
+./meetings.db-wal
