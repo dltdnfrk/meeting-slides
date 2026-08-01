@@ -1,0 +1,240 @@
+COMMANDS: baseline scope and prohibited integration scan
+CHANGED_PATHS:
+M	.env.example
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/01-focused-tests.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/02-full-bun-test-unbounded-exit-137.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/03-full-bun-test-bounded.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/04-strict-typescript.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/05-browser-checkjs.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/06-pdf-timeout-isolation.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/07-loc-scope-diff.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/08-real-chromium-smoke.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/09-full-bun-test-serial.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/10-final-repair-receipt.md
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/11-current-head-focused-chromium-ws.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/12-current-head-full-suite.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/13-current-head-full-suite-clean-rerun.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/14-current-head-strict-typescript.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/15-current-head-browser-checkjs.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/16-current-head-identity-loc-cleanup.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/17-current-head-verification-receipt.md
+A	.omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/F2-code-quality-rerun.md
+A	.omo/evidence/meeting-minutes-bundle/final/f2-quality-remediation/01-strict-typecheck.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-quality-remediation/02-focused-tests.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-quality-remediation/03-browser-checkjs.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-quality-remediation/04-chromium-dom-smoke.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-quality-remediation/05-schema-and-loc.txt
+A	.omo/evidence/meeting-minutes-bundle/final/f2-quality-remediation/06-final-salvage-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/01-red-tests.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/02-server-sqlite-tests.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/03-dom-chromium-tests.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/04-review-panel-checkjs.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/05-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/06-event-driven-flow.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/07-t9-t14-contracts.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/09-main-worktree-fingerprint.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/flow-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-transaction-recorder/00-summary.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-transaction-recorder/01-focused-tests.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-transaction-recorder/02-real-ws-sqlite-initial-failure.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-transaction-recorder/02-real-ws-sqlite.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-transaction-recorder/03-strict-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-transaction-recorder/04-diff-check.txt
+A	.omo/evidence/meeting-minutes-bundle/final/remediation-transaction-recorder/real-ws-sqlite-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-1/01-baseline-characterization.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/02-red-handler-map.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/03-implementation-error-and-fix.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/04-real-ws-qa.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/05-real-ws-qa-pass.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/06-full-bun-test.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/07-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/08-git-diff-check.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/09-focused-tests-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/10-cleanup-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-1/manual-export.json
+A	.omo/evidence/meeting-minutes-bundle/task-1/real-ws-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-10/01-red-proof.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/02-focused-green.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/03-full-bun-test.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/04-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/05-static-scope-check.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/06-real-render-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-10/06-real-render-driver.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/06-real-render-empty.png
+A	.omo/evidence/meeting-minutes-bundle/task-10/06-real-render.png
+A	.omo/evidence/meeting-minutes-bundle/task-10/07-adversarial-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-10/07-adversarial-driver.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/08-diagnostics.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/09-diff-check.txt
+A	.omo/evidence/meeting-minutes-bundle/task-10/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-10/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup/cleanup-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup/diff-check.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup/focused-bun.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup/full-bun.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup/receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11-cleanup/tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/01-red-proof.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/02-focused-green.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/03-full-bun-test.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/04-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/05-diff-check.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/06-real-pdf-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-11/06-real-pdf-driver.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/07-adversarial-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-11/07-adversarial-driver.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/08-main-worktree-fingerprint.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-11/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/minutes-a4-page-1.png
+A	.omo/evidence/meeting-minutes-bundle/task-11/minutes-a4-shrunk.pdf
+A	.omo/evidence/meeting-minutes-bundle/task-11/minutes-a4.pdf
+A	.omo/evidence/meeting-minutes-bundle/task-11/page-1.txt
+A	.omo/evidence/meeting-minutes-bundle/task-11/page-2.txt
+A	.omo/evidence/meeting-minutes-bundle/task-12/01-red-contracts.txt
+A	.omo/evidence/meeting-minutes-bundle/task-12/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-12/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-12/real-artifact-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-13/01-red.txt
+A	.omo/evidence/meeting-minutes-bundle/task-13/02-focused-initial.txt
+A	.omo/evidence/meeting-minutes-bundle/task-13/03-real-probe.json
+A	.omo/evidence/meeting-minutes-bundle/task-13/04-adversarial.json
+A	.omo/evidence/meeting-minutes-bundle/task-13/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-13/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-13/real-event-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-14/01-red-conclusion-contracts.txt
+A	.omo/evidence/meeting-minutes-bundle/task-14/01-red-meeting-conclusion.txt
+A	.omo/evidence/meeting-minutes-bundle/task-14/02-real-ws-sqlite-filesystem-pdf-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-14/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-14/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/baseline-store.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/bun-test.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/cleanup-adversarial.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/diff-check.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/failing-first.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/fresh-sqlite-qa-attempt1.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/fresh-sqlite-qa.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-2/validator-limitation.txt
+A	.omo/evidence/meeting-minutes-bundle/task-3/00-edit-attempt-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-3/01-baseline-detect.txt
+A	.omo/evidence/meeting-minutes-bundle/task-3/02-failing-first-chat.txt
+A	.omo/evidence/meeting-minutes-bundle/task-3/03-green-tests-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-3/04-manual-qa-adversarial.txt
+A	.omo/evidence/meeting-minutes-bundle/task-3/05-cleanup-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-6/07-done-claim.txt
+A	.omo/evidence/meeting-minutes-bundle/task-6/08-final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/01-red-required-evidence.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/02-focused-public-review.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/03-browser-qa-adversarial.json
+A	.omo/evidence/meeting-minutes-bundle/task-8/04-full-bun-test.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/05-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/06-git-diff-check.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/07-browser-js-diagnostics-vs-t7.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/08-test-diagnostics.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-8/browser-qa.ts
+A	.omo/evidence/meeting-minutes-bundle/task-8/final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/main-worktree-before.txt
+A	.omo/evidence/meeting-minutes-bundle/task-8/qa-desktop.png
+A	.omo/evidence/meeting-minutes-bundle/task-8/qa-mobile.png
+A	.omo/evidence/meeting-minutes-bundle/task-9/01-red-ws-sqlite.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/02-focused-green.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/03-scoped-diff.patch
+A	.omo/evidence/meeting-minutes-bundle/task-9/04-real-ws-sqlite-driver.ts
+A	.omo/evidence/meeting-minutes-bundle/task-9/05-real-ws-sqlite-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/06-full-bun-suite.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/07-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/08-final-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/09-main-worktree-before.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/10-focused-review-actions.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/11-real-ws-sqlite-receipt.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/12-full-bun-test.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/13-tsc.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/14-diff-check.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/15-t8-index-tree-gate.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/16-cleanup.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/17-diagnostics.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/18-main-worktree-after.txt
+A	.omo/evidence/meeting-minutes-bundle/task-9/DoneClaim.json
+A	.omo/evidence/meeting-minutes-bundle/task-9/final-receipt.txt
+A	deck/minutes.css
+M	public/app.js
+M	public/index.html
+A	public/review-panel-render.js
+A	public/review-panel.js
+M	public/style.css
+M	server.ts
+A	src/audio-recorder.ts
+A	src/bundle.ts
+A	src/conclusion.ts
+M	src/config.ts
+A	src/extract.ts
+M	src/llm-cli.ts
+M	src/llm.ts
+A	src/minutes-store-meetings.ts
+A	src/minutes-store-review-mutations.ts
+A	src/minutes-store-review-persistence.ts
+A	src/minutes-store-schema-artifacts.ts
+A	src/minutes-store-schema-core.ts
+A	src/minutes-store-schema-review.ts
+A	src/minutes-store-schema.ts
+A	src/minutes-store-transcripts.ts
+A	src/minutes-store-types.ts
+A	src/minutes-store-utils.ts
+A	src/minutes-store.ts
+A	src/minutes.ts
+A	src/pdf.ts
+M	src/session.ts
+A	src/start-review.ts
+M	src/store.ts
+A	src/transcript-versioning.ts
+M	src/whisper.ts
+A	tests/attendees-action.test.ts
+A	tests/bundle.test.ts
+A	tests/conclusion.test.ts
+A	tests/extract.test.ts
+A	tests/llm-transport.test.ts
+A	tests/meeting-conclusion.test.ts
+A	tests/minutes-store.test.ts
+A	tests/minutes.test.ts
+A	tests/pdf.test.ts
+A	tests/public-attendees.test.ts
+A	tests/public-review.test.ts
+A	tests/review-actions.test.ts
+A	tests/server-handler-map.test.ts
+A	tests/server-recorder-startup.test.ts
+A	tests/server-ws-dispatch.test.ts
+A	tests/start-review-action.test.ts
+A	tests/start-review.test.ts
+A	tests/transcript-versioning.test.ts
+PLAN_LEDGER_TODO_PATHS:
+PROHIBITED_PRODUCT_INTEGRATION_SCAN:
+ALLOWED_LOCAL_CRM_REFERENCE_ONLY:
+server.ts:426:      ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
+server.ts:444:      ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
+public/app.js:653:      crmPersonEntityId: typeof a.crm_person_entity_id === "string" ? a.crm_person_entity_id : null,
+tests/bundle.test.ts:136:      { attendee_id: "alice", display_name: "Alice", crm_person_entity_id: "crm-person-1" },
+tests/bundle.test.ts:137:      { attendee_id: "bob", display_name: "Bob", crm_person_entity_id: null },
+src/bundle.ts:83:  return { schema_version: 1, meeting: { meeting_id: s.meeting.id, started_at: s.meeting.started_at, ended_at: s.meeting.ended_at, provider: s.meeting.provider, purpose: s.meta.purpose }, review: { review_id: s.review.review_id, confirmed_at: s.review.confirmed_at, confirmed_by: s.review.confirmed_by }, transcript: { version_id: s.version.transcriptVersionId, version_no: s.version.versionNo, source_kind: s.version.sourceKind, engine: s.version.engine, engine_model: s.version.engineModel, finalized_at: s.version.finalizedAt, content_sha256: hash(s.transcriptBytes), relative_path: transcriptPath }, attendees: s.attendees.map((a) => ({ attendee_id: a.attendeeId, display_name: a.displayName, crm_person_entity_id: a.crmPersonEntityId })), decisions: s.decisions.map((r) => mapItem(r, "decision_id")), action_items: s.actions.map((r) => ({ ...mapItem(r, "action_item_id"), assignee_attendee_id: r.assignee_attendee_id, deadline: r.deadline, deadline_text: r.deadline_text })), open_items: s.open.map((r) => mapItem(r, "open_item_id")), referenced_materials: s.materials.map((r) => ({ material_id: r.item_id, material_type: r.material_type, title: r.title, uri: r.uri, notes: r.notes, source: r.source_transcript_version_id ? source(r) : null, source_segment: r.source_transcript_version_id ? source(r) : null })) };
+tests/attendees-action.test.ts:209:  expect(firstAttendees[0]).toMatchObject({ display_name: "Alice", crm_person_entity_id: "crm-alice" });
+tests/attendees-action.test.ts:252:  expect(db.query("SELECT display_name, crm_person_entity_id FROM attendees WHERE meeting_id = ? AND attendee_id = ?")
+tests/attendees-action.test.ts:253:    .get(meetingId, "dana-local")).toEqual({ display_name: "Dana", crm_person_entity_id: null });
+src/minutes-store-meetings.ts:126:      INSERT INTO attendees (meeting_id, attendee_id, display_name, crm_person_entity_id, sort_order, created_at)
+src/minutes-store-meetings.ts:130:        crm_person_entity_id = excluded.crm_person_entity_id,
+src/minutes-store-meetings.ts:140:      SELECT attendee_id, display_name, crm_person_entity_id, sort_order
+src/minutes-store-meetings.ts:143:      attendee_id: string; display_name: string; crm_person_entity_id: string | null; sort_order: number;
+src/minutes-store-meetings.ts:147:      crmPersonEntityId: row.crm_person_entity_id, sortOrder: row.sort_order,
+tests/public-attendees.test.ts:289:        { attendee_id: "a-1", display_name: "김현준", crm_person_entity_id: "crm-person-001" },
+tests/public-attendees.test.ts:290:        { attendee_id: "a-2", display_name: "박지민", crm_person_entity_id: null },
+tests/public-attendees.test.ts:315:      attendees: [{ attendee_id: "a-1", display_name: "김현준", crm_person_entity_id: null }],
+tests/public-attendees.test.ts:378:      attendees: [{ attendee_id: "a-1", display_name: "김현준", crm_person_entity_id: null }],
+tests/public-attendees.test.ts:405:        crm_person_entity_id: "<script>window.__pwned=1</script>",
+tests/public-attendees.test.ts:430:      attendees: [{ attendee_id: "a-1", display_name: "김현준", crm_person_entity_id: null }],
+src/minutes-store-schema-core.ts:14:  crm_person_entity_id TEXT,
+src/minutes-store-schema-core.ts:21:  ON attendees(meeting_id, crm_person_entity_id) WHERE crm_person_entity_id IS NOT NULL;
+src/session.ts:93:    crm_person_entity_id?: string;

@@ -1,0 +1,46 @@
+TASK_WORKTREE_STATUS_AFTER_TEMP_CLEANUP:
+?? .omo/evidence/meeting-minutes-bundle/final/f1-plan-compliance-rerun/
+?? .omo/evidence/meeting-minutes-bundle/final/f1-plan-compliance/
+?? .omo/evidence/meeting-minutes-bundle/final/f2-code-quality/
+?? .omo/evidence/meeting-minutes-bundle/final/f3-manual-qa-rerun/
+?? .omo/evidence/meeting-minutes-bundle/final/f3-manual-qa/
+?? .omo/evidence/meeting-minutes-bundle/final/f4-scope-fidelity-final/
+?? .omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/
+?? .omo/evidence/meeting-minutes-bundle/final/remediation-flow/
+?? .omo/evidence/meeting-minutes-bundle/final/transport-suite/
+?? .omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/diff-check.txt
+?? .omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/exact-driver.ts
+?? .omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/exact-driver.txt
+?? .omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/focused-bun.txt
+?? .omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/full-bun.txt
+?? .omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/tsc.txt
+?? .omo/evidence/meeting-minutes-bundle/task-4/
+?? .omo/evidence/meeting-minutes-bundle/task-5/
+?? .omo/evidence/meeting-minutes-bundle/task-6/01-red.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/02-focused-green.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/03-full-suite.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/04-tsc.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/05-real-module-qa-adversarial.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/06-post-edit-final-gate.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/09-red-deadline-grounding.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/10-focused-green.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/11-full-bun-test.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/12-tsc.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/13-diff-check.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/14-adversarial-driver.ts
+?? .omo/evidence/meeting-minutes-bundle/task-6/14-adversarial-driver.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/15-scoped-commit.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/16-static-contract.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/17-terminal-evidence.txt
+?? .omo/evidence/meeting-minutes-bundle/task-6/DoneClaim.json
+?? .omo/evidence/meeting-minutes-bundle/task-6/final-receipt.txt
+?? .omo/evidence/meeting-minutes-bundle/task-7/
+?? .omo/evidence/meeting-minutes-bundle/wave2-independent/
+?? .omo/evidence/meeting-minutes-bundle/wave4-independent/
+?? .omo/evidence/meeting-minutes-bundle/wave4-regression/
+?? .omo/evidence/meeting-minutes-bundle/wave5-independent/
+UNTRACKED_NON_EVIDENCE:
+OWNED_PROCESSES:
+ 7457 85395 /bin/bash -c cd /Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes && out=.omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/02-full-suite-isolated-serial.txt; { printf 'COMMAND: for each tracked tests/*.test.ts in lexical order: bun test <file>\nMODE: deterministic isolated serial; one Bun process per file; no overlapping Chromium\nVERIFIED_HEAD: '; git rev-parse HEAD; printf 'STARTED_AT: '; date -u +%Y-%m-%dT%H:%M:%SZ; } > "$out"; total=0; files=0; fail=0; while IFS= read -r f; do files=$((files+1)); printf '\n===== %s =====\n' "$f" | tee -a "$out"; set -o pipefail; bun test "$f" 2>&1 | tee -a "$out"; code=${PIPESTATUS[0]}; printf 'FILE_EXIT_CODE: %s\n' "$code" | tee -a "$out"; if [ "$code" -ne 0 ]; then fail=1; break; fi; done < <(git ls-files 'tests/*.test.ts' | sort); { printf '\nFILES_COMPLETED: %s\nEXIT_CODE: %s\nFINISHED_AT: ' "$files" "$fail"; date -u +%Y-%m-%dT%H:%M:%SZ; } | tee -a "$out"; exit "$fail"
+ 8371  7457 bun test tests/public-review.test.ts
+OWNED_TEMP_PATHS:

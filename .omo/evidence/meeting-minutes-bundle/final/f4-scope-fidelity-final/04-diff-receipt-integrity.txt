@@ -1,0 +1,19 @@
+COMMANDS: diff and committed receipt integrity
+BASELINE_DIFF_CHECK_EXIT=0
+WORKTREE_DIFF_CHECK_EXIT=0
+INDEX_DIFF_CHECK_EXIT=0
+DONECLAIM_JSON_RESULT=PASS
+8760474cb55eb0fd86363271fe0109f42b4610a8e73f8e6727f217a1cc09d616  .omo/evidence/meeting-minutes-bundle/task-8/DoneClaim.json
+ad67ee8992f70eb49da7ec40120ae3314167a8ec1f4d3785072f82f1c205d5c8  .omo/evidence/meeting-minutes-bundle/task-8/final-receipt.txt
+a5efd98175b71145c4babebc563bfba94b0bc47a62fc50abed09406bc50aa6e2  .omo/evidence/meeting-minutes-bundle/task-9/DoneClaim.json
+939ee85adada8bf326b357adf5de63287a2d7eb984864d9486991b8e99e2d66d  .omo/evidence/meeting-minutes-bundle/task-9/final-receipt.txt
+aa81a027795a5f453c2bc60c24cba16a5448c42232aa72ecd14343dbbfb6287d  .omo/evidence/meeting-minutes-bundle/task-10/DoneClaim.json
+0e5b8bcc92c2ce8d1125af63dbbd2874f15fc751a49fbdf009410292bc64d2f3  .omo/evidence/meeting-minutes-bundle/task-10/final-receipt.txt
+fe0ce1b05b029e021ddd4bf8c04af859f5af00863f882590b4552fcf0f43cedd  .omo/evidence/meeting-minutes-bundle/task-11/DoneClaim.json
+cb6dcf5ae196c643a2a269cbba6994c52786352c2e3a43f040d4b48134c3a2c1  .omo/evidence/meeting-minutes-bundle/task-11/final-receipt.txt
+a21b0ff21fa8d73c6ec186e786d965252bb576e338608b68d0878171891617d5  .omo/evidence/meeting-minutes-bundle/task-12/DoneClaim.json
+2f5267b440dbdb643fa5d92d872b74fa819dc96a5fde2b24ce1cf87e9e65915f  .omo/evidence/meeting-minutes-bundle/task-12/final-receipt.txt
+8fb334396594fc2dc03e5504762d4285c75bc767008b05a33204f8412de8d4c3  .omo/evidence/meeting-minutes-bundle/task-13/DoneClaim.json
+a8b1e554bdd5c81eba3278cc9defb128a8f65b98b4f2ea68fbedad28d0081e57  .omo/evidence/meeting-minutes-bundle/task-13/final-receipt.txt
+d8e3f5f01569a48c37dac79c1d5239bdb7be45a48622fdc1d59be709ee9192ba  .omo/evidence/meeting-minutes-bundle/task-14/DoneClaim.json
+b82ea70b05aa2caf89285c693e9a0a7d3e468bfb752da361e66f77aa5cec6f8f  .omo/evidence/meeting-minutes-bundle/task-14/final-receipt.txt

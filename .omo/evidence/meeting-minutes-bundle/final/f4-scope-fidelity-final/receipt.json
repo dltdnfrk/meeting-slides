@@ -1,0 +1,38 @@
+{
+  "result": "PASS",
+  "baseline": "921a01513593c0e10181cf01e535a7abe995deb3",
+  "audited_head": "67dbb92179e7dd8ba703a2940e69c10c8d56949f",
+  "audited_tree": "93a3b67c7574388da7be5b884d3363a9fe50ae88",
+  "product_f2_repair_commit": "6711ecfcb47f75b1bb22377d97dd551538568ad7",
+  "receipt_repair_commit": "67dbb92179e7dd8ba703a2940e69c10c8d56949f",
+  "verified_by": "st_019fbee0 / 019fbee7-caef-7ec1-a27c-7df16d89abde",
+  "verified_at": "2026-08-01T20:15:00Z",
+  "gates": {
+    "linear_baseline_ancestry": "PASS: 33 commits, 0 merges",
+    "t4_t14_actual_target_parent_chain": "PASS",
+    "remediation_chain": "PASS",
+    "baseline_diff_check": "PASS",
+    "receipt_json_integrity": "PASS",
+    "prohibited_scope_scan": "PASS",
+    "untracked_non_evidence": "PASS: 0",
+    "main_worktree_preservation": "PASS",
+    "f2_pure_loc": "PASS: 235, 145, 145, 143",
+    "f2_focused_chromium_ws_sqlite": "PASS: 56/56",
+    "full_suite": "PASS: 209/209",
+    "strict_typescript": "PASS",
+    "browser_checkjs": "PASS"
+  },
+  "task_targets": {
+    "T4": "6ec8905e686bd23ee351cfb08795ec2f959d291b",
+    "T5": "dff8ea5bc92bdf454622c29b1748ef21d2300100",
+    "T6": "9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367",
+    "T7": "b12706c2b1099f315f19c6bf528880789be18bbe",
+    "T8": "524292a3a23584bacf6787ccfce3e318293b0e47",
+    "T9": "a29d0d4856e7020edf031317ab9a91f0afa54218",
+    "T10": "94fea038c0ca47e8b32950a8d666550bd9dea448",
+    "T11": "f64fb18c83659dd6732d9481434d8758f98c231a",
+    "T12": "f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc",
+    "T13": "0c0d5aa55f4def8f8cd79ee398417b7acf8788d4",
+    "T14": "c2736c81fe6ca04167b4f2ded7e67804226471ce"
+  }
+}
