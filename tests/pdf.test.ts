@@ -47,6 +47,10 @@ async function rendererTemps(): Promise<string[]> {
   return (await readdir(tmpdir())).filter((name) => name.startsWith("meeting-minutes-pdf-"));
 }
 
+function expectNoTempLeak(before: string[], after: string[]): void {
+  expect(after).toEqual(before);
+}
+
 describe("renderMinutesPdf", () => {
   test("prints a non-empty portrait A4 PDF with the complete summary before the appendix", async () => {
     const pdf = await renderMinutesPdf(buildMinutesHtml(input(2, 2)));
@@ -84,6 +88,16 @@ describe("renderMinutesPdf", () => {
       executablePath: "/definitely/missing/meeting-minutes-chromium",
     })).rejects.toThrow(/Chromium launch failed/i);
 
-    expect(await rendererTemps()).toEqual(before);
+    expectNoTempLeak(before, await rendererTemps());
+  }, 30_000);
+
+  test("removes its temporary directory after overflow and measurement failures", async () => {
+    const before = await rendererTemps();
+
+    await expect(renderMinutesPdf(buildMinutesHtml(input(30, 20)))).rejects.toBeInstanceOf(MinutesPdfOverflowError);
+    expectNoTempLeak(before, await rendererTemps());
+
+    await expect(renderMinutesPdf("<html><body><main>missing first page</main></body></html>")).rejects.toThrow(/first-page/i);
+    expectNoTempLeak(before, await rendererTemps());
   }, 30_000);
 });

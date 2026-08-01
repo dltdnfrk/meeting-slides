@@ -1,0 +1,7 @@
+task=T11 PDF temp-directory cleanup
+commit_subject=fix(minutes): clean PDF temp directories on every exit
+focused_bun=pass
+full_bun=known-unrelated-public-attendees-failure
+tsc=pass
+diff_check=pass
+cleanup_driver=pass
