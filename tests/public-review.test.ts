@@ -248,13 +248,12 @@ describe("candidate cards", () => {
     const action = await page.evaluate(() => {
       const row = document.querySelector('.review-item[data-item-id="act-1"]')!;
       return {
-        deadline: row.querySelector(".review-item__deadline")?.textContent?.trim(),
+        deadline: (row.querySelector(".review-item__deadline-input") as HTMLInputElement)?.value,
+        deadlineText: row.querySelector(".review-item__deadline-text")?.textContent?.trim(),
         hasAssignee: !!row.querySelector(".review-item__assignee"),
       };
     });
-    expect(action.hasAssignee).toBe(true);
-    expect(action.deadline).toContain("2026-08-07");
-    expect(action.deadline).toContain("금요일까지");
+    expect(action).toEqual({ deadline: "2026-08-07", deadlineText: "금요일까지", hasAssignee: true });
   });
 
   test("decisions and open items have no assignee control — only action items do", async () => {
@@ -410,11 +409,33 @@ describe("edit and drop controls", () => {
 });
 
 describe("confirm action", () => {
-  test("confirm sends confirmReview with the review id", async () => {
+  test("the actual browser flow confirms complete candidates, corrects an action deadline, then confirms the review", async () => {
     await openReview();
-    await clearSent();
+    expect(await page.$eval("#btn-review-confirm", (button) => (button as HTMLButtonElement).disabled)).toBe(true);
+
+    await page.click('.review-item[data-item-id="dec-1"] .review-item__confirm');
+    await page.select('.review-item[data-item-id="act-1"] .review-item__attribution', "att-1");
+    await page.select('.review-item[data-item-id="act-1"] .review-item__assignee', "att-2");
+    await page.$eval('.review-item[data-item-id="act-1"] .review-item__deadline-input', (input) => {
+      (input as HTMLInputElement).value = "2026-08-14";
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await page.click('.review-item[data-item-id="act-1"] .review-item__confirm');
+    await page.select('.review-item[data-item-id="open-1"] .review-item__attribution', "att-2");
+    await page.click('.review-item[data-item-id="open-1"] .review-item__confirm');
+
+    expect(await page.$eval("#btn-review-confirm", (button) => (button as HTMLButtonElement).disabled)).toBe(false);
     await page.click("#btn-review-confirm");
-    expect(await sent()).toEqual([{ action: "confirmReview", reviewId: "rev-001" }]);
+    expect(await sent()).toEqual([
+      { action: "updateItem", reviewId: "rev-001", itemId: "dec-1", kind: "decision", patch: { reviewState: "confirmed" } },
+      { action: "updateItem", reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { attributedAttendeeId: "att-1" } },
+      { action: "updateItem", reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { assigneeAttendeeId: "att-2" } },
+      { action: "updateItem", reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { deadline: "2026-08-14" } },
+      { action: "updateItem", reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { reviewState: "confirmed" } },
+      { action: "updateItem", reviewId: "rev-001", itemId: "open-1", kind: "open_item", patch: { attributedAttendeeId: "att-2" } },
+      { action: "updateItem", reviewId: "rev-001", itemId: "open-1", kind: "open_item", patch: { reviewState: "confirmed" } },
+      { action: "confirmReview", reviewId: "rev-001" },
+    ]);
   });
 
   test("the confirm button reports how many candidates will be kept", async () => {
@@ -424,14 +445,12 @@ describe("confirm action", () => {
     expect(await page.evaluate(() => document.getElementById("review-confirm-count")!.textContent)).toBe("2");
   });
 
-  test("confirming while every candidate is dropped is blocked", async () => {
+  test("a review with every candidate rejected remains confirmable", async () => {
     await openReview({ items: [reviewMessage().items[0]] });
     await page.click('.review-item[data-item-id="dec-1"] .review-item__drop');
     await clearSent();
     await page.click("#btn-review-confirm");
-    expect(await sent()).toEqual([]);
-    expect(await page.evaluate(() => document.getElementById("review-error")!.textContent!.trim()))
-      .toBe("확정할 후보가 없습니다");
+    expect(await sent()).toEqual([{ action: "confirmReview", reviewId: "rev-001" }]);
   });
 });
 
@@ -445,7 +464,7 @@ describe("empty, error, and loading states", () => {
     }))).toEqual({
       rows: 0,
       empty: "추출된 후보가 없습니다 — 전사에 명시적인 결정·액션·미결 표현이 없었습니다",
-      confirmDisabled: true,
+      confirmDisabled: false,
     });
   });
 
@@ -558,12 +577,19 @@ describe("reconnect and update handling", () => {
     }))).toEqual({ ids: ["dec-9"], version: "tv-second-version" });
 
     await clearSent();
+    await page.select('.review-item[data-item-id="dec-9"] .review-item__attribution', "att-1");
+    await page.click('.review-item[data-item-id="dec-9"] .review-item__confirm');
     await page.click("#btn-review-confirm");
-    expect(await sent()).toEqual([{ action: "confirmReview", reviewId: "rev-002" }]);
+    expect(await sent()).toEqual([
+      { action: "updateItem", reviewId: "rev-002", itemId: "dec-9", kind: "decision", patch: { attributedAttendeeId: "att-1" } },
+      { action: "updateItem", reviewId: "rev-002", itemId: "dec-9", kind: "decision", patch: { reviewState: "confirmed" } },
+      { action: "confirmReview", reviewId: "rev-002" },
+    ]);
   });
 
   test("a dropped socket disables confirm and reconnect restores it", async () => {
-    await openReview();
+    await openReview({ items: [reviewMessage().items[0]] });
+    await page.click('.review-item[data-item-id="dec-1"] .review-item__confirm');
     await page.evaluate(() => window.__sockets.at(-1)!.close());
     await page.waitForFunction(() => (document.getElementById("btn-review-confirm") as HTMLButtonElement).disabled);
     await clearSent();
@@ -664,10 +690,16 @@ describe("hostile payloads", () => {
     });
     expect(await sent()).toEqual([]);
 
-    // The kept candidate still confirms, so one bad kind cannot block the review.
+    // The kept candidate still transitions and confirms, so one bad kind cannot block the review.
     await clearSent();
+    await page.select('.review-item[data-item-id="ok-1"] .review-item__attribution', "att-1");
+    await page.click('.review-item[data-item-id="ok-1"] .review-item__confirm');
     await page.click("#btn-review-confirm");
-    expect(await sent()).toEqual([{ action: "confirmReview", reviewId: "rev-001" }]);
+    expect(await sent()).toEqual([
+      { action: "updateItem", reviewId: "rev-001", itemId: "ok-1", kind: "decision", patch: { attributedAttendeeId: "att-1" } },
+      { action: "updateItem", reviewId: "rev-001", itemId: "ok-1", kind: "decision", patch: { reviewState: "confirmed" } },
+      { action: "confirmReview", reviewId: "rev-001" },
+    ]);
   });
 
   test("items missing required evidence or source coordinates are refused rather than rendered uncited", async () => {

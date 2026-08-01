@@ -22,11 +22,11 @@ function createReviewPanel(transport) {
   const noticeEl = byId("review-attendee-notice");
   const loadingEl = byId("review-loading");
   const versionEl = byId("review-version");
-  const confirmEl = byId("btn-review-confirm");
+  const confirmEl = /** @type {HTMLButtonElement} */ (byId("btn-review-confirm"));
   const confirmCountEl = byId("review-confirm-count");
-  const retryEl = byId("btn-review-retry");
-  const closeEl = byId("btn-review-close");
-  const toggleEl = byId("btn-review");
+  const retryEl = /** @type {HTMLButtonElement} */ (byId("btn-review-retry"));
+  const closeEl = /** @type {HTMLButtonElement} */ (byId("btn-review-close"));
+  const toggleEl = /** @type {HTMLButtonElement} */ (byId("btn-review"));
   const countEl = byId("review-count");
 
   // updateItem의 kind 계약과 정확히 같은 집합이다(server.ts parseReviewKind).
@@ -104,9 +104,13 @@ function createReviewPanel(transport) {
   const reviewStateOf = (item) => stateOf(item).reviewState ?? "candidate";
   const attributionOf = (item) => stateOf(item).attributedAttendeeId ?? item.attributedAttendeeId;
   const assigneeOf = (item) => stateOf(item).assigneeAttendeeId ?? item.assigneeAttendeeId;
+  const deadlineOf = (item) => stateOf(item).deadline ?? item.deadline;
   const patchLocal = (id, patch) => localState.set(id, { ...(localState.get(id) ?? {}), ...patch });
 
   const keptItems = () => (review?.items ?? []).filter((item) => reviewStateOf(item) !== "rejected");
+  const isComplete = (item) => Boolean(attributionOf(item)) && (item.kind !== "action_item" ||
+    (Boolean(assigneeOf(item)) && Boolean(deadlineOf(item))));
+  const canConfirmReview = () => (review?.items ?? []).every((item) => reviewStateOf(item) !== "candidate");
 
   function setError(text) {
     errorEl.textContent = text ?? "";
@@ -134,16 +138,21 @@ function createReviewPanel(transport) {
   }
 
   function itemHtml(item, hasAttendees) {
-    const dropped = reviewStateOf(item) === "rejected";
+    const itemState = reviewStateOf(item);
+    const dropped = itemState === "rejected";
+    const confirmed = itemState === "confirmed";
     const description = descriptionOf(item);
     const disabled = dropped || !hasAttendees ? " disabled" : "";
     const range = item.startSeq === item.endSeq
       ? `seq ${item.startSeq}`
       : `seq ${item.startSeq}–${item.endSeq}`;
     const editing = editingId === item.id;
-    const deadline = item.kind === "action_item" && (item.deadline || item.deadlineText)
-      ? `<p class="review-item__deadline"><span class="review-item__deadline-label">기한</span>${
-        escapeHtml(item.deadline || "미정")}${item.deadlineText ? ` · ${escapeHtml(item.deadlineText)}` : ""}</p>`
+    const deadline = item.kind === "action_item"
+      ? `<label class="review-item__field review-item__deadline"><span class="review-item__field-label">기한</span>
+           <input class="review-item__deadline-input" type="date" value="${escapeHtml(deadlineOf(item))}"
+             aria-label="${escapeHtml(description)} 기한"${dropped ? " disabled" : ""}>
+           ${item.deadlineText ? `<span class="review-item__deadline-text">${escapeHtml(item.deadlineText)}</span>` : ""}
+         </label>`
       : "";
     const assignee = item.kind === "action_item"
       ? `<label class="review-item__field"><span class="review-item__field-label">담당자</span>
@@ -160,7 +169,7 @@ function createReviewPanel(transport) {
         role="listitem"
         data-item-id="${escapeHtml(item.id)}"
         data-kind="${escapeHtml(item.kind)}"
-        data-review-state="${dropped ? "rejected" : "candidate"}"
+        data-review-state="${escapeHtml(itemState)}"
         data-transcript-version-id="${escapeHtml(item.transcriptVersionId)}"
         data-start-seq="${escapeHtml(String(item.startSeq))}"
         data-end-seq="${escapeHtml(String(item.endSeq))}">
@@ -182,6 +191,9 @@ function createReviewPanel(transport) {
             </select></label>
           ${assignee}
           <span class="review-item__spacer"></span>
+          ${!dropped ? `<button type="button" class="review-item__action review-item__confirm"
+            aria-label="${escapeHtml(description)} ${confirmed ? "재검토" : "항목 확정"}"
+            ${!confirmed && !isComplete(item) ? " disabled" : ""}>${confirmed ? "재검토" : "항목 확정"}</button>` : ""}
           ${editing
             ? `<button type="button" class="review-item__action review-item__save" aria-label="${escapeHtml(description)} 수정 저장">저장</button>
                <button type="button" class="review-item__action review-item__cancel" aria-label="${escapeHtml(description)} 수정 취소">취소</button>`
@@ -218,12 +230,8 @@ function createReviewPanel(transport) {
     confirmCountEl.textContent = String(kept);
     countEl.textContent = String(kept);
     countEl.hidden = kept === 0;
-    confirmEl.disabled = kept === 0 || !transport.isOpen();
+    confirmEl.disabled = !canConfirmReview() || !transport.isOpen();
     toggleEl.hidden = false;
-    // 비활성 버튼은 이유를 말하지 않는다 — 후보를 전부 제외해 막힌 상태라면
-    // 사용자가 복원해야 한다는 것을 명시한다(빈 추출 결과와는 다른 상황).
-    if (kept === 0 && review.items.length > 0) setError("확정할 후보가 없습니다");
-    else if (errorEl.textContent === "확정할 후보가 없습니다") setError("");
   }
 
   function open(focusInside = true) {
@@ -257,7 +265,7 @@ function createReviewPanel(transport) {
 
   const itemFor = (target) => {
     const card = target instanceof Element ? target.closest(".review-item") : null;
-    if (!card || !review) return null;
+    if (!(card instanceof HTMLElement) || !review) return null;
     return review.items.find((candidate) => candidate.id === card.dataset.itemId) ?? null;
   };
 
@@ -268,22 +276,48 @@ function createReviewPanel(transport) {
     if (ev.target.classList.contains("review-item__attribution")) {
       patchLocal(item.id, { attributedAttendeeId: value });
       sendPatch(item, { attributedAttendeeId: value || null });
+      render();
     } else if (ev.target.classList.contains("review-item__assignee")) {
       patchLocal(item.id, { assigneeAttendeeId: value });
       sendPatch(item, { assigneeAttendeeId: value || null });
+      render();
     }
+  });
+
+  listEl.addEventListener("change", (ev) => {
+    const item = itemFor(ev.target);
+    if (!item || !(ev.target instanceof HTMLInputElement) ||
+        !ev.target.classList.contains("review-item__deadline-input")) return;
+    const deadline = ev.target.value;
+    if (!deadline || !sendPatch(item, { deadline })) return;
+    patchLocal(item.id, { deadline });
+    render();
   });
 
   listEl.addEventListener("click", (ev) => {
     const item = itemFor(ev.target);
     if (!item || !(ev.target instanceof Element)) return;
 
+    if (ev.target.closest(".review-item__confirm")) {
+      const nextState = reviewStateOf(item) === "confirmed" ? "candidate" : "confirmed";
+      if (nextState === "confirmed" && !isComplete(item)) {
+        setError("귀속·담당자·기한을 모두 지정해야 합니다");
+        return;
+      }
+      if (!sendPatch(item, { reviewState: nextState })) return;
+      patchLocal(item.id, { reviewState: nextState });
+      render();
+      return;
+    }
     if (ev.target.closest(".review-item__edit")) {
       editingId = item.id;
       setError("");
       render();
       const editor = listEl.querySelector(`.review-item[data-item-id="${CSS.escape(item.id)}"] .review-item__editor`);
-      if (editor) { editor.focus(); editor.setSelectionRange(editor.value.length, editor.value.length); }
+      if (editor instanceof HTMLTextAreaElement) {
+        editor.focus();
+        editor.setSelectionRange(editor.value.length, editor.value.length);
+      }
       return;
     }
     if (ev.target.closest(".review-item__cancel")) {
@@ -294,10 +328,10 @@ function createReviewPanel(transport) {
     }
     if (ev.target.closest(".review-item__save")) {
       const editor = listEl.querySelector(`.review-item[data-item-id="${CSS.escape(item.id)}"] .review-item__editor`);
-      const next = (editor?.value ?? "").trim();
+      const next = (editor instanceof HTMLTextAreaElement ? editor.value : "").trim();
       if (!next) {
         setError("설명을 비울 수 없습니다");
-        editor?.focus();
+        if (editor instanceof HTMLTextAreaElement) editor.focus();
         return;
       }
       if (!sendPatch(item, { description: next })) return;
@@ -317,8 +351,8 @@ function createReviewPanel(transport) {
 
   confirmEl.addEventListener("click", () => {
     if (!review) return;
-    if (keptItems().length === 0) {
-      setError("확정할 후보가 없습니다");
+    if (!canConfirmReview()) {
+      setError("모든 후보를 항목 확정 또는 제외해야 합니다");
       return;
     }
     if (!transport.send({ action: "confirmReview", reviewId: review.reviewId })) {
@@ -384,7 +418,7 @@ function createReviewPanel(transport) {
     },
     /** 소켓 개폐에 따라 확정 버튼 가용성을 되맞춘다. */
     syncTransport() {
-      confirmEl.disabled = keptItems().length === 0 || !transport.isOpen();
+      confirmEl.disabled = !canConfirmReview() || !transport.isOpen();
     },
   };
 }

@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import type { MinutesExtractionInput, MinutesExtractionResult } from "./extract.ts";
 import type { MinutesStore } from "./minutes-store.ts";
 import type { ReviewUpdate } from "./session.ts";
@@ -95,9 +93,50 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
     throw new Error(`extractor returned wrong transcript version ${result.transcriptVersionId}`);
   }
 
+  const reviewId = input.store.saveCandidates({
+    meetingId: input.meetingId,
+    transcriptVersionId: canonical.transcriptVersionId,
+    decisions: result.decisions.map((item) => ({
+      id: item.id,
+      description: item.description,
+      source: {
+        transcriptVersionId: item.sourceSegment.transcript_version_id,
+        startSeq: item.sourceSegment.start_seq,
+        endSeq: item.sourceSegment.end_seq,
+      },
+      attributedAttendeeId: item.suggestedAttributionAttendeeId,
+      origin: item.origin,
+    })),
+    actionItems: result.actionItems.map((item) => ({
+      id: item.id,
+      description: item.description,
+      source: {
+        transcriptVersionId: item.sourceSegment.transcript_version_id,
+        startSeq: item.sourceSegment.start_seq,
+        endSeq: item.sourceSegment.end_seq,
+      },
+      attributedAttendeeId: item.suggestedAttributionAttendeeId,
+      assigneeAttendeeId: item.suggestedAssigneeAttendeeId,
+      deadline: item.deadline,
+      deadlineText: item.deadlineText,
+      origin: item.origin,
+    })),
+    openItems: result.openItems.map((item) => ({
+      id: item.id,
+      description: item.description,
+      source: {
+        transcriptVersionId: item.sourceSegment.transcript_version_id,
+        startSeq: item.sourceSegment.start_seq,
+        endSeq: item.sourceSegment.end_seq,
+      },
+      attributedAttendeeId: item.suggestedAttributionAttendeeId,
+      origin: item.origin,
+    })),
+  });
+
   return {
     type: "review",
-    reviewId: randomUUID(),
+    reviewId,
     transcriptVersionId: canonical.transcriptVersionId,
     items: itemPayload(result, lines),
     attendees,

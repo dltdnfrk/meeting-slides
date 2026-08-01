@@ -62,7 +62,7 @@ beforeAll(async () => {
   callsPath = join(tempDir, "calls.txt");
   const fakeCli = join(tempDir, "fake-cli");
   const fakeWhisper = join(tempDir, "fake-whisper");
-  writeFileSync(fakeCli, `#!/usr/bin/env bun\nimport { appendFileSync } from "node:fs";\nif (process.argv.includes("--version")) { console.log("fake 1.0"); process.exit(0); }\nappendFileSync(${JSON.stringify(callsPath)}, "extract\\n");\nconsole.log(JSON.stringify({ transcriptVersionId: "canonical-v1", decisions: [{ description: "Ship Friday", sourceSegment: { transcript_version_id: "canonical-v1", start_seq: 1, end_seq: 1 }, evidenceQuote: "Ship Friday was confirmed.", suggestedAttributionAttendeeId: "alice" }], actionItems: [], openItems: [] }));\n`);
+  writeFileSync(fakeCli, `#!/usr/bin/env bun\nimport { appendFileSync } from "node:fs";\nif (process.argv.includes("--version")) { console.log("fake 1.0"); process.exit(0); }\nappendFileSync(${JSON.stringify(callsPath)}, "extract\\n");\nconsole.log(JSON.stringify({ transcriptVersionId: "canonical-v1", decisions: [{ description: "Ship Friday", sourceSegment: { transcript_version_id: "canonical-v1", start_seq: 1, end_seq: 1 }, evidenceQuote: "Ship Friday was confirmed.", suggestedAttributionAttendeeId: "alice" }], actionItems: [{ description: "Publish", sourceSegment: { transcript_version_id: "canonical-v1", start_seq: 1, end_seq: 1 }, evidenceQuote: "Alice will publish by 2026-08-07.", suggestedAttributionAttendeeId: "alice", suggestedAssigneeAttendeeId: "alice", deadlineText: "2026-08-07" }], openItems: [{ description: "Budget", sourceSegment: { transcript_version_id: "canonical-v1", start_seq: 1, end_seq: 1 }, evidenceQuote: "Budget remains open.", suggestedAttributionAttendeeId: "alice" }] }));\n`);
   writeFileSync(fakeWhisper, "#!/usr/bin/env bun\nawait new Promise(() => {});\n");
   chmodSync(fakeCli, 0o755);
   chmodSync(fakeWhisper, 0o755);
@@ -82,6 +82,8 @@ beforeAll(async () => {
       WHISPER_INPUT_MODE: "mic",
       WHISPER_STREAM_BIN: fakeWhisper,
       WHISPER_MODEL_PATH: join(tempDir, "model.bin"),
+      MEETING_BUNDLE_OUTPUT_ROOT: join(tempDir, "exports"),
+      MEETING_BUNDLE_TARGET_COMMIT: "0123456789abcdef0123456789abcdef01234567",
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -130,7 +132,11 @@ test("startReview is ended-only, requester-scoped, and single-flight for one can
   const db = new Database(dbPath);
   const store = new MinutesStore(db);
   const version = store.addTranscriptVersion(meetingId, { transcriptVersionId: "canonical-v1", sourceKind: "import" });
-  store.addTranscriptVersionLines(version.transcriptVersionId, [{ seq: 1, speakerTurn: 7, text: "Ship Friday was confirmed." }]);
+  store.addTranscriptVersionLines(version.transcriptVersionId, [{
+    seq: 1,
+    speakerTurn: 7,
+    text: "Ship Friday was confirmed. Alice will publish by 2026-08-07. Budget remains open.",
+  }]);
   store.finalizeTranscriptVersion(version.transcriptVersionId, transcriptContentSha256(store, version.transcriptVersionId));
   store.setCanonical(meetingId, version.transcriptVersionId);
   db.run("UPDATE meeting_meta SET phase = 'ended' WHERE meeting_id = ?", [meetingId]);
@@ -145,17 +151,48 @@ test("startReview is ended-only, requester-scoped, and single-flight for one can
   expect(first).toMatchObject({
     type: "review",
     transcriptVersionId: "canonical-v1",
-    items: [{
-      kind: "decision",
-      sourceSegment: { transcript_version_id: "canonical-v1", start_seq: 1, end_seq: 1 },
-      segment_text: "Ship Friday was confirmed.",
-    }],
-    transcript: { lines: [{ seq: 1, speakerTurn: 7, text: "Ship Friday was confirmed." }] },
+    items: [
+      { kind: "decision", sourceSegment: { transcript_version_id: "canonical-v1", start_seq: 1, end_seq: 1 } },
+      { kind: "action_item", sourceSegment: { transcript_version_id: "canonical-v1", start_seq: 1, end_seq: 1 } },
+      { kind: "open_item", sourceSegment: { transcript_version_id: "canonical-v1", start_seq: 1, end_seq: 1 } },
+    ],
+    transcript: { lines: [{
+      seq: 1,
+      speakerTurn: 7,
+      text: "Ship Friday was confirmed. Alice will publish by 2026-08-07. Budget remains open.",
+    }] },
   });
   expect(readFileSync(callsPath, "utf8").trim().split("\n")).toHaveLength(1);
 
-  const persistence = new Database(dbPath, { readonly: true });
-  expect(persistence.query("SELECT COUNT(*) AS count FROM meeting_reviews").get()).toEqual({ count: 0 });
-  expect(persistence.query("SELECT COUNT(*) AS count FROM decisions").get()).toEqual({ count: 0 });
-  persistence.close();
+  const reviewId = first.reviewId as string;
+  const items = first.items as Array<{ id: string; kind: "decision" | "action_item" | "open_item" }>;
+  const persisted = new Database(dbPath, { readonly: true });
+  expect(persisted.query("SELECT review_id, status FROM meeting_reviews").get()).toEqual({ review_id: reviewId, status: "draft" });
+  expect([
+    persisted.query("SELECT decision_id AS id, review_id FROM decisions").get(),
+    persisted.query("SELECT action_item_id AS id, review_id FROM action_items").get(),
+    persisted.query("SELECT open_item_id AS id, review_id FROM open_items").get(),
+  ]).toEqual(items.map((item) => ({ id: item.id, review_id: reviewId })));
+  persisted.close();
+
+  for (const item of items) {
+    const updated = next(owner, (message) => message.type === "reviewItemUpdated" && message.itemId === item.id);
+    owner.send(JSON.stringify({
+      action: "updateItem", reviewId, itemId: item.id, kind: item.kind, patch: { reviewState: "confirmed" },
+    }));
+    await updated;
+  }
+  const concluded = next(owner, (message) => message.type === "meetingConcluded" && message.reviewId === reviewId);
+  owner.send(JSON.stringify({ action: "confirmReview", reviewId }));
+  expect(await concluded).toMatchObject({ type: "meetingConcluded", concluded: true, reviewId });
+
+  const completed = new Database(dbPath, { readonly: true });
+  expect(completed.query("SELECT status FROM meeting_reviews WHERE review_id = ?").get(reviewId)).toEqual({ status: "confirmed" });
+  expect([
+    completed.query("SELECT review_state FROM decisions").get(),
+    completed.query("SELECT review_state FROM action_items").get(),
+    completed.query("SELECT review_state FROM open_items").get(),
+  ]).toEqual(Array.from({ length: 3 }, () => ({ review_state: "confirmed" })));
+  expect(completed.query("SELECT COUNT(*) AS count FROM meeting_conclusions WHERE review_id = ?").get(reviewId)).toEqual({ count: 1 });
+  completed.close();
 }, timeoutMs + 2_000);

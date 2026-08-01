@@ -1,0 +1,25 @@
+$ bun test tests/review-actions.test.ts tests/meeting-conclusion.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/meeting-conclusion.test.ts:
+(pass) meeting-conclusion transaction > confirmReview publishes a complete version-linked manifest and only then closes the meeting [53.26ms]
+(pass) meeting-conclusion transaction > rejects unresolved, invalid-source, and stale-version reviews before exporting [29.90ms]
+(pass) meeting-conclusion transaction > PDF failure rolls back review, complete rows, conclusion, and all artifacts, and retry succeeds [44.06ms]
+(pass) meeting-conclusion transaction > post-export hash failure rolls back and removes the atomically published bundle [61.49ms]
+(pass) meeting-conclusion transaction > repeated and concurrent conclusion shares one export and never duplicates bundle state [66.44ms]
+(pass) meeting-conclusion transaction > real WS confirmReview reaches SQLite, bundle publication, and MeetingConcluded [860.00ms]
+
+tests/review-actions.test.ts:
+(pass) MinutesStore review mutation transaction > validates candidate ownership, attendee membership, and the whole patch before mutating [3.17ms]
+(pass) MinutesStore review mutation transaction > atomically transitions draft to confirmed only after every item is reviewed [1.83ms]
+(pass) MinutesStore review mutation transaction > rejects a review whose transcript version is no longer canonical [1.45ms]
+(pass) MinutesStore review mutation transaction > detects changed canonical transcript bytes and leaves review/artifact rows untouched [1.35ms]
+(pass) MinutesStore review mutation transaction > revalidates persisted attendee identities inside the confirmation transaction [2.53ms]
+(pass) MinutesStore review mutation transaction > rolls back confirmation when a confirmed source range has an interior gap [2.18ms]
+(pass) MinutesStore review mutation transaction > rolls back the status and timestamp when the confirmation transaction fails [2.36ms]
+(pass) real WS actions reject adversarial patches, persist valid changes, and conclude with one complete bundle [395.26ms]
+
+ 14 pass
+ 0 fail
+ 70 expect() calls
+Ran 14 tests across 2 files. [2.18s]

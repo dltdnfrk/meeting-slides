@@ -1,0 +1,6 @@
+main_worktree=/Users/hyunjun/Documents/MUNI/meeting-slides
+head=921a01513593c0e10181cf01e535a7abe995deb3
+branch=main
+index_tree=80385a18820c17aea94ecc8b9901fe9b7d385097
+dirty_path_count=688
+dirty_paths_sha256=4322fb5082f9d0550c575e4be37afee211d8d0e37dd7e339c436715a0261e5e7
