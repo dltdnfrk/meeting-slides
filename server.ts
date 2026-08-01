@@ -10,11 +10,12 @@ import { LLMClient, type BlockDetector, type ChatTransport } from "./src/llm.ts"
 import { CliLLMClient } from "./src/llm-cli.ts";
 import { MinutesExtractor } from "./src/extract.ts";
 import { startReview } from "./src/start-review.ts";
+import { concludeMeeting } from "./src/conclusion.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ReviewUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
 import { MinutesStore, type AttendeeInput, type ReviewState } from "./src/minutes-store.ts";
-import { RawAudioRecorder, TranscriptVersionWriter, claimFileAudioSource, sha256File } from "./src/transcript-versioning.ts";
+import { CaptureFinalizer, RawAudioRecorder, TranscriptVersionWriter, claimFileAudioSource, sha256File } from "./src/transcript-versioning.ts";
 import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
 import { copyDeckAssets } from "./src/deck-assets.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
@@ -58,6 +59,9 @@ const broadcast = (msg: ServerMessage) => {
 };
 // anarlog(fastrepl) 방식: 전사·슬라이드를 로컬 SQLite에 영속 저장
 const databasePath = process.env.MEETINGS_DB_PATH ?? join(import.meta.dir, "meetings.db");
+const bundleOutputRoot = process.env.MEETING_BUNDLE_OUTPUT_ROOT ?? join(import.meta.dir, "exports");
+const bundleTargetCommit = process.env.MEETING_BUNDLE_TARGET_COMMIT
+  ?? spawnSync("git", ["rev-parse", "HEAD"], { cwd: import.meta.dir, encoding: "utf8" }).stdout.trim();
 const store = new MeetingStore(databasePath);
 const minutesStore = new MinutesStore(store.databaseHandle());
 const transcriptWriter = new TranscriptVersionWriter(minutesStore);
@@ -451,16 +455,23 @@ const handleUpdateItem: WsActionHandler = ({ cmd }) => {
   broadcast({ type: "reviewItemUpdated", reviewId, itemId, kind });
 };
 
-const handleConfirmReview: WsActionHandler = ({ cmd }) => {
+const handleConfirmReview: WsActionHandler = ({ ws, cmd }) => {
   const reviewId = parseReviewId(cmd.reviewId, "reviewId");
-  minutesStore.confirmReview(reviewId);
-  const review = minutesStore.review(reviewId)!;
-  broadcast({
-    type: "reviewConfirmed",
-    reviewId,
-    transcriptVersionId: review.transcriptVersionId,
-    confirmedAt: review.confirmedAt!,
-  });
+  void concludeMeeting(reviewId, {
+    store: minutesStore,
+    outputRoot: bundleOutputRoot,
+    projectRoot: import.meta.dir,
+    targetCommit: bundleTargetCommit,
+  }).then((conclusion) => {
+    const review = minutesStore.review(reviewId)!;
+    broadcast({
+      type: "reviewConfirmed",
+      reviewId,
+      transcriptVersionId: review.transcriptVersionId,
+      confirmedAt: review.confirmedAt!,
+    });
+    broadcast(conclusion);
+  }).catch((error: unknown) => requestError(ws, error));
 };
 
 const handleStatus: WsActionHandler = ({ ws, cmd }) => {
@@ -856,6 +867,7 @@ let stopPromise: Promise<void> | null = null;
 let captureRun: Promise<void> | null = null;
 let stopRequested = false;
 let rawAudioRecorder: RawAudioRecorder | null = null;
+let captureFinalizer: CaptureFinalizer | null = null;
 
 function captureMessage(): CaptureUpdate {
   return { type: "capture", capturing, mode: config.input.mode };
@@ -878,6 +890,7 @@ async function startCapture(requestedMeetingId?: unknown): Promise<void> {
     if (requestedMeetingId === undefined) return;
     throw new Error("capture is already running");
   }
+  if (stopPromise) await stopPromise;
   let preparedMeetingId: number | null = null;
   if (requestedMeetingId !== undefined) {
     if (!Number.isInteger(requestedMeetingId) || (requestedMeetingId as number) < 1) {
@@ -891,11 +904,13 @@ async function startCapture(requestedMeetingId?: unknown): Promise<void> {
       throw new Error(`meeting ${preparedMeetingId} is not prepared`);
     }
   }
-  // 빠른 시작/중지 반복 시 이전 whisper 자식이 완전히 종료되기 전에
-  // 새 start가 들어오면 마이크 장치 경쟁이 발생한다. stop이 끝날 때까지 대기.
-  if (stopPromise) await stopPromise;
-  // 이전 실행의 고아 whisper-stream이 마이크 장치를 점유하면 새 캡처는 무음이
-  // 된다. 우리 바이너리+모델 경로 조합의 잔재만 정리하고 시작한다.
+  if (config.input.mode === "file" && config.input.filePath) {
+    const duplicateMeetingId = minutesStore.findMeetingByAudioHash(sha256File(config.input.filePath));
+    if (duplicateMeetingId !== null) {
+      currentMeetingId = duplicateMeetingId;
+      throw new Error(`[DUPLICATE_AUDIO] audio already belongs to meeting ${duplicateMeetingId}`);
+    }
+  }
   if (config.input.mode === "mic") {
     spawnSync("pkill", ["-f", `${config.whisper.streamBin} -m ${config.whisper.modelPath}`], { stdio: "ignore" });
   }
@@ -906,55 +921,91 @@ async function startCapture(requestedMeetingId?: unknown): Promise<void> {
     minutesStore.activatePreparedMeeting(preparedMeetingId);
     store.activateMeeting(preparedMeetingId);
   }
+  if (currentMeetingId === null) throw new Error("capture meeting was not created");
+  const meetingId = currentMeetingId;
+  if (config.input.mode === "file" && config.input.filePath) {
+    const claimed = claimFileAudioSource(minutesStore, meetingId, config.input.filePath);
+    if (claimed.duplicateMeetingId !== null) throw new Error(`[DUPLICATE_AUDIO] audio already belongs to meeting ${claimed.duplicateMeetingId}`);
+  }
+  rawAudioRecorder = null;
+  if (config.input.mode === "mic" && config.whisper.audioRecorderBin) {
+    mkdirSync(join(import.meta.dir, "exports"), { recursive: true });
+    const outputPath = join(import.meta.dir, "exports", `audio-${meetingId}-${Date.now()}.tmp.wav`);
+    try {
+      rawAudioRecorder = await RawAudioRecorder.start({
+        bin: config.whisper.audioRecorderBin,
+        captureId: config.whisper.captureId,
+        outputPath,
+      });
+    } catch (error) {
+      console.error("[audio recorder] start failed:", error);
+    }
+  }
+  transcriptWriter.begin(meetingId, {
+    sourceKind: config.input.mode === "file" ? "file_transcription" : "live_capture",
+    engine: "whisper.cpp",
+    engineModel: config.whisper.modelPath,
+    dualWriteLegacy: true,
+  });
+  captureFinalizer = new CaptureFinalizer(minutesStore, transcriptWriter, meetingId, rawAudioRecorder);
   capturing = true;
+  stopRequested = false;
   broadcast(captureMessage());
   broadcast({ type: "status", text: "🎤 녹음 시작 — 말씀하세요" });
-  void whisper.start(whisperHandlers).then(async () => {
-    await session.flush();
-    const wasCapturing = capturing;
-    capturing = false;
-    if (wasCapturing && currentMeetingId !== null) {
-      store.endMeeting();
-      minutesStore.endMeeting(currentMeetingId);
+  const finalizer = captureFinalizer;
+  captureRun = (async () => {
+    let failure: unknown = null;
+    try {
+      await whisper.start(whisperHandlers);
+    } catch (error) {
+      failure = error;
+    } finally {
+      try {
+        await session.flush();
+        const finalized = await finalizer.finish();
+        if (finalized.audio.status === "unavailable" && config.input.mode === "mic") {
+          broadcast({ type: "status", text: "원본 오디오를 보존하지 못했습니다 (recorder_failed)" });
+        }
+      } finally {
+        rawAudioRecorder = null;
+        captureFinalizer = null;
+        store.endMeeting();
+        if (minutesStore.meetingMeta(meetingId)?.phase === "capturing") minutesStore.endMeeting(meetingId);
+        const endedNaturally = capturing && !stopRequested;
+        capturing = false;
+        broadcast(captureMessage());
+        if (endedNaturally && config.input.mode === "mic") {
+          broadcast({ type: "status", text: "⚠️ 마이크 캡처가 종료되었습니다 — 장치/권한 확인 후 다시 시작하세요" });
+        } else if (!stopRequested) {
+          broadcast({ type: "status", text: "입력 종료" });
+        }
+      }
     }
-    broadcast(captureMessage());
-    if (config.input.mode === "mic" && wasCapturing) {
-      // 사용자가 중지하지 않았는데 캡처가 끝남 = 장치/권한 이상
-      console.warn("[whisper] 마이크 캡처가 종료됨 — 장치/권한 확인 필요");
-      broadcast({ type: "status", text: "⚠️ 마이크 캡처가 종료되었습니다 — 장치/권한 확인 후 다시 시작하세요" });
-    } else {
-      broadcast({ type: "status", text: "입력 종료" });
+    if (failure) {
+      const message = failure instanceof Error ? failure.message : String(failure);
+      console.error(`[capture fatal] ${message}`);
+      broadcast({ type: "status", text: `캡처 치명 오류: ${message}` });
     }
-  }).catch((e: unknown) => {
-    const wasCapturing = capturing;
-    capturing = false;
-    if (wasCapturing && currentMeetingId !== null) {
-      store.endMeeting();
-      minutesStore.endMeeting(currentMeetingId);
-    }
-    broadcast(captureMessage());
-    const message = e instanceof Error ? e.message : String(e);
-    console.error(`[whisper fatal] ${message}`);
-    broadcast({ type: "status", text: `whisper 치명 오류: ${message}` });
-  });
+  })();
 }
 
 async function stopCapture(): Promise<void> {
-  if (!capturing) return;
+  if (!capturing || !captureRun) return;
   capturing = false;
+  stopRequested = true;
   broadcast(captureMessage());
-  // startCapture가 await stopPromise로 기다릴 수 있도록 promise를 노출.
-  const p = whisper.stop();
-  stopPromise = p;
-  try {
-    await p;
-    await session.flush();
-    store.endMeeting();
-    if (currentMeetingId !== null) minutesStore.endMeeting(currentMeetingId);
-    broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
-  } finally {
-    stopPromise = null;
-  }
+  const run = captureRun;
+  stopPromise = (async () => {
+    try {
+      await whisper.stop();
+      await run;
+      broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
+    } finally {
+      captureRun = null;
+      stopPromise = null;
+    }
+  })();
+  await stopPromise;
 }
 
 if (config.input.mode === "file") {
@@ -963,16 +1014,8 @@ if (config.input.mode === "file") {
 
 const shutdown = async () => {
   console.log("\n종료 중...");
-  // 캡처를 먼저 멈춰야 flush 도중 새 청크가 끼어들어 문장이 유실되지 않는다.
-  await whisper.stop();
-  await session.flush();
-  if (capturing && currentMeetingId !== null) {
-    capturing = false;
-    store.endMeeting();
-    if (minutesStore.meetingMeta(currentMeetingId)?.phase === "capturing") {
-      minutesStore.endMeeting(currentMeetingId);
-    }
-  }
+  if (capturing && captureRun) await stopCapture();
+  else if (captureRun) await captureRun;
   process.exit(0);
 };
 process.on("SIGINT", () => { void shutdown(); });

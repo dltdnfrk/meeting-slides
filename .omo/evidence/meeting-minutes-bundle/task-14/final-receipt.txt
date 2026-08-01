@@ -1,0 +1,12 @@
+T14 complete.
+
+Verified:
+- bun test tests/conclusion.test.ts tests/review-actions.test.ts tests/bundle.test.ts
+- bun test
+- bunx tsc -p tsconfig.json --noEmit
+- git diff --check
+- real WS/SQLite/filesystem/PDF conclusion coverage in tests/review-actions.test.ts
+
+Notes:
+- No full-suite failures remained.
+- Evidence files written under .omo/evidence/meeting-minutes-bundle/task-14/.

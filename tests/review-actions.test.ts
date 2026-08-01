@@ -263,6 +263,8 @@ beforeAll(async () => {
     env: {
       ...process.env,
       MEETINGS_DB_PATH: dbPath,
+      MEETING_BUNDLE_OUTPUT_ROOT: join(tempDir, "exports"),
+      MEETING_BUNDLE_TARGET_COMMIT: "0123456789abcdef0123456789abcdef01234567",
       HTTP_PORT: String(port),
       OPEN_BROWSER: "false",
       LLM_PROVIDER: "cli",
@@ -314,7 +316,7 @@ afterAll(async () => {
   rmSync(tempDir, { recursive: true, force: true });
 });
 
-test("real WS actions reject adversarial patches, persist valid changes, and confirm without artifacts", async () => {
+test("real WS actions reject adversarial patches, persist valid changes, and conclude with one complete bundle", async () => {
   await wsError({ action: "confirmReview", reviewId: "not-started" }, "REVIEW_NOT_DRAFT");
   await wsError({ action: "confirmReview" }, "INVALID_REVIEW_REQUEST");
   await wsError({ action: "confirmReview", reviewId }, "PENDING_REVIEW_ITEMS");
@@ -364,7 +366,8 @@ test("real WS actions reject adversarial patches, persist valid changes, and con
   };
   expect(persistedReview.status).toBe("confirmed");
   expect(persistedReview.confirmed_at).toBeGreaterThan(0);
-  expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
-  expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
+  expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles WHERE status = 'complete'").get()).toEqual({ count: 1 });
+  expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 4 });
+  expect(db.query("SELECT COUNT(*) AS count FROM meeting_conclusions").get()).toEqual({ count: 1 });
   db.close();
 }, 20_000);

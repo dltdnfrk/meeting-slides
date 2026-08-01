@@ -60,7 +60,7 @@ function loadSnapshot(store: MinutesStore, meetingId: number, reviewId: string) 
   const meta = store.meetingMeta(meetingId);
   if (!meeting || !meta) throw new Error("[MEETING_NOT_FOUND] meeting metadata is missing");
   const attendees = store.attendeesFor(meetingId), lines = store.transcriptVersionLines(version.transcriptVersionId);
-  const storedBytes = enc.encode(lines.map((line) => JSON.stringify({ seq: line.seq, captured_at_ms: line.capturedAtMs, audio_start_ms: line.audioStartMs, audio_end_ms: line.audioEndMs, speaker_turn: line.speakerTurn, text: line.text })).join("\n") + (lines.length ? "\n" : ""));
+  const storedBytes = enc.encode(lines.map((line) => JSON.stringify({ seq: line.seq, ts: line.capturedAtMs, speaker_turn: line.speakerTurn, text: line.text })).join("\n") + (lines.length ? "\n" : ""));
   if (hash(storedBytes) !== version.contentSha256) throw new Error("[TRANSCRIPT_INTEGRITY_FAILED] canonical transcript rows do not match their finalized hash");
   const transcriptBytes = enc.encode(lines.map((line) => JSON.stringify({ seq: line.seq, ts: line.capturedAtMs, speaker_turn: line.speakerTurn, text: line.text })).join("\n") + (lines.length ? "\n" : ""));
   const select = (table: string, id: string) => db.query(`SELECT *, ${id} AS item_id FROM ${table} WHERE review_id = ? AND review_state = 'confirmed' ORDER BY created_at, ${id}`).all(reviewId) as Row[];

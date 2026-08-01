@@ -1,0 +1,12 @@
+{
+  "taskId": "st_019fbde5",
+  "status": "done",
+  "summary": "Conclusion flow now atomically confirms reviews only after a successful bundle publish and persists the concluded meeting identity.",
+  "verification": [
+    "bun test tests/conclusion.test.ts tests/review-actions.test.ts tests/bundle.test.ts",
+    "bun test",
+    "bunx tsc -p tsconfig.json --noEmit",
+    "git diff --check",
+    "real WS/SQLite/filesystem/PDF conclusion coverage via tests/review-actions.test.ts"
+  ]
+}

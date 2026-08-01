@@ -134,6 +134,18 @@ export interface ReviewConfirmed {
   confirmedAt: number;
 }
 
+export interface MeetingConcluded {
+  type: "meetingConcluded";
+  concluded: true;
+  meetingId: number;
+  reviewId: string;
+  transcriptVersionId: string;
+  bundleId: string;
+  bundlePath: string;
+  manifest: { sha256: string; targetCommit: string };
+  concludedAt: number;
+}
+
 /** LLM 블록 감지 진행 표시 (관찰성: 사람·AI 모두 "지금 만드는 중"을 읽을 수 있게) */
 export interface DetectUpdate {
   type: "detect";
@@ -146,7 +158,7 @@ export interface SavedUpdate {
   path: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | ReviewItemUpdated | ReviewConfirmed | LineUpdate | DetectUpdate | SavedUpdate;
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | ReviewItemUpdated | ReviewConfirmed | MeetingConcluded | LineUpdate | DetectUpdate | SavedUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 

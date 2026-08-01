@@ -117,7 +117,7 @@ describe("meeting conclusion", () => {
     };
 
     await expect(concludeMeeting(fx.reviewId, options(fx, { exporter }))).rejects.toThrow("injected bundle failure");
-    expect(fx.store.review(fx.reviewId)?.status).toBe("confirmed");
+    expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
     expect(persisted(fx.store)).toBeNull();
     expect(existsSync(fx.outputRoot) ? readdirSync(fx.outputRoot) : []).toEqual([]);
 
