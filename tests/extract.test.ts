@@ -73,6 +73,43 @@ describe("parseMinutesExtractionJson", () => {
     }]);
   });
 
+  test("normalizes deadlines only from explicit source text, never model inference", () => {
+    const input = {
+      ...request,
+      lines: [
+        ...request.lines,
+        { seq: 4, speakerTurn: 2, text: "밥이 내일까지 완료하겠습니다." },
+      ],
+    };
+    const parsed = parseMinutesExtractionJson(payload({
+      actionItems: [
+        {
+          description: "QA 결과 공유",
+          sourceSegment: { transcript_version_id: "tv-1", start_seq: 2, end_seq: 2 },
+          evidenceQuote: "QA 결과를 공유",
+          suggestedAttributionAttendeeId: "alice",
+          suggestedAssigneeAttendeeId: "alice",
+          deadline: "2026-08-08",
+          deadlineText: "2026-08-07까지",
+        },
+        {
+          description: "보고 완료",
+          sourceSegment: { transcript_version_id: "tv-1", start_seq: 4, end_seq: 4 },
+          evidenceQuote: "내일까지 완료",
+          suggestedAttributionAttendeeId: "bob",
+          suggestedAssigneeAttendeeId: "bob",
+          deadline: "2026-08-02",
+          deadlineText: "내일까지",
+        },
+      ],
+    }), input);
+
+    expect(parsed.actionItems.map(({ deadline, deadlineText }) => ({ deadline, deadlineText }))).toEqual([
+      { deadline: "2026-08-07", deadlineText: "2026-08-07까지" },
+      { deadline: null, deadlineText: "내일까지" },
+    ]);
+  });
+
   test("diagnoses every provenance rejection without keeping invalid candidates", () => {
     const sparse = { ...request, lines: [request.lines[0]!, request.lines[2]!, { seq: 5, speakerTurn: null, text: "끝" }] };
     const cases: Array<[string, MinutesExtractionInput, Record<string, unknown>, string]> = [

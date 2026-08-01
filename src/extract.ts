@@ -87,6 +87,11 @@ function sourceFrom(raw: Record<string, unknown>): SourceSegmentRef | null {
   };
 }
 
+function sourceText(source: SourceSegmentRef, request: MinutesExtractionInput): string {
+  return request.lines.filter((line) => line.seq >= source.start_seq && line.seq <= source.end_seq)
+    .map((line) => line.text).join("\n");
+}
+
 function rejectionFor(
   raw: Record<string, unknown>, request: MinutesExtractionInput,
 ): CandidateRejectionCode | null {
@@ -106,9 +111,9 @@ function rejectionFor(
     if (!lines.has(seq)) return "non_contiguous_range";
   }
   const quote = raw.evidenceQuote;
-  if (typeof quote !== "string" || !quote ||
-      !request.lines.filter((line) => line.seq >= source.start_seq && line.seq <= source.end_seq)
-        .map((line) => line.text).join("\n").includes(quote)) return "evidence_quote_mismatch";
+  if (typeof quote !== "string" || !quote || !sourceText(source, request).includes(quote)) {
+    return "evidence_quote_mismatch";
+  }
   const attendeeIds = new Set(request.attendees.map((attendee) => attendee.attendeeId));
   for (const key of ["suggestedAttributionAttendeeId", "suggestedAssigneeAttendeeId"] as const) {
     const value = raw[key];
@@ -151,12 +156,18 @@ export function parseMinutesExtractionJson(content: string, request: MinutesExtr
       };
       if (kind === "decision") result.decisions.push(base);
       else if (kind === "open_item") result.openItems.push(base);
-      else result.actionItems.push({
-        ...base,
-        suggestedAssigneeAttendeeId: raw.suggestedAssigneeAttendeeId as string | null ?? null,
-        deadline: typeof raw.deadline === "string" ? raw.deadline : null,
-        deadlineText: typeof raw.deadlineText === "string" ? raw.deadlineText : null,
-      });
+      else {
+        const transcriptText = sourceText(base.sourceSegment, request);
+        const suggestedDeadlineText = raw.deadlineText;
+        const deadlineText = typeof suggestedDeadlineText === "string" && suggestedDeadlineText &&
+          transcriptText.includes(suggestedDeadlineText) ? suggestedDeadlineText : null;
+        result.actionItems.push({
+          ...base,
+          suggestedAssigneeAttendeeId: raw.suggestedAssigneeAttendeeId as string | null ?? null,
+          deadline: deadlineText ? absoluteDeadline(deadlineText) : null,
+          deadlineText,
+        });
+      }
     });
   }
   return result;
