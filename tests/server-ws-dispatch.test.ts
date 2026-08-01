@@ -90,7 +90,7 @@ beforeAll(async () => {
   rmSync(join(root, "exports"), { recursive: true, force: true });
 
   port = 18_700 + (process.pid % 500);
-  child = spawn(process.execPath, ["run", "server.ts"], {
+  child = spawn(process.execPath, ["server.ts"], {
     cwd: root,
     env: {
       ...process.env,
@@ -115,8 +115,9 @@ beforeAll(async () => {
 afterAll(async () => {
   if (socket?.readyState === WebSocket.OPEN) socket.close();
   if (child && child.exitCode === null) {
-    child.kill("SIGTERM");
-    await waitFor<void>((done) => child.once("close", () => done()));
+    const closed = waitFor<void>((done) => child.once("close", () => done()));
+    child.kill("SIGKILL");
+    await closed;
   }
   for (const artifact of createdArtifacts) rmSync(join(root, artifact), { recursive: true, force: true });
   rmSync(join(root, "exports"), { recursive: true, force: true });

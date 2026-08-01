@@ -69,6 +69,27 @@ describe("MinutesStore SQLite contracts", () => {
     legacy.close();
   });
 
+  test("replaces prepared attendees and locks the roster after review confirmation", () => {
+    const { legacy, minutes } = stores();
+    const { meetingId, transcriptVersionId } = preparedTranscript(minutes);
+    minutes.replaceAttendees(meetingId, [
+      { attendeeId: "alice-local", displayName: "Alice Kim", sortOrder: 0 },
+      { attendeeId: "dana-local", displayName: "Dana", sortOrder: 1 },
+    ]);
+    expect(minutes.attendeesFor(meetingId)).toEqual([
+      { attendeeId: "alice-local", displayName: "Alice Kim", crmPersonEntityId: null, sortOrder: 0 },
+      { attendeeId: "dana-local", displayName: "Dana", crmPersonEntityId: null, sortOrder: 1 },
+    ]);
+
+    const reviewId = minutes.saveCandidates({ meetingId, transcriptVersionId });
+    minutes.confirmReview(reviewId, "reviewer");
+    expect(() => minutes.replaceAttendees(meetingId, [
+      { attendeeId: "alice-local", displayName: "Changed" },
+    ])).toThrow(/locked after review confirmation/);
+    expect(minutes.attendeesFor(meetingId)[0]?.displayName).toBe("Alice Kim");
+    legacy.close();
+  });
+
   test("versions immutable transcript lines, finalizes, and selects canonical", () => {
     const { legacy, minutes } = stores();
     const { meetingId, transcriptVersionId } = preparedTranscript(minutes);

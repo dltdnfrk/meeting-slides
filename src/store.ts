@@ -92,6 +92,17 @@ export class MeetingStore {
     return this.meetingId;
   }
 
+  /** 준비 단계에서 이미 만든 회의를 현재 캡처 대상으로 연결한다. */
+  activateMeeting(meetingId: number): void {
+    const meeting = this.db.query("SELECT id FROM meetings WHERE id = ?").get(meetingId);
+    if (!meeting) throw new Error(`unknown meeting ${meetingId}`);
+    const latest = this.db.query(
+      "SELECT coalesce(MAX(seq), 0) AS seq FROM transcript_lines WHERE meeting_id = ?",
+    ).get(meetingId) as { seq: number };
+    this.meetingId = meetingId;
+    this.lineSeq = latest.seq;
+  }
+
   endMeeting(): void {
     if (this.meetingId === null) return;
     this.db.run("UPDATE meetings SET ended_at = ? WHERE id = ?", [Date.now(), this.meetingId]);

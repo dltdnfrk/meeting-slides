@@ -11,11 +11,12 @@ import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
+import { MinutesStore, type AttendeeInput } from "./src/minutes-store.ts";
 import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
 import { copyDeckAssets } from "./src/deck-assets.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { join, sep } from "node:path";
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { spawn, spawnSync } from "child_process";
@@ -48,7 +49,9 @@ const broadcast = (msg: ServerMessage) => {
   for (const l of listeners) { try { l(msg); } catch {} }
 };
 // anarlog(fastrepl) 방식: 전사·슬라이드를 로컬 SQLite에 영속 저장
-const store = new MeetingStore(join(import.meta.dir, "meetings.db"));
+const databasePath = process.env.MEETINGS_DB_PATH ?? join(import.meta.dir, "meetings.db");
+const store = new MeetingStore(databasePath);
+const minutesStore = new MinutesStore(store.databaseHandle());
 const session = new MeetingSession(
   llm,
   config.block.detectInterval,
@@ -166,6 +169,58 @@ interface WsCommand {
   key?: string;
   model?: string;
   effort?: string;
+  meeting_id?: unknown;
+  purpose?: unknown;
+  attendees?: unknown;
+}
+
+let currentMeetingId: number | null = null;
+
+function requestError(ws: ServerWebSocket<undefined>, error: unknown): void {
+  const message = error instanceof Error ? error.message : String(error);
+  ws.send(JSON.stringify({ type: "status" as const, text: `요청 처리 실패: ${message}` }));
+}
+
+function parseAttendees(value: unknown): AttendeeInput[] {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error("attendees must contain at least one attendee");
+  }
+  const attendeeIds = new Set<string>();
+  const crmPersonIds = new Set<string>();
+  return value.map((raw, index) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      throw new Error(`attendees[${index}] must be an object`);
+    }
+    const attendee = raw as Record<string, unknown>;
+    if (typeof attendee.name !== "string" || !attendee.name.trim()) {
+      throw new Error(`attendees[${index}].name must be a non-blank string`);
+    }
+    let attendeeId: string;
+    if (attendee.attendeeId === undefined) attendeeId = randomUUID();
+    else if (typeof attendee.attendeeId !== "string" || !attendee.attendeeId.trim()) {
+      throw new Error(`attendees[${index}].attendeeId must be a non-blank string when provided`);
+    } else attendeeId = attendee.attendeeId.trim();
+    if (attendeeIds.has(attendeeId)) throw new Error(`duplicate attendeeId: ${attendeeId}`);
+    attendeeIds.add(attendeeId);
+
+    let crmPersonEntityId: string | null = null;
+    if (attendee.crmPersonId !== undefined && attendee.crmPersonId !== null) {
+      if (typeof attendee.crmPersonId !== "string" || !attendee.crmPersonId.trim()) {
+        throw new Error(`attendees[${index}].crmPersonId must be a non-blank string or null`);
+      }
+      crmPersonEntityId = attendee.crmPersonId.trim();
+      if (crmPersonIds.has(crmPersonEntityId)) throw new Error(`duplicate crmPersonId: ${crmPersonEntityId}`);
+      crmPersonIds.add(crmPersonEntityId);
+    }
+    return { attendeeId, displayName: attendee.name.trim(), crmPersonEntityId, sortOrder: index };
+  });
+}
+
+function parsePurpose(value: unknown): string | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (typeof value !== "string" || !value.trim()) throw new Error("purpose must be a non-blank string or null");
+  return value.trim();
 }
 
 type WsActionContext = {
@@ -176,7 +231,7 @@ type WsActionContext = {
 type WsActionHandler = (ctx: WsActionContext) => void;
 
 const handleStartCapture: WsActionHandler = ({ ws, cmd }) => {
-  void startCapture();
+  void startCapture(cmd.meeting_id).catch((error) => requestError(ws, error));
 };
 
 const handleStopCapture: WsActionHandler = ({ ws, cmd }) => {
@@ -187,8 +242,36 @@ const handleReset: WsActionHandler = ({ ws, cmd }) => {
   session.reset();
   // 회의 저장소도 새 회의로 전환 (캡처 중이면 이어서 기록)
   store.endMeeting();
-  if (capturing) store.startMeeting(currentProviderId);
+  if (currentMeetingId !== null && minutesStore.meetingMeta(currentMeetingId)?.phase !== "ended") {
+    minutesStore.endMeeting(currentMeetingId);
+  }
+  if (capturing) {
+    currentMeetingId = store.startMeeting(currentProviderId);
+    minutesStore.registerCapturingMeeting(currentMeetingId);
+  } else {
+    currentMeetingId = null;
+  }
   broadcast(session.transcript("snapshot"));
+};
+
+const handleSetAttendees: WsActionHandler = ({ cmd }) => {
+  const attendees = parseAttendees(cmd.attendees);
+  const purpose = parsePurpose(cmd.purpose);
+  const meetingId = currentMeetingId ?? minutesStore.ensurePreparedMeeting(currentProviderId, purpose ?? null);
+  const meta = minutesStore.meetingMeta(meetingId);
+  if (!meta) throw new Error(`unknown meeting ${meetingId}`);
+  minutesStore.replaceAttendees(meetingId, attendees);
+  if (purpose !== undefined) minutesStore.setMeetingPurpose(meetingId, purpose);
+  currentMeetingId = meetingId;
+  broadcast({
+    type: "attendees",
+    meeting_id: meetingId,
+    attendees: minutesStore.attendeesFor(meetingId).map((attendee) => ({
+      attendee_id: attendee.attendeeId,
+      display_name: attendee.displayName,
+      ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
+    })),
+  });
 };
 
 const handleStatus: WsActionHandler = ({ ws, cmd }) => {
@@ -469,6 +552,7 @@ export const handlerMap = new Map<string, WsActionHandler>([
   ["startCapture", handleStartCapture],
   ["stopCapture", handleStopCapture],
   ["reset", handleReset],
+  ["setAttendees", handleSetAttendees],
   ["status", handleStatus],
   ["transcript", handleTranscript],
   ["exportDeck", handleDeckExport],
@@ -592,9 +676,24 @@ const whisperHandlers = {
   },
 };
 
-async function startCapture(): Promise<void> {
-  if (capturing) return;
-  capturing = true;
+async function startCapture(requestedMeetingId?: unknown): Promise<void> {
+  if (capturing) {
+    if (requestedMeetingId === undefined) return;
+    throw new Error("capture is already running");
+  }
+  let preparedMeetingId: number | null = null;
+  if (requestedMeetingId !== undefined) {
+    if (!Number.isInteger(requestedMeetingId) || (requestedMeetingId as number) < 1) {
+      throw new Error("meeting_id must be a positive integer");
+    }
+    preparedMeetingId = requestedMeetingId as number;
+    if (currentMeetingId === null || preparedMeetingId !== currentMeetingId) {
+      throw new Error(`meeting ${preparedMeetingId} does not match the current prepared meeting`);
+    }
+    if (minutesStore.meetingMeta(preparedMeetingId)?.phase !== "prepared") {
+      throw new Error(`meeting ${preparedMeetingId} is not prepared`);
+    }
+  }
   // 빠른 시작/중지 반복 시 이전 whisper 자식이 완전히 종료되기 전에
   // 새 start가 들어오면 마이크 장치 경쟁이 발생한다. stop이 끝날 때까지 대기.
   if (stopPromise) await stopPromise;
@@ -603,13 +702,24 @@ async function startCapture(): Promise<void> {
   if (config.input.mode === "mic") {
     spawnSync("pkill", ["-f", `${config.whisper.streamBin} -m ${config.whisper.modelPath}`], { stdio: "ignore" });
   }
-  store.startMeeting(currentProviderId);
+  if (preparedMeetingId === null) {
+    currentMeetingId = store.startMeeting(currentProviderId);
+    minutesStore.registerCapturingMeeting(currentMeetingId);
+  } else {
+    minutesStore.activatePreparedMeeting(preparedMeetingId);
+    store.activateMeeting(preparedMeetingId);
+  }
+  capturing = true;
   broadcast(captureMessage());
   broadcast({ type: "status", text: "🎤 녹음 시작 — 말씀하세요" });
   void whisper.start(whisperHandlers).then(async () => {
     await session.flush();
     const wasCapturing = capturing;
     capturing = false;
+    if (wasCapturing && currentMeetingId !== null) {
+      store.endMeeting();
+      minutesStore.endMeeting(currentMeetingId);
+    }
     broadcast(captureMessage());
     if (config.input.mode === "mic" && wasCapturing) {
       // 사용자가 중지하지 않았는데 캡처가 끝남 = 장치/권한 이상
@@ -619,7 +729,12 @@ async function startCapture(): Promise<void> {
       broadcast({ type: "status", text: "입력 종료" });
     }
   }).catch((e: unknown) => {
+    const wasCapturing = capturing;
     capturing = false;
+    if (wasCapturing && currentMeetingId !== null) {
+      store.endMeeting();
+      minutesStore.endMeeting(currentMeetingId);
+    }
     broadcast(captureMessage());
     const message = e instanceof Error ? e.message : String(e);
     console.error(`[whisper fatal] ${message}`);
@@ -638,6 +753,7 @@ async function stopCapture(): Promise<void> {
     await p;
     await session.flush();
     store.endMeeting();
+    if (currentMeetingId !== null) minutesStore.endMeeting(currentMeetingId);
     broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
   } finally {
     stopPromise = null;
@@ -648,19 +764,26 @@ if (config.input.mode === "file") {
   void startCapture();
 }
 
+const shutdown = async () => {
+  console.log("\n종료 중...");
+  // 캡처를 먼저 멈춰야 flush 도중 새 청크가 끼어들어 문장이 유실되지 않는다.
+  await whisper.stop();
+  await session.flush();
+  if (capturing && currentMeetingId !== null) {
+    capturing = false;
+    store.endMeeting();
+    if (minutesStore.meetingMeta(currentMeetingId)?.phase === "capturing") {
+      minutesStore.endMeeting(currentMeetingId);
+    }
+  }
+  process.exit(0);
+};
+process.on("SIGINT", () => { void shutdown(); });
+process.on("SIGTERM", () => { void shutdown(); });
+
 const ok = await llm.ping();
 if (ok) {
   console.log(`LLM 연결 OK: ${config.llm.provider} / ${llmLabel}`);
 } else {
   console.warn(`LLM 핑 실패 - 서버는 동작함. provider=${config.llm.provider}`);
 }
-
-const shutdown = async () => {
-  console.log("\n종료 중...");
-  // 캡처를 먼저 멈춰야 flush 도중 새 청크가 끼어들어 문장이 유실되지 않는다.
-  await whisper.stop();
-  await session.flush();
-  process.exit(0);
-};
-process.on("SIGINT", () => { void shutdown(); });
-process.on("SIGTERM", () => { void shutdown(); });

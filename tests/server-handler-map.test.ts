@@ -7,6 +7,7 @@ const existingActions = [
   "startCapture",
   "stopCapture",
   "reset",
+  "setAttendees",
   "status",
   "transcript",
   "exportDeck",
