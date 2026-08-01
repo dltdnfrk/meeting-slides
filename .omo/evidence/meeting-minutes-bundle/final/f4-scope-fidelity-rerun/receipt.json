@@ -1,0 +1,34 @@
+{
+  "verdict": "PASS",
+  "audited_governance_target": "b86610058e2cff22319976b23dd6d48282f7d678",
+  "audited_governance_parent": "7123fd986fceb981c358ad1b73531fab6bd8dc16",
+  "audited_governance_tree": "5e9c65aa72f9c59c7ae4554d137a069c56f12bd0",
+  "product_target": "6711ecfcb47f75b1bb22377d97dd551538568ad7",
+  "baseline": "921a01513593c0e10181cf01e535a7abe995deb3",
+  "f4_evidence_commit": "5187f3090e0d16a55be4b5e2bd88ab47406911a1",
+  "f4_evidence_parent": "b86610058e2cff22319976b23dd6d48282f7d678",
+  "f4_evidence_tree": "17a7dc557fa059c795405eee9b8b89807c037b1c",
+  "report_git_blob": "6cab158a8ec5be5a608917fd7f85086e999a8703",
+  "report_sha256": "3c4fdf55e46619ef2e6bc60623033ca0946ff07f84a45e1d00f90924a1a7011b",
+  "receipt_carrier_parent": "5187f3090e0d16a55be4b5e2bd88ab47406911a1",
+  "verified_by": "st_019fbee6 / 019fbeef-0810-7757-a53c-3af346b6b243",
+  "verified_at": "2026-08-01T20:20:00Z",
+  "gates": {
+    "t4_t14_immutable_receipts": "PASS",
+    "baseline_ancestry": "PASS: 36 commits, 0 merges at audited target",
+    "product_scope_after_6711ecf": "PASS: 0 product paths",
+    "prohibited_integrations": "PASS: 0 semantic hits",
+    "focused_real_surfaces": "PASS: 67/67",
+    "strict_typescript": "PASS",
+    "browser_checkjs": "PASS",
+    "isolated_full_suite": "PASS: 209/209, 29/29 files",
+    "diff_checks": "PASS",
+    "untracked_non_evidence": "PASS: 0",
+    "main_tracked_preservation": "PASS"
+  },
+  "retained_failures": {
+    "combined_focus_without_vendor_link": "retained in 01-focused-real-surfaces.txt; clean isolated rerun passed",
+    "single_process_full_suite": "207/209 in 07-full-suite-serial.txt; complete isolated serial rerun passed 209/209",
+    "historical_manual_driver": "stale schema/payload driver, not used as PASS evidence"
+  }
+}
