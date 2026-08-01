@@ -1,7 +1,7 @@
 // ============================================================
 // review-panel.js — 회의록 후보 검토 오버레이
-// review 메시지(자체완전 페이로드)를 받아 결정/액션/미결/참조자료 후보를
-// 카드로 세우고, 근거 인용 + 불변 전사 좌표(version_id, seq)를 함께 보여준다.
+// review 메시지(자체완전 페이로드)를 받아 결정/액션/미결 후보를 카드로
+// 세우고, 근거 인용 + 불변 전사 좌표(version_id, seq)를 함께 보여준다.
 // 귀속·담당자는 참석자 명단 드롭다운으로만 지정한다(자유입력 없음 — D8).
 // 슬라이드 셸은 그대로 두고 위에 얹히며, 캡처를 하드 게이트하지 않는다.
 // ============================================================
@@ -29,11 +29,13 @@ function createReviewPanel(transport) {
   const toggleEl = byId("btn-review");
   const countEl = byId("review-count");
 
+  // updateItem의 kind 계약과 정확히 같은 집합이다(server.ts parseReviewKind).
+  // 여기 없는 kind를 카드로 세우면 그 카드의 모든 조작은 서버가 반드시
+  // INVALID_REVIEW_REQUEST로 거절하므로, 사용자에게 거짓 손잡이를 주는 셈이다.
   const KIND_LABEL = {
     decision: "결정",
     action_item: "액션",
     open_item: "미결",
-    referenced_material: "참조 자료",
   };
   const STATUS_LOADING = "회의록 후보 추출 중…";
   const STATUS_FAILED = "회의록 후보 추출 실패·재시도";
@@ -63,6 +65,7 @@ function createReviewPanel(transport) {
     if (typeof versionId !== "string" || !versionId) return null;
     if (!isFiniteInt(source.start_seq) || !isFiniteInt(source.end_seq)) return null;
     if (source.start_seq < 1 || source.end_seq < source.start_seq) return null;
+    if (typeof raw.evidenceQuote !== "string" || !raw.evidenceQuote.trim()) return null;
     return {
       id: raw.id,
       kind: raw.kind,
@@ -70,7 +73,7 @@ function createReviewPanel(transport) {
       transcriptVersionId: versionId,
       startSeq: source.start_seq,
       endSeq: source.end_seq,
-      evidenceQuote: typeof raw.evidenceQuote === "string" ? raw.evidenceQuote : "",
+      evidenceQuote: raw.evidenceQuote,
       segmentText: typeof raw.segment_text === "string" ? raw.segment_text : "",
       attributedAttendeeId: typeof raw.attributedAttendeeId === "string" ? raw.attributedAttendeeId : "",
       assigneeAttendeeId: typeof raw.assigneeAttendeeId === "string" ? raw.assigneeAttendeeId : "",

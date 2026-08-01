@@ -1,0 +1,39 @@
+Task: 8 - public review-panel overlay with attendee dropdown attribution
+Base commit: b12706c2b1099f315f19c6bf528880789be18bbe
+Target commit: the commit carrying this receipt, with exact subject feat(public): add review-panel overlay with attendee dropdown attribution
+Target source blob: public/review-panel.js ea8ccf9c3969387bb3af6dc708940e37bd42b066
+Target test blob: tests/public-review.test.ts 334bf122ed7358bab0a23f94bcd6f80331f741cb
+Verified by: hephaestus (senpi task st_019fbe5a; PI_SESSION_ID 019fbe5a-01d4-70fb-9238-c398c8ec1992; model gpt-5.6-sol)
+Verified at: 2026-08-01T17:25:46Z
+
+Implemented scope:
+- Candidate cards retain description, evidenceQuote, and transcript-version-scoped seq coordinates.
+- Only decision, action_item, and open_item are actionable; malformed/unsupported candidates, including missing/blank evidence, are rejected.
+- Attribution/assignee controls are attendee-only selects; absent rosters show disabled controls and an explicit notice.
+- Mutations emit updateItem; confirmation emits confirmReview; empty extraction has a disabled-confirm notice.
+
+Commands and gates:
+- bun test tests/public-review.test.ts => PASS (32 tests, 55 assertions)
+- bun .omo/evidence/meeting-minutes-bundle/task-8/browser-qa.ts => PASS (real Chrome/150 DOM, desktop/mobile, wire, malformed JSON/object, unsupported-kind, missing-evidence probes)
+- bun test => PASS (195 tests, 725 assertions, 27 files)
+- bunx tsc --noEmit => PASS
+- git diff --check => PASS
+- direct JS checkJs diagnostics => 13 pre-existing DOM-narrowing diagnostics, identical in category/count to T7 and excluded by tsconfig; project tsc is clean
+
+Evidence:
+- 02-focused-public-review.txt
+- 03-browser-qa-adversarial.json
+- qa-desktop.png
+- qa-mobile.png
+- 04-full-bun-test.txt
+- 05-tsc.txt
+- 06-git-diff-check.txt
+- 07-browser-js-diagnostics-vs-t7.txt
+- 08-test-diagnostics.txt
+
+Main-worktree preservation:
+- before receipt: main-worktree-before.txt
+- after HEAD: 921a01513593c0e10181cf01e535a7abe995deb3
+- after status_sha256: 6c4f788dd1ca722616c93650f5dd97da57ee2cad60589e9e222293fb498ba0d4
+- after tracked_diff_sha256: bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9
+- result: main worktree was read only; its pre-existing dirty state was not changed by Task 8.

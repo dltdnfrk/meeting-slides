@@ -626,7 +626,51 @@ describe("hostile payloads", () => {
     }))).toEqual({ rows: 3, shellAlive: true, panelHidden: false });
   });
 
-  test("items missing evidence coordinates are refused rather than rendered uncited", async () => {
+  test("a kind outside the updateItem wire contract is refused, not rendered as an actionable card", async () => {
+    // server.ts parseReviewKind accepts only decision | action_item | open_item.
+    // Rendering any other kind would offer attribution and drop controls whose
+    // updateItem the server is guaranteed to reject with INVALID_REVIEW_REQUEST.
+    await openReview({
+      items: [
+        {
+          id: "ok-1",
+          kind: "decision",
+          description: "계약 가능한 결정",
+          sourceSegment: { transcript_version_id: VERSION_ID, start_seq: 1, end_seq: 1 },
+          evidenceQuote: "가격 정책은 구독으로 확정합니다.",
+          segment_text: "가격 정책은 구독으로 확정합니다.",
+          attributedAttendeeId: null,
+        },
+        {
+          id: "mat-1",
+          kind: "referenced_material",
+          description: "참조 자료 후보",
+          sourceSegment: { transcript_version_id: VERSION_ID, start_seq: 2, end_seq: 2 },
+          evidenceQuote: "제가 계약서 초안을 금요일까지 공유하겠습니다.",
+          segment_text: "제가 계약서 초안을 금요일까지 공유하겠습니다.",
+          attributedAttendeeId: null,
+        },
+      ],
+    });
+    expect(await page.evaluate(() =>
+      Array.from(document.querySelectorAll(".review-item")).map((r) => (r as HTMLElement).dataset.itemId),
+    )).toEqual(["ok-1"]);
+
+    // Nothing on the refused candidate can reach the wire.
+    await clearSent();
+    await page.evaluate(() => {
+      document.querySelectorAll('.review-item[data-item-id="mat-1"] button, .review-item[data-item-id="mat-1"] select')
+        .forEach((control) => (control as HTMLElement).click());
+    });
+    expect(await sent()).toEqual([]);
+
+    // The kept candidate still confirms, so one bad kind cannot block the review.
+    await clearSent();
+    await page.click("#btn-review-confirm");
+    expect(await sent()).toEqual([{ action: "confirmReview", reviewId: "rev-001" }]);
+  });
+
+  test("items missing required evidence or source coordinates are refused rather than rendered uncited", async () => {
     await openReview({
       items: [
         {
@@ -644,8 +688,25 @@ describe("hostile payloads", () => {
           kind: "decision",
           description: "좌표 깨진 결정",
           sourceSegment: { transcript_version_id: "", start_seq: 0, end_seq: -1 },
-          evidenceQuote: "",
-          segment_text: "",
+          evidenceQuote: "깨진 좌표의 인용",
+          segment_text: "깨진 좌표의 인용",
+          attributedAttendeeId: null,
+        },
+        {
+          id: "bad-3",
+          kind: "decision",
+          description: "인용 없는 결정",
+          sourceSegment: { transcript_version_id: VERSION_ID, start_seq: 2, end_seq: 2 },
+          segment_text: "인용 필드가 없는 구간 전문",
+          attributedAttendeeId: null,
+        },
+        {
+          id: "bad-4",
+          kind: "decision",
+          description: "빈 인용 결정",
+          sourceSegment: { transcript_version_id: VERSION_ID, start_seq: 3, end_seq: 3 },
+          evidenceQuote: "   ",
+          segment_text: "공백 인용의 구간 전문",
           attributedAttendeeId: null,
         },
       ],

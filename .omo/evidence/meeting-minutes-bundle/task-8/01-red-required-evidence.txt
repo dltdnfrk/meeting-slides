@@ -1,0 +1,29 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-review.test.ts:
+711 |         },
+712 |       ],
+713 |     });
+714 |     expect(await page.evaluate(() =>
+715 |       Array.from(document.querySelectorAll(".review-item")).map((r) => (r as HTMLElement).dataset.itemId),
+716 |     )).toEqual(["ok-1"]);
+             ^
+error: expect(received).toEqual(expected)
+
+  [
+    "ok-1",
++   "bad-3",
++   "bad-4",
+  ]
+
+- Expected  - 0
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/public-review.test.ts:716:8)
+(fail) hostile payloads > items missing required evidence or source coordinates are refused rather than rendered uncited [585.77ms]
+
+ 0 pass
+ 31 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [1146.00ms]
