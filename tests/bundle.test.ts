@@ -214,4 +214,26 @@ describe("exportBundle", () => {
     expect(fx.store.databaseHandle().query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
     expect(fx.store.databaseHandle().query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
   });
+
+  test("keeps an atomically published bundle when database finalization fails and deduplicates it on retry", async () => {
+    const fx = fixture();
+    fx.store.confirmReview(fx.reviewId);
+    const db = fx.store.databaseHandle();
+    db.run(`CREATE TRIGGER fail_bundle_finalize BEFORE INSERT ON artifact_bundles
+      BEGIN SELECT RAISE(ABORT, 'injected finalize failure'); END`);
+
+    await expect(run(fx)).rejects.toThrow("injected finalize failure");
+    const published = outputNames(fx.outputRoot);
+    expect(published).toHaveLength(1);
+    expect(published[0]).not.toContain(".tmp");
+    expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
+    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
+
+    db.run("DROP TRIGGER fail_bundle_finalize");
+    const retried = await run(fx);
+    expect(retried.deduplicated).toBe(true);
+    expect(basename(retried.bundlePath)).toBe(published[0]);
+    expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 1 });
+    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 4 });
+  });
 });

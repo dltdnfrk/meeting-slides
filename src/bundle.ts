@@ -86,9 +86,38 @@ function minutesJson(s: ReturnType<typeof loadSnapshot>, transcriptPath: string)
 function recordComplete(s: ReturnType<typeof loadSnapshot>, bundleId: string, bundlePath: string, entries: ManifestEntry[]) {
   const now = s.review.confirmed_at as number;
   s.db.transaction(() => {
-    s.db.run("INSERT OR IGNORE INTO artifact_bundles VALUES (?, ?, ?, ?, ?, 'complete', ?, ?)", [bundleId, s.meeting.id as number, s.review.review_id as string, s.version.transcriptVersionId, bundlePath, now, now]);
+    const existing = s.db.query(`
+      SELECT meeting_id, review_id, transcript_version_id, bundle_path, status
+      FROM artifact_bundles WHERE bundle_id = ?
+    `).get(bundleId) as {
+      meeting_id: number; review_id: string; transcript_version_id: string;
+      bundle_path: string; status: string;
+    } | null;
+    if (existing && (existing.meeting_id !== s.meeting.id || existing.review_id !== s.review.review_id ||
+        existing.transcript_version_id !== s.version.transcriptVersionId || existing.bundle_path !== bundlePath ||
+        existing.status !== "complete")) {
+      throw new Error("[BUNDLE_IDENTITY_MISMATCH] persisted bundle identity differs");
+    }
+    if (!existing) s.db.run("INSERT INTO artifact_bundles VALUES (?, ?, ?, ?, ?, 'complete', ?, ?)", [bundleId, s.meeting.id as number, s.review.review_id as string, s.version.transcriptVersionId, bundlePath, now, now]);
     const specs: Array<[string, string]> = [["minutes_pdf", "minutes.pdf"], ["minutes_json", "minutes.json"], ["canonical_transcript", `transcript.v${s.version.versionNo}.jsonl`], ["slide_deck", "deck/index.html"]];
-    for (const [type, path] of specs) { const entry = entries.find((candidate) => candidate.path === path); if (!entry) throw new Error(`[BUNDLE_INCOMPLETE] missing database artifact ${path}`); s.db.run("INSERT OR IGNORE INTO artifacts VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [`${bundleId}:${type}`, bundleId, type, path, entry.content_type, entry.sha256, entry.byte_size, now]); }
+    for (const [type, path] of specs) {
+      const entry = entries.find((candidate) => candidate.path === path);
+      if (!entry) throw new Error(`[BUNDLE_INCOMPLETE] missing database artifact ${path}`);
+      const artifactId = `${bundleId}:${type}`;
+      s.db.run("INSERT OR IGNORE INTO artifacts VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [artifactId, bundleId, type, path, entry.content_type, entry.sha256, entry.byte_size, now]);
+      const recorded = s.db.query(`
+        SELECT bundle_id, artifact_type, relative_path, media_type, sha256, byte_length
+        FROM artifacts WHERE artifact_id = ?
+      `).get(artifactId) as {
+        bundle_id: string; artifact_type: string; relative_path: string;
+        media_type: string; sha256: string; byte_length: number;
+      } | null;
+      if (!recorded || recorded.bundle_id !== bundleId || recorded.artifact_type !== type ||
+          recorded.relative_path !== path || recorded.media_type !== entry.content_type ||
+          recorded.sha256 !== entry.sha256 || recorded.byte_length !== entry.byte_size) {
+        throw new Error(`[BUNDLE_IDENTITY_MISMATCH] persisted artifact ${type} differs`);
+      }
+    }
   })();
 }
 
@@ -98,9 +127,15 @@ export async function exportBundle(meetingId: number, reviewId: string, options:
   const targetCommit = options.targetCommit.toLowerCase();
   if (!/^[0-9a-f]{40}$/.test(targetCommit)) throw new Error("targetCommit must be a 40-character git commit");
   const s = loadSnapshot(options.store, meetingId, reviewId), identity = hash(enc.encode(`${meetingId}\0${reviewId}\0${s.version.transcriptVersionId}`)), bundleId = `bundle-${identity}`;
+  const recorded = s.db.query("SELECT bundle_path FROM artifact_bundles WHERE bundle_id = ?").get(bundleId) as { bundle_path: string } | null;
+  if (recorded) {
+    const manifest = await validateBundle(recorded.bundle_path, bundleId, targetCommit);
+    recordComplete(s, bundleId, recorded.bundle_path, manifest.entries);
+    return { bundleId, bundlePath: recorded.bundle_path, manifest, deduplicated: true };
+  }
   const outputRoot = options.outputRoot ?? join(process.cwd(), "exports"), stamp = new Date(s.review.confirmed_at as number).toISOString().replace(/[:.]/g, "-"), target = join(outputRoot, `bundle-${meetingId}-${stamp}`);
   try { const manifest = await validateBundle(target, bundleId, targetCommit); recordComplete(s, bundleId, target, manifest.entries); return { bundleId, bundlePath: target, manifest, deduplicated: true }; } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
-  const temporary = join(outputRoot, `.bundle-${meetingId}-${stamp}-${randomUUID()}.tmp`); let published = false;
+  const temporary = join(outputRoot, `.bundle-${meetingId}-${stamp}-${randomUUID()}.tmp`);
   await mkdir(temporary, { recursive: true });
   try {
     const entries: ManifestEntry[] = [], version = { transcript_version_id: s.version.transcriptVersionId, version_no: s.version.versionNo };
@@ -114,6 +149,15 @@ export async function exportBundle(meetingId: number, reviewId: string, options:
     const deck: DeckInput = { title: "Meeting Notes", startedAt: s.meeting.started_at as number, provider: s.meeting.provider as string | null, slides: slides.map((slide) => ({ idx: slide.idx, title: slide.title, bullets: JSON.parse(slide.bullets), startedAt: slide.started_at })), lines: s.lines.map((line) => ({ seq: line.seq, ts: line.capturedAtMs ?? 0, speaker: line.speakerTurn, text: line.text })) };
     const root = options.projectRoot ?? process.cwd(); await put("deck/index.html", buildDeckHtml(deck)); await put("deck/theme.css", await readFile(join(root, "deck", "theme.css"))); for (const file of buildSlideFiles(deck)) await put(`deck/slides/${file.filename}`, file.html); await put("deck/slides/theme.css", await readFile(join(root, "deck", "theme.css"))); for (const name of ["meeting-cover.png", "meeting-topic-map.png"]) { const bytes = await readFile(join(root, "deck", "assets", name)); await put(`deck/assets/${name}`, bytes); await put(`deck/slides/assets/${name}`, bytes); }
     entries.sort((a, b) => a.path.localeCompare(b.path)); const manifest: BundleManifest = { schema_version: 1, bundle_id: bundleId, meeting_id: meetingId, review_id: reviewId, target_commit: targetCommit, created_at: new Date(s.review.confirmed_at as number).toISOString(), entries, artifacts: entries }; await writeFile(join(temporary, "manifest.json"), json(manifest)); await validateBundle(temporary, bundleId, targetCommit);
-    await rename(temporary, target); published = true; recordComplete(s, bundleId, target, entries); return { bundleId, bundlePath: target, manifest, deduplicated: false };
-  } catch (error) { if (published) await rm(target, { recursive: true, force: true }); throw error; } finally { await rm(temporary, { recursive: true, force: true }); }
+    try {
+      await rename(temporary, target);
+    } catch (error) {
+      if (!["EEXIST", "ENOTEMPTY"].includes((error as NodeJS.ErrnoException).code ?? "")) throw error;
+      const winner = await validateBundle(target, bundleId, targetCommit);
+      recordComplete(s, bundleId, target, winner.entries);
+      return { bundleId, bundlePath: target, manifest: winner, deduplicated: true };
+    }
+    recordComplete(s, bundleId, target, entries);
+    return { bundleId, bundlePath: target, manifest, deduplicated: false };
+  } finally { await rm(temporary, { recursive: true, force: true }); }
 }

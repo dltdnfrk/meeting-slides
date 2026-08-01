@@ -108,6 +108,41 @@ describe("meeting conclusion", () => {
     fx.legacy.close();
   });
 
+  test("does not hold a SQLite transaction across export and preserves unrelated writes on export failure", async () => {
+    const fx = fixture();
+    const db = fx.store.databaseHandle();
+    await expect(concludeMeeting(fx.reviewId, options(fx, {
+      exporter: async () => {
+        expect(db.inTransaction).toBe(false);
+        db.run("UPDATE meeting_meta SET purpose = 'unrelated write' WHERE meeting_id = ?", [fx.meetingId]);
+        throw new Error("external export failed");
+      },
+    }))).rejects.toThrow("external export failed");
+    expect(db.query("SELECT purpose FROM meeting_meta WHERE meeting_id = ?").get(fx.meetingId))
+      .toEqual({ purpose: "unrelated write" });
+    expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
+    fx.legacy.close();
+  });
+
+  test("does not delete a pre-existing deduplicated bundle when conclusion validation fails", async () => {
+    const fx = fixture();
+    fx.store.confirmReview(fx.reviewId);
+    const original = await exportBundle(fx.meetingId, fx.reviewId, options(fx));
+    expect(original.deduplicated).toBe(false);
+    const exporter = async (...args: Parameters<typeof exportBundle>): Promise<ExportBundleResult> => {
+      const deduplicated = await exportBundle(...args);
+      expect(deduplicated.deduplicated).toBe(true);
+      return { ...deduplicated, manifest: { ...deduplicated.manifest, review_id: "wrong-review" } };
+    };
+
+    await expect(concludeMeeting(fx.reviewId, options(fx, { exporter })))
+      .rejects.toThrow("[CONCLUSION_IDENTITY_MISMATCH]");
+    expect(existsSync(original.bundlePath)).toBe(true);
+    expect(fx.store.databaseHandle().query("SELECT COUNT(*) count FROM artifact_bundles WHERE bundle_id = ?")
+      .get(original.bundleId)).toEqual({ count: 1 });
+    fx.legacy.close();
+  });
+
   test("does not claim conclusion on bundle failure, then retries a confirmed review idempotently", async () => {
     const fx = fixture();
     let fail = true;
@@ -181,6 +216,13 @@ describe("meeting conclusion", () => {
     };
     await expect(concludeMeeting(fx.reviewId, options(fx, { exporter }))).rejects.toThrow("[CONCLUSION_IDENTITY_MISMATCH]");
     expect(persisted(fx.store)).toBeNull();
+    expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
+    expect(existsSync(fx.outputRoot) ? readdirSync(fx.outputRoot) : []).toHaveLength(1);
+
+    const retried = await concludeMeeting(fx.reviewId, options(fx));
+    expect(retried.concluded).toBe(true);
+    expect(fx.store.databaseHandle().query("SELECT COUNT(*) count FROM artifact_bundles").get()).toEqual({ count: 1 });
+    expect(fx.store.databaseHandle().query("SELECT COUNT(*) count FROM meeting_conclusions").get()).toEqual({ count: 1 });
     fx.legacy.close();
   });
 

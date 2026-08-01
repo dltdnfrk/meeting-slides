@@ -182,7 +182,7 @@ describe("meeting-conclusion transaction", () => {
     fx.legacy.close();
   });
 
-  test("post-export hash failure rolls back and removes the atomically published bundle", async () => {
+  test("post-export hash failure rolls back review state without destructively deleting the published bundle", async () => {
     const fx = fixture();
     const corruptingExporter = async (...args: Parameters<typeof exportBundle>) => {
       const result = await exportBundle(...args);
@@ -191,8 +191,8 @@ describe("meeting-conclusion transaction", () => {
     };
     await expect(concludeMeeting(fx.reviewId, options(fx, { exporter: corruptingExporter }))).rejects.toThrow("[BUNDLE_HASH_MISMATCH]");
     expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
-    expect(counts(fx.store)).toMatchObject({ bundles: { count: 0 }, artifacts: { count: 0 }, conclusions: { count: 0 } });
-    expect(outputNames(fx)).toEqual([]);
+    expect(counts(fx.store)).toMatchObject({ bundles: { count: 1 }, artifacts: { count: 4 }, conclusions: { count: 0 } });
+    expect(outputNames(fx)).toHaveLength(1);
     fx.legacy.close();
   });
 

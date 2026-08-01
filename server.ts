@@ -938,7 +938,10 @@ async function startCapture(requestedMeetingId?: unknown): Promise<void> {
         outputPath,
       });
     } catch (error) {
-      console.error("[audio recorder] start failed:", error);
+      rawAudioRecorder = null;
+      store.endMeeting();
+      if (minutesStore.meetingMeta(meetingId)?.phase === "capturing") minutesStore.endMeeting(meetingId);
+      throw error;
     }
   }
   transcriptWriter.begin(meetingId, {

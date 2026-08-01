@@ -185,6 +185,22 @@ describe("raw audio hash and recorder contract", () => {
     failed.legacy.close();
   });
 
+  test("recorder startup timeout terminates and awaits the child exactly once", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "meeting-recorder-startup-"));
+    const fake = join(dir, "ffmpeg-timeout");
+    const output = join(dir, "capture.tmp.wav");
+    const signals = join(dir, "signals.txt");
+    writeFileSync(fake, `#!/usr/bin/env bun\nimport { appendFileSync } from "node:fs";\nprocess.on("SIGTERM", () => { appendFileSync(${JSON.stringify(signals)}, "TERM\\n"); process.exit(0); });\nawait new Promise(() => {});\n`);
+    chmodSync(fake, 0o755);
+
+    await expect(RawAudioRecorder.start({
+      bin: fake, captureId: 3, outputPath: output, startupTimeoutMs: 500,
+    })).rejects.toThrow(/did not create output/);
+    expect(readFileSync(signals, "utf8").trim().split("\n")).toEqual(["TERM"]);
+    expect(existsSync(output)).toBe(false);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
   test("recorder waits for closure, hashes a valid WAV, and removes failed partial output", async () => {
     const dir = mkdtempSync(join(tmpdir(), "meeting-recorder-"));
     const fake = join(dir, "ffmpeg");

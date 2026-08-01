@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFile, rm } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
 
 import {
@@ -16,6 +16,7 @@ const REQUIRED_ARTIFACTS = {
   slide_deck: "deck/index.html",
 } as const;
 const runs = new WeakMap<MinutesStore, Map<string, Promise<ConclusionState>>>();
+const storeTails = new WeakMap<MinutesStore, Promise<void>>();
 
 export interface ConclusionState {
   type: "meetingConcluded";
@@ -185,48 +186,47 @@ async function runConclusion(reviewId: string, options: ConcludeMeetingOptions):
   const existing = conclusionFor(options.store, reviewId);
   if (existing) return state(existing);
   const db = options.store.databaseHandle();
-  let transactionOpen = false;
-  let publishedPath: string | null = null;
+  const initial = options.store.review(reviewId);
+  const confirmedHere = initial?.status === "draft";
+  let result: ExportBundleResult | null = null;
   try {
-    db.run("BEGIN IMMEDIATE");
-    transactionOpen = true;
-    const raced = conclusionFor(options.store, reviewId);
-    if (raced) {
-      db.run("COMMIT");
-      transactionOpen = false;
-      return state(raced);
-    }
-    const initial = options.store.review(reviewId);
-    if (!initial || initial.status === "draft") options.store.confirmReview(reviewId);
+    if (!initial || confirmedHere) options.store.confirmReview(reviewId);
     const review = options.store.review(reviewId);
     if (!review || review.status !== "confirmed" || review.confirmedAt === null) {
       throw failure("REVIEW_NOT_CONFIRMED", `review ${reviewId} is not confirmed`);
     }
     const { exporter = exportBundle, ...bundleOptions } = options;
-    const result = await exporter(review.meetingId, reviewId, bundleOptions);
-    publishedPath = result.bundlePath;
+    result = await exporter(review.meetingId, reviewId, bundleOptions);
     const manifestSha256 = await validateResult(
       result, review.meetingId, reviewId, review.transcriptVersionId, options.targetCommit,
     );
     validateArtifactLinks(options.store, result, review.meetingId, reviewId, review.transcriptVersionId);
-    const concludedAt = Date.now();
-    db.run(`
-      INSERT INTO meeting_conclusions
-        (meeting_id, review_id, transcript_version_id, bundle_id, bundle_path,
-         manifest_sha256, target_commit, concluded_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [review.meetingId, reviewId, review.transcriptVersionId, result.bundleId,
-      result.bundlePath, manifestSha256, options.targetCommit.toLowerCase(), concludedAt]);
-    const persisted = conclusionFor(options.store, reviewId);
-    if (!persisted) throw failure("CONCLUSION_PERSIST_FAILED", "closed state was not persisted");
-    db.run("COMMIT");
-    transactionOpen = false;
+    const persisted = db.transaction(() => {
+      const raced = conclusionFor(options.store, reviewId);
+      if (raced) return raced;
+      const concludedAt = Date.now();
+      db.run(`
+        INSERT INTO meeting_conclusions
+          (meeting_id, review_id, transcript_version_id, bundle_id, bundle_path,
+           manifest_sha256, target_commit, concluded_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `, [review.meetingId, reviewId, review.transcriptVersionId, result!.bundleId,
+        result!.bundlePath, manifestSha256, options.targetCommit.toLowerCase(), concludedAt]);
+      const row = conclusionFor(options.store, reviewId);
+      if (!row) throw failure("CONCLUSION_PERSIST_FAILED", "closed state was not persisted");
+      return row;
+    })();
     return state(persisted);
   } catch (error) {
-    if (transactionOpen) {
-      try { db.run("ROLLBACK"); } catch {}
+    // A published bundle is immutable shared state. Keep it and its complete artifact rows:
+    // a retry can deduplicate it, while destructive rollback could race another publisher.
+    if (confirmedHere && !conclusionFor(options.store, reviewId)) {
+      db.transaction(() => db.run(`
+        UPDATE meeting_reviews
+        SET status = 'draft', confirmed_at = NULL, confirmed_by = NULL, updated_at = ?
+        WHERE review_id = ? AND status = 'confirmed'
+      `, [Date.now(), reviewId]))();
     }
-    if (publishedPath) await rm(publishedPath, { recursive: true, force: true });
     throw typed(error);
   }
 }
@@ -245,7 +245,9 @@ export function concludeMeeting(reviewId: string, options: ConcludeMeetingOption
   }
   const active = storeRuns.get(normalized);
   if (active) return active;
-  const run = runConclusion(normalized, options);
+  const prior = storeTails.get(options.store) ?? Promise.resolve();
+  const run = prior.catch(() => {}).then(() => runConclusion(normalized, options));
+  storeTails.set(options.store, run.then(() => {}, () => {}));
   storeRuns.set(normalized, run);
   void run.finally(() => {
     if (storeRuns?.get(normalized) === run) storeRuns.delete(normalized);

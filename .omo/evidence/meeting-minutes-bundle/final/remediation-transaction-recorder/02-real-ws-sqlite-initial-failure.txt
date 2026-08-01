@@ -1,0 +1,21 @@
+INITIAL DRIVER FAILURE (escaped; stale pre-conclusion artifact expectation):
+| COMMAND: bun run .omo/evidence/meeting-minutes-bundle/task-9/04-real-ws-sqlite-driver.ts
+| PASS wrong-attendee + partial-patch: deterministic rejection, zero mutation
+| PASS malformed/missing requests: deterministic boundary rejection
+| PASS wrong-version: canonical switch rejected, review remains draft
+| PASS changed-transcript: hash mismatch rejected, review remains draft
+| PASS persisted attendee tamper: roster revalidation rejected and review remains draft
+| PASS source interior-gap: full range revalidation rejected and review remains draft
+| PASS transaction failure: trigger abort rolled back status and timestamp
+| 199 |   await send({ action: "confirmReview", reviewId: happyCase.reviewId },
+| 200 |     (message) => message.type === "reviewConfirmed" && message.reviewId === happyCase.reviewId);
+| 201 |   if (store.review(happyCase.reviewId)?.status !== "confirmed") throw new Error("happy review not confirmed");
+| 202 |   const artifactBundles = db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get() as { count: number };
+| 203 |   const artifacts = db.query("SELECT COUNT(*) AS count FROM artifacts").get() as { count: number };
+| 204 |   if (artifactBundles.count !== 0 || artifacts.count !== 0) throw new Error("T9 created artifacts");
+|                                                                             ^
+| error: T9 created artifacts
+|       at /Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/.omo/evidence/meeting-minutes-bundle/task-9/04-real-ws-sqlite-driver.ts:204:71
+|
+| Bun v1.3.14 (macOS arm64)
+| EXIT_CODE: 1

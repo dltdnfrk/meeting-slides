@@ -1,0 +1,48 @@
+COMMAND: bun test tests/bundle.test.ts tests/conclusion.test.ts tests/meeting-conclusion.test.ts tests/transcript-versioning.test.ts tests/server-recorder-startup.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/meeting-conclusion.test.ts:
+(pass) meeting-conclusion transaction > confirmReview publishes a complete version-linked manifest and only then closes the meeting [37.70ms]
+(pass) meeting-conclusion transaction > rejects unresolved, invalid-source, and stale-version reviews before exporting [26.71ms]
+(pass) meeting-conclusion transaction > PDF failure rolls back review, complete rows, conclusion, and all artifacts, and retry succeeds [33.69ms]
+(pass) meeting-conclusion transaction > post-export hash failure rolls back review state without destructively deleting the published bundle [24.48ms]
+(pass) meeting-conclusion transaction > repeated and concurrent conclusion shares one export and never duplicates bundle state [34.01ms]
+(pass) meeting-conclusion transaction > real WS confirmReview reaches SQLite, bundle publication, and MeetingConcluded [652.86ms]
+
+tests/server-recorder-startup.test.ts:
+(pass) recorder startup failure leaves capture stopped and never launches whisper [624.76ms]
+
+tests/transcript-versioning.test.ts:
+(pass) canonical transcript versioning > live capture dual-writes, finalizes a content hash, and makes canonical lines immutable [2.09ms]
+(pass) canonical transcript versioning > retranscription creates a new immutable coordinate space without changing canonical automatically [1.71ms]
+(pass) canonical transcript versioning > an interrupted retranscription leaves the previous canonical version intact [1.32ms]
+(pass) canonical transcript versioning > legacy snapshot rejects duplicate coordinates instead of guessing [1.63ms]
+(pass) raw audio hash and recorder contract > file audio claims reject same bytes without duplicate persistence and allow different bytes [1.78ms]
+(pass) raw audio hash and recorder contract > capture finalization stops the recorder exactly once on success and failure [2.47ms]
+(pass) raw audio hash and recorder contract > recorder startup timeout terminates and awaits the child exactly once [510.01ms]
+(pass) raw audio hash and recorder contract > recorder waits for closure, hashes a valid WAV, and removes failed partial output [686.63ms]
+
+tests/bundle.test.ts:
+(pass) exportBundle > publishes six logical outputs atomically and records four required artifacts only after validation [23.13ms]
+(pass) exportBundle > mirrors the minutes ontology and keeps every source tuple equal to JSONL coordinates [22.25ms]
+(pass) exportBundle > writes canonical four-field JSONL and binds its exact bytes to content_sha256 and manifest hashes [27.42ms]
+(pass) exportBundle > refuses unconfirmed, stale-canonical, and version-mismatched confirmed items without artifact rows [12.36ms]
+(pass) exportBundle > refuses a missing required deck output and removes the staging tree [12.98ms]
+(pass) exportBundle > cleans the atomic .tmp directory on PDF failure and never publishes or records partial output [6.72ms]
+(pass) exportBundle > keeps an atomically published bundle when database finalization fails and deduplicates it on retry [28.30ms]
+
+tests/conclusion.test.ts:
+(pass) meeting conclusion > confirms, atomically builds the bundle, then persists and returns its complete identity [30.65ms]
+(pass) meeting conclusion > does not hold a SQLite transaction across export and preserves unrelated writes on export failure [8.41ms]
+(pass) meeting conclusion > does not delete a pre-existing deduplicated bundle when conclusion validation fails [34.34ms]
+(pass) meeting conclusion > does not claim conclusion on bundle failure, then retries a confirmed review idempotently [31.31ms]
+(pass) meeting conclusion > revalidates attendee identity in the confirmation transaction before bundle publication [7.66ms]
+(pass) meeting conclusion > rejects pending and stale reviews before bundle publication [14.51ms]
+(pass) meeting conclusion > rejects exporter results whose manifest identity does not match the meeting without persisting conclusion [33.70ms]
+(pass) meeting conclusion > rejects unconfirmed direct publication and mismatched artifact links without a conclusion [37.49ms]
+
+ 30 pass
+ 0 fail
+ 206 expect() calls
+Ran 30 tests across 5 files. [3.14s]
+EXIT_CODE: 0

@@ -211,10 +211,33 @@ function removeIfPresent(path: string): void {
   if (existsSync(path)) rmSync(path, { force: true });
 }
 
+async function terminateRecorder(proc: ChildProcess): Promise<void> {
+  if (proc.exitCode !== null || proc.signalCode !== null) return;
+  await new Promise<void>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      proc.off("close", finish);
+      proc.off("error", finish);
+      resolve();
+    };
+    const timer = setTimeout(() => {
+      if (proc.exitCode === null && proc.signalCode === null) proc.kill("SIGKILL");
+    }, 5_000);
+    proc.once("close", finish);
+    proc.once("error", finish);
+    proc.kill("SIGTERM");
+  });
+}
+
 export class RawAudioRecorder implements AudioRecorderHandle {
   private constructor(private readonly proc: ChildProcess, private readonly outputPath: string) {}
 
-  static async start(input: { bin: string; captureId: number; outputPath: string }): Promise<RawAudioRecorder> {
+  static async start(input: {
+    bin: string; captureId: number; outputPath: string; startupTimeoutMs?: number;
+  }): Promise<RawAudioRecorder> {
     removeIfPresent(input.outputPath);
     const targetName = basename(input.outputPath);
     const { promise: outputCreated, resolve: created, reject: createFailed } = Promise.withResolvers<void>();
@@ -222,17 +245,24 @@ export class RawAudioRecorder implements AudioRecorderHandle {
       if (filename === targetName && existsSync(input.outputPath)) created();
     });
     watcher.once("error", createFailed);
+    let watcherClosed = false;
+    const closeWatcher = () => {
+      if (watcherClosed) return;
+      watcherClosed = true;
+      watcher.close();
+    };
     const proc = spawn(input.bin, recorderArgs(input.bin, input.captureId, input.outputPath), {
       stdio: ["ignore", "ignore", "pipe"],
     });
     try {
       await new Promise<void>((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error("audio recorder did not create output within 5 seconds")), 5_000);
+        const timeoutMs = input.startupTimeoutMs ?? 5_000;
+        const timer = setTimeout(() => reject(new Error(`audio recorder did not create output within ${timeoutMs}ms`)), timeoutMs);
         const finish = (fn: () => void) => {
           clearTimeout(timer);
           proc.off("error", onError);
           proc.off("close", onClose);
-          watcher.close();
+          closeWatcher();
           fn();
         };
         const onError = (error: Error) => finish(() => reject(error));
@@ -243,6 +273,8 @@ export class RawAudioRecorder implements AudioRecorderHandle {
       });
       return new RawAudioRecorder(proc, input.outputPath);
     } catch (error) {
+      closeWatcher();
+      await terminateRecorder(proc);
       removeIfPresent(input.outputPath);
       throw error;
     }
