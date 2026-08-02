@@ -522,7 +522,10 @@ const httpServer = Bun.serve({
       if (ok) return undefined;
       return new Response("Upgrade failed", { status: 426 });
     }
-    const path = url.pathname === "/" ? "/index.html" : url.pathname;
+    // Meeting Slides.app WKWebView는 /app 을 엔트리로 로드한다.
+    const path = (url.pathname === "/" || url.pathname === "/app" || url.pathname === "/app/")
+      ? "/index.html"
+      : url.pathname;
     const publicDir = join(import.meta.dir, "public");
     const filePath = join(publicDir, path);
     if (filePath !== publicDir && !filePath.startsWith(`${publicDir}${sep}`)) {
