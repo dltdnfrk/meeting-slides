@@ -6,7 +6,7 @@
 
 import { spawnSync } from "child_process";
 
-import { LLMClient, type BlockDetector } from "./llm.js";
+import { LLMClient, type MeetingLLM } from "./llm.js";
 import { CliLLMClient } from "./llm-cli.js";
 import { resolveLLMConfig } from "./config.js";
 import type { ProviderInfo } from "./session.js";
@@ -73,7 +73,7 @@ export function buildProviderEntries(
 export function createDetector(
   id: string,
   opts: { cliTimeoutMs: number; model?: string; effort?: string },
-): BlockDetector | null {
+): MeetingLLM | null {
   if (id === "cli:claude") {
     return new CliLLMClient({ bin: "claude", preset: "claude", timeoutMs: opts.cliTimeoutMs, model: opts.model });
   }

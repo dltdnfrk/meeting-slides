@@ -22,6 +22,23 @@ export interface BlockDetector {
   ping(): Promise<boolean>;
 }
 
+export interface DeckPlannerInput {
+  meetingId: number;
+  transcript: Array<{ seq: number; ts: number; speaker: number | null; text: string }>;
+  liveSlideAnchors: Array<{ idx: number; title: string; bullets: string[]; startedAt: number }>;
+}
+
+export interface DeckPlannerRepair {
+  validationError: string;
+}
+
+/** HTTP and CLI model clients share this batch-planning contract. */
+export interface DeckPlanner {
+  planDeck(input: DeckPlannerInput, repair?: DeckPlannerRepair): Promise<unknown>;
+}
+
+export type MeetingLLM = BlockDetector & DeckPlanner;
+
 /**
  * 모델 출력에서 MeetingCard JSON을 추출하고 엄격히 검증한다. GLM의
  * reasoning_content처럼 앞뒤에 텍스트가 붙어도 JSON 객체 자체는 추출한다.
@@ -95,12 +112,36 @@ shouldAdvance 판단 규칙:
 
 반드시 유효한 JSON 객체만 출력하세요. 마크다운, 설명, 사고 과정, 추가 키는 금지합니다.`;
 
+export const DECK_PLANNER_SYSTEM_PROMPT = `당신은 전체 한국어 회의 전사와 실시간 슬라이드 앵커를 바탕으로 발표용 DeckOutline을 설계합니다.
+모델은 HTML/CSS/마크다운을 절대 출력하지 않고 아래 JSON 객체만 출력합니다.
+
+최상위 필드: meetingId(number), title(string), style(string), slides(array), source(optional object).
+슬라이드 kind와 필드:
+- cover: {kind,title,subtitle?,kicker?}
+- section: {kind,title,kicker?,bullets:[1..6]}
+- summary: {kind,title,bullets:[1..6],emphasis?}
+- decision: {kind,title,decision,rationale?:[0..6]}
+- actions: {kind,title,actions:[{text,owner?,due?}]}
+- closing: {kind,title,bullets:[0..6],emphasis?}
+
+첫 슬라이드는 cover, 마지막은 closing이며 그 사이에 최소 한 장의 내용 슬라이드를 둡니다.
+전사에 근거한 결정과 액션만 사용하고, liveSlideAnchors는 논의 구간과 제목을 잡는 보조 근거로 사용합니다.
+추가 키와 렌더링 코드는 금지합니다.`;
+
+export function buildDeckPlannerUserPrompt(input: DeckPlannerInput, repair?: DeckPlannerRepair): string {
+  const repairText = repair === undefined
+    ? ""
+    : `\n이전 응답이 다음 검증 오류로 거부되었습니다: ${repair.validationError}\n스키마에 맞게 새 JSON 객체를 작성하세요.\n`;
+  return `요청 meetingId: ${input.meetingId}${repairText}\n전체 입력:\n${JSON.stringify(input)}\n\nJSON 객체로만 응답하세요.`;
+}
+
 // GLM-5.2 reasoning 모델은 thinking 토큰 때문에 응답이 느릴 수 있음.
 // 행잉 요청이 session.detecting을 영원히 고정하지 않도록 요청에 상한을 둔다.
 const DETECT_TIMEOUT_MS = 30_000;
+const PLAN_TIMEOUT_MS = 120_000;
 const PING_TIMEOUT_MS = 10_000;
 
-export class LLMClient {
+export class LLMClient implements MeetingLLM {
   constructor(private cfg: LLMProviderConfig) {}
 
   private chatURL(): string {
@@ -153,6 +194,34 @@ JSON으로만 응답하세요.`;
     // content 우선; 비어있으면 reasoning_content에서 JSON 추출 (GLM reasoning 대응)
     const raw = msg?.content ?? msg?.reasoning_content ?? "";
     return parseBlockDetectionJson(raw);
+  }
+
+  async planDeck(input: DeckPlannerInput, repair?: DeckPlannerRepair): Promise<unknown> {
+    const resp = await fetch(this.chatURL(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.cfg.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.cfg.model,
+        messages: [
+          { role: "system", content: DECK_PLANNER_SYSTEM_PROMPT },
+          { role: "user", content: buildDeckPlannerUserPrompt(input, repair) },
+        ],
+        temperature: 0.2,
+        max_tokens: 6000,
+        response_format: { type: "json_object" as const },
+      }),
+      signal: AbortSignal.timeout(PLAN_TIMEOUT_MS),
+    });
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`LLM API ${resp.status}: ${errText.slice(0, 200)}`);
+    }
+    const data = (await resp.json()) as ChatResponse;
+    const msg = data.choices?.[0]?.message;
+    return msg?.content ?? msg?.reasoning_content ?? "";
   }
 
   async ping(): Promise<boolean> {

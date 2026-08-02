@@ -7,6 +7,8 @@
 
 import { Database } from "bun:sqlite";
 
+import { parseDeckOutline, parseSlideSpec, type DeckOutline } from "./slide-spec.js";
+
 export interface StoredLine {
   seq: number;
   ts: number;
@@ -19,6 +21,12 @@ export interface StoredSlide {
   title: string;
   bullets: string[];
   startedAt: number;
+}
+
+export interface StoredDeckOutline {
+  outline: DeckOutline;
+  plannerError: string | null;
+  compiledAt: number;
 }
 
 export class MeetingStore {
@@ -58,8 +66,23 @@ export class MeetingStore {
         bullets TEXT NOT NULL,
         started_at INTEGER NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS deck_outlines (
+        meeting_id INTEGER PRIMARY KEY,
+        title TEXT NOT NULL,
+        style TEXT NOT NULL,
+        source_json TEXT,
+        planner_error TEXT,
+        compiled_at INTEGER NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS deck_slide_specs (
+        meeting_id INTEGER NOT NULL,
+        idx INTEGER NOT NULL,
+        spec_json TEXT NOT NULL,
+        PRIMARY KEY (meeting_id, idx)
+      );
       CREATE INDEX IF NOT EXISTS idx_lines_meeting ON transcript_lines(meeting_id, seq);
       CREATE INDEX IF NOT EXISTS idx_slides_meeting ON slides(meeting_id, idx);
+      CREATE INDEX IF NOT EXISTS idx_deck_specs_meeting ON deck_slide_specs(meeting_id, idx);
     `);
 
     // (meeting_id, idx) 단위 upsert: 같은 토픽 슬라이드 갱신이 INSERT 중복으로 쌓이지 않게.
@@ -142,6 +165,69 @@ export class MeetingStore {
       `)
       .all(id) as { idx: number; title: string; bullets: string; startedAt: number }[];
     return rows.map((r) => ({ ...r, bullets: JSON.parse(r.bullets) as string[] }));
+  }
+
+  /** 검증된 outline 메타데이터와 canonical SlideSpec들을 한 트랜잭션으로 교체한다. */
+  saveDeckOutline(outlineValue: unknown, plannerError: string | null = null): StoredDeckOutline {
+    const outline = parseDeckOutline(outlineValue);
+    const compiledAt = Date.now();
+    this.db.transaction(() => {
+      this.db.run(
+        `INSERT INTO deck_outlines (meeting_id, title, style, source_json, planner_error, compiled_at)
+         VALUES (?, ?, ?, ?, ?, ?)
+         ON CONFLICT(meeting_id) DO UPDATE SET
+           title = excluded.title,
+           style = excluded.style,
+           source_json = excluded.source_json,
+           planner_error = excluded.planner_error,
+           compiled_at = excluded.compiled_at`,
+        [
+          outline.meetingId,
+          outline.title,
+          outline.style,
+          outline.source === undefined ? null : JSON.stringify(outline.source),
+          plannerError,
+          compiledAt,
+        ],
+      );
+      this.db.run("DELETE FROM deck_slide_specs WHERE meeting_id = ?", [outline.meetingId]);
+      for (const [idx, spec] of outline.slides.entries()) {
+        this.db.run(
+          "INSERT INTO deck_slide_specs (meeting_id, idx, spec_json) VALUES (?, ?, ?)",
+          [outline.meetingId, idx, JSON.stringify(parseSlideSpec(spec))],
+        );
+      }
+    })();
+    return { outline, plannerError, compiledAt };
+  }
+
+  /** HTML이 아닌 persisted SlideSpec들로 outline을 재구성하고 다시 검증한다. */
+  deckOutline(meetingId?: number): StoredDeckOutline | null {
+    const id = meetingId ?? this.meetingId;
+    if (id === null) return null;
+    const row = this.db.query(
+      `SELECT title, style, source_json as sourceJson,
+              planner_error as plannerError, compiled_at as compiledAt
+       FROM deck_outlines WHERE meeting_id = ?`,
+    ).get(id) as {
+      title: string;
+      style: string;
+      sourceJson: string | null;
+      plannerError: string | null;
+      compiledAt: number;
+    } | null;
+    if (row === null) return null;
+    const specs = this.db.query(
+      "SELECT spec_json as specJson FROM deck_slide_specs WHERE meeting_id = ? ORDER BY idx",
+    ).all(id) as { specJson: string }[];
+    const outline = parseDeckOutline({
+      meetingId: id,
+      title: row.title,
+      style: row.style,
+      slides: specs.map(({ specJson }) => parseSlideSpec(specJson)),
+      ...(row.sourceJson === null ? {} : { source: JSON.parse(row.sourceJson) as unknown }),
+    });
+    return { outline, plannerError: row.plannerError, compiledAt: row.compiledAt };
   }
 
   /** anarlog식 Markdown export: 헤더 + 슬라이드 요약 + 전체 전사본 */

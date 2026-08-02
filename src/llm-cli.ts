@@ -14,10 +14,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import {
+  DECK_PLANNER_SYSTEM_PROMPT,
   SYSTEM_PROMPT,
+  buildDeckPlannerUserPrompt,
   parseBlockDetectionJson,
   type BlockDetectionResult,
-  type BlockDetector,
+  type DeckPlannerInput,
+  type DeckPlannerRepair,
+  type MeetingLLM,
 } from "./llm.js";
 import type { CliLLMConfig } from "./config.js";
 
@@ -85,7 +89,7 @@ function runCli(cfg: CliLLMConfig, prompt: string): Promise<string> {
   });
 }
 
-export class CliLLMClient implements BlockDetector {
+export class CliLLMClient implements MeetingLLM {
   constructor(private cfg: CliLLMConfig) {}
 
   async detectBlock(sentences: string[]): Promise<BlockDetectionResult> {
@@ -98,6 +102,11 @@ ${sentences.map((s, i) => `${i + 1}. ${s}`).join("\n")}
 JSON으로만 응답하세요.`;
     const output = await runCli(this.cfg, `${SYSTEM_PROMPT}\n\n${userPrompt}`);
     return parseBlockDetectionJson(output);
+  }
+
+  async planDeck(input: DeckPlannerInput, repair?: DeckPlannerRepair): Promise<unknown> {
+    const prompt = `${DECK_PLANNER_SYSTEM_PROMPT}\n\n${buildDeckPlannerUserPrompt(input, repair)}`;
+    return runCli(this.cfg, prompt);
   }
 
   async ping(): Promise<boolean> {
