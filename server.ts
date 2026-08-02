@@ -11,8 +11,8 @@ import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
-import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
 import { runCompileDeckAction } from "./src/deck-compile-action.ts";
+import { prepareExportDeck } from "./src/deck-export.ts";
 import { copyDeckAssets } from "./src/deck-assets.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
@@ -77,6 +77,8 @@ let currentEffort: string | undefined;
 const cliTimeoutMs = config.llm.cli?.timeoutMs ?? 120_000;
 // 관찰성: 마지막 저장 경로를 유지해 클라이언트에 상시 표시
 let lastSavedPath: string | null = null;
+// Compile and export target the same meeting artifacts; exports fail fast rather than replaying stale history mid-compile.
+let compilingMeetingId: number | null = null;
 
 function providersMessage(): ProvidersUpdate {
   return {
@@ -206,19 +208,32 @@ const httpServer = Bun.serve({
           if (cmd.meetingId !== undefined && typeof cmd.meetingId !== "number") {
             broadcast({ type: "compile", status: "started" });
             broadcast({ type: "compile", status: "error", error: "meetingId must be a number" });
+          } else if (compilingMeetingId !== null) {
+            broadcast({ type: "compile", status: "error", meetingId: compilingMeetingId, error: "A deck compile is already in progress" });
           } else {
+            const requestedMeetingId = cmd.meetingId ?? store.latestMeeting()?.id;
+            compilingMeetingId = requestedMeetingId ?? -1;
             void runCompileDeckAction({
               store,
               planner: llm,
               ...(cmd.meetingId === undefined ? {} : { meetingId: cmd.meetingId }),
               exportsDirectory: join(import.meta.dir, "exports"),
               send: broadcast,
-            });
+            }).finally(() => { compilingMeetingId = null; });
           }
         }
         else if (cmd.action === "exportDeck" || cmd.action === "exportPdf" || cmd.action === "exportPng") {
-          // lecture-deck 템플릿 기반 reveal.js 덱 + slides-grab 계약 파일 생성
-          // PDF/PNG는 초안 경로: validate 후 렌더. 가짜 design-gate proceed 영수증은 쓰지 않는다.
+          // PDF/PNG는 기존 validate/review/design-gate 체인을 그대로 사용한다.
+          if (compilingMeetingId !== null) {
+            broadcast({
+              type: "export",
+              status: "error",
+              action: cmd.action,
+              code: "compile-busy",
+              error: "Deck compile is in progress; export was not started",
+            });
+            return;
+          }
           try {
             const meta = store.latestMeeting();
             if (!meta) {
@@ -235,17 +250,17 @@ const httpServer = Bun.serve({
                 exportDirectory: dir,
                 slidesDirectory: slidesDir,
               });
-              const input = {
-                title: "Meeting Notes",
-                startedAt: meta.started_at,
-                provider: meta.provider,
-                slides: store.slides(meta.id),
-                lines: store.lines(meta.id),
-              };
-              writeFileSync(join(dir, "index.html"), buildDeckHtml(input), "utf-8");
-              for (const f of buildSlideFiles(input)) {
-                writeFileSync(join(slidesDir, f.filename), f.html, "utf-8");
+              const material = prepareExportDeck(store, meta.id);
+              writeFileSync(join(dir, "index.html"), material.indexHtml, "utf-8");
+              for (const file of material.files) {
+                writeFileSync(join(slidesDir, file.filename), file.html, "utf-8");
               }
+              broadcast({
+                type: "status",
+                text: material.source === "compiled"
+                  ? `컴파일 덱 ${material.slideCount}장으로 내보내는 중…`
+                  : "컴파일 덱 없음 — 라이브 히스토리로 내보내는 중…",
+              });
 
               // slides-grab CLI 실행 헬퍼 (프로젝트 로컬 chromium 사용)
               const runGrab = (args: string[], onDone: (code: number | null, tail: string) => void) => {
@@ -288,8 +303,7 @@ const httpServer = Bun.serve({
                 // 체인: validate → 정직한 Pass A/B 리포트(실제 수행한 검사를 기록) → design-gate → pdf.
                 const out = join(import.meta.dir, "exports", `deck-${stamp}.pdf`);
                 broadcast({ type: "status", text: "PDF 준비 중… (design-gate)" });
-                const slideFiles = buildSlideFiles(input);
-                const fingerprints = slideFiles.map((f) => ({
+                const fingerprints = material.files.map((f) => ({
                   file: f.filename,
                   sha256: createHash("sha256").update(f.html, "utf-8").digest("hex"),
                 }));
@@ -326,9 +340,9 @@ const httpServer = Bun.serve({
                         const gateInput = {
                           slideFiles: fingerprints,
                           previewFiles,
-                          slideCount: input.slides.length,
-                          maxBullets: Math.max(0, ...input.slides.map((s) => s.bullets.length)),
-                          lineCount: input.lines.length,
+                          slideCount: material.slideCount,
+                          maxBullets: material.maxBullets,
+                          lineCount: material.lineCount,
                           reviewed: true,
                           confidence: review.confidence,
                           notes: `독립 시각 리뷰 요약: ${review.summary}`,

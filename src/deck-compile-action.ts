@@ -84,6 +84,7 @@ export async function compileDeckToDisk(
     });
     for (const file of rendered.files) writeFileSync(join(slidesDirectory, file.filename), file.html, "utf-8");
     renameSync(stagingDirectory, finalDirectory);
+    store.markDeckPublished(meetingId);
   } catch (error) {
     rmSync(stagingDirectory, { recursive: true, force: true });
     throw error;

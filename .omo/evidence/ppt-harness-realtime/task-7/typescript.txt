@@ -1,0 +1,4 @@
+$ bunx tsc -p tsconfig.json --noEmit
+
+Exit status: 0
+No diagnostics.

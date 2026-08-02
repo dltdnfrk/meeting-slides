@@ -299,6 +299,15 @@ body {
 }
 .dock__btn span { color: var(--live); font-size: 12px; }
 .dock__btn:hover { color: var(--z100); border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.03); }
+.dock__btn:disabled { cursor: progress; opacity: 0.55; }
+.dock__btn--compile { border-color: rgba(16,185,129,0.24); }
+.compile-status {
+  align-self: center; max-width: 150px; margin-right: 6px;
+  color: var(--z500); font-family: var(--font-mono); font-size: 9px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.compile-status[data-state="success"] { color: var(--live); }
+.compile-status[data-state="error"] { color: var(--err); }
 .dock__btn--danger span { color: var(--err); }
 .dock__btn--danger:hover { border-color: rgba(239,68,68,0.4); }
 

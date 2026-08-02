@@ -27,6 +27,7 @@ export interface StoredDeckOutline {
   outline: DeckOutline;
   plannerError: string | null;
   compiledAt: number;
+  publishedAt: number | null;
 }
 
 export class MeetingStore {
@@ -84,6 +85,10 @@ export class MeetingStore {
       CREATE INDEX IF NOT EXISTS idx_slides_meeting ON slides(meeting_id, idx);
       CREATE INDEX IF NOT EXISTS idx_deck_specs_meeting ON deck_slide_specs(meeting_id, idx);
     `);
+    const outlineColumns = this.db.query("PRAGMA table_info(deck_outlines)").all() as { name: string }[];
+    if (!outlineColumns.some(({ name }) => name === "published_at")) {
+      this.db.run("ALTER TABLE deck_outlines ADD COLUMN published_at INTEGER");
+    }
 
     // (meeting_id, idx) 단위 upsert: 같은 토픽 슬라이드 갱신이 INSERT 중복으로 쌓이지 않게.
     // 기존 DB에 중복 행이 있어도 UPDATE는 전부 갱신하고, 없을 때만 INSERT.
@@ -180,7 +185,8 @@ export class MeetingStore {
            style = excluded.style,
            source_json = excluded.source_json,
            planner_error = excluded.planner_error,
-           compiled_at = excluded.compiled_at`,
+           compiled_at = excluded.compiled_at,
+           published_at = NULL`,
         [
           outline.meetingId,
           outline.title,
@@ -198,7 +204,16 @@ export class MeetingStore {
         );
       }
     })();
-    return { outline, plannerError, compiledAt };
+    return { outline, plannerError, compiledAt, publishedAt: null };
+  }
+
+  /** Filesystem publish가 끝난 outline만 export 우선 대상으로 표시한다. */
+  markDeckPublished(meetingId: number, publishedAt = Date.now()): void {
+    const result = this.db.run(
+      "UPDATE deck_outlines SET published_at = ? WHERE meeting_id = ?",
+      [publishedAt, meetingId],
+    );
+    if (Number(result.changes) !== 1) throw new Error(`No compiled outline for meeting ${meetingId}`);
   }
 
   /** HTML이 아닌 persisted SlideSpec들로 outline을 재구성하고 다시 검증한다. */
@@ -207,7 +222,8 @@ export class MeetingStore {
     if (id === null) return null;
     const row = this.db.query(
       `SELECT title, style, source_json as sourceJson,
-              planner_error as plannerError, compiled_at as compiledAt
+              planner_error as plannerError, compiled_at as compiledAt,
+              published_at as publishedAt
        FROM deck_outlines WHERE meeting_id = ?`,
     ).get(id) as {
       title: string;
@@ -215,6 +231,7 @@ export class MeetingStore {
       sourceJson: string | null;
       plannerError: string | null;
       compiledAt: number;
+      publishedAt: number | null;
     } | null;
     if (row === null) return null;
     const specs = this.db.query(
@@ -227,7 +244,12 @@ export class MeetingStore {
       slides: specs.map(({ specJson }) => parseSlideSpec(specJson)),
       ...(row.sourceJson === null ? {} : { source: JSON.parse(row.sourceJson) as unknown }),
     });
-    return { outline, plannerError: row.plannerError, compiledAt: row.compiledAt };
+    return {
+      outline,
+      plannerError: row.plannerError,
+      compiledAt: row.compiledAt,
+      publishedAt: row.publishedAt,
+    };
   }
 
   /** anarlog식 Markdown export: 헤더 + 슬라이드 요약 + 전체 전사본 */

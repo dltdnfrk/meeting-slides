@@ -1,0 +1,13 @@
+$ bun test tests/deck-export.test.ts tests/deck-compile-action.test.ts tests/public-shell.test.ts
+
+14 pass
+0 fail
+61 expect() calls
+Ran 14 tests across 3 files.
+
+Covered:
+- client compileDeck request and started/success/error rendering
+- typed compile-busy export error rendering
+- explicit legacy fallback when no successful compile exists
+- compiled kinded registry files preferred after successful publish
+- compile filesystem publish and WS transition contract

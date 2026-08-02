@@ -110,7 +110,15 @@ export interface CompileUpdate {
   error?: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | LineUpdate | DetectUpdate | SavedUpdate | CompileUpdate;
+export interface ExportUpdate {
+  type: "export";
+  status: "error";
+  action: "exportDeck" | "exportPdf" | "exportPng";
+  code: "compile-busy";
+  error: string;
+}
+
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | LineUpdate | DetectUpdate | SavedUpdate | CompileUpdate | ExportUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 

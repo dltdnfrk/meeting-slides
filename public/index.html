@@ -130,6 +130,8 @@
           실시간 전사 <span class="dock__count" id="feed-count">0</span>
         </button>
         <div class="dock__spacer"></div>
+        <button id="btn-compile-deck" class="dock__btn dock__btn--compile" type="button" title="전체 회의를 발표 덱으로 컴파일" aria-label="발표 덱 컴파일"><span>✦</span>컴파일</button>
+        <span id="compile-status" class="compile-status" role="status" aria-live="polite" hidden></span>
         <button id="btn-export-md"   class="dock__btn" type="button" title="Markdown 내보내기" aria-label="Markdown 내보내기"><span>↓</span>MD</button>
         <button id="btn-export-json" class="dock__btn" type="button" title="JSON 내보내기" aria-label="JSON 내보내기"><span>{ }</span>JSON</button>
         <button id="btn-export-transcript" class="dock__btn" type="button" title="전사본 내보내기" aria-label="전사본 내보내기"><span>¶</span>전사</button>

@@ -20,6 +20,8 @@ const statusTextEl = $("status-text");
 const btnExportMdEl = $("btn-export-md");
 const btnExportJsonEl = $("btn-export-json");
 const btnExportTranscriptEl = $("btn-export-transcript");
+const btnCompileDeckEl = $("btn-compile-deck");
+const compileStatusEl = $("compile-status");
 const btnExportDeckEl = $("btn-export-deck");
 const btnExportPdfEl = $("btn-export-pdf");
 const btnExportPngEl = $("btn-export-png");
@@ -510,6 +512,38 @@ btnExportTranscriptEl.onclick = () => {
   }
 };
 
+btnCompileDeckEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "compileDeck" }));
+    btnCompileDeckEl.disabled = true;
+    compileStatusEl.hidden = false;
+    compileStatusEl.dataset.state = "started";
+    compileStatusEl.textContent = "컴파일 중…";
+    renderStatus("발표 덱 컴파일 시작…");
+  } else {
+    renderStatus("연결되지 않음 — 컴파일 불가");
+  }
+};
+
+function renderCompileStatus(msg) {
+  compileStatusEl.hidden = false;
+  compileStatusEl.dataset.state = msg.status;
+  if (msg.status === "started") {
+    btnCompileDeckEl.disabled = true;
+    compileStatusEl.textContent = "컴파일 중…";
+    renderStatus("발표 덱 컴파일 중…");
+  } else if (msg.status === "success") {
+    btnCompileDeckEl.disabled = false;
+    const count = msg.outline?.slideCount;
+    compileStatusEl.textContent = `컴파일 완료${Number.isFinite(count) ? ` · ${count}장` : ""}`;
+    renderStatus(`컴파일 완료${msg.path ? `: ${msg.path}` : ""}`);
+  } else {
+    btnCompileDeckEl.disabled = false;
+    compileStatusEl.textContent = `컴파일 실패: ${msg.error || "알 수 없는 오류"}`;
+    renderStatus(compileStatusEl.textContent);
+  }
+}
+
 btnExportDeckEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     // lecture-deck 템플릿으로 reveal.js 강의 덱 생성 → exports/deck-*/
@@ -669,6 +703,10 @@ function connect() {
         detecting = !!msg.detecting;
         if (glanceDetectEl) glanceDetectEl.hidden = !msg.detecting;
         renderPill();
+      } else if (msg.type === "compile") {
+        renderCompileStatus(msg);
+      } else if (msg.type === "export" && msg.status === "error") {
+        renderStatus(msg.code === "compile-busy" ? "컴파일 중에는 내보낼 수 없습니다" : msg.error);
       } else if (msg.type === "saved") {
         renderStatus(`저장됨: ${msg.path}`);
         // 상시 표시 (관찰성: 마지막 저장물 경로를 도크에 고정)
@@ -685,6 +723,7 @@ function connect() {
     }
   };
   ws.onclose = () => {
+    btnCompileDeckEl.disabled = false;
     renderStatus("연결 끊김. 3초 후 재시도...");
     setTimeout(connect, 3000);
   };

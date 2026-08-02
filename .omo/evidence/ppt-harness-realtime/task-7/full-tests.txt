@@ -1,0 +1,6 @@
+$ bun test
+
+100 pass
+0 fail
+335 expect() calls
+Ran 100 tests across 16 files.

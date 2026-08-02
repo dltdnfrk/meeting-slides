@@ -62,6 +62,7 @@ describe("compiled deck disk action", () => {
       "slide-03.html", "slide-04.html", "slide-05.html",
     ]);
     expect(store.deckOutline(meetingId)?.outline).toEqual(result.outline);
+    expect(store.deckOutline(meetingId)?.publishedAt).not.toBeNull();
     expect(readFileSync(join(slidesDirectory, "slide-02.html"), "utf-8")).toContain('class="slide-page is-summary"');
     expect(readFileSync(join(slidesDirectory, "slide-03.html"), "utf-8")).toContain("금요일에 배포한다");
     expect(readFileSync(join(slidesDirectory, "slide-04.html"), "utf-8")).toContain("릴리스 노트");
