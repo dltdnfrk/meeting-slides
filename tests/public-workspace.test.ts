@@ -411,3 +411,102 @@ describe("중앙 무대 잠금과 반응형", () => {
     await page.setViewport({ width: 1440, height: 900 });
   });
 });
+
+
+describe("헤르메틱 워크스페이스 E2E", () => {
+  test("세 패널·스플리터·전사 줄·MeetingCard·레이아웃 복원을 한 흐름으로 통과한다", async () => {
+    await page.setViewport({ width: 1440, height: 900 });
+    await page.evaluate((key) => localStorage.removeItem(key), STORAGE_KEY);
+    await page.reload({ waitUntil: "load" });
+    await harness.clientConnected;
+    await waitForStableLayout(page);
+
+    // 1) three panes
+    const panes = await page.evaluate(() => ({
+      rail: !!document.querySelector(".session-rail"),
+      stage: !!document.querySelector(".stage-pane"),
+      transcript: !!document.querySelector(".transcript-pane"),
+    }));
+    expect(panes).toEqual({ rail: true, stage: true, transcript: true });
+
+    // 2) splitter drag changes widths
+    const before = await paneWidths(page);
+    await dragSplitter(page, "#splitter-rail", 100);
+    const afterDrag = await paneWidths(page);
+    expect(afterDrag.left - before.left).toBeGreaterThan(50);
+
+    // 3) transcript line in dock
+    await page.evaluate(() => {
+      const body = document.getElementById("transcript-body")!;
+      (globalThis as unknown as { __line: Promise<void> }).__line = new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => { observer.disconnect(); reject(new Error("line timeout")); }, 5_000);
+        const observer = new MutationObserver(() => {
+          if ([...body.querySelectorAll(".feed-line")].some((el) => el.textContent?.includes("E2E 전사 줄"))) {
+            clearTimeout(timer); observer.disconnect(); resolve();
+          }
+        });
+        observer.observe(body, { childList: true, subtree: true });
+      });
+    });
+    harness.pushMessage({ type: "line", text: "E2E 전사 줄", ts: Date.now(), speaker: 1 });
+    await page.evaluate(() => (globalThis as unknown as { __line: Promise<void> }).__line);
+    const lineInPane = await page.evaluate(() => {
+      const pane = document.querySelector(".transcript-pane")!;
+      const line = [...pane.querySelectorAll(".feed-line")].find((el) => el.textContent?.includes("E2E 전사 줄"));
+      return !!line && pane.contains(line);
+    });
+    expect(lineInPane).toBe(true);
+
+    // 4) MeetingCard in center after line
+    await page.evaluate(() => {
+      const root = document.getElementById("current-slide")!;
+      (globalThis as unknown as { __card: Promise<void> }).__card = new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => { observer.disconnect(); reject(new Error("card timeout")); }, 5_000);
+        const observer = new MutationObserver(() => {
+          if (root.querySelector(".slide__title")?.textContent === "E2E 중앙 카드") {
+            clearTimeout(timer); observer.disconnect(); resolve();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+      });
+    });
+    harness.pushMessage({
+      type: "slide",
+      current: {
+        index: 7,
+        title: "E2E 중앙 카드",
+        bullets: ["한 흐름"],
+        startedAt: Date.now(),
+        sentenceCount: 1,
+      },
+      history: [],
+    });
+    await page.evaluate(() => (globalThis as unknown as { __card: Promise<void> }).__card);
+    const card = await page.evaluate(() => {
+      const stage = document.querySelector(".stage-pane")!;
+      const title = document.querySelector(".slide__title");
+      return {
+        inStage: stage.contains(title),
+        text: title?.textContent ?? null,
+      };
+    });
+    expect(card).toEqual({ inStage: true, text: "E2E 중앙 카드" });
+
+    // 5) layout persist roundtrip
+    const dragged = await paneWidths(page);
+    await page.reload({ waitUntil: "load" });
+    await harness.clientConnected;
+    await waitForStableLayout(page);
+    const restored = await paneWidths(page);
+    expect(restored.left).toBeCloseTo(dragged.left, 0);
+    expect(restored.right).toBeCloseTo(dragged.right, 0);
+
+    // edge: empty transcript state still ok
+    const emptyOk = await page.evaluate(() => {
+      const empty = document.getElementById("transcript-empty");
+      return empty !== null;
+    });
+    expect(emptyOk).toBe(true);
+  });
+});
+
