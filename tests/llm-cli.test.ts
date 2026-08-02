@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { buildCliArgs } from "../src/llm-cli.ts";
-import { parseBlockDetectionJson } from "../src/llm.ts";
+import { parseBlockDetectionJson, SYSTEM_PROMPT } from "../src/llm.ts";
 
 describe("buildCliArgs", () => {
   test("claude 프리셋: -p + text 출력", () => {
@@ -39,40 +39,42 @@ describe("buildCliArgs", () => {
 });
 
 describe("parseBlockDetectionJson", () => {
-  test("정상 JSON 파싱", () => {
-    const result = parseBlockDetectionJson('{"shouldAdvance": true, "blockTitle": "출시 일정", "bullets": ["베타 금요일", "QA 완료"]}');
-    expect(result.shouldAdvance).toBe(true);
-    expect(result.blockTitle).toBe("출시 일정");
-    expect(result.bullets).toEqual(["베타 금요일", "QA 완료"]);
+  test("MeetingCard JSON의 선택 필드까지 파싱", () => {
+    const result = parseBlockDetectionJson(JSON.stringify({
+      shouldAdvance: true,
+      title: "출시 일정",
+      kicker: "배포 준비",
+      bullets: ["베타 금요일", "QA 완료"],
+      emphasis: "목요일까지 QA를 끝낸다",
+    }));
+    expect(result).toEqual({
+      shouldAdvance: true,
+      title: "출시 일정",
+      kicker: "배포 준비",
+      bullets: ["베타 금요일", "QA 완료"],
+      emphasis: "목요일까지 QA를 끝낸다",
+    });
   });
 
   test("앞뒤 사고 과정이 붙은 출력에서 JSON 추출 (reasoning 대응)", () => {
-    const noisy = '생각해보니... 주제가 바뀌었군요. {"shouldAdvance": true, "blockTitle": "기술 설계", "bullets": []} 이렇게 하겠습니다.';
-    const result = parseBlockDetectionJson(noisy);
-    expect(result.shouldAdvance).toBe(true);
-    expect(result.blockTitle).toBe("기술 설계");
+    const noisy = '생각해보니... {"shouldAdvance":true,"title":"기술 설계","bullets":["API 계약 확정"]} 이렇게 하겠습니다.';
+    expect(parseBlockDetectionJson(noisy).title).toBe("기술 설계");
   });
 
-  test("깨진 출력은 파싱 실패 fallback", () => {
-    const result = parseBlockDetectionJson("JSON이 아닌 응답");
-    expect(result.blockTitle).toBe("(파싱 실패)");
-    expect(result.shouldAdvance).toBe(false);
+  test.each([
+    ["비 JSON", "JSON이 아닌 응답"],
+    ["빈 출력", ""],
+    ["문자열 boolean", '{"shouldAdvance":"false","title":"일정","bullets":["확인"]}'],
+    ["빈 bullets", '{"shouldAdvance":false,"title":"일정","bullets":[]}'],
+    ["알 수 없는 키", '{"shouldAdvance":false,"title":"일정","bullets":["확인"],"html":"<b>x</b>"}'],
+  ])("잘못된 %s은 failure 경로로 예외", (_label, content) => {
+    expect(() => parseBlockDetectionJson(content)).toThrow();
   });
 
-  test("빈 출력은 빈 결과", () => {
-    const result = parseBlockDetectionJson("");
-    expect(result.blockTitle).toBe("");
-    expect(result.bullets).toEqual([]);
-  });
-
-  test("제목 50자, 불렛 80자/6개 제한", () => {
-    const result = parseBlockDetectionJson(JSON.stringify({
-      shouldAdvance: false,
-      blockTitle: "가".repeat(60),
-      bullets: Array.from({ length: 8 }, (_, i) => `${i}${"나".repeat(90)}`),
-    }));
-    expect(result.blockTitle).toHaveLength(50);
-    expect(result.bullets).toHaveLength(6);
-    expect(result.bullets[0]).toHaveLength(80);
+  test("MeetingCard 스키마 드라이버를 명시", () => {
+    expect(SYSTEM_PROMPT).toContain('"shouldAdvance": boolean');
+    expect(SYSTEM_PROMPT).toContain('"kicker"?: string');
+    expect(SYSTEM_PROMPT).toContain('"bullets": string[1..6]');
+    expect(SYSTEM_PROMPT).toContain('"emphasis"?: string');
   });
 });

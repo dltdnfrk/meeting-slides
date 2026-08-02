@@ -1,0 +1,46 @@
+$ bun test tests/session.test.ts tests/slide-spec.test.ts tests/llm-cli.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/slide-spec.test.ts:
+(pass) SlideSpec > all six slide kinds parse in one valid outline [0.61ms]
+(pass) SlideSpec > rejects an unknown kind [0.16ms]
+(pass) SlideSpec > rejects a missing title [0.03ms]
+(pass) SlideSpec > rejects too many bullets instead of truncating [0.13ms]
+(pass) SlideSpec > rejects over-limit strings and malformed JSON [0.06ms]
+(pass) SlideSpec > enforces kind-specific required and empty-array rules [0.04ms]
+(pass) SlideSpec > does not coerce field types [0.04ms]
+(pass) SlideSpec > maps a legacy slide to a detached live meeting card [0.04ms]
+
+tests/session.test.ts:
+(pass) MeetingSession > 첫 감지에서 MeetingCard 슬라이드 생성 [0.51ms]
+(pass) MeetingSession > hysteresis: 같은 pending 후보 2회만 advance하고 첫 신호는 현재 카드를 오염시키지 않음 [0.23ms]
+(pass) MeetingSession > A→B→C 단일 신호는 A를 archive하지 않고 후보별 streak를 격리 [0.12ms]
+(pass) MeetingSession > advance 시그널이 끊기면 후보 streak 리셋 [0.22ms]
+(pass) MeetingSession > reset()은 진행 중이던 감지 결과를 폐기 (epoch 무효화) [0.08ms]
+(pass) MeetingSession > detectInterval 문장이 쌓여야 LLM 호출 [0.19ms]
+(pass) MeetingSession > 자막은 디바운스 후 정확한 caption 이벤트로 브로드캐스트 [200.11ms]
+(pass) MeetingSession > LLM 실패는 fallback MeetingCard를 만들고 detecting을 안전하게 해제 [0.46ms]
+(pass) MeetingSession > setDetector로 런타임 LLM 교체 — 다음 감지부터 새 백엔드 사용 [0.07ms]
+(pass) MeetingSession > 전사 로그는 문장+시각+화자를 전부 보관하고 reset에서 비움 [0.04ms]
+(pass) MeetingSession > 화자 번호가 캡션에 실리고, 화자 변경 시 버퍼 즉시 플러시 [200.08ms]
+(pass) MeetingSession > 같은 토픽 MeetingCard 갱신도 sink.onSlide로 영속화 [0.39ms]
+
+tests/llm-cli.test.ts:
+(pass) buildCliArgs > claude 프리셋: -p + text 출력 [0.04ms]
+(pass) buildCliArgs > codex 프리셋: exec + 최종 메시지 파일 [0.03ms]
+(pass) buildCliArgs > codex: 모델/effort 오버라이드 인자 [0.02ms]
+(pass) buildCliArgs > claude: 모델 오버라이드 인자 [0.01ms]
+(pass) parseBlockDetectionJson > MeetingCard JSON의 선택 필드까지 파싱 [0.12ms]
+(pass) parseBlockDetectionJson > 앞뒤 사고 과정이 붙은 출력에서 JSON 추출 (reasoning 대응) [0.02ms]
+(pass) parseBlockDetectionJson > 잘못된 비 JSON은 failure 경로로 예외 [0.02ms]
+(pass) parseBlockDetectionJson > 잘못된 빈 출력은 failure 경로로 예외
+(pass) parseBlockDetectionJson > 잘못된 문자열 boolean은 failure 경로로 예외
+(pass) parseBlockDetectionJson > 잘못된 빈 bullets은 failure 경로로 예외
+(pass) parseBlockDetectionJson > 잘못된 알 수 없는 키은 failure 경로로 예외
+(pass) parseBlockDetectionJson > MeetingCard 스키마 드라이버를 명시 [0.01ms]
+
+ 32 pass
+ 0 fail
+ 64 expect() calls
+Ran 32 tests across 3 files. [423.00ms]
+exit=0

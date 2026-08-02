@@ -10,11 +10,10 @@
 // max_tokens를 충분히 잡고, content가 비면 reasoning_content에서 JSON 추출.
 
 import { LLMProviderConfig } from "./config.js";
+import { parseLiveMeetingCard, type LiveMeetingCard } from "./slide-spec.js";
 
-export interface BlockDetectionResult {
+export interface BlockDetectionResult extends LiveMeetingCard {
   shouldAdvance: boolean;
-  blockTitle: string;
-  bullets: string[];
 }
 
 /** HTTP든 CLI든 블록 감지 클라이언트가 만족해야 하는 공통 인터페이스. */
@@ -24,27 +23,40 @@ export interface BlockDetector {
 }
 
 /**
- * 모델 출력에서 블록 감지 JSON을 추출한다. GLM reasoning_content처럼 앞뒤에
- * 사고 과정이 붙은 출력도 첫 { 부터 마지막 } 까지 잘라 파싱한다.
+ * 모델 출력에서 MeetingCard JSON을 추출하고 엄격히 검증한다. GLM의
+ * reasoning_content처럼 앞뒤에 텍스트가 붙어도 JSON 객체 자체는 추출한다.
+ * 잘못된 출력은 예외로 올려 세션의 provider failure/fallback 경로를 사용한다.
  */
 export function parseBlockDetectionJson(content: string): BlockDetectionResult {
-  const raw = content.trim().length > 0 ? content : "{}";
-  try {
-    const jsonStr = raw.includes("{")
-      ? raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1)
-      : raw;
-    const parsed = JSON.parse(jsonStr) as Partial<BlockDetectionResult>;
-    const bulletsRaw = Array.isArray(parsed.bullets) ? parsed.bullets : [];
-    return {
-      shouldAdvance: Boolean(parsed.shouldAdvance),
-      blockTitle: String(parsed.blockTitle ?? "").slice(0, 50),
-      bullets: bulletsRaw.map((b) => String(b).slice(0, 80)).slice(0, 6),
-    };
-  } catch {
-    // 빈 출력은 정상 no-op(문장 없음 등). 비어있지 않은 비-JSON만 경고로 기록.
-    if (raw.trim().length > 0) console.warn("[LLM] 블록 감지 JSON 파싱 실패:", raw.slice(0, 200));
-    return { shouldAdvance: false, blockTitle: "(파싱 실패)", bullets: [] };
+  const raw = content.trim();
+  const firstBrace = raw.indexOf("{");
+  const lastBrace = raw.lastIndexOf("}");
+  const jsonStr = firstBrace >= 0 && lastBrace >= firstBrace
+    ? raw.slice(firstBrace, lastBrace + 1)
+    : raw;
+  const parsed = JSON.parse(jsonStr) as unknown;
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new TypeError("detection must be a JSON object");
   }
+
+  const value = parsed as Record<string, unknown>;
+  const allowed = new Set(["shouldAdvance", "title", "kicker", "bullets", "emphasis"]);
+  const unknown = Object.keys(value).find((key) => !allowed.has(key));
+  if (unknown) throw new TypeError(`detection.${unknown} is not allowed`);
+  if (typeof value.shouldAdvance !== "boolean") {
+    throw new TypeError("detection.shouldAdvance must be a boolean");
+  }
+
+  const card = parseLiveMeetingCard({
+    title: value.title,
+    ...(value.kicker === undefined ? {} : { kicker: value.kicker }),
+    bullets: value.bullets,
+    ...(value.emphasis === undefined ? {} : { emphasis: value.emphasis }),
+  });
+  if (card.bullets.length < 1) {
+    throw new TypeError("detection.bullets must contain 1-6 items");
+  }
+  return { shouldAdvance: value.shouldAdvance, ...card };
 }
 
 interface ChatChoice {
@@ -58,23 +70,30 @@ interface ChatResponse {
   choices?: ChatChoice[];
 }
 
-export const SYSTEM_PROMPT = `당신은 실시간 한국어 회의 전사를 분석하는 어시스턴트입니다.
+export const SYSTEM_PROMPT = `당신은 실시간 한국어 회의를 화면용 MeetingCard로 구조화합니다.
+최근 발언에 실제로 나온 정보만 사용하고, 아래 JSON 스키마를 정확히 따르세요.
 
-입력: 최근 회의 발언 문장들
-출력: JSON 객체 (reasoning_content 없이 content에 JSON만)
+{
+  "shouldAdvance": boolean,
+  "title": string,
+  "kicker"?: string,
+  "bullets": string[1..6],
+  "emphasis"?: string
+}
 
-역할:
-1. 현재 다루고 있는 주제 블록의 제목을 10-15자 이내로 요약
-2. 블록의 핵심 요점 3-5개를 불렛으로 추출 (각 25자 이내)
-3. 주제가 바뀌었는지 판단 (shouldAdvance=true: 새 주제 블록 시작)
+필드 작성 규칙:
+- title: 현재 안건을 분명하게 요약한 짧은 한국어 제목
+- kicker: 회의 단계나 맥락이 유용할 때만 쓰는 짧은 라벨
+- bullets: 핵심 사실, 논점, 합의 또는 할 일을 1~6개의 간결한 한국어 문장으로 정리
+- emphasis: 결정, 위험 또는 다음 행동 중 특히 강조할 한 줄이 있을 때만 작성
+- 선택 필드는 근거가 없으면 키 자체를 생략
 
-주제 전환 판단 기준:
-- 완전히 다른 안건으로 넘어감 (예: 일정 → 기술 설계)
-- 이전 결론을 맺고 새 논의 시작
-- 단순한 화자 교체나 부가 설명은 전환 아님
+shouldAdvance 판단 규칙:
+- 완전히 다른 안건으로 넘어가거나, 이전 논의를 맺고 새 논의를 시작하면 true
+- 같은 안건의 보충 설명, 화자 교체, 세부 질문은 false
+- 확신이 없으면 false
 
-반드시 JSON만 출력 (사고 과정 금지):
-{"shouldAdvance": false, "blockTitle": "...", "bullets": ["...", "..."]}`;
+반드시 유효한 JSON 객체만 출력하세요. 마크다운, 설명, 사고 과정, 추가 키는 금지합니다.`;
 
 // GLM-5.2 reasoning 모델은 thinking 토큰 때문에 응답이 느릴 수 있음.
 // 행잉 요청이 session.detecting을 영원히 고정하지 않도록 요청에 상한을 둔다.
@@ -94,7 +113,7 @@ export class LLMClient {
 
   async detectBlock(sentences: string[]): Promise<BlockDetectionResult> {
     if (sentences.length === 0) {
-      return { shouldAdvance: false, blockTitle: "", bullets: [] };
+      return { shouldAdvance: false, title: "", bullets: [] };
     }
 
     const userPrompt = `최근 회의 문장들:

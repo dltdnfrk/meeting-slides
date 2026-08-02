@@ -1,0 +1,112 @@
+$ bun test
+bun test v1.3.14 (0d9b296a)
+
+tests/store.test.ts:
+(pass) MeetingStore > 회의 라이프사이클: 시작 → 라인/슬라이드 → 종료 [2.14ms]
+(pass) MeetingStore > 회의가 열려있지 않으면 라인/슬라이드 무시 [0.19ms]
+(pass) MeetingStore > Markdown export: 헤더 + 슬라이드 + 전사본 [1.78ms]
+(pass) MeetingStore > 같은 idx 슬라이드 갱신은 upsert되어 export에 최신 불렛이 남는다 [0.40ms]
+
+tests/sentence-assembler.test.ts:
+(pass) SentenceAssembler > 완결 구두점이면 즉시 방출 [0.06ms]
+(pass) SentenceAssembler > 미완결 조각은 보류 후 다음 조각과 병합 [0.02ms]
+(pass) SentenceAssembler > 구두점으로 끝난 뒤에는 새 문장 시작 [0.01ms]
+(pass) SentenceAssembler > 길이 상한을 넘으면 구두점 없이도 강제 방출 (실시간성 하한) [0.01ms]
+(pass) SentenceAssembler > 화자 전환/종료 시 flush로 보류분 방출
+
+tests/deck.test.ts:
+(pass) linesForSlide > 블록 시작 시각 구간으로 라인 배정 [0.02ms]
+(pass) buildDeckHtml > 타이틀/본문/마무리 섹션 구성 [0.02ms]
+(pass) buildDeckHtml > 불렛과 발표자 노트(전사) 포함 [0.08ms]
+(pass) buildDeckHtml > HTML 이스케이프 [0.06ms]
+(pass) buildDeckHtml > Given meeting imagery assets, When reveal deck is built, Then semantic cover and topic content reference only local decorative images [0.12ms]
+(pass) buildSlideFiles (slides-grab 계약) > 타이틀+블록+마무리 개별 파일 생성 [0.09ms]
+(pass) buildSlideFiles (slides-grab 계약) > legacy cover/topic/closing files are produced by the SlideSpec template registry [0.08ms]
+(pass) buildSlideFiles (slides-grab 계약) > unregistered SlideSpec kinds fail with a typed error before producing a file [0.06ms]
+(pass) buildSlideFiles (slides-grab 계약) > 16:9 고정 프레임과 로컬 테마 링크 [0.02ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given standalone slide files, When normal and empty decks are built, Then every page delegates styling and geometry to the shared theme [0.12ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given slides-grab's 960x540 presentation viewport, When standalone slide files are built, Then the shared frame adapter preserves the 1280x720 design surface [0.05ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given topic slide pages, When standalone files are built, Then cover and topics use their matching local decorative assets while closing remains typography-only [0.03ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given six product-limit Korean bullets, When a dense topic is built, Then both outputs use the compact presentation contract without losing text [0.18ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given a long Korean cover title, When deck outputs are built, Then both cover surfaces use the readable long-title contract without deleting text [0.09ms]
+
+tests/whisper-speaker.test.ts:
+(pass) extractSpeakerTurn > 마커가 있으면 turn=true + 텍스트에서 제거 [0.04ms]
+(pass) extractSpeakerTurn > 마커가 없으면 원문 유지
+(pass) extractSpeakerTurn > 마커만 있는 라인은 빈 텍스트
+(pass) isHallucinationLoop > 토큰 4회 이상 연속 반복은 환각 루프 [0.19ms]
+(pass) isHallucinationLoop > 실제 강조(3회 이하)와 정상 문장은 통과 [0.02ms]
+
+tests/slide-spec.test.ts:
+(pass) SlideSpec > all six slide kinds parse in one valid outline [0.36ms]
+(pass) SlideSpec > rejects an unknown kind [0.04ms]
+(pass) SlideSpec > rejects a missing title [0.02ms]
+(pass) SlideSpec > rejects too many bullets instead of truncating [0.03ms]
+(pass) SlideSpec > rejects over-limit strings and malformed JSON [0.05ms]
+(pass) SlideSpec > enforces kind-specific required and empty-array rules [0.03ms]
+(pass) SlideSpec > does not coerce field types [0.04ms]
+(pass) SlideSpec > maps a legacy slide to a detached live meeting card [0.04ms]
+
+tests/providers.test.ts:
+(pass) buildProviderEntries > 구독 CLI 가용성은 주입된 탐지 결과를 따른다 [0.06ms]
+(pass) buildProviderEntries > HTTP 프로바이더는 키/URL 존재로 가용 판정 [0.02ms]
+(pass) buildProviderEntries > 5개 카드를 순서대로 제공 (구독 2 + API 3) [0.02ms]
+(pass) buildProviderEntries > 모델/effort 옵션 목록 제공 [0.03ms]
+(pass) upsertEnvText > 기존 키는 값만 교체하고 다른 줄은 보존 [0.09ms]
+(pass) upsertEnvText > 없는 키는 끝에 추가 [0.01ms]
+(pass) upsertEnvText > 여러 키 동시 upsert [0.01ms]
+(pass) upsertEnvText > 키 주변 공백이 있어도 매칭 [0.01ms]
+(pass) createDetector > cli 프리셋은 API 키 없이 생성 [0.04ms]
+(pass) createDetector > 알 수 없는 id는 null [0.05ms]
+
+tests/slide-persist.test.ts:
+(pass) same-topic slide persistence end-to-end > 세션 같은 토픽 갱신 → SQLite → deck export에 최신 불렛 [103.53ms]
+
+tests/whisper-dedupe.test.ts:
+(pass) bigramSimilarity > 완전히 같은 문장은 1 [0.11ms]
+(pass) bigramSimilarity > 띄어쓰기·대소문자 차이는 정규화로 흡수 [0.02ms]
+(pass) bigramSimilarity > 같은 발화의 부분 수정(리비전)은 높은 유사도 [0.04ms]
+(pass) bigramSimilarity > 공통 어미(습니다)만 같은 무관한 문장은 낮은 유사도 [0.01ms]
+(pass) bigramSimilarity > 같은 글자를 어순만 바꾼 문장은 중복이 아님
+(pass) bigramSimilarity > 빈 문자열·한 글자는 0 [0.01ms]
+
+tests/session.test.ts:
+(pass) MeetingSession > 첫 감지에서 MeetingCard 슬라이드 생성 [0.24ms]
+(pass) MeetingSession > hysteresis: 같은 pending 후보 2회만 advance하고 첫 신호는 현재 카드를 오염시키지 않음 [0.13ms]
+(pass) MeetingSession > A→B→C 단일 신호는 A를 archive하지 않고 후보별 streak를 격리 [0.10ms]
+(pass) MeetingSession > advance 시그널이 끊기면 후보 streak 리셋 [0.09ms]
+(pass) MeetingSession > reset()은 진행 중이던 감지 결과를 폐기 (epoch 무효화) [0.09ms]
+(pass) MeetingSession > detectInterval 문장이 쌓여야 LLM 호출 [0.15ms]
+(pass) MeetingSession > 자막은 디바운스 후 정확한 caption 이벤트로 브로드캐스트 [200.17ms]
+(pass) MeetingSession > LLM 실패는 fallback MeetingCard를 만들고 detecting을 안전하게 해제 [0.65ms]
+(pass) MeetingSession > setDetector로 런타임 LLM 교체 — 다음 감지부터 새 백엔드 사용 [0.09ms]
+(pass) MeetingSession > 전사 로그는 문장+시각+화자를 전부 보관하고 reset에서 비움 [0.05ms]
+(pass) MeetingSession > 화자 번호가 캡션에 실리고, 화자 변경 시 버퍼 즉시 플러시 [200.19ms]
+(pass) MeetingSession > 같은 토픽 MeetingCard 갱신도 sink.onSlide로 영속화 [0.36ms]
+
+tests/deck-assets.test.ts:
+(pass) Given deck-local imagery, When export assets are copied, Then reveal and standalone roots receive byte-identical local files [7.04ms]
+
+tests/grab.test.ts:
+(pass) grab design-gate helpers > reviewed=false면 proceed 리포트 생성 거부 [0.19ms]
+(pass) grab design-gate helpers > reviewed=true면 계약 문구를 포함한 마크다운 생성 [0.12ms]
+
+tests/llm-cli.test.ts:
+(pass) buildCliArgs > claude 프리셋: -p + text 출력 [0.05ms]
+(pass) buildCliArgs > codex 프리셋: exec + 최종 메시지 파일 [0.03ms]
+(pass) buildCliArgs > codex: 모델/effort 오버라이드 인자 [0.02ms]
+(pass) buildCliArgs > claude: 모델 오버라이드 인자 [0.01ms]
+(pass) parseBlockDetectionJson > MeetingCard JSON의 선택 필드까지 파싱 [0.14ms]
+(pass) parseBlockDetectionJson > 앞뒤 사고 과정이 붙은 출력에서 JSON 추출 (reasoning 대응) [0.02ms]
+(pass) parseBlockDetectionJson > 잘못된 비 JSON은 failure 경로로 예외 [0.02ms]
+(pass) parseBlockDetectionJson > 잘못된 빈 출력은 failure 경로로 예외
+(pass) parseBlockDetectionJson > 잘못된 문자열 boolean은 failure 경로로 예외
+(pass) parseBlockDetectionJson > 잘못된 빈 bullets은 failure 경로로 예외
+(pass) parseBlockDetectionJson > 잘못된 알 수 없는 키은 failure 경로로 예외
+(pass) parseBlockDetectionJson > MeetingCard 스키마 드라이버를 명시 [0.01ms]
+
+ 80 pass
+ 0 fail
+ 241 expect() calls
+Ran 80 tests across 12 files. [550.00ms]
+exit=0

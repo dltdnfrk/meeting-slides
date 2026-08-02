@@ -17,7 +17,7 @@ describe("same-topic slide persistence end-to-end", () => {
         call++;
         return {
           shouldAdvance: false,
-          blockTitle: "출시 일정",
+          title: "출시 일정",
           bullets: call === 1 ? ["초기 초안"] : ["베타 금요일", "QA 목요일"],
         };
       },
@@ -34,9 +34,9 @@ describe("same-topic slide persistence end-to-end", () => {
     });
 
     session.onChunk({ text: "일정 초안을 말합니다", ts: 1000 });
-    await Bun.sleep(20);
+    await session.flush();
     session.onChunk({ text: "베타와 QA 날짜를 확정합니다", ts: 2000 });
-    await Bun.sleep(20);
+    await session.flush();
 
     const slides = store.slides();
     expect(slides).toHaveLength(1);

@@ -5,12 +5,11 @@
 // 블록 전환 감지 시 WebSocket 클라이언트에 슬라이드 push.
 
 import type { BlockDetectionResult, BlockDetector } from "./llm.js";
+import type { LiveMeetingCard } from "./slide-spec.js";
 import type { TranscriptChunk } from "./whisper.js";
 
-export interface Slide {
+export interface Slide extends LiveMeetingCard {
   index: number;
-  title: string;
-  bullets: string[];
   startedAt: number;
   sentenceCount: number;
 }
@@ -131,6 +130,7 @@ export class MeetingSession {
   private captionFlushTimer: NodeJS.Timeout | null = null;
   private epoch = 0;
   private advanceStreak = 0;
+  private pendingAdvanceTitle: string | null = null;
   private static readonly MAX_SENTENCES = 200;
   private static readonly ADVANCE_THRESHOLD = 2;
 
@@ -271,7 +271,7 @@ export class MeetingSession {
 
   private fallbackDetect(context: string[]): BlockDetectionResult {
     if (context.length === 0) {
-      return { shouldAdvance: false, blockTitle: "", bullets: [] };
+      return { shouldAdvance: false, title: "", bullets: [] };
     }
 
     const joined = context.join(" ");
@@ -297,33 +297,39 @@ export class MeetingSession {
     const shouldAdvance = this.currentSlide === null
       || (this.currentSlide.title !== title && TOPIC_SHIFT_PATTERN.test(joined));
 
-    return { shouldAdvance, blockTitle: title, bullets };
+    return { shouldAdvance, title, kicker: "로컬 회의 요약", bullets };
   }
 
   private applyDetection(result: BlockDetectionResult): void {
-    // 빈 결과 (LLM이 내용 없다고 판단) → 슬라이드 생성/업데이트 스킵
-    const isEmpty = result.bullets.length === 0 && !result.blockTitle;
+    // 빈 내부 no-op 결과(문장 없음)는 슬라이드를 만들지 않는다.
+    const isEmpty = result.bullets.length === 0 && !result.title;
     if (isEmpty) {
       this.advanceStreak = 0;
+      this.pendingAdvanceTitle = null;
       return;
     }
 
-    // Hysteresis: 첫 슬라이드가 아닌 경우, 연속 N회 advance 시그널이 있어야
-    // 실제로 새 슬라이드를 만든다. 중복 슬라이드 spam 방지.
+    // Hysteresis: pending candidate는 현재 카드와 분리한다. 같은 제목의 후보가
+    // 연속 N회 확인될 때만 archive/advance하며, B 다음 C는 새 streak로 시작한다.
     let shouldAdvance = result.shouldAdvance;
     if (shouldAdvance && this.currentSlide !== null) {
-      this.advanceStreak++;
+      if (this.pendingAdvanceTitle === result.title) {
+        this.advanceStreak++;
+      } else {
+        this.pendingAdvanceTitle = result.title;
+        this.advanceStreak = 1;
+      }
       if (this.advanceStreak < MeetingSession.ADVANCE_THRESHOLD) {
-        shouldAdvance = false; // 아직 확정 아님 — 불렛만 갱신
+        return;
       }
     }
     if (!result.shouldAdvance) {
       this.advanceStreak = 0;
+      this.pendingAdvanceTitle = null;
     }
 
     let changed = false;
     if (shouldAdvance || this.currentSlide === null) {
-      // 첫 슬라이드이거나 새 블록 시작 (hysteresis 통과)
       if (this.currentSlide !== null) {
         this.history.push(this.currentSlide);
         if (this.history.length > 50) this.history.shift();
@@ -331,8 +337,10 @@ export class MeetingSession {
       this.slideIndex++;
       this.currentSlide = {
         index: this.slideIndex,
-        title: result.blockTitle || `(블록 ${this.slideIndex})`,
+        title: result.title || `(블록 ${this.slideIndex})`,
+        ...(result.kicker === undefined ? {} : { kicker: result.kicker }),
         bullets: result.bullets,
+        ...(result.emphasis === undefined ? {} : { emphasis: result.emphasis }),
         startedAt: Date.now(),
         sentenceCount: this.sentences.length,
       };
@@ -342,18 +350,26 @@ export class MeetingSession {
         console.error("[store] 슬라이드 저장 실패:", e);
       }
       this.advanceStreak = 0;
+      this.pendingAdvanceTitle = null;
       changed = true;
     } else if (this.currentSlide) {
-      // 같은 블록 — 실제 표시 내용이 달라진 경우만 업데이트
-      // 라이브 UI뿐 아니라 SQLite/export도 최신 불렛을 보려면 sink에 반드시 반영.
+      // 같은 블록의 완전한 MeetingCard를 반영한다. 선택 필드가 생략되면 이전의
+      // stale kicker/emphasis도 제거되어 모델의 최신 카드와 일치한다.
       const current = this.currentSlide;
-      const nextTitle = result.blockTitle || current.title;
       const nextBullets = result.bullets.length > 0 ? result.bullets : current.bullets;
       const bulletsChanged = nextBullets.length !== current.bullets.length
         || nextBullets.some((b, i) => b !== current.bullets[i]);
-      if (nextTitle !== current.title || bulletsChanged) {
-        current.title = nextTitle;
+      const cardChanged = result.title !== current.title
+        || result.kicker !== current.kicker
+        || result.emphasis !== current.emphasis
+        || bulletsChanged;
+      if (cardChanged) {
+        current.title = result.title || current.title;
         current.bullets = nextBullets;
+        if (result.kicker === undefined) delete current.kicker;
+        else current.kicker = result.kicker;
+        if (result.emphasis === undefined) delete current.emphasis;
+        else current.emphasis = result.emphasis;
         current.sentenceCount = this.sentences.length;
         try {
           this.sink?.onSlide(current);
@@ -385,6 +401,7 @@ export class MeetingSession {
     this.captionBuffer = "";
     this.captionSpeaker = undefined;
     this.advanceStreak = 0;
+    this.pendingAdvanceTitle = null;
     this.broadcast({ type: "slide", current: null, history: [] });
     this.broadcast({ type: "status", text: "세션 초기화" });
   }

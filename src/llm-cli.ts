@@ -90,7 +90,7 @@ export class CliLLMClient implements BlockDetector {
 
   async detectBlock(sentences: string[]): Promise<BlockDetectionResult> {
     if (sentences.length === 0) {
-      return { shouldAdvance: false, blockTitle: "", bullets: [] };
+      return { shouldAdvance: false, title: "", bullets: [] };
     }
     const userPrompt = `최근 회의 문장들:
 ${sentences.map((s, i) => `${i + 1}. ${s}`).join("\n")}

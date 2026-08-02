@@ -1,0 +1,2 @@
+$ git diff --check -- src/llm.ts src/llm-cli.ts src/session.ts tests/llm-cli.test.ts tests/session.test.ts tests/slide-persist.test.ts
+exit=0
