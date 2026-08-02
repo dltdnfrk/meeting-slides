@@ -281,3 +281,133 @@ describe("워크스페이스 스플리터", () => {
     expect(widths.stage).toBeGreaterThan(widths.left);
   });
 });
+
+
+describe("중앙 무대 잠금과 반응형", () => {
+  test("MeetingCard가 .stage-pane 안에만 렌더되고 무대 중앙 hit가 stage다", async () => {
+    await page.setViewport({ width: 1440, height: 900 });
+    await page.evaluate(() => localStorage.removeItem("workspace.layout.v1"));
+    await page.reload({ waitUntil: "load" });
+    await harness.clientConnected;
+    await waitForStableLayout(page);
+
+    // 렌더 대기 무장 후 슬라이드 push
+    await page.evaluate(() => {
+      const root = document.getElementById("current-slide")!;
+      (globalThis as unknown as { __card: Promise<void> }).__card = new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => {
+          observer.disconnect();
+          reject(new Error("MeetingCard render timeout"));
+        }, 5_000);
+        const observer = new MutationObserver(() => {
+          if (root.querySelector(".slide__title")?.textContent === "중앙 무대 카드") {
+            clearTimeout(timer);
+            observer.disconnect();
+            resolve();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+      });
+    });
+    harness.pushMessage({
+      type: "slide",
+      current: {
+        index: 1,
+        title: "중앙 무대 카드",
+        bullets: ["무대 잠금"],
+        startedAt: 1_700_000_000_000,
+        sentenceCount: 1,
+      },
+      history: [],
+    });
+    await page.evaluate(() => (globalThis as unknown as { __card: Promise<void> }).__card);
+
+    const lock = await page.evaluate(() => {
+      const stage = document.querySelector(".stage-pane") as HTMLElement;
+      const root = document.getElementById("current-slide")!;
+      const title = root.querySelector(".slide__title");
+      const box = stage.getBoundingClientRect();
+      const cx = box.left + box.width / 2;
+      const cy = box.top + box.height / 2;
+      const hit = document.elementFromPoint(cx, cy);
+      return {
+        titleInStage: stage.contains(title),
+        titleText: title?.textContent ?? null,
+        hitInStage: hit?.closest(".stage-pane") !== null,
+        compileVisible: document.querySelector(".dock #btn-compile-deck") !== null,
+        exportVisible: document.querySelector(".dock #btn-export-deck") !== null,
+      };
+    });
+
+    expect(lock).toEqual({
+      titleInStage: true,
+      titleText: "중앙 무대 카드",
+      hitInStage: true,
+      compileVisible: true,
+      exportVisible: true,
+    });
+  });
+
+  test("820px에서 레일은 접히고 무대/전사는 살아 있으며 문서 가로 스크롤이 없다", async () => {
+    await page.setViewport({ width: 820, height: 900 });
+    await page.evaluate(() => localStorage.removeItem("workspace.layout.v1"));
+    await page.reload({ waitUntil: "load" });
+    await harness.clientConnected;
+    await waitForStableLayout(page);
+
+    const narrow = await page.evaluate(() => {
+      const rail = document.querySelector(".session-rail") as HTMLElement;
+      const stage = document.querySelector(".stage-pane") as HTMLElement;
+      const transcript = document.querySelector(".transcript-pane") as HTMLElement;
+      const railStyle = getComputedStyle(rail);
+      const sr = stage.getBoundingClientRect();
+      const tr = transcript.getBoundingClientRect();
+      return {
+        railDisplay: railStyle.display,
+        stageVisible: sr.width > 0 && sr.height > 0,
+        transcriptVisible: tr.width > 0 && tr.height > 0,
+        transcriptBelowOrBeside: tr.top >= sr.bottom - 1 || tr.left >= sr.right - 1,
+        docScrollX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        bodyScrollX: document.body.scrollWidth - document.body.clientWidth,
+        compileVisible: document.querySelector(".dock #btn-compile-deck") !== null,
+      };
+    });
+
+    expect(narrow.railDisplay).toBe("none");
+    expect(narrow.stageVisible).toBe(true);
+    expect(narrow.transcriptVisible).toBe(true);
+    expect(narrow.transcriptBelowOrBeside).toBe(true);
+    expect(narrow.docScrollX).toBeLessThanOrEqual(1);
+    expect(narrow.bodyScrollX).toBeLessThanOrEqual(1);
+    expect(narrow.compileVisible).toBe(true);
+  });
+
+  test("375px에서 도크 줄바꿈으로 문서 가로 스크롤이 생기지 않는다", async () => {
+    await page.setViewport({ width: 375, height: 720 });
+    await page.evaluate(() => localStorage.removeItem("workspace.layout.v1"));
+    await page.reload({ waitUntil: "load" });
+    await harness.clientConnected;
+    await waitForStableLayout(page);
+
+    const tiny = await page.evaluate(() => {
+      const tabs = document.querySelector(".dock__tabs") as HTMLElement;
+      const style = getComputedStyle(tabs);
+      return {
+        flexWrap: style.flexWrap,
+        docScrollX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        bodyScrollX: document.body.scrollWidth - document.body.clientWidth,
+        compileVisible: document.querySelector(".dock #btn-compile-deck") !== null,
+        stageVisible: (document.querySelector(".stage-pane") as HTMLElement).getBoundingClientRect().width > 0,
+      };
+    });
+
+    expect(tiny.flexWrap).toBe("wrap");
+    expect(tiny.docScrollX).toBeLessThanOrEqual(1);
+    expect(tiny.bodyScrollX).toBeLessThanOrEqual(1);
+    expect(tiny.compileVisible).toBe(true);
+    expect(tiny.stageVisible).toBe(true);
+
+    // 후속 테스트 오염 방지
+    await page.setViewport({ width: 1440, height: 900 });
+  });
+});

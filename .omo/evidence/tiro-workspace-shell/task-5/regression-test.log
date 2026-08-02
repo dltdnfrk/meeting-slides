@@ -1,0 +1,9 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-compile-control.test.ts:
+(pass) 컴파일 컨트롤 > 요청을 보내고 started/success/error 상태를 사용자에게 표시한다 [67.17ms]
+
+ 1 pass
+ 0 fail
+ 4 expect() calls
+Ran 1 test across 1 file. [1171.00ms]

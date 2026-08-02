@@ -1,0 +1,31 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-shell.test.ts:
+(pass) 라이브 MeetingCard 렌더 > 슬라이드가 없으면 플레이스홀더를 유지한다 [27.50ms]
+(pass) 라이브 MeetingCard 렌더 > kicker/emphasis 포함 카드가 모두 렌더된다 [5.71ms]
+(pass) 라이브 MeetingCard 렌더 > 375px 폭에서 가로 오버플로가 없다 [2.35ms]
+(pass) 라이브 MeetingCard 렌더 > kicker/emphasis 없는 레거시 슬라이드도 제목/불릿만으로 렌더된다 [0.88ms]
+(pass) 라이브 MeetingCard 렌더 > 불릿이 비어도 제목 카드가 깨지지 않는다 [0.66ms]
+(pass) 라이브 MeetingCard 렌더 > 히스토리 미리보기에서도 같은 카드 레이아웃을 쓴다 [50.74ms]
+(pass) HTML 이스케이프 > 모델 텍스트의 마크업이 실행되지 않는다 [3.14ms]
+
+tests/public-workspace.test.ts:
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 좌/중앙/우 세 패널을 담는다 [7.57ms]
+(pass) 워크스페이스 셸 구조 > 중앙 패널이 기존 시각 자료 무대를 그대로 품는다 [0.78ms]
+(pass) 워크스페이스 셸 구조 > 세 패널이 가로로 나란히 놓이고 하단 도크가 보존된다 [0.58ms]
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 가로 오버플로 없이 뷰포트에 맞는다 [0.70ms]
+(pass) 워크스페이스 스플리터 > 두 스플리터가 패널 사이 DOM 순서에 놓인다 [57.00ms]
+(pass) 워크스페이스 스플리터 > 좌 스플리터를 끌면 레일이 넓어지고 무대가 그만큼 줄어든다 [124.50ms]
+(pass) 워크스페이스 스플리터 > 우 스플리터를 왼쪽으로 끌면 전사 패널이 넓어진다 [108.34ms]
+(pass) 워크스페이스 스플리터 > 최소 폭 밑으로는 접히지 않는다 [258.54ms]
+(pass) 워크스페이스 스플리터 > 드래그 결과가 workspace.layout.v1에 JSON으로 남는다 [108.35ms]
+(pass) 워크스페이스 스플리터 > 새로고침 후 저장된 폭이 복원된다 [216.24ms]
+(pass) 워크스페이스 스플리터 > 저장값이 손상돼도 기본 레이아웃으로 뜬다 [116.76ms]
+(pass) 중앙 무대 잠금과 반응형 > MeetingCard가 .stage-pane 안에만 렌더되고 무대 중앙 hit가 stage다 [62.75ms]
+(pass) 중앙 무대 잠금과 반응형 > 820px에서 레일은 접히고 무대/전사는 살아 있으며 문서 가로 스크롤이 없다 [79.73ms]
+(pass) 중앙 무대 잠금과 반응형 > 375px에서 도크 줄바꿈으로 문서 가로 스크롤이 생기지 않는다 [67.83ms]
+
+ 21 pass
+ 0 fail
+ 72 expect() calls
+Ran 21 tests across 2 files. [3.94s]

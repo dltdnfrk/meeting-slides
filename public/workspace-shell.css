@@ -284,6 +284,18 @@
   overflow-y: auto;
 }
 
+/* ── 하단 도크 행: 버튼이 넘치면 문서를 밀지 않고 접힌다 ──
+   .dock__tabs는 nowrap flex 행이라 좁은 폭에서 8개 버튼이 뷰포트를 넘겨
+   문서 전체에 가로 스크롤을 만들었다. 무대를 지키는 셸 규약과 같은 원칙으로
+   여기서도 “넘치면 접는다”. */
+.dock__tabs {
+  flex-wrap: wrap;
+  row-gap: var(--sp-1);
+  padding-bottom: var(--sp-1);
+}
+/* 스페이서는 첫 줄에서만 밀어내는 역할을 하고, 줄바꿈의 기점이 된다 */
+.dock__tabs .dock__spacer { min-width: 0; }
+
 /* ── 반응형: 좁아지면 사이드부터 접어 무대를 지킨다 ── */
 @media (max-width: 1180px) {
   .workspace { grid-template-columns: minmax(0, 1fr) var(--splitter-w) var(--transcript-w); }
