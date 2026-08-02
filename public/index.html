@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/workspace-shell.css">
 </head>
 <body>
   <!-- 앰비언트 배경 레이어 -->
@@ -87,8 +88,23 @@
       </div>
     </div>
 
-    <!-- ── 메인: 현재 슬라이드 (문서 히어로) ───── -->
-    <main class="stage">
+    <!-- ── 워크스페이스: 세션 레일 | 비주얼 스테이지 | 전사 ── -->
+    <div class="workspace" id="workspace">
+
+    <!-- 좌: 세션 레일 -->
+    <aside class="session-rail" id="session-rail" aria-label="세션">
+      <div class="pane__head">
+        <span class="pane__title">세션</span>
+        <span class="pane__count" id="session-count">0</span>
+      </div>
+      <div class="pane__body">
+        <ul class="session-list" id="session-list"></ul>
+        <p class="pane__empty" id="session-empty">저장된 세션이 없습니다</p>
+      </div>
+    </aside>
+
+    <!-- 중앙: 시각 자료 무대 (Tiro 히어로 슬롯) -->
+    <main class="stage stage-pane" id="stage-pane">
       <section class="slide-frame" id="slide-frame">
         <div class="doc-head">
           <h1 class="doc-title" id="doc-title">회의 준비 중</h1>
@@ -119,6 +135,20 @@
         <span class="island__meta" id="pill-meta"></span>
       </section>
     </main>
+
+    <!-- 우: 전사 패널 (연결은 todo 3) -->
+    <aside class="transcript-pane" id="transcript-pane" aria-label="전사">
+      <div class="pane__head">
+        <span class="pane__title">전사</span>
+        <span class="pane__count" id="transcript-count">0</span>
+      </div>
+      <div class="pane__body">
+        <div class="transcript-stream" id="transcript-stream"></div>
+        <p class="pane__empty" id="transcript-empty">녹음을 시작하면<br>전사가 여기에 흐릅니다</p>
+      </div>
+    </aside>
+
+    </div>
 
     <!-- ── 하단 패널: 탭(히스토리 / 전사) + export ─ -->
     <div class="dock">

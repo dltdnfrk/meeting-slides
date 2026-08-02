@@ -1,0 +1,125 @@
+/* ============================================================
+   workspace-shell.css — Tiro 스타일 3분할 워크스페이스 셸
+   세션 레일 | 시각 자료 무대(히어로) | 전사 패널
+   style.css의 zinc/live 토큰 위에 얹는 레이아웃 레이어.
+   스플리터(todo 2)·전사 배선(todo 3)은 여기서 다루지 않는다.
+   ============================================================ */
+
+:root {
+  /* 워크스페이스 기하: 스플리터가 나중에 갱신할 단일 소스 */
+  --rail-w: 232px;
+  --transcript-w: 320px;
+
+  /* 셸 스페이싱 스케일 (2px 그리드 기반) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+
+  /* 셸 라운드/보더 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --rule: 1px solid rgba(255, 255, 255, 0.06);
+  --rule-strong: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* ── 3분할 그리드: 좌 레일 · 중앙 무대 · 우 전사 ── */
+.workspace {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--transcript-w);
+  align-items: stretch;
+}
+
+/* 사이드 패널 공통 골격 */
+.session-rail,
+.transcript-pane {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* 사이드는 한 단계 눌러 중앙 히어로가 떠 보이게 한다 */
+  background: rgba(9, 9, 11, 0.5);
+}
+.session-rail { border-right: var(--rule); }
+.transcript-pane { border-left: var(--rule); }
+
+.pane__head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: var(--rule);
+}
+.pane__title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--z500);
+}
+.pane__count {
+  padding: 1px var(--sp-2);
+  border: var(--rule-strong);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--z700);
+}
+
+.pane__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--sp-2) var(--sp-3) var(--sp-4);
+}
+/* 빈 상태는 패널 위쪽에 붙여 목록이 채워질 자리를 미리 보여준다 */
+.pane__empty {
+  padding: var(--sp-3) var(--sp-2);
+  border: 1px dashed rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--z500);
+}
+.pane__empty[hidden] { display: none; }
+
+/* 세션 레일 (목록 배선은 todo 4) */
+.session-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.session-list:empty { display: none; }
+
+/* 전사 스트림 (배선은 todo 3) */
+.transcript-stream {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.transcript-stream:empty { display: none; }
+
+/* ── 중앙 무대: 기존 히어로가 그대로 산다 ── */
+.stage-pane {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ── 반응형: 좁아지면 사이드부터 접어 무대를 지킨다 ── */
+@media (max-width: 1180px) {
+  .workspace { grid-template-columns: minmax(0, 1fr) var(--transcript-w); }
+  .session-rail { display: none; }
+}
+@media (max-width: 900px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .transcript-pane { display: none; }
+}
