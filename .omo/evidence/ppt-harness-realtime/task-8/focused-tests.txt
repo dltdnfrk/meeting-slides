@@ -1,0 +1,11 @@
+$ bun test tests/hybrid-path.e2e.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/hybrid-path.e2e.test.ts:
+(pass) Hybrid live -> compile -> export hermetic path > renders a detected MeetingCard, persists and publishes kinded registry slides, then prefers compiled export [37.50ms]
+(pass) Hybrid live -> compile -> export hermetic path > rejects an invalid outline, falls back after model HTML, and surfaces compile-busy export without starting work [14.51ms]
+
+ 2 pass
+ 0 fail
+ 35 expect() calls
+Ran 2 tests across 1 file. [740.00ms]
