@@ -1,0 +1,16 @@
+Command: bun test tests/deck.test.ts tests/deck-compiler.test.ts tests/deck-compile-action.test.ts
+Exit: 0
+
+24 pass
+0 fail
+129 expect() calls
+Ran 24 tests across 3 files.
+
+Covered:
+- Existing legacy deck and standalone registry behavior
+- All six SlideSpec kinds, including summary/decision/actions templates
+- Planner validation, retry/fallback, and SQLite outline persistence
+- Fake-planner compile-to-disk path and standalone file existence
+- compile WS action started -> success metadata
+- Invalid outline rejection before rendering
+- Unknown meeting started -> error with no planner call or output directory

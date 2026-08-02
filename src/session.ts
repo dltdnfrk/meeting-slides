@@ -95,7 +95,22 @@ export interface SavedUpdate {
   path: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | LineUpdate | DetectUpdate | SavedUpdate;
+export interface CompileUpdate {
+  type: "compile";
+  status: "started" | "success" | "error";
+  meetingId?: number;
+  path?: string;
+  outline?: {
+    title: string;
+    style: string;
+    slideCount: number;
+    usedFallback: boolean;
+    plannerError: string | null;
+  };
+  error?: string;
+}
+
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | LineUpdate | DetectUpdate | SavedUpdate | CompileUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 

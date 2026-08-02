@@ -6,10 +6,13 @@
 // reveal.js는 CDN, 테마는 deck/theme.css (exports 폴더로 함께 복사).
 
 import type {
+  ActionsSlideSpec,
   ClosingSlideSpec,
   CoverSlideSpec,
+  DecisionSlideSpec,
   SectionSlideSpec,
   SlideSpec,
+  SummarySlideSpec,
 } from "./slide-spec.js";
 import type { StoredLine, StoredSlide } from "./store.js";
 
@@ -135,8 +138,8 @@ export interface SlideFile {
   html: string;
 }
 
-type SlidePageKind = "closing" | "cover" | "topic";
-type RegisteredSlideSpec = ClosingSlideSpec | CoverSlideSpec | SectionSlideSpec;
+type SlidePageKind = SlideSpec["kind"] | "topic";
+type RegisteredSlideSpec = SlideSpec;
 
 function slidePageHtml(inner: string, kind: SlidePageKind, dense = false, longCover = false): string {
   return `<!doctype html>
@@ -176,18 +179,55 @@ ${bullets}
   </div>`, "topic", isDenseTopic(spec));
 }
 
-function renderClosingTemplate(spec: ClosingSlideSpec): string {
+function renderSummaryTemplate(spec: SummarySlideSpec): string {
   const bullets = spec.bullets.map((bullet) => `    <li>${esc(bullet)}</li>`).join("\n");
   return slidePageHtml(`
+  <p class="eyebrow">SUMMARY</p>
   <h2>${esc(spec.title)}</h2>
   <ul>
 ${bullets}
-  </ul>`, "closing");
+  </ul>
+  ${spec.emphasis ? `<p class="emphasis">${esc(spec.emphasis)}</p>` : ""}`, "summary", isDenseTopic(spec));
+}
+
+function renderDecisionTemplate(spec: DecisionSlideSpec): string {
+  const rationale = spec.rationale?.map((item) => `    <li>${esc(item)}</li>`).join("\n") ?? "";
+  return slidePageHtml(`
+  <p class="eyebrow">DECISION</p>
+  <h2>${esc(spec.title)}</h2>
+  <p class="decision-statement">${esc(spec.decision)}</p>
+  ${rationale ? `<ul class="rationale">\n${rationale}\n  </ul>` : ""}`, "decision", (spec.rationale?.length ?? 0) >= DENSE_TOPIC_MIN_BULLETS);
+}
+
+function renderActionsTemplate(spec: ActionsSlideSpec): string {
+  const actions = spec.actions.map((action, index) => `    <li>
+      <span class="action-index">${String(index + 1).padStart(2, "0")}</span>
+      <span class="action-text">${esc(action.text)}</span>
+      ${action.owner ? `<span class="action-meta">${esc(action.owner)}${action.due ? ` · ${esc(action.due)}` : ""}</span>` : action.due ? `<span class="action-meta">${esc(action.due)}</span>` : ""}
+    </li>`).join("\n");
+  return slidePageHtml(`
+  <p class="eyebrow">NEXT ACTIONS</p>
+  <h2>${esc(spec.title)}</h2>
+  <ol class="action-list">
+${actions}
+  </ol>`, "actions", spec.actions.length >= DENSE_TOPIC_MIN_BULLETS);
+}
+
+function renderClosingTemplate(spec: ClosingSlideSpec): string {
+  const bullets = spec.bullets.map((bullet) => `    <li>${esc(bullet)}</li>`).join("\n");
+  return slidePageHtml(`
+  <p class="eyebrow">CLOSING</p>
+  <h2>${esc(spec.title)}</h2>
+  ${bullets ? `<ul>\n${bullets}\n  </ul>` : ""}
+  ${spec.emphasis ? `<p class="emphasis">${esc(spec.emphasis)}</p>` : ""}`, "closing");
 }
 
 const slideTemplateRegistry = {
   cover: renderCoverTemplate,
   section: renderSectionTemplate,
+  summary: renderSummaryTemplate,
+  decision: renderDecisionTemplate,
+  actions: renderActionsTemplate,
   closing: renderClosingTemplate,
 } satisfies { [Kind in RegisteredSlideSpec["kind"]]: (spec: Extract<RegisteredSlideSpec, { kind: Kind }>) => string };
 

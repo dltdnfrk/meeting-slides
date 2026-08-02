@@ -129,12 +129,23 @@ describe("buildSlideFiles (slides-grab 계약)", () => {
     expect(files).toEqual(renderedSpecs);
   });
 
-  test("unregistered SlideSpec kinds fail with a typed error before producing a file", () => {
-    expect(() => renderSlideSpec({
-      kind: "summary",
-      title: "요약",
-      bullets: ["핵심 내용"],
-    }, 1)).toThrow(UnsupportedSlideTemplateError);
+  test("all compiled SlideSpec kinds render through first-class templates", () => {
+    const compiled = [
+      renderSlideSpec({ kind: "summary", title: "요약", bullets: ["핵심 내용"], emphasis: "이번 주 배포" }, 1),
+      renderSlideSpec({ kind: "decision", title: "결정", decision: "금요일 배포", rationale: ["QA 완료"] }, 2),
+      renderSlideSpec({ kind: "actions", title: "할 일", actions: [{ text: "릴리스 노트", owner: "민지", due: "목요일" }] }, 3),
+    ];
+
+    expect(compiled[0]?.html).toContain('class="slide-page is-summary"');
+    expect(compiled[0]?.html).toContain("이번 주 배포");
+    expect(compiled[1]?.html).toContain('class="slide-page is-decision"');
+    expect(compiled[1]?.html).toContain("금요일 배포");
+    expect(compiled[2]?.html).toContain('class="slide-page is-actions"');
+    expect(compiled[2]?.html).toContain("민지 · 목요일");
+  });
+
+  test("unregistered runtime kinds fail with a typed error before producing a file", () => {
+    expect(() => renderSlideSpec({ kind: "unknown", title: "요약" } as never, 1)).toThrow(UnsupportedSlideTemplateError);
   });
 
   test("16:9 고정 프레임과 로컬 테마 링크", () => {

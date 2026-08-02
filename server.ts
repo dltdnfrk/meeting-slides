@@ -6,12 +6,13 @@
 
 import { loadConfig, loadWhisperConfig } from "./src/config.ts";
 import { WhisperStream, WhisperCLI, listCaptureDevices, type TranscriptChunk } from "./src/whisper.ts";
-import { LLMClient, type BlockDetector } from "./src/llm.ts";
+import { LLMClient, type MeetingLLM } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate } from "./src/session.ts";
 import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
 import { MeetingStore } from "./src/store.ts";
 import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
+import { runCompileDeckAction } from "./src/deck-compile-action.ts";
 import { copyDeckAssets } from "./src/deck-assets.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
@@ -33,7 +34,7 @@ if (args.includes("--devices")) {
 
 const config = loadConfig(args);
 
-let llm: BlockDetector;
+let llm: MeetingLLM;
 let llmLabel: string;
 if (config.llm.cli) {
   llm = new CliLLMClient(config.llm.cli);
@@ -185,7 +186,7 @@ const httpServer = Bun.serve({
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
       try {
-        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string; key?: string; model?: string; effort?: string };
+        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string; key?: string; model?: string; effort?: string; meetingId?: unknown };
         if (cmd.action === "startCapture") void startCapture();
         else if (cmd.action === "stopCapture") void stopCapture();
         else if (cmd.action === "reset") {
@@ -200,6 +201,20 @@ const httpServer = Bun.serve({
         }
         else if (cmd.action === "transcript") {
           ws.send(JSON.stringify(session.transcript("export")));
+        }
+        else if (cmd.action === "compileDeck") {
+          if (cmd.meetingId !== undefined && typeof cmd.meetingId !== "number") {
+            broadcast({ type: "compile", status: "started" });
+            broadcast({ type: "compile", status: "error", error: "meetingId must be a number" });
+          } else {
+            void runCompileDeckAction({
+              store,
+              planner: llm,
+              ...(cmd.meetingId === undefined ? {} : { meetingId: cmd.meetingId }),
+              exportsDirectory: join(import.meta.dir, "exports"),
+              send: broadcast,
+            });
+          }
         }
         else if (cmd.action === "exportDeck" || cmd.action === "exportPdf" || cmd.action === "exportPng") {
           // lecture-deck 템플릿 기반 reveal.js 덱 + slides-grab 계약 파일 생성
@@ -408,6 +423,7 @@ const httpServer = Bun.serve({
             const detector = createDetector(entry.id, { cliTimeoutMs, model, effort });
             if (detector) {
               session.setDetector(detector);
+              llm = detector;
               currentProviderId = entry.id;
               currentModel = model;
               currentEffort = effort;
