@@ -1,0 +1,23 @@
+{
+  "viewport": {
+    "w": 820,
+    "h": 900
+  },
+  "railDisplay": "none",
+  "stage": {
+    "w": 820,
+    "h": 400,
+    "t": 52,
+    "l": 0
+  },
+  "transcript": {
+    "w": 820,
+    "h": 248,
+    "t": 452,
+    "l": 0
+  },
+  "hitClosest": "stage-pane",
+  "docScrollX": 0,
+  "dockWrap": "wrap",
+  "compile": true
+}
