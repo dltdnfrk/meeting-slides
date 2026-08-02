@@ -205,13 +205,39 @@ body {
 }
 @keyframes slide-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .slide__inner { display: flex; flex-direction: column; width: 100%; }
-.slide__header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px; }
+/* 머리말: 인덱스 배지 + kicker를 한 줄로 묶고, 제목은 본문과 같은 왼쪽 끝선을 공유한다. */
+.slide__header { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+.slide__meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; }
 .slide__index { font-family: var(--font-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.14em; color: var(--live); padding: 3px 9px; border: 1px solid rgba(16,185,129,0.3); border-radius: 6px; background: var(--live-soft); flex-shrink: 0; }
-.slide__title { font-family: var(--font-display); font-weight: 700; font-size: clamp(22px, 5.5vw, 34px); line-height: 1.2; color: var(--z100); }
+.slide__kicker {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--live);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.slide__title { font-family: var(--font-display); font-weight: 700; font-size: clamp(22px, 5.5vw, 34px); line-height: 1.2; color: var(--z100); overflow-wrap: anywhere; }
 .slide__accent { height: 2px; width: 40px; background: linear-gradient(90deg, var(--live), transparent); border-radius: 2px; margin-bottom: 16px; }
 .slide__bullets { list-style: none; display: flex; flex-direction: column; gap: 9px; overflow-y: auto; }
-.slide__bullets li { font-size: clamp(14px, 3.4vw, 17px); line-height: 1.55; color: var(--z300); padding-left: 18px; position: relative; }
+.slide__bullets li { font-size: clamp(14px, 3.4vw, 17px); line-height: 1.55; color: var(--z300); padding-left: 18px; position: relative; overflow-wrap: anywhere; }
 .slide__bullets li::before { content: ""; position: absolute; left: 2px; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--live); opacity: 0.7; }
+/* emphasis: 결정/리스크/다음 한 줄 — 불릿보다 한 단계 강한 카드 바닥 액센트 */
+.slide__emphasis {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-top: 16px; padding: 12px 14px;
+  border: 1px solid rgba(16,185,129,0.28);
+  border-left-width: 3px;
+  border-radius: 10px;
+  background: var(--live-soft);
+  font-size: clamp(14px, 3.4vw, 17px); line-height: 1.5;
+  color: var(--z100);
+  overflow-wrap: anywhere;
+}
+.slide__emphasis-label {
+  font-family: var(--font-mono); font-size: 0.68em; font-weight: 700;
+  letter-spacing: 0.14em; color: var(--live); flex-shrink: 0;
+}
 .slide__notice { display: block; width: 100%; margin-bottom: 12px; padding: 8px 12px; border: 1px solid rgba(16,185,129,0.35); border-radius: 8px; background: rgba(16,185,129,0.08); color: var(--live); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-align: left; cursor: pointer; transition: background 0.25s var(--ease-smooth); }
 .slide__notice:hover { background: rgba(16,185,129,0.16); }
 .slide__placeholder { margin: auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
@@ -336,6 +362,8 @@ button:focus-visible { outline-offset: 1px; }
   .stage { padding: 14px; }
   .slide { padding: 24px 20px; }
   .slide__title { font-size: clamp(20px, 6vw, 28px); }
+  .slide__header { gap: 8px; }
+  .slide__emphasis { flex-direction: column; gap: 4px; }
   .dock { height: 180px; }
   .dock__btn { padding: 6px 8px; font-size: 9px; gap: 4px; }
   .dock__btn span { font-size: 11px; }
@@ -405,9 +433,18 @@ button:focus-visible { outline-offset: 1px; }
   line-height: 1.14;
   letter-spacing: -0.015em;
 }
+.slide__kicker {
+  font-size: clamp(11px, 1vw, 13px);
+}
 .slide__bullets li {
   font-size: clamp(16px, 1.8vw, 20px);
   line-height: 1.65;
+}
+.slide__emphasis {
+  margin-top: clamp(18px, 2vw, 28px);
+  padding: clamp(12px, 1.4vw, 18px) clamp(14px, 1.6vw, 20px);
+  border-radius: 14px;
+  font-size: clamp(15px, 1.7vw, 19px);
 }
 .slide__placeholder { min-height: 38vh; }
 .placeholder__sub { max-width: 520px; }

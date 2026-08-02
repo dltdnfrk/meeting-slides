@@ -69,18 +69,36 @@ function escapeHtml(s) {
   }[c]));
 }
 
+// 라이브 MeetingCard: title(필수) + kicker/emphasis(선택) + bullets.
+// 라이브 무대는 항상 이 단일 레이아웃 하나만 쓴다 (kind별 분기는 컴파일 덱 전용).
+// kicker/emphasis가 없는 레거시 슬라이드도 제목/불릿만으로 정상 렌더된다.
 function slideHtml(slide) {
+  const kicker = typeof slide.kicker === "string" ? slide.kicker.trim() : "";
+  const emphasis = typeof slide.emphasis === "string" ? slide.emphasis.trim() : "";
   const bullets = (slide.bullets ?? [])
     .map((b) => `<li>${escapeHtml(b)}</li>`)
     .join("");
+  const kickerHtml = kicker
+    ? `<span class="slide__kicker">${escapeHtml(kicker)}</span>`
+    : "";
+  const bulletsHtml = bullets
+    ? `<ul class="slide__bullets">${bullets}</ul>`
+    : "";
+  const emphasisHtml = emphasis
+    ? `<p class="slide__emphasis"><span class="slide__emphasis-label">핵심</span>${escapeHtml(emphasis)}</p>`
+    : "";
   return `
     <div class="slide__inner">
       <header class="slide__header">
-        <span class="slide__index">${escapeHtml(String(slide.index).padStart(2, "0"))}</span>
+        <div class="slide__meta">
+          <span class="slide__index">${escapeHtml(String(slide.index).padStart(2, "0"))}</span>
+          ${kickerHtml}
+        </div>
         <h2 class="slide__title">${escapeHtml(slide.title)}</h2>
       </header>
       <div class="slide__accent"></div>
-      <ul class="slide__bullets">${bullets}</ul>
+      ${bulletsHtml}
+      ${emphasisHtml}
     </div>`;
 }
 
