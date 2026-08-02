@@ -1,0 +1,3 @@
+$ compare HEAD standalone HTML with working-tree standalone HTML
+byte-identical standalone HTML for 3 representative inputs
+exit: 0

@@ -5,6 +5,12 @@
 // 블록 섹션(<aside class="notes">에 해당 블록의 전사 라인) → 마무리 슬라이드.
 // reveal.js는 CDN, 테마는 deck/theme.css (exports 폴더로 함께 복사).
 
+import type {
+  ClosingSlideSpec,
+  CoverSlideSpec,
+  SectionSlideSpec,
+  SlideSpec,
+} from "./slide-spec.js";
 import type { StoredLine, StoredSlide } from "./store.js";
 
 export interface DeckInput {
@@ -130,6 +136,7 @@ export interface SlideFile {
 }
 
 type SlidePageKind = "closing" | "cover" | "topic";
+type RegisteredSlideSpec = ClosingSlideSpec | CoverSlideSpec | SectionSlideSpec;
 
 function slidePageHtml(inner: string, kind: SlidePageKind, dense = false, longCover = false): string {
   return `<!doctype html>
@@ -147,48 +154,87 @@ ${inner}
 `;
 }
 
-/** slides-grab용 개별 슬라이드 파일 목록 (타이틀 + 블록들 + 마무리). */
-export function buildSlideFiles(input: DeckInput): SlideFile[] {
-  const files: SlideFile[] = [];
-  const date = new Date(input.startedAt).toLocaleString("ko-KR", { hour12: false });
-  const longCover = isLongCoverTitle(input.title);
-
-  files.push({
-    filename: "slide-00.html",
-    html: slidePageHtml(`
+function renderCoverTemplate(spec: CoverSlideSpec): string {
+  return slidePageHtml(`
   <img class="cover-visual" src="./assets/meeting-cover.png" alt="" aria-hidden="true" />
-  <p class="eyebrow">MEETING SLIDES</p>
-  <h1>${esc(input.title)}</h1>
-  <p class="meta">${esc(date)}${input.provider ? ` · ${esc(input.provider)}` : ""}</p>`, "cover", false, longCover),
-  });
+  <p class="eyebrow">${esc(spec.kicker ?? "MEETING SLIDES")}</p>
+  <h1>${esc(spec.title)}</h1>
+  <p class="meta">${esc(spec.subtitle ?? "")}</p>`, "cover", false, isLongCoverTitle(spec.title));
+}
 
-  input.slides.forEach((slide, i) => {
-    const bullets = slide.bullets.map((b) => `    <li>${esc(b)}</li>`).join("\n");
-    const dense = isDenseTopic(slide);
-    files.push({
-      filename: `slide-${String(i + 1).padStart(2, "0")}.html`,
-      html: slidePageHtml(`
+function renderSectionTemplate(spec: SectionSlideSpec): string {
+  const bullets = spec.bullets.map((bullet) => `    <li>${esc(bullet)}</li>`).join("\n");
+  return slidePageHtml(`
   <div class="topic-layout">
     <div class="topic-copy">
-      <h2><span class="idx">${String(slide.idx).padStart(2, "0")}</span>${esc(slide.title)}</h2>
+      <h2><span class="idx">${esc(spec.kicker ?? "")}</span>${esc(spec.title)}</h2>
       <ul>
 ${bullets}
       </ul>
     </div>
     <img class="topic-map" src="./assets/meeting-topic-map.png" alt="" aria-hidden="true" />
-  </div>`, "topic", dense),
-    });
-  });
+  </div>`, "topic", isDenseTopic(spec));
+}
 
-  files.push({
-    filename: `slide-${String(input.slides.length + 1).padStart(2, "0")}.html`,
-    html: slidePageHtml(`
-  <h2>회의 정리</h2>
+function renderClosingTemplate(spec: ClosingSlideSpec): string {
+  const bullets = spec.bullets.map((bullet) => `    <li>${esc(bullet)}</li>`).join("\n");
+  return slidePageHtml(`
+  <h2>${esc(spec.title)}</h2>
   <ul>
-    <li>슬라이드 ${input.slides.length}장, 전사 ${input.lines.length}문장을 기록했습니다</li>
-    <li>Meeting Slides로 생성 · lecture-deck(MIT) 테마</li>
-  </ul>`, "closing"),
-  });
+${bullets}
+  </ul>`, "closing");
+}
 
-  return files;
+const slideTemplateRegistry = {
+  cover: renderCoverTemplate,
+  section: renderSectionTemplate,
+  closing: renderClosingTemplate,
+} satisfies { [Kind in RegisteredSlideSpec["kind"]]: (spec: Extract<RegisteredSlideSpec, { kind: Kind }>) => string };
+
+export class UnsupportedSlideTemplateError extends TypeError {
+  constructor(readonly kind: string) {
+    super(`No standalone slide template registered for kind: ${kind}`);
+    this.name = "UnsupportedSlideTemplateError";
+  }
+}
+
+/** Render one validated SlideSpec through the standalone template registry. */
+export function renderSlideSpec(spec: SlideSpec, index: number): SlideFile {
+  const template = slideTemplateRegistry[spec.kind as keyof typeof slideTemplateRegistry];
+  if (!template) throw new UnsupportedSlideTemplateError(spec.kind);
+  return {
+    filename: `slide-${String(index).padStart(2, "0")}.html`,
+    html: template(spec as never),
+  };
+}
+
+function legacySlideSpecs(input: DeckInput): RegisteredSlideSpec[] {
+  const date = new Date(input.startedAt).toLocaleString("ko-KR", { hour12: false });
+  return [
+    {
+      kind: "cover",
+      title: input.title,
+      kicker: "MEETING SLIDES",
+      subtitle: `${date}${input.provider ? ` · ${input.provider}` : ""}`,
+    },
+    ...input.slides.map((slide): SectionSlideSpec => ({
+      kind: "section",
+      title: slide.title,
+      kicker: String(slide.idx).padStart(2, "0"),
+      bullets: slide.bullets,
+    })),
+    {
+      kind: "closing",
+      title: "회의 정리",
+      bullets: [
+        `슬라이드 ${input.slides.length}장, 전사 ${input.lines.length}문장을 기록했습니다`,
+        "Meeting Slides로 생성 · lecture-deck(MIT) 테마",
+      ],
+    },
+  ];
+}
+
+/** slides-grab용 개별 슬라이드 파일 목록 (타이틀 + 블록들 + 마무리). */
+export function buildSlideFiles(input: DeckInput): SlideFile[] {
+  return legacySlideSpecs(input).map(renderSlideSpec);
 }

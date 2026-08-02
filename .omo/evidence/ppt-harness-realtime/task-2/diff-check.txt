@@ -1,0 +1,2 @@
+$ git diff --check -- src/deck.ts tests/deck.test.ts
+exit: 0

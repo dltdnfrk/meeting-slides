@@ -2,7 +2,13 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { buildDeckHtml, buildSlideFiles, linesForSlide } from "../src/deck.ts";
+import {
+  UnsupportedSlideTemplateError,
+  buildDeckHtml,
+  buildSlideFiles,
+  linesForSlide,
+  renderSlideSpec,
+} from "../src/deck.ts";
 
 const slides = [
   { idx: 1, title: "출시 일정", bullets: ["베타 금요일", "QA 수요일"], startedAt: 1000 },
@@ -87,6 +93,48 @@ describe("buildSlideFiles (slides-grab 계약)", () => {
     expect(files[1].html).toContain("출시 일정");
     expect(files[1].html).toContain("베타 금요일");
     expect(files[3].html).toContain("회의 정리");
+  });
+
+  test("legacy cover/topic/closing files are produced by the SlideSpec template registry", () => {
+    const date = new Date(1000).toLocaleString("ko-KR", { hour12: false });
+    const renderedSpecs = [
+      renderSlideSpec({
+        kind: "cover",
+        title: "Meeting Notes",
+        kicker: "MEETING SLIDES",
+        subtitle: `${date} · cli:codex`,
+      }, 0),
+      renderSlideSpec({
+        kind: "section",
+        title: "출시 일정",
+        kicker: "01",
+        bullets: ["베타 금요일", "QA 수요일"],
+      }, 1),
+      renderSlideSpec({
+        kind: "section",
+        title: "고객 피드백",
+        kicker: "02",
+        bullets: ["이탈률 높음"],
+      }, 2),
+      renderSlideSpec({
+        kind: "closing",
+        title: "회의 정리",
+        bullets: [
+          "슬라이드 2장, 전사 3문장을 기록했습니다",
+          "Meeting Slides로 생성 · lecture-deck(MIT) 테마",
+        ],
+      }, 3),
+    ];
+
+    expect(files).toEqual(renderedSpecs);
+  });
+
+  test("unregistered SlideSpec kinds fail with a typed error before producing a file", () => {
+    expect(() => renderSlideSpec({
+      kind: "summary",
+      title: "요약",
+      bullets: ["핵심 내용"],
+    }, 1)).toThrow(UnsupportedSlideTemplateError);
   });
 
   test("16:9 고정 프레임과 로컬 테마 링크", () => {

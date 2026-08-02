@@ -1,0 +1,34 @@
+$ bun test tests/deck.test.ts tests/slide-spec.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/deck.test.ts:
+(pass) linesForSlide > 블록 시작 시각 구간으로 라인 배정 [0.03ms]
+(pass) buildDeckHtml > 타이틀/본문/마무리 섹션 구성 [0.03ms]
+(pass) buildDeckHtml > 불렛과 발표자 노트(전사) 포함 [0.07ms]
+(pass) buildDeckHtml > HTML 이스케이프 [0.06ms]
+(pass) buildDeckHtml > Given meeting imagery assets, When reveal deck is built, Then semantic cover and topic content reference only local decorative images [0.11ms]
+(pass) buildSlideFiles (slides-grab 계약) > 타이틀+블록+마무리 개별 파일 생성 [0.03ms]
+(pass) buildSlideFiles (slides-grab 계약) > legacy cover/topic/closing files are produced by the SlideSpec template registry [0.06ms]
+(pass) buildSlideFiles (slides-grab 계약) > unregistered SlideSpec kinds fail with a typed error before producing a file [0.06ms]
+(pass) buildSlideFiles (slides-grab 계약) > 16:9 고정 프레임과 로컬 테마 링크 [0.02ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given standalone slide files, When normal and empty decks are built, Then every page delegates styling and geometry to the shared theme [0.11ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given slides-grab's 960x540 presentation viewport, When standalone slide files are built, Then the shared frame adapter preserves the 1280x720 design surface [0.06ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given topic slide pages, When standalone files are built, Then cover and topics use their matching local decorative assets while closing remains typography-only [0.02ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given six product-limit Korean bullets, When a dense topic is built, Then both outputs use the compact presentation contract without losing text [0.17ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given a long Korean cover title, When deck outputs are built, Then both cover surfaces use the readable long-title contract without deleting text [0.09ms]
+
+tests/slide-spec.test.ts:
+(pass) SlideSpec > all six slide kinds parse in one valid outline [0.38ms]
+(pass) SlideSpec > rejects an unknown kind [0.04ms]
+(pass) SlideSpec > rejects a missing title [0.02ms]
+(pass) SlideSpec > rejects too many bullets instead of truncating [0.03ms]
+(pass) SlideSpec > rejects over-limit strings and malformed JSON [0.05ms]
+(pass) SlideSpec > enforces kind-specific required and empty-array rules [0.03ms]
+(pass) SlideSpec > does not coerce field types [0.04ms]
+(pass) SlideSpec > maps a legacy slide to a detached live meeting card [0.04ms]
+
+ 22 pass
+ 0 fail
+ 91 expect() calls
+Ran 22 tests across 2 files. [15.00ms]
+exit: 0
