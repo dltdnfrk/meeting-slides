@@ -1,5 +1,4 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test";
-import { file } from "bun";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -10,43 +9,14 @@ import { prepareExportDeck } from "../src/deck-export.ts";
 import type { BlockDetector, DeckPlanner } from "../src/llm.ts";
 import { MeetingSession, type ServerMessage } from "../src/session.ts";
 import { MeetingStore } from "../src/store.ts";
+import { createPublicTestHarness } from "./public-test-harness.ts";
 
 const projectDirectory = join(import.meta.dir, "..");
-const publicDirectory = join(projectDirectory, "public");
 const temporaryDirectories: string[] = [];
-const sockets = new Set<{ send(data: string): void }>();
-let resolveClientConnected: (() => void) | null = null;
-const clientConnected = new Promise<void>((resolve) => { resolveClientConnected = resolve; });
-
-const server = Bun.serve({
-  port: 0,
-  fetch(request, bunServer) {
-    const url = new URL(request.url);
-    if (url.pathname === "/ws") {
-      return bunServer.upgrade(request) ? undefined : new Response("upgrade failed", { status: 400 });
-    }
-    if (url.pathname === "/favicon.ico") return new Response(null, { status: 204 });
-    const name = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
-    if (!/^[a-z0-9._-]+$/i.test(name)) return new Response("not found", { status: 404 });
-    return new Response(file(join(publicDirectory, name)));
-  },
-  websocket: {
-    open(socket) {
-      sockets.add(socket);
-      resolveClientConnected?.();
-    },
-    close(socket) {
-      sockets.delete(socket);
-    },
-    message() {},
-  },
-});
-
-const origin = `http://localhost:${server.port}`;
+const harness = createPublicTestHarness();
 
 function broadcast(message: ServerMessage): void {
-  const payload = JSON.stringify(message);
-  for (const socket of sockets) socket.send(payload);
+  harness.pushMessage(message);
 }
 
 function waitForSessionMessage(
@@ -116,11 +86,11 @@ beforeAll(async () => {
   page = await browser.newPage();
   await page.setRequestInterception(true);
   page.on("request", (request) => {
-    if (request.url().startsWith(origin)) void request.continue();
+    if (request.url().startsWith(harness.origin)) void request.continue();
     else void request.abort();
   });
-  await page.goto(origin, { waitUntil: "load" });
-  await clientConnected;
+  await page.goto(harness.origin, { waitUntil: "load" });
+  await harness.clientConnected;
 });
 
 afterEach(() => {
@@ -129,7 +99,7 @@ afterEach(() => {
 
 afterAll(async () => {
   await browser?.close();
-  server.stop(true);
+  harness.stop();
 });
 
 describe("Hybrid live -> compile -> export hermetic path", () => {

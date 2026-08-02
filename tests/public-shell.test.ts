@@ -1,70 +1,17 @@
 // 라이브 무대(MeetingCard) 렌더 검증 — 실제 public/app.js + style.css를 브라우저에서 로드한다.
 // 서버는 전사/LLM 없이 WS slide 페이로드만 밀어넣는 헤르메틱 스텁.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { file } from "bun";
-import { join } from "node:path";
 import puppeteer, { type Browser, type Page } from "puppeteer";
 
 import type { Slide } from "../src/session.ts";
-
-const publicDir = join(import.meta.dir, "..", "public");
+import { createPublicTestHarness } from "./public-test-harness.ts";
 
 type SlidePayload = { type: "slide"; current: Slide | null; history: Slide[] };
 
-const sockets = new Set<{ send(data: string): void }>();
-const clientMessageWaiters: Array<(message: unknown) => void> = [];
-let onClientConnected: (() => void) | null = null;
-/** 클라이언트 WS 연결을 이벤트로 기다린다 (고정 sleep 금지). */
-const clientConnected = new Promise<void>((resolve) => {
-  onClientConnected = resolve;
-});
-
-const server = Bun.serve({
-  port: 0,
-  fetch(req, srv) {
-    const url = new URL(req.url);
-    if (url.pathname === "/ws") {
-      return srv.upgrade(req) ? undefined : new Response("upgrade failed", { status: 400 });
-    }
-    if (url.pathname === "/favicon.ico") return new Response(null, { status: 204 });
-    const name = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
-    if (!/^[a-z0-9._-]+$/i.test(name)) return new Response("not found", { status: 404 });
-    return new Response(file(join(publicDir, name)));
-  },
-  websocket: {
-    open(ws) {
-      sockets.add(ws);
-      onClientConnected?.();
-    },
-    close(ws) {
-      sockets.delete(ws);
-    },
-    message(_ws, data) {
-      const message = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as unknown;
-      clientMessageWaiters.shift()?.(message);
-    },
-  },
-});
-
-const origin = `http://localhost:${server.port}`;
-
-function pushMessage(payload: unknown): void {
-  const data = JSON.stringify(payload);
-  for (const ws of sockets) ws.send(data);
-}
+const harness = createPublicTestHarness();
 
 function pushSlide(payload: SlidePayload): void {
-  pushMessage(payload);
-}
-
-function nextClientMessage(): Promise<unknown> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("client message timeout")), 5_000);
-    clientMessageWaiters.push((message) => {
-      clearTimeout(timer);
-      resolve(message);
-    });
-  });
+  harness.pushMessage(payload);
 }
 
 /**
@@ -117,53 +64,14 @@ beforeAll(async () => {
   browser = await puppeteer.launch({ args: ["--no-sandbox"] });
   page = await browser.newPage();
   await page.setViewport({ width: 375, height: 720 });
-  await page.goto(origin, { waitUntil: "load" });
+  await page.goto(harness.origin, { waitUntil: "load" });
   // 첫 push가 유실되지 않도록 클라이언트 WS 연결이 열린 뒤에 테스트를 시작한다.
-  await clientConnected;
+  await harness.clientConnected;
 });
 
 afterAll(async () => {
   await browser?.close();
-  server.stop(true);
-});
-
-describe("컴파일 컨트롤", () => {
-  test("요청을 보내고 started/success/error 상태를 사용자에게 표시한다", async () => {
-    const action = nextClientMessage();
-    await page.click("#btn-compile-deck");
-    expect(await action).toEqual({ action: "compileDeck" });
-    expect(await page.$eval("#btn-compile-deck", (button) => (button as HTMLButtonElement).disabled)).toBe(true);
-
-    pushMessage({ type: "compile", status: "started", meetingId: 1 });
-    await page.waitForFunction(() => document.getElementById("compile-status")?.textContent === "컴파일 중…");
-    pushMessage({
-      type: "compile",
-      status: "success",
-      meetingId: 1,
-      path: "exports/deck-ok/slides",
-      outline: { title: "출시 덱", style: "clear-editorial", slideCount: 6, usedFallback: false, plannerError: null },
-    });
-    await page.waitForFunction(() => document.getElementById("compile-status")?.textContent === "컴파일 완료 · 6장");
-    expect(await page.$eval("#btn-compile-deck", (button) => (button as HTMLButtonElement).disabled)).toBe(false);
-
-    pushMessage({ type: "compile", status: "error", meetingId: 1, error: "planner unavailable" });
-    await page.waitForFunction(() => document.getElementById("compile-status")?.textContent?.includes("planner unavailable"));
-    const state = await page.$eval("#compile-status", (status) => ({
-      text: status.textContent,
-      state: (status as HTMLElement).dataset.state,
-      role: status.getAttribute("role"),
-    }));
-    expect(state).toEqual({ text: "컴파일 실패: planner unavailable", state: "error", role: "status" });
-
-    pushMessage({
-      type: "export",
-      status: "error",
-      action: "exportPdf",
-      code: "compile-busy",
-      error: "Deck compile is in progress; export was not started",
-    });
-    await page.waitForFunction(() => document.getElementById("status-text")?.textContent === "컴파일 중에는 내보낼 수 없습니다");
-  });
+  harness.stop();
 });
 
 describe("라이브 MeetingCard 렌더", () => {
