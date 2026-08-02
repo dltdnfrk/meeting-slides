@@ -103,6 +103,9 @@
       </div>
     </aside>
 
+    <!-- 좌|중앙 스플리터 -->
+    <div class="splitter splitter--rail" id="splitter-rail" role="separator" aria-orientation="vertical" aria-label="세션 레일 너비 조절" tabindex="0"></div>
+
     <!-- 중앙: 시각 자료 무대 (Tiro 히어로 슬롯) -->
     <main class="stage stage-pane" id="stage-pane">
       <section class="slide-frame" id="slide-frame">
@@ -135,6 +138,9 @@
         <span class="island__meta" id="pill-meta"></span>
       </section>
     </main>
+
+    <!-- 중앙|우 스플리터 -->
+    <div class="splitter splitter--transcript" id="splitter-transcript" role="separator" aria-orientation="vertical" aria-label="전사 패널 너비 조절" tabindex="0"></div>
 
     <!-- 우: 전사 패널 (연결은 todo 3) -->
     <aside class="transcript-pane" id="transcript-pane" aria-label="전사">
@@ -192,6 +198,7 @@
     </div>
   </div>
 
+  <script src="/workspace-split.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

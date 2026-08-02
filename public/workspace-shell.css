@@ -1,14 +1,18 @@
 /* ============================================================
    workspace-shell.css — Tiro 스타일 3분할 워크스페이스 셸
-   세션 레일 | 시각 자료 무대(히어로) | 전사 패널
+   세션 레일 | 스플리터 | 시각 자료 무대(히어로) | 스플리터 | 전사 패널
    style.css의 zinc/live 토큰 위에 얹는 레이아웃 레이어.
-   스플리터(todo 2)·전사 배선(todo 3)은 여기서 다루지 않는다.
+   전사 배선(todo 3)은 여기서 다루지 않는다.
    ============================================================ */
 
 :root {
-  /* 워크스페이스 기하: 스플리터가 나중에 갱신할 단일 소스 */
+  /* 워크스페이스 기하: workspace-split.js가 #workspace에 덮어쓰는 단일 소스 */
   --rail-w: 232px;
   --transcript-w: 320px;
+
+  /* 스플리터 기하: 시각 두께는 얇게, 포인터 히트 영역은 넉넉하게 */
+  --splitter-w: 5px;
+  --splitter-grab: 9px;
 
   /* 셸 스페이싱 스케일 (2px 그리드 기반) */
   --sp-1: 4px;
@@ -29,9 +33,13 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--transcript-w);
+  grid-template-columns:
+    var(--rail-w) var(--splitter-w) minmax(0, 1fr) var(--splitter-w) var(--transcript-w);
   align-items: stretch;
 }
+/* 드래그 중에는 전역 커서를 고정하고 텍스트 선택을 막는다 */
+.workspace--resizing { cursor: col-resize; user-select: none; }
+.workspace--resizing * { cursor: col-resize !important; }
 
 /* 사이드 패널 공통 골격 */
 .session-rail,
@@ -107,6 +115,36 @@
 }
 .transcript-stream:empty { display: none; }
 
+/* ── 스플리터: 얇은 룰 + 넓은 히트 영역 ── */
+.splitter {
+  position: relative;
+  min-width: 0;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: col-resize;
+  touch-action: none;
+  transition: background 0.2s var(--ease-smooth);
+}
+/* 히트 영역을 트랙 밖으로 넓혀 5px 룰에서도 잡기 쉽게 한다 */
+.splitter::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc((var(--splitter-w) - var(--splitter-grab)) / 2);
+}
+/* 실제로 보이는 1px 룰 */
+.splitter::after {
+  content: "";
+  position: absolute;
+  inset: 0 calc(50% - 0.5px);
+  background: rgba(255, 255, 255, 0.06);
+  transition: background 0.2s var(--ease-smooth);
+}
+.splitter:hover::after,
+.splitter:focus-visible::after,
+.splitter--active::after { background: var(--live); }
+.splitter:focus-visible { outline: none; }
+
 /* ── 중앙 무대: 기존 히어로가 그대로 산다 ── */
 .stage-pane {
   min-width: 0;
@@ -116,10 +154,12 @@
 
 /* ── 반응형: 좁아지면 사이드부터 접어 무대를 지킨다 ── */
 @media (max-width: 1180px) {
-  .workspace { grid-template-columns: minmax(0, 1fr) var(--transcript-w); }
-  .session-rail { display: none; }
+  .workspace { grid-template-columns: minmax(0, 1fr) var(--splitter-w) var(--transcript-w); }
+  .session-rail,
+  .splitter--rail { display: none; }
 }
 @media (max-width: 900px) {
   .workspace { grid-template-columns: minmax(0, 1fr); }
-  .transcript-pane { display: none; }
+  .transcript-pane,
+  .splitter--transcript { display: none; }
 }

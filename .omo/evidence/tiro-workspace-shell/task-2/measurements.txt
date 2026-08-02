@@ -1,0 +1,4 @@
+default: {"rail":232,"stage":878,"transcript":320,"stored":null}
+after-drag: {"rail":352,"stage":638,"transcript":440,"stored":"{\"leftPx\":352,\"rightPx\":440}"}
+after-reload: {"rail":352,"stage":638,"transcript":440,"stored":"{\"leftPx\":352,\"rightPx\":440}"}
+min-clamped: {"rail":180,"stage":1010,"transcript":240,"stored":"{\"leftPx\":180,\"rightPx\":240}"}
