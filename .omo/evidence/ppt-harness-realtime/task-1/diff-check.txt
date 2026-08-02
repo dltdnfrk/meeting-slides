@@ -1,0 +1,2 @@
+$ git diff --cached --check -- src/slide-spec.ts tests/slide-spec.test.ts
+exit_code=0

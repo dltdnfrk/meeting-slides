@@ -1,0 +1,19 @@
+$ bun test tests/slide-spec.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/slide-spec.test.ts:
+(pass) SlideSpec > all six slide kinds parse in one valid outline [0.50ms]
+(pass) SlideSpec > rejects an unknown kind [0.10ms]
+(pass) SlideSpec > rejects a missing title [0.02ms]
+(pass) SlideSpec > rejects too many bullets instead of truncating [0.11ms]
+(pass) SlideSpec > rejects over-limit strings and malformed JSON [0.06ms]
+(pass) SlideSpec > enforces kind-specific required and empty-array rules [0.04ms]
+(pass) SlideSpec > does not coerce field types [0.04ms]
+(pass) SlideSpec > maps a legacy slide to a detached live meeting card [0.04ms]
+
+ 8 pass
+ 0 fail
+ 13 expect() calls
+Ran 8 tests across 1 file. [10.00ms]
+
+exit_code=0
