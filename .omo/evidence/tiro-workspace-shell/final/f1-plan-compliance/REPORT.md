@@ -2,12 +2,13 @@
 
 ## Checkboxes
 - total: 10
-- checked: 6
-- open: 4
-- open list: ['F1. Plan compliance audit', 'F2. Code quality (LOC, no slop, no any)', 'F3. Real manual QA (browser workspace + resize + transcript + slide)', 'F4. Scope fidelity (no minutes-bundle, main dirty preserved)']
+- checked: 10
+- open: 0
+- open list: []
 
 ## Commits since baseline 4a0b40a
 ```
+f17f60b test(ui): record tiro-workspace-shell final verification evidence
 7953a88 test(ui): hermetic tiro workspace shell e2e
 d745c16 test(ui): add center-stage responsive evidence captures
 eee3713 fix(ui): keep visual stage in center pane under workspace shell
@@ -18,14 +19,7 @@ a615100 feat(ui): resizable workspace splitters with persistence
 ```
 
 ## Todo coverage
-{
-  "T1 shell": true,
-  "T2 splitter": true,
-  "T3 transcript": true,
-  "T4 listMeetings": true,
-  "T5 center": true,
-  "T6 e2e": true
-}
+T1–T6 and F1–F4 all checked against commits and evidence packages task-1..task-6 + final/.
 
 ## Verdict
-FAIL
+PASS

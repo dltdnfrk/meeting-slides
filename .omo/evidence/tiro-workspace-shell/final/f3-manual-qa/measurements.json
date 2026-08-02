@@ -1,0 +1,17 @@
+{
+  "shots": [
+    "01-workspace-empty.png",
+    "02-stage-card.png",
+    "03-transcript-live.png",
+    "04-after-resize.png",
+    "05-narrow-820.png"
+  ],
+  "measures": {
+    "railDisplay": "none",
+    "stageW": 820,
+    "hitStage": true,
+    "lines": 2,
+    "title": "F3 카드",
+    "docScrollX": 0
+  }
+}
