@@ -2,7 +2,6 @@
    workspace-shell.css — Tiro 스타일 3분할 워크스페이스 셸
    세션 레일 | 스플리터 | 시각 자료 무대(히어로) | 스플리터 | 전사 패널
    style.css의 zinc/live 토큰 위에 얹는 레이아웃 레이어.
-   전사 배선(todo 3)은 여기서 다루지 않는다.
    ============================================================ */
 
 :root {
@@ -13,6 +12,9 @@
   /* 스플리터 기하: 시각 두께는 얇게, 포인터 히트 영역은 넉넉하게 */
   --splitter-w: 5px;
   --splitter-grab: 9px;
+  /* 도킹 패널 모서리 그립(S/SW) 히트 영역 */
+  --grip-h: 9px;
+  --grip-corner: 18px;
 
   /* 셸 스페이싱 스케일 (2px 그리드 기반) */
   --sp-1: 4px;
@@ -24,6 +26,8 @@
   /* 셸 라운드/보더 */
   --radius-sm: 8px;
   --radius-md: 12px;
+  /* 사이드 패널 면: 중앙 히어로가 떠 보이도록 한 단계 누른 바탕 */
+  --pane-surface: rgba(9, 9, 11, 0.5);
   --rule: 1px solid rgba(255, 255, 255, 0.06);
   --rule-strong: 1px solid rgba(255, 255, 255, 0.09);
 }
@@ -48,8 +52,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  /* 사이드는 한 단계 눌러 중앙 히어로가 떠 보이게 한다 */
-  background: rgba(9, 9, 11, 0.5);
+  background: var(--pane-surface);
 }
 .session-rail { border-right: var(--rule); }
 .transcript-pane { border-left: var(--rule); }
@@ -107,13 +110,104 @@
 }
 .session-list:empty { display: none; }
 
-/* 전사 스트림 (배선은 todo 3) */
+/* ── 도킹된 전사 카드: 라이브 전사의 1차 거처 ── */
+/* 기본은 패널을 가득 채운다. S/SW 그립으로 높이를 잡으면
+   --transcript-card-h가 들어오고 아래는 여백으로 남는다. */
+.transcript-card {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.transcript-pane--sized .transcript-card {
+  flex: 0 0 var(--transcript-card-h);
+  height: var(--transcript-card-h);
+  border-bottom: var(--rule);
+  /* 아래 여백과 구분되도록 카드는 패널과 같은 면을 깔고 앉는다 */
+  background: var(--pane-surface);
+}
+/* 남은 여백은 미약한 사선 결로 칠해 “의도된 빈 공간”임을 드러낸다 —
+   그냥 검은 면이면 렌더 사고처럼 읽힌다. */
+.transcript-pane--sized {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.018) 0 6px,
+    transparent 6px 12px
+  );
+}
+/* 드래그 중에는 본문 선택을 막아 포인터가 그립에 붙어 있게 한다 */
+.transcript-pane--resizing { user-select: none; }
+
 .transcript-stream {
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
 }
 .transcript-stream:empty { display: none; }
+
+/* 상한 경고는 스트림 끝에 붙여 잘린 지점을 보여준다 */
+.transcript-trunc {
+  margin-top: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--warn);
+  font-size: 10px;
+  line-height: 1.5;
+  text-align: center;
+}
+.transcript-trunc[hidden] { display: none; }
+
+/* ── 다중 모서리 그립: 남(높이) · 남서(높이+폭) ──
+   서쪽 폭은 워크스페이스 스플리터가 이미 담당하므로 여기엔 두지 않는다. */
+.transcript-grip {
+  position: absolute;
+  bottom: 0;
+  touch-action: none;
+  background: transparent;
+}
+.transcript-grip:focus-visible { outline: none; }
+
+.transcript-grip--s {
+  left: var(--grip-corner);
+  right: 0;
+  height: var(--grip-h);
+  cursor: ns-resize;
+}
+/* 보이는 1px 룰은 그립 중앙에 얇게 — 스플리터와 같은 언어 */
+.transcript-grip--s::after {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 0.5px) 0;
+  background: rgba(255, 255, 255, 0.06);
+  transition: background 0.2s var(--ease-smooth);
+}
+.transcript-grip--s:hover::after,
+.transcript-grip--s:focus-visible::after,
+.transcript-grip--s.transcript-grip--active::after { background: var(--live); }
+
+/* 남서 코너: 사선 두 줄로 “여기를 잡으면 둘 다 바뀜다”를 말한다 */
+.transcript-grip--sw {
+  left: 0;
+  width: var(--grip-corner);
+  height: var(--grip-corner);
+  cursor: nesw-resize;
+}
+.transcript-grip--sw::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(45deg, transparent 42%, rgba(255, 255, 255, 0.22) 42%, rgba(255, 255, 255, 0.22) 50%, transparent 50%),
+    linear-gradient(45deg, transparent 66%, rgba(255, 255, 255, 0.14) 66%, rgba(255, 255, 255, 0.14) 74%, transparent 74%);
+  transition: opacity 0.2s var(--ease-smooth);
+  opacity: 0.75;
+}
+.transcript-grip--sw:hover::after,
+.transcript-grip--sw:focus-visible::after,
+.transcript-grip--sw.transcript-grip--active::after { opacity: 1; }
 
 /* ── 스플리터: 얇은 룰 + 넓은 히트 영역 ── */
 .splitter {
@@ -158,8 +252,26 @@
   .session-rail,
   .splitter--rail { display: none; }
 }
+/* 좌우 분할이 무리인 폭에서는 전사를 숨기지 않고 무대 아래로 쌓는다 —
+   도크 복제본을 없앱으므로 여기서 숨기면 전사에 도달할 경로가 사라진다. */
 @media (max-width: 900px) {
-  .workspace { grid-template-columns: minmax(0, 1fr); }
-  .transcript-pane,
+  /* 두 패널이 워크스페이스 높이를 나눠 갖는다 — 무대 우선, 전사는 고정 몶
+     워크스페이스 자체는 스크롤하지 않고 각 패널 안에서만 흐른다. */
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 0.62fr);
+  }
   .splitter--transcript { display: none; }
+  .transcript-pane {
+    border-left: none;
+    border-top: var(--rule);
+  }
+  /* 세로 모드에서는 그립 높이 조절이 의미가 없다 */
+  .transcript-grip { display: none; }
+  .transcript-pane--sized .transcript-card {
+    flex: 1;
+    height: auto;
+    border-bottom: none;
+  }
+  .transcript-pane--sized { background-image: none; }
 }

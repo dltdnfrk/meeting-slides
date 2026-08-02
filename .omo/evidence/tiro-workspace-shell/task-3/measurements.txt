@@ -1,0 +1,6 @@
+empty: {"transcriptW":320,"cardH":648,"paneH":648,"stageW":878,"stageH":648,"lines":0,"linesOutsidePane":0,"stageHitAtCenter":true,"storedHeight":null,"storedLayout":null}
+docked-live: {"transcriptW":320,"cardH":648,"paneH":648,"stageW":878,"stageH":648,"lines":8,"linesOutsidePane":0,"stageHitAtCenter":true,"storedHeight":null,"storedLayout":null}
+south-drag: {"transcriptW":320,"cardH":388,"paneH":648,"stageW":878,"stageH":648,"lines":8,"linesOutsidePane":0,"stageHitAtCenter":true,"storedHeight":"{\"heightPx\":388}","storedLayout":null}
+southwest-drag: {"transcriptW":480,"cardH":478,"paneH":648,"stageW":718,"stageH":648,"lines":8,"linesOutsidePane":0,"stageHitAtCenter":true,"storedHeight":"{\"heightPx\":478}","storedLayout":"{\"leftPx\":232,\"rightPx\":480}"}
+after-reload: {"transcriptW":480,"cardH":478,"paneH":648,"stageW":718,"stageH":648,"lines":0,"linesOutsidePane":0,"stageHitAtCenter":true,"storedHeight":"{\"heightPx\":478}","storedLayout":"{\"leftPx\":232,\"rightPx\":480}"}
+narrow-820: {"transcriptW":820,"cardH":247,"paneH":248,"stageW":820,"stageH":400,"lines":8,"linesOutsidePane":0,"stageHitAtCenter":true,"storedHeight":null,"storedLayout":null}

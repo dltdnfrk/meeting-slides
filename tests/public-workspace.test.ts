@@ -1,5 +1,5 @@
 // Tiro 스타일 3분할 워크스페이스 셸 검증 (todo 1 레이아웃 + todo 2 스플리터).
-// 전사 배선(todo 3)·세션 목록(todo 4)은 범위 밖.
+// 전사 도킹/리사이즈는 public-transcript-dock.test.ts, 세션 목록(todo 4)은 범위 밖.
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import puppeteer, { type Browser, type Page } from "puppeteer";
 

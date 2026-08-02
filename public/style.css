@@ -272,20 +272,15 @@ body {
   height: 200px;
 }
 .dock__tabs { display: flex; align-items: stretch; gap: 0; padding: 0; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
-.dock__tab {
+/* 전사가 우측 도킹 패널로 옮겨가 도크는 슬라이드 히스토리 단일 면이다 — 탭 대신 라벨 */
+.dock__label {
   display: flex; align-items: center; gap: 7px;
   padding: 10px 14px;
-  border: none; background: transparent;
-  color: var(--z500);
+  color: var(--z300);
   font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: color 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth);
+  border-bottom: 2px solid var(--live);
 }
-.dock__tab:hover { color: var(--z300); background: rgba(255,255,255,0.02); }
-.dock__tab--active { color: var(--live); border-bottom-color: var(--live); }
 .dock__count { font-size: 9px; font-weight: 700; color: var(--z700); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 1px 6px; }
-.dock__tab--active .dock__count { color: var(--live); border-color: rgba(16,185,129,0.3); }
 .dock__spacer { flex: 1; }
 .dock__btn {
   align-self: center;
@@ -328,15 +323,12 @@ body {
 .thumbnail__bullets li { font-size: 10px; line-height: 1.4; color: var(--z500); padding-left: 9px; position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .thumbnail__bullets li::before { content: ""; position: absolute; left: 0; top: 6px; width: 3px; height: 3px; border-radius: 50%; background: var(--live); opacity: 0.6; }
 
-/* 전사: 세로 흐름 */
-.feed__list { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-.feed__empty { margin-top: 24px; text-align: center; font-size: 11px; line-height: 1.7; color: var(--z500); }
+/* 전사 한 줄: 우측 도킹 패널(.transcript-stream)이 쓴다 */
 .feed-line { display: flex; flex-direction: column; gap: 3px; padding-left: 10px; border-left: 2px solid rgba(255,255,255,0.09); animation: line-in 0.3s var(--ease-smooth); }
 @keyframes line-in { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: translateX(0); } }
 .feed-line__meta { display: flex; gap: 6px; align-items: center; }
 .feed-line__time { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.06em; color: var(--z500); }
 .feed-line__text { font-size: 12px; line-height: 1.55; color: var(--z100); opacity: 0.85; }
-.feed__trunc { margin-top: 8px; padding: 6px 10px; border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; background: rgba(245,158,11,0.08); color: var(--warn); font-size: 10px; line-height: 1.5; text-align: center; }
 
 /* ── 녹음 시작/중지 버튼 ── */
 .record-btn { display: flex; align-items: center; gap: 7px; padding: 6px 13px; border: 1px solid rgba(16,185,129,0.4); border-radius: 999px; background: rgba(16,185,129,0.1); color: var(--live); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; cursor: pointer; transition: background 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth); flex-shrink: 0; }
@@ -506,5 +498,5 @@ button:focus-visible { outline-offset: 1px; }
 
 /* ── 도크 가독성: 탭과 버튼을 조금 더 여유 있게 ── */
 .dock__tabs { gap: 4px; }
-.dock__tab { font-size: 12px; padding: 8px 14px; }
+.dock__label { font-size: 12px; padding: 8px 14px; }
 .dock__btn { font-size: 11px; }

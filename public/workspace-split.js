@@ -142,4 +142,19 @@
   bind(transcriptSplitter, "right", commit);
 
   window.addEventListener("resize", () => apply(clamp(preferred.leftPx, preferred.rightPx)));
+
+  // 서쪽 폭은 남서(SW) 그립도 같은 기하를 쓴다.
+  // clamp/persist를 두 번 구현하지 않도록 전사 패널 폭만 좀은 상태로 열어둔다.
+  window.workspaceLayout = {
+    transcriptWidth: () => currentWidths().rightPx,
+    setTranscriptWidth(rightPx) {
+      const next = clamp(currentWidths().leftPx, rightPx);
+      apply(next);
+      preferred = next;
+      return next.rightPx;
+    },
+    persistTranscriptWidth() {
+      persist(currentWidths());
+    },
+  };
 })();

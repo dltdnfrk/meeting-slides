@@ -30,8 +30,11 @@ const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
 const btnRecheckEl = $("btn-recheck");
 const btnRecordEl = $("btn-record");
-const feedListEl = $("feed-list");
-const feedCountEl = $("feed-count");
+// 전사는 우측 도킹 패널(.transcript-pane)이 1차 거처다 — 하단 도크 복제본은 없았다.
+const transcriptStreamEl = $("transcript-stream");
+const transcriptCountEl = $("transcript-count");
+const transcriptEmptyEl = $("transcript-empty");
+const transcriptBodyEl = $("transcript-body");
 const btnResetEl = $("btn-reset");
 
 // 글랜서블 상태 스트립
@@ -52,12 +55,7 @@ const selectModelEl = $("select-model");
 const selectEffortEl = $("select-effort");
 const effortRowEl = $("effort-row");
 
-// 하단 도크 탭
-const tabHistoryEl = $("tab-history");
-const tabFeedEl = $("tab-feed");
-const dockHistoryEl = $("dock-history");
-const dockFeedEl = $("dock-feed");
-const feedTruncEl = $("feed-trunc");
+const transcriptTruncEl = $("transcript-trunc");
 
 let currentSlide = null;
 let slideHistory = [];
@@ -146,7 +144,7 @@ function renderGlance() {
   const total = slideHistory.length + (currentSlide ? 1 : 0);
   const idx = cur ? String(cur.index).padStart(2, "0") : "00";
   glanceSlideEl.textContent = `${idx}/${String(total).padStart(2, "0")}`;
-  glanceLinesEl.textContent = String(feedCount);
+  glanceLinesEl.textContent = String(transcriptLineCount);
 }
 
 function renderThumbnails(history) {
@@ -214,7 +212,7 @@ function renderPill() {
   const total = slideHistory.length + (currentSlide ? 1 : 0);
   pillMetaEl.textContent = [
     currentSlide ? `SLIDE ${currentSlide.index}/${String(total).padStart(2, "0")}` : null,
-    `LINES ${feedCount}`,
+    `LINES ${transcriptLineCount}`,
     providerLabelCur || null,
   ].filter(Boolean).join(" · ");
 }
@@ -227,7 +225,7 @@ function renderDocHead() {
   if (meetingStartTs) {
     parts.push(new Date(meetingStartTs).toLocaleTimeString("ko-KR", { hour12: false, hour: "2-digit", minute: "2-digit" }));
   }
-  parts.push(`${feedCount}문장`);
+  parts.push(`${transcriptLineCount}문장`);
   if (total > 0) parts.push(`${total}슬라이드`);
   if (providerLabelCur) parts.push(providerLabelCur);
   docMetaEl.textContent = parts.join(" · ");
@@ -392,12 +390,16 @@ document.addEventListener("click", (ev) => {
   }
 });
 
-// ── 실시간 전사 피드 ──
-let feedCount = 0;
+// ── 실시간 전사: 우측 도킹 패널 ──
+let transcriptLineCount = 0;
 
-function renderFeedLine(entry) {
-  const empty = feedListEl.querySelector(".feed__empty");
-  if (empty) empty.remove();
+// 도킹 패널은 pane__body가 스크롤 컨테이너다 — 목록이 아니라 몸체를 밀어야 최신 문장이 보인다.
+function scrollTranscriptToLatest() {
+  transcriptBodyEl.scrollTop = transcriptBodyEl.scrollHeight;
+}
+
+function renderTranscriptLine(entry) {
+  transcriptEmptyEl.hidden = true;
   const row = document.createElement("div");
   row.className = "feed-line";
   const time = new Date(entry.ts).toLocaleTimeString("ko-KR", { hour12: false });
@@ -407,29 +409,29 @@ function renderFeedLine(entry) {
   row.innerHTML = `
     <span class="feed-line__meta"><span class="feed-line__time">${escapeHtml(time)}</span>${chip}</span>
     <span class="feed-line__text">${escapeHtml(entry.text)}</span>`;
-  feedListEl.appendChild(row);
-  feedCount += 1;
-  feedCountEl.textContent = String(feedCount);
+  transcriptStreamEl.appendChild(row);
+  transcriptLineCount += 1;
+  transcriptCountEl.textContent = String(transcriptLineCount);
   if (!meetingStartTs) meetingStartTs = entry.ts;
   renderGlance();
   renderDocHead();
   renderPill();
-  feedListEl.scrollTop = feedListEl.scrollHeight;
+  scrollTranscriptToLatest();
 }
-function renderFeedBacklog(entries) {
-  feedListEl.innerHTML = "";
-  feedCount = 0;
-  feedCountEl.textContent = "0";
-  feedListEl.scrollTop = 0;
+function renderTranscriptBacklog(entries) {
+  transcriptStreamEl.replaceChildren();
+  transcriptLineCount = 0;
+  transcriptCountEl.textContent = "0";
+  transcriptBodyEl.scrollTop = 0;
   if (!entries || entries.length === 0) {
-    feedListEl.innerHTML = `<div class="feed__empty">녹음을 시작하면<br>전사가 여기에 흐릅니다</div>`;
+    transcriptEmptyEl.hidden = false;
     return;
   }
-  // 각 line은 renderFeedLine이 feedCount를 증가시키고 renderGlance를 갱신한다.
+  // 각 line은 renderTranscriptLine이 transcriptLineCount를 증가시키고 renderGlance를 갱신한다.
   // backlog 시작점에서 카운트/스크롤을 리셋하고, 한 번만 끝단에서 정리.
-  for (const e of entries) renderFeedLine(e);
+  for (const e of entries) renderTranscriptLine(e);
   renderGlance();
-  feedListEl.scrollTop = feedListEl.scrollHeight;
+  scrollTranscriptToLatest();
 }
 
 // ── 녹음 시작/중지 버튼 ──
@@ -575,9 +577,8 @@ btnResetEl.onclick = () => {
   currentSlide = null;
   slideHistory = [];
   viewingHistory = null;
-  feedCount = 0;
-  feedCountEl.textContent = "0";
-  feedTruncEl.hidden = true;
+  renderTranscriptBacklog([]);
+  transcriptTruncEl.hidden = true;
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "reset" }));
     renderStatus("세션 초기화 요청됨");
@@ -630,27 +631,12 @@ window.addEventListener("keydown", (ev) => {
   // 입력 필드/패널 안에서는 단축키 무시
   const tag = (ev.target instanceof HTMLElement ? ev.target.tagName : "").toLowerCase();
   if (tag === "input" || tag === "textarea" || !providerPanelEl.hidden) return;
-  if (ev.key === "h" || ev.key === "1") setDockTab("history");
-  else if (ev.key === "f" || ev.key === "2") setDockTab("feed");
-  else if (ev.key === "r" && inputMode !== "file") {
+  if (ev.key === "r" && inputMode !== "file") {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
     }
   }
 });
-
-// ── 하단 도크 탭 전환 ──
-function setDockTab(which) {
-  const toFeed = which === "feed";
-  tabHistoryEl.classList.toggle("dock__tab--active", !toFeed);
-  tabHistoryEl.setAttribute("aria-selected", String(!toFeed));
-  tabFeedEl.classList.toggle("dock__tab--active", toFeed);
-  tabFeedEl.setAttribute("aria-selected", String(toFeed));
-  dockHistoryEl.hidden = toFeed;
-  dockFeedEl.hidden = !toFeed;
-}
-tabHistoryEl.addEventListener("click", () => setDockTab("history"));
-tabFeedEl.addEventListener("click", () => setDockTab("feed"));
 
 // ── WebSocket ──
 function connect() {
@@ -677,22 +663,18 @@ function connect() {
         renderCaption(msg.text, msg.speaker);
       } else if (msg.type === "transcript") {
         if (msg.reason === "snapshot") {
-          renderFeedBacklog(msg.entries);
-          feedTruncEl.hidden = !msg.truncated;
+          renderTranscriptBacklog(msg.entries);
+          transcriptTruncEl.hidden = !msg.truncated;
         } else {
           exportTranscript(msg.entries);
         }
       } else if (msg.type === "line") {
-        renderFeedLine(msg);
+        renderTranscriptLine(msg);
       } else if (msg.type === "providers") {
         renderProviders(msg);
       } else if (msg.type === "capture") {
-        const wasCapturing = capturing;
         capturing = !!msg.capturing;
         inputMode = msg.mode ?? "mic";
-        // 녹음 시작 시 전사 탭으로 전환해 진행 과정이 바로 보이도록.
-        // 단, 슬라이드 미리보기 중에는 사용자의 시선을 끊지 않는다.
-        if (capturing && !wasCapturing && !viewingHistory) setDockTab("feed");
         renderCaptureButton();
         renderCaptureState();
         renderPill();

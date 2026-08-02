@@ -142,29 +142,32 @@
     <!-- 중앙|우 스플리터 -->
     <div class="splitter splitter--transcript" id="splitter-transcript" role="separator" aria-orientation="vertical" aria-label="전사 패널 너비 조절" tabindex="0"></div>
 
-    <!-- 우: 전사 패널 (연결은 todo 3) -->
+    <!-- 우: 전사 패널 — 라이브 전사의 1차 거처 -->
     <aside class="transcript-pane" id="transcript-pane" aria-label="전사">
-      <div class="pane__head">
-        <span class="pane__title">전사</span>
-        <span class="pane__count" id="transcript-count">0</span>
-      </div>
-      <div class="pane__body">
-        <div class="transcript-stream" id="transcript-stream"></div>
-        <p class="pane__empty" id="transcript-empty">녹음을 시작하면<br>전사가 여기에 흐릅니다</p>
-      </div>
+      <section class="transcript-card" id="transcript-card">
+        <div class="pane__head">
+          <span class="pane__title">전사</span>
+          <span class="pane__count" id="transcript-count">0</span>
+        </div>
+        <div class="pane__body" id="transcript-body">
+          <div class="transcript-stream" id="transcript-stream"></div>
+          <p class="pane__empty" id="transcript-empty">녹음을 시작하면<br>전사가 여기에 흐릅니다</p>
+          <div class="transcript-trunc" id="transcript-trunc" hidden>⚠ 전사 로그 상한 도달 — 오래된 문장이 잘렸습니다</div>
+        </div>
+        <!-- 남/남서 리사이즈 손잡이: 서쪽 폭은 워크스페이스 스플리터가 담당 -->
+        <div class="transcript-grip transcript-grip--s" id="transcript-grip-s" role="separator" aria-orientation="horizontal" aria-label="전사 패널 높이 조절" tabindex="0"></div>
+        <div class="transcript-grip transcript-grip--sw" id="transcript-grip-sw" role="separator" aria-label="전사 패널 너비·높이 조절" tabindex="0"></div>
+      </section>
     </aside>
 
     </div>
 
-    <!-- ── 하단 패널: 탭(히스토리 / 전사) + export ─ -->
+    <!-- ── 하단 도크: 슬라이드 히스토리 + export (전사는 우측 패널로 이전) ─ -->
     <div class="dock">
-      <div class="dock__tabs" role="tablist">
-        <button class="dock__tab dock__tab--active" id="tab-history" role="tab" aria-selected="true" type="button">
+      <div class="dock__tabs">
+        <span class="dock__label" id="tab-history">
           히스토리 <span class="dock__count" id="history-count">0</span>
-        </button>
-        <button class="dock__tab" id="tab-feed" role="tab" aria-selected="false" type="button">
-          실시간 전사 <span class="dock__count" id="feed-count">0</span>
-        </button>
+        </span>
         <div class="dock__spacer"></div>
         <button id="btn-compile-deck" class="dock__btn dock__btn--compile" type="button" title="전체 회의를 발표 덱으로 컴파일" aria-label="발표 덱 컴파일"><span>✦</span>컴파일</button>
         <span id="compile-status" class="compile-status" role="status" aria-live="polite" hidden></span>
@@ -179,7 +182,7 @@
       </div>
 
       <!-- 히스토리 패널: 가로 필름스트립 -->
-      <div class="dock__panel dock__panel--active" id="dock-history" role="tabpanel">
+      <div class="dock__panel dock__panel--active" id="dock-history">
         <div class="filmstrip" id="thumbnails">
           <div class="filmstrip__empty">
             <span class="filmstrip__empty-ring"></span>
@@ -188,17 +191,11 @@
         </div>
       </div>
 
-      <!-- 실시간 전사 패널: 세로 흐름 -->
-      <div class="dock__panel" id="dock-feed" role="tabpanel" hidden>
-        <div class="feed__list" id="feed-list">
-          <div class="feed__empty">녹음을 시작하면<br>전사가 여기에 흐릅니다</div>
-        </div>
-        <div class="feed__trunc" id="feed-trunc" hidden>⚠ 전사 로그 상한 도달 — 오래된 문장이 잘렸습니다</div>
-      </div>
     </div>
   </div>
 
   <script src="/workspace-split.js"></script>
+  <script src="/transcript-resize.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
