@@ -3,6 +3,40 @@ import { describe, expect, test } from "bun:test";
 import { MeetingStore } from "../src/store.ts";
 
 describe("MeetingStore", () => {
+  test("회의 목록은 빈 저장소에서 비어 있다", () => {
+    const store = new MeetingStore(":memory:");
+    expect(store.listMeetings()).toEqual([]);
+    store.close();
+  });
+
+  test("회의 목록은 첫 슬라이드 제목과 시작/종료 상태를 노출한다", () => {
+    const store = new MeetingStore(":memory:");
+    const beforeStart = Date.now();
+    const id = store.startMeeting("cli:codex");
+
+    const open = store.listMeetings();
+    expect(open).toHaveLength(1);
+    expect(open[0]).toEqual({
+      id,
+      title: `회의 #${id}`,
+      started_at: expect.any(Number),
+      status: "open",
+    });
+    expect(open[0].started_at).toBeGreaterThanOrEqual(beforeStart);
+
+    store.addSlide({ idx: 2, title: "두 번째 안건", bullets: [], startedAt: 2000 });
+    store.addSlide({ idx: 1, title: "출시 일정", bullets: ["금요일"], startedAt: 1000 });
+    store.endMeeting();
+
+    expect(store.listMeetings()).toEqual([{
+      id,
+      title: "출시 일정",
+      started_at: open[0].started_at,
+      status: "ended",
+    }]);
+    store.close();
+  });
+
   test("회의 라이프사이클: 시작 → 라인/슬라이드 → 종료", () => {
     const store = new MeetingStore(":memory:");
     const id = store.startMeeting("cli:codex");

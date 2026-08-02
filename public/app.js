@@ -36,6 +36,9 @@ const transcriptCountEl = $("transcript-count");
 const transcriptEmptyEl = $("transcript-empty");
 const transcriptBodyEl = $("transcript-body");
 const btnResetEl = $("btn-reset");
+const sessionListEl = $("session-list");
+const sessionEmptyEl = $("session-empty");
+const sessionCountEl = $("session-count");
 
 // 글랜서블 상태 스트립
 const appEl = document.querySelector(".app");
@@ -60,6 +63,8 @@ const transcriptTruncEl = $("transcript-trunc");
 let currentSlide = null;
 let slideHistory = [];
 let ws = null;
+let meetings = [];
+let selectedMeetingId = null;
 // 히스토리 썸네일로 미리보기 중인 과거 슬라이드 (null이면 라이브 표시)
 let viewingHistory = null;
 
@@ -68,6 +73,47 @@ function escapeHtml(s) {
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   }[c]));
 }
+
+function requestMeetings() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "listMeetings" }));
+  }
+}
+
+function renderMeetings(items) {
+  meetings = Array.isArray(items) ? items : [];
+  if (selectedMeetingId !== null && !meetings.some((item) => item.id === selectedMeetingId)) {
+    selectedMeetingId = null;
+  }
+  sessionCountEl.textContent = String(meetings.length);
+  sessionEmptyEl.hidden = meetings.length > 0;
+  sessionListEl.innerHTML = meetings.map((item) => {
+    const selected = item.id === selectedMeetingId;
+    const started = new Date(item.started_at).toLocaleString("ko-KR", {
+      month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false,
+    });
+    return `<li>
+      <button type="button" class="session-row${selected ? " session-row--selected" : ""}" data-meeting-id="${escapeHtml(item.id)}" aria-pressed="${selected}">
+        <span class="session-row__title">${escapeHtml(item.title)}</span>
+        <span class="session-row__meta">
+          <span>${escapeHtml(started)}</span>
+          <span class="session-row__status session-row__status--${item.status === "open" ? "open" : "ended"}">${item.status === "open" ? "진행 중" : "종료"}</span>
+        </span>
+      </button>
+    </li>`;
+  }).join("");
+}
+
+sessionListEl.addEventListener("click", (ev) => {
+  const row = ev.target.closest(".session-row");
+  if (!row) return;
+  selectedMeetingId = Number(row.dataset.meetingId);
+  renderMeetings(meetings);
+  const meeting = meetings.find((item) => item.id === selectedMeetingId);
+  if (meeting) renderStatus(meeting.status === "open"
+    ? `진행 중인 세션: ${meeting.title}`
+    : `과거 세션 열기는 준비 중입니다: ${meeting.title}`);
+});
 
 // 라이브 MeetingCard: title(필수) + kicker/emphasis(선택) + bullets.
 // 라이브 무대는 항상 이 단일 레이아웃 하나만 쓴다 (kind별 분기는 컴파일 덱 전용).
@@ -483,6 +529,7 @@ function renderCaptureButton() {
 btnRecordEl.onclick = () => {
   if (!ws || ws.readyState !== WebSocket.OPEN) return;
   ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
+  requestMeetings();
 };
 
 renderCaptureButton();
@@ -581,6 +628,7 @@ btnResetEl.onclick = () => {
   transcriptTruncEl.hidden = true;
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "reset" }));
+    requestMeetings();
     renderStatus("세션 초기화 요청됨");
   } else {
     renderStatus("연결되지 않음 — 초기화 불가");
@@ -643,7 +691,10 @@ function connect() {
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
   ws = new WebSocket(`${proto}//${location.host}/ws`);
 
-  ws.onopen = () => renderStatus("서버 연결됨");
+  ws.onopen = () => {
+    renderStatus("서버 연결됨");
+    requestMeetings();
+  };
   ws.onmessage = (ev) => {
     try {
       const msg = JSON.parse(ev.data);
@@ -661,6 +712,8 @@ function connect() {
         setOnAir(capturing || !!currentSlide);
       } else if (msg.type === "caption") {
         renderCaption(msg.text, msg.speaker);
+      } else if (msg.type === "meetings") {
+        renderMeetings(msg.items);
       } else if (msg.type === "transcript") {
         if (msg.reason === "snapshot") {
           renderTranscriptBacklog(msg.entries);
@@ -691,6 +744,7 @@ function connect() {
         renderStatus(msg.code === "compile-busy" ? "컴파일 중에는 내보낼 수 없습니다" : msg.error);
       } else if (msg.type === "saved") {
         renderStatus(`저장됨: ${msg.path}`);
+        requestMeetings();
         // 상시 표시 (관찰성: 마지막 저장물 경로를 도크에 고정)
         if (lastSavedEl) {
           lastSavedEl.hidden = false;

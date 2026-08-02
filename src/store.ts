@@ -30,6 +30,13 @@ export interface StoredDeckOutline {
   publishedAt: number | null;
 }
 
+export interface MeetingSummary {
+  id: number;
+  title: string;
+  started_at: number;
+  status: "open" | "ended";
+}
+
 export class MeetingStore {
   private db: Database;
   private meetingId: number | null = null;
@@ -250,6 +257,24 @@ export class MeetingStore {
       compiledAt: row.compiledAt,
       publishedAt: row.publishedAt,
     };
+  }
+
+  /** 최근 회의부터 레일에 노출한다. 제목은 첫 슬라이드가 없으면 안정적인 회의 ID로 대체한다. */
+  listMeetings(): MeetingSummary[] {
+    const rows = this.db.query(`
+      SELECT m.id, m.started_at,
+             CASE WHEN m.ended_at IS NULL THEN 'open' ELSE 'ended' END AS status,
+             COALESCE((
+               SELECT s.title
+               FROM slides s
+               WHERE s.meeting_id = m.id
+               ORDER BY s.idx ASC, s.id DESC
+               LIMIT 1
+             ), '회의 #' || m.id) AS title
+      FROM meetings m
+      ORDER BY m.started_at DESC, m.id DESC
+    `).all() as MeetingSummary[];
+    return rows;
   }
 
   /** anarlog식 Markdown export: 헤더 + 슬라이드 요약 + 전체 전사본 */

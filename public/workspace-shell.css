@@ -101,7 +101,7 @@
 }
 .pane__empty[hidden] { display: none; }
 
-/* 세션 레일 (목록 배선은 todo 4) */
+/* 세션 레일 */
 .session-list {
   list-style: none;
   display: flex;
@@ -109,6 +109,44 @@
   gap: var(--sp-1);
 }
 .session-list:empty { display: none; }
+.session-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--z300);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth);
+}
+.session-row:hover { background: rgba(255, 255, 255, 0.035); }
+.session-row--selected {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: var(--live-soft);
+}
+.session-row__title {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.session-row__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--z500);
+}
+.session-row__status { white-space: nowrap; }
+.session-row__status--open { color: var(--live); }
 
 /* ── 도킹된 전사 카드: 라이브 전사의 1차 거처 ── */
 /* 기본은 패널을 가득 채운다. S/SW 그립으로 높이를 잡으면

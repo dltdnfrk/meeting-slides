@@ -83,6 +83,16 @@ export interface CaptureUpdate {
   mode: string;
 }
 
+export interface MeetingsUpdate {
+  type: "meetings";
+  items: Array<{
+    id: number;
+    title: string;
+    started_at: number;
+    status: "open" | "ended";
+  }>;
+}
+
 /** LLM 블록 감지 진행 표시 (관찰성: 사람·AI 모두 "지금 만드는 중"을 읽을 수 있게) */
 export interface DetectUpdate {
   type: "detect";
@@ -118,7 +128,7 @@ export interface ExportUpdate {
   error: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | LineUpdate | DetectUpdate | SavedUpdate | CompileUpdate | ExportUpdate;
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | MeetingsUpdate | LineUpdate | DetectUpdate | SavedUpdate | CompileUpdate | ExportUpdate;
 
 export type ClientListener = (msg: ServerMessage) => void;
 

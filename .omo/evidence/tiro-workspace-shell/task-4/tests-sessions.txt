@@ -1,0 +1,19 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/store.test.ts:
+(pass) MeetingStore > 회의 목록은 빈 저장소에서 비어 있다 [1.95ms]
+(pass) MeetingStore > 회의 목록은 첫 슬라이드 제목과 시작/종료 상태를 노출한다 [0.53ms]
+(pass) MeetingStore > 회의 라이프사이클: 시작 → 라인/슬라이드 → 종료 [0.50ms]
+(pass) MeetingStore > 회의가 열려있지 않으면 라인/슬라이드 무시 [0.25ms]
+(pass) MeetingStore > Markdown export: 헤더 + 슬라이드 + 전사본 [1.60ms]
+(pass) MeetingStore > 같은 idx 슬라이드 갱신은 upsert되어 export에 최신 불렛이 남는다 [0.32ms]
+
+tests/public-sessions.test.ts:
+(pass) 세션 레일 listMeetings > 빈 목록이면 empty state 를 보여준다 [7.61ms]
+(pass) 세션 레일 listMeetings > 회의 목록을 렌더하고 클릭 시 선택 하이라이트한다 [27.57ms]
+(pass) 세션 레일 listMeetings > malformed meetings payload 도 빈 목록으로 복구된다 [21.34ms]
+
+ 9 pass
+ 0 fail
+ 35 expect() calls
+Ran 9 tests across 2 files. [1206.00ms]

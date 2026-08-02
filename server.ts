@@ -57,12 +57,15 @@ const session = new MeetingSession(
   listeners,
   {
     onLine: (entry) => store.addLine(entry),
-    onSlide: (slide) => store.addSlide({
-      idx: slide.index,
-      title: slide.title,
-      bullets: slide.bullets,
-      startedAt: slide.startedAt,
-    }),
+    onSlide: (slide) => {
+      store.addSlide({
+        idx: slide.index,
+        title: slide.title,
+        bullets: slide.bullets,
+        startedAt: slide.startedAt,
+      });
+      broadcast(meetingsMessage());
+    },
   },
 );
 
@@ -88,6 +91,10 @@ function providersMessage(): ProvidersUpdate {
     currentModel,
     currentEffort,
   };
+}
+
+function meetingsMessage(): ServerMessage {
+  return { type: "meetings", items: store.listMeetings() };
 }
 
 function openUrl(url: string): void {
@@ -197,9 +204,13 @@ const httpServer = Bun.serve({
           store.endMeeting();
           if (capturing) store.startMeeting(currentProviderId);
           broadcast(session.transcript("snapshot"));
+          broadcast(meetingsMessage());
         }
         else if (cmd.action === "status") {
           ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
+        }
+        else if (cmd.action === "listMeetings") {
+          ws.send(JSON.stringify(meetingsMessage()));
         }
         else if (cmd.action === "transcript") {
           ws.send(JSON.stringify(session.transcript("export")));
@@ -578,6 +589,7 @@ async function startCapture(): Promise<void> {
   }
   store.startMeeting(currentProviderId);
   broadcast(captureMessage());
+  broadcast(meetingsMessage());
   broadcast({ type: "status", text: "🎤 녹음 시작 — 말씀하세요" });
   void whisper.start(whisperHandlers).then(async () => {
     await session.flush();
@@ -611,6 +623,7 @@ async function stopCapture(): Promise<void> {
     await p;
     await session.flush();
     store.endMeeting();
+    broadcast(meetingsMessage());
     broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
   } finally {
     stopPromise = null;
