@@ -90,9 +90,9 @@ export function parseBlockDetectionJson(content: string): BlockDetectionResult {
 }
 
 /** 스크린샷의 "회의 종료 / 회의가 종료되었습니다" 류 메타 카드 하드 차단. */
-const META_TITLE = /^(회의\s*(시작|종료|재개|진행|안내|정리)?|인사|테스트|녹음|연결|대기|마무리|클로징|오프닝|안건\s*없음|논의\s*진행)$/i;
-const META_BULLET = /(회의가\s*(시작|종료)|녹음을\s*(시작|중지)|안녕하세요|테스트입니다|들(?:리|리시)나요|접속(?:됐| 됐)|슬라이드\s*앱|논의를\s*진행)/i;
-const HOLLOW_BULLET = /^(네|좋아요|알겠습니다|좋습니다|그렇습니다|진행합니다|논의합니다|확인합니다|확인이 필요합니다)[.!…]?$/i;
+const META_TITLE = /^(회의\s*(시작|종료|재개|진행|안내|정리)|인사|테스트|녹음|연결|대기|마무리|클로징|오프닝|안건\s*없음|논의\s*진행)$/i;
+const META_BULLET = /(회의[가이를를]?\s*(시작|종료)|녹음을\s*(시작|중지)|안녕하세요|반갑습니다|수고하셨습니다|테스트입니다|들(?:리|리시)나요|접속(?:됐| 됐)|슬라이드\s*앱|논의를\s*진행|종료합니다|종료되었습니다)/i;
+const HOLLOW_BULLET = /^(네|좋아요|알겠습니다|좋습니다|그렇습니다|진행합니다|논의합니다|확인합니다|확인이 필요합니다|수고하셨습니다)[.!…]?$/i;
 
 export function isLowQualityMeetingCard(card: LiveMeetingCard): boolean {
   const title = card.title.trim();
@@ -101,11 +101,16 @@ export function isLowQualityMeetingCard(card: LiveMeetingCard): boolean {
 
   const bullets = card.bullets.map((b) => b.trim()).filter(Boolean);
   if (bullets.length === 0) return true;
-  if (bullets.every((b) => META_BULLET.test(b) || HOLLOW_BULLET.test(b) || b.length < 6)) return true;
+  if (bullets.every((b) => META_BULLET.test(b) || HOLLOW_BULLET.test(b))) return true;
+  // 극단적으로 짧은 불릿만 거부 (한글 2~4자도 유효 요점일 수 있음)
+  if (bullets.every((b) => b.length < 2)) return true;
 
   const norm = (s: string) => s.replace(/[\s.。·]/g, "");
-  if (bullets.length === 1 && (norm(bullets[0]) === norm(title) || norm(bullets[0]).includes(norm(title)))) {
-    if (bullets[0].length <= title.length + 8) return true;
+  // 제목과 불릿이 사실상 동일할 때만 반복으로 본다 (includes 오탐 금지)
+  if (bullets.length === 1 && title.length >= 4) {
+    const nb = norm(bullets[0]);
+    const nt = norm(title);
+    if (nb === nt || nb === nt + "입니다" || nb === nt + "다") return true;
   }
   if (bullets.length === 1 && /되었습니다\.?$/.test(bullets[0]) && bullets[0].length < 24) return true;
   return false;
