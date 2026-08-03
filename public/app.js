@@ -282,7 +282,10 @@ function setOnAir(active) {
 }
 
 function renderStatus(text) {
-  statusTextEl.textContent = text;
+  // 긴 whisper/metal 로그가 status bar를 잠식하지 않게 자른다.
+  const cleaned = String(text ?? "").replace(/\s+/g, " ").trim();
+  statusTextEl.textContent = cleaned.length > 160 ? `${cleaned.slice(0, 157)}...` : cleaned;
+  statusTextEl.title = cleaned;
   statusIndicatorEl.classList.remove(
     "status__indicator--ok",
     "status__indicator--warn",
