@@ -1,0 +1,65 @@
+{
+  "hashedAt": "2026-08-03T12:46:19.710254Z",
+  "files": [
+    {
+      "file": "artifacts/track1-results.json",
+      "bytes": 9446,
+      "sha256": "5a191b0407f953fd844edc57d2cd8bf6084170beb8878b1dc15500449bb46018"
+    },
+    {
+      "file": "artifacts/track2-results.json",
+      "bytes": 9898,
+      "sha256": "021990dd384da1f94a73b8a45b06af4846e763a21e0291a64b047d4a03991176"
+    },
+    {
+      "file": "artifacts/track2b-connect-results.json",
+      "bytes": 3919,
+      "sha256": "0a49c289d3748a1b73de5f3be1bb9641726df20a0a96f9d3d97c445f836fa84a"
+    },
+    {
+      "file": "artifacts/track3-stt-timeline.json",
+      "bytes": 7544,
+      "sha256": "d45aa442691fbc989001a05d7b3a356525a4fa077eac861fcbf103613537f3f9"
+    },
+    {
+      "file": "artifacts/track3-four-state-recapture.json",
+      "bytes": 12563,
+      "sha256": "20bc2a57c36fa41c76e8ebc1592017b6086a2ba429e485f533695bb5252c203c"
+    },
+    {
+      "file": "artifacts/continuation-artifact-verification.json",
+      "bytes": 3948,
+      "sha256": "3ab8ee2466b80cc34c167e83be47b8ac45901f3b5f7d1babe070b568277a7fde"
+    },
+    {
+      "file": "artifacts/png-integrity.json",
+      "bytes": 22425,
+      "sha256": "8aca000470d81b7c820ae4b2f60ebe7a208107c671b9e7a42881641154009e20"
+    },
+    {
+      "file": "artifacts/requirement-map.json",
+      "bytes": 5638,
+      "sha256": "5dff45d9bf94fdea6479e04a784da4ab6c1d4698d5b2ba04a761a250ad483ba1"
+    },
+    {
+      "file": "state/continuation-baseline-inventory.txt",
+      "bytes": 762,
+      "sha256": "873365a97ba07accd9b30ed0214670f4aa53cebd85fb04ad24d2a9cfddafc26c"
+    },
+    {
+      "file": "state/continuation-atomic-staging-receipt.txt",
+      "bytes": 902,
+      "sha256": "73e42be4c32e7c80c7882c8e2b5d601c24901ca7119f821e2a7e9111bba6d7f2"
+    },
+    {
+      "file": "state/continuation-process-ledger.json",
+      "bytes": 1618,
+      "sha256": "fc55342c4fd2d2b48109012d8c6e85e8210ac5aeb3b4c0924328fc514dc279d2"
+    },
+    {
+      "file": "state/continuation-cleanup-receipt.txt",
+      "bytes": 1062,
+      "sha256": "21554cf07c0a50dbc1e8feb8ca0d872a48b034f542b6440f7333e0f2feb53051"
+    }
+  ]
+}

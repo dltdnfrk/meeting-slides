@@ -1,0 +1,188 @@
+{
+  "capturedAt": "2026-08-03T12:06:37.537Z",
+  "separators": [
+    {
+      "id": "splitter-rail",
+      "arrowKey": "ArrowRight",
+      "initial": {
+        "id": "splitter-rail",
+        "role": "separator",
+        "orientation": "vertical",
+        "min": 180,
+        "max": 942,
+        "now": 232,
+        "active": true
+      },
+      "arrow": {
+        "id": "splitter-rail",
+        "role": "separator",
+        "orientation": "vertical",
+        "min": 180,
+        "max": 942,
+        "now": 248,
+        "active": true
+      },
+      "home": {
+        "id": "splitter-rail",
+        "role": "separator",
+        "orientation": "vertical",
+        "min": 180,
+        "max": 942,
+        "now": 180,
+        "active": true
+      },
+      "end": {
+        "id": "splitter-rail",
+        "role": "separator",
+        "orientation": "vertical",
+        "min": 180,
+        "max": 942,
+        "now": 942,
+        "active": true
+      },
+      "valid": true
+    },
+    {
+      "id": "splitter-transcript",
+      "arrowKey": "ArrowLeft",
+      "initial": {
+        "id": "splitter-transcript",
+        "role": "separator",
+        "orientation": "vertical",
+        "min": 240,
+        "max": 1002,
+        "now": 320,
+        "active": true
+      },
+      "arrow": {
+        "id": "splitter-transcript",
+        "role": "separator",
+        "orientation": "vertical",
+        "min": 240,
+        "max": 1002,
+        "now": 336,
+        "active": true
+      },
+      "home": {
+        "id": "splitter-transcript",
+        "role": "separator",
+        "orientation": "vertical",
+        "min": 240,
+        "max": 1002,
+        "now": 240,
+        "active": true
+      },
+      "end": {
+        "id": "splitter-transcript",
+        "role": "separator",
+        "orientation": "vertical",
+        "min": 240,
+        "max": 1002,
+        "now": 1002,
+        "active": true
+      },
+      "valid": true
+    },
+    {
+      "id": "transcript-grip-s",
+      "arrowKey": "ArrowUp",
+      "initial": {
+        "id": "transcript-grip-s",
+        "role": "separator",
+        "orientation": "horizontal",
+        "min": 160,
+        "max": 694,
+        "now": 694,
+        "active": true
+      },
+      "arrow": {
+        "id": "transcript-grip-s",
+        "role": "separator",
+        "orientation": "horizontal",
+        "min": 160,
+        "max": 694,
+        "now": 678,
+        "active": true
+      },
+      "home": {
+        "id": "transcript-grip-s",
+        "role": "separator",
+        "orientation": "horizontal",
+        "min": 160,
+        "max": 694,
+        "now": 160,
+        "active": true
+      },
+      "end": {
+        "id": "transcript-grip-s",
+        "role": "separator",
+        "orientation": "horizontal",
+        "min": 160,
+        "max": 694,
+        "now": 694,
+        "active": true
+      },
+      "valid": true
+    },
+    {
+      "id": "transcript-grip-sw",
+      "arrowKey": "ArrowUp",
+      "initial": {
+        "id": "transcript-grip-sw",
+        "role": "separator",
+        "orientation": "horizontal",
+        "min": 160,
+        "max": 694,
+        "now": 694,
+        "active": true
+      },
+      "arrow": {
+        "id": "transcript-grip-sw",
+        "role": "separator",
+        "orientation": "horizontal",
+        "min": 160,
+        "max": 694,
+        "now": 678,
+        "active": true
+      },
+      "home": {
+        "id": "transcript-grip-sw",
+        "role": "separator",
+        "orientation": "horizontal",
+        "min": 160,
+        "max": 694,
+        "now": 160,
+        "active": true
+      },
+      "end": {
+        "id": "transcript-grip-sw",
+        "role": "separator",
+        "orientation": "horizontal",
+        "min": 160,
+        "max": 694,
+        "now": 694,
+        "active": true
+      },
+      "valid": true
+    }
+  ],
+  "koreanTitle": {
+    "text": "제품 출시 일정 논의",
+    "idx": 9,
+    "non": {
+      "top": 406.953125,
+      "bottom": 420.953125,
+      "left": 97.28125,
+      "right": 107.671875
+    },
+    "ui": {
+      "top": 406.953125,
+      "bottom": 420.953125,
+      "left": 107.65625,
+      "right": 118.046875
+    },
+    "sameLine": true,
+    "contiguous": true
+  },
+  "status": "PASS"
+}

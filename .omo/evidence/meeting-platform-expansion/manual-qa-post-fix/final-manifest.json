@@ -1,0 +1,324 @@
+{
+  "taskId": "st_019fc78e",
+  "revision": "c655ad023a450fa1d29f5c505b305ed50ad2af0c",
+  "status": "PASS",
+  "scope": "Continuation-only completion of missing post-fix visual states 15-18; prior 14 fresh states retained; no product code/tests edited, no build/tests rerun, no commit.",
+  "priorReleaseValidation": {
+    "provenance": "Retained from task st_019fc781; not rerun by this continuation.",
+    "typescript": "PASS (prior run)",
+    "tests": "PASS: 188 pass, 0 fail, 669 expect() calls, 33 files, 19.94s (prior run exactly once)",
+    "build": "PASS (prior run)",
+    "codesign": "PASS (prior run; current signed app launched)"
+  },
+  "continuationMethod": {
+    "priorRealUiProof": "Prior post-fix manual QA already proved real UI download initiation, live byte/progress rendering, cancellation, hidden-partial cleanup, and three completed production installs in states 10-14 (artifacts/track3-stt-timeline.json and associated screenshots).",
+    "stagingRationale": "This continuation independently downloaded and verified all four official catalog payloads outside the app, then atomically staged the exact bytes only for fresh visual recapture, avoiding another flaky multi-gigabyte browser wait without replacing the prior real-UI lifecycle proof.",
+    "downloader": "Four direct curl transfers using --continue-at -, bounded connect/overall/retry windows, and process-completion waits; temporary QA cache removed after capture.",
+    "staging": "Verified-source hard link to a hidden same-directory destination followed by atomic rename; no partials remained.",
+    "synchronization": "Downloader completion, signed-launch stdout readiness, WebSocket frames, DOM mutation, and child-process exit events; no QA sleeps or timer polling loops."
+  },
+  "officialArtifacts": [
+    {
+      "id": "small",
+      "fileName": "ggml-small-q8_0.bin",
+      "catalogUrl": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q8_0.bin",
+      "catalogSizeBytes": 264464607,
+      "actualSizeBytes": 264464607,
+      "sizeExact": true,
+      "catalogSha256": "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f",
+      "actualSha256": "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f",
+      "sha256Exact": true,
+      "persistedDownloadLog": "logs/continuation-downloader-small.log"
+    },
+    {
+      "id": "medium",
+      "fileName": "ggml-medium-q8_0.bin",
+      "catalogUrl": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium-q8_0.bin",
+      "catalogSizeBytes": 823369779,
+      "actualSizeBytes": 823369779,
+      "sizeExact": true,
+      "catalogSha256": "42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502",
+      "actualSha256": "42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502",
+      "sha256Exact": true,
+      "persistedDownloadLog": "logs/continuation-downloader-medium.log"
+    },
+    {
+      "id": "large-v3-turbo",
+      "fileName": "ggml-large-v3-turbo-q8_0.bin",
+      "catalogUrl": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q8_0.bin",
+      "catalogSizeBytes": 874188075,
+      "actualSizeBytes": 874188075,
+      "sizeExact": true,
+      "catalogSha256": "317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1",
+      "actualSha256": "317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1",
+      "sha256Exact": true,
+      "persistedDownloadLog": "logs/continuation-downloader-large-v3-turbo.log"
+    },
+    {
+      "id": "large-v3",
+      "fileName": "ggml-large-v3-q8_0.bin",
+      "catalogUrl": "https://huggingface.co/Pomni/whisper-large-v3-ggml-allquants/resolve/main/ggml-large-v3-q8_0.bin",
+      "catalogSizeBytes": 1656538283,
+      "actualSizeBytes": 1656538283,
+      "sizeExact": true,
+      "catalogSha256": "24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e",
+      "actualSha256": "24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e",
+      "sha256Exact": true,
+      "persistedDownloadLog": "logs/continuation-downloader-large-v3.log"
+    }
+  ],
+  "signedAppLaunches": [
+    {
+      "sequence": 1,
+      "launcherPid": 89735,
+      "serverPid": 89774,
+      "logPath": "/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/meeting-platform-expansion/manual-qa-post-fix/logs/continuation-launch-1.log",
+      "startedAt": "2026-08-03T12:43:18.973Z",
+      "readyAt": "2026-08-03T12:43:20.648Z",
+      "puppeteerPid": 89851,
+      "puppeteerClosedAt": "2026-08-03T12:43:22.414Z",
+      "termRequestedAt": "2026-08-03T12:43:22.415Z",
+      "termTargetServerPid": 89774,
+      "exitedAt": "2026-08-03T12:43:22.431Z",
+      "exitCode": 0,
+      "exitSignal": null,
+      "terminatedOnlyOwnedPids": [
+        89774,
+        89735
+      ]
+    },
+    {
+      "sequence": 2,
+      "launcherPid": 90245,
+      "serverPid": 90256,
+      "logPath": "/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/meeting-platform-expansion/manual-qa-post-fix/logs/continuation-launch-2.log",
+      "startedAt": "2026-08-03T12:43:22.432Z",
+      "readyAt": "2026-08-03T12:43:23.743Z",
+      "puppeteerPid": 90321,
+      "puppeteerClosedAt": "2026-08-03T12:43:24.947Z",
+      "termRequestedAt": "2026-08-03T12:43:24.947Z",
+      "termTargetServerPid": 90256,
+      "exitedAt": "2026-08-03T12:43:24.981Z",
+      "exitCode": 0,
+      "exitSignal": null,
+      "terminatedOnlyOwnedPids": [
+        90256,
+        90245
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "state": 1,
+      "name": "History hydrated; Korean title 논의 remains on one contiguous line",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t1-02-meeting28-hydrated.png",
+        "artifacts/separator-keyboard-aria.json"
+      ]
+    },
+    {
+      "state": 2,
+      "name": "Compiled history hydrated",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t1-03-meeting43-hydrated-compiled.png",
+        "artifacts/track1-results.json"
+      ]
+    },
+    {
+      "state": 3,
+      "name": "Export terminal state and controls recovery",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t1-07-pdf-export-terminal.png",
+        "artifacts/track1-results.json"
+      ]
+    },
+    {
+      "state": 4,
+      "name": "Bad-input terminal recovery",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t1-08-bad-input-error-recovery.png",
+        "artifacts/track1-results.json"
+      ]
+    },
+    {
+      "state": 5,
+      "name": "Provider desktop state after truthful recheck",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t2-02-settings-desktop-after-recheck.png",
+        "artifacts/track2-results.json"
+      ]
+    },
+    {
+      "state": 6,
+      "name": "360px settings open, unclipped, keyboard focus restored",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t2-08-settings-narrow-360-open.png",
+        "artifacts/track2-results.json"
+      ]
+    },
+    {
+      "state": 7,
+      "name": "Provider/model/effort persistence after reload",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t2-09-settings-after-reload.png",
+        "artifacts/track2-results.json"
+      ]
+    },
+    {
+      "state": 8,
+      "name": "Safe connect feedback without optimistic auth",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t2b-after-connect-clicks.png",
+        "artifacts/track2b-connect-results.json"
+      ]
+    },
+    {
+      "state": 9,
+      "name": "STT all four absent",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-01-stt-all-four-absent.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 10,
+      "name": "STT active progress and hidden partial",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-02-stt-downloading-progress.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 11,
+      "name": "STT cancelled cleanup",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-03-stt-cancelled-cleanup.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 12,
+      "name": "Production Small installed, exact size/SHA",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-04-installed-small.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 13,
+      "name": "Production Medium installed, exact size/SHA",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-04-installed-medium.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 14,
+      "name": "Production Large v3 Turbo installed, exact size/SHA",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-04-installed-large-v3-turbo.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 15,
+      "name": "All four installed with 음성 인식 모델 and all cards visible",
+      "status": "PASS",
+      "freshness": "continuation fresh recapture",
+      "evidence": [
+        "screens/t3-05-stt-all-installed.png",
+        "artifacts/track3-four-state-recapture.json",
+        "artifacts/continuation-artifact-verification.json"
+      ]
+    },
+    {
+      "state": 16,
+      "name": "Every selection control clicked; final exactly Large v3 selected visible",
+      "status": "PASS",
+      "freshness": "continuation fresh recapture",
+      "evidence": [
+        "screens/t3-06-stt-all-model-selection-final.png",
+        "artifacts/track3-four-state-recapture.json"
+      ]
+    },
+    {
+      "state": 17,
+      "name": "Recheck keeps all cards and Large v3 selected visible",
+      "status": "PASS",
+      "freshness": "continuation fresh recapture",
+      "evidence": [
+        "screens/t3-08-stt-after-recheck.png",
+        "artifacts/track3-four-state-recapture.json"
+      ]
+    },
+    {
+      "state": 18,
+      "name": "Post-launcher/server restart: Large v3 사용 중 / 선택됨 visible",
+      "status": "PASS",
+      "freshness": "continuation fresh recapture",
+      "evidence": [
+        "screens/t3-09-stt-selection-after-restart.png",
+        "artifacts/track3-four-state-recapture.json",
+        "state/continuation-process-ledger.json"
+      ]
+    }
+  ],
+  "completion": {
+    "passedStates": 18,
+    "requiredStates": 18,
+    "missingStates": [],
+    "priorFreshStatesRetained": 14,
+    "freshContinuationStates": 4
+  },
+  "pngIntegrity": {
+    "path": "artifacts/png-integrity.json",
+    "requiredCount": 18,
+    "requiredAllValid": true,
+    "allScreenPngCount": 36,
+    "allScreenPngsAllValid": true,
+    "prior14Unchanged": true,
+    "verifiedAfterLatestPngEdit": true
+  },
+  "artifactVerification": "artifacts/continuation-artifact-verification.json",
+  "evidenceHashes": "artifacts/continuation-evidence-hashes.json",
+  "requirementMap": "artifacts/requirement-map.json",
+  "processLedger": "state/continuation-process-ledger.json",
+  "cleanupReceipt": "state/continuation-cleanup-receipt.txt",
+  "cleanup": {
+    "baselineRestored": true,
+    "qaOwnedPidsRemaining": 0,
+    "port8787Listeners": 0,
+    "meetingSlidesState": "absent",
+    "modelsSttEntryCount": 0,
+    "temporaryArtifactQaDirectory": "removed",
+    "preExistingProcessesTerminated": "none"
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "stateCount": 18,
+  "passed": 18,
+  "failed": 0,
+  "requirements": [
+    {
+      "state": 1,
+      "name": "History hydrated; Korean title 논의 remains on one contiguous line",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t1-02-meeting28-hydrated.png",
+        "artifacts/separator-keyboard-aria.json"
+      ]
+    },
+    {
+      "state": 2,
+      "name": "Compiled history hydrated",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t1-03-meeting43-hydrated-compiled.png",
+        "artifacts/track1-results.json"
+      ]
+    },
+    {
+      "state": 3,
+      "name": "Export terminal state and controls recovery",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t1-07-pdf-export-terminal.png",
+        "artifacts/track1-results.json"
+      ]
+    },
+    {
+      "state": 4,
+      "name": "Bad-input terminal recovery",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t1-08-bad-input-error-recovery.png",
+        "artifacts/track1-results.json"
+      ]
+    },
+    {
+      "state": 5,
+      "name": "Provider desktop state after truthful recheck",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t2-02-settings-desktop-after-recheck.png",
+        "artifacts/track2-results.json"
+      ]
+    },
+    {
+      "state": 6,
+      "name": "360px settings open, unclipped, keyboard focus restored",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t2-08-settings-narrow-360-open.png",
+        "artifacts/track2-results.json"
+      ]
+    },
+    {
+      "state": 7,
+      "name": "Provider/model/effort persistence after reload",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t2-09-settings-after-reload.png",
+        "artifacts/track2-results.json"
+      ]
+    },
+    {
+      "state": 8,
+      "name": "Safe connect feedback without optimistic auth",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t2b-after-connect-clicks.png",
+        "artifacts/track2b-connect-results.json"
+      ]
+    },
+    {
+      "state": 9,
+      "name": "STT all four absent",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-01-stt-all-four-absent.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 10,
+      "name": "STT active progress and hidden partial",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-02-stt-downloading-progress.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 11,
+      "name": "STT cancelled cleanup",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-03-stt-cancelled-cleanup.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 12,
+      "name": "Production Small installed, exact size/SHA",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-04-installed-small.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 13,
+      "name": "Production Medium installed, exact size/SHA",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-04-installed-medium.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 14,
+      "name": "Production Large v3 Turbo installed, exact size/SHA",
+      "status": "PASS",
+      "freshness": "prior post-fix fresh capture retained",
+      "evidence": [
+        "screens/t3-04-installed-large-v3-turbo.png",
+        "artifacts/track3-stt-timeline.json"
+      ]
+    },
+    {
+      "state": 15,
+      "name": "All four installed with 음성 인식 모델 and all cards visible",
+      "status": "PASS",
+      "freshness": "continuation fresh recapture",
+      "evidence": [
+        "screens/t3-05-stt-all-installed.png",
+        "artifacts/track3-four-state-recapture.json",
+        "artifacts/continuation-artifact-verification.json"
+      ]
+    },
+    {
+      "state": 16,
+      "name": "Every selection control clicked; final exactly Large v3 selected visible",
+      "status": "PASS",
+      "freshness": "continuation fresh recapture",
+      "evidence": [
+        "screens/t3-06-stt-all-model-selection-final.png",
+        "artifacts/track3-four-state-recapture.json"
+      ]
+    },
+    {
+      "state": 17,
+      "name": "Recheck keeps all cards and Large v3 selected visible",
+      "status": "PASS",
+      "freshness": "continuation fresh recapture",
+      "evidence": [
+        "screens/t3-08-stt-after-recheck.png",
+        "artifacts/track3-four-state-recapture.json"
+      ]
+    },
+    {
+      "state": 18,
+      "name": "Post-launcher/server restart: Large v3 사용 중 / 선택됨 visible",
+      "status": "PASS",
+      "freshness": "continuation fresh recapture",
+      "evidence": [
+        "screens/t3-09-stt-selection-after-restart.png",
+        "artifacts/track3-four-state-recapture.json",
+        "state/continuation-process-ledger.json"
+      ]
+    }
+  ]
+}

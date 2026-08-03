@@ -1,0 +1,15 @@
+# Post-fix manual QA cleanup receipt
+completed_at: 2026-08-03T12:14:34Z
+backup_dir: /tmp/ms-post-fix-qa-backup.vbM51W
+terminated_qa_launcher: 75107
+terminated_qa_server: 75121
+qa_processes_absent: yes
+port_8787_listener: 0
+meeting_slides_state: absent
+models_stt_entry_count: 0
+exports_inventory_diff_count: 0
+restored_database_checksums:
+99de34b89ef3ff0be5d87e8e8c5a92ed08b8839047d23a5069dc907ebc6256f5  ./meetings.db
+e09b57396988bdb5e1ddea2492918c26644510aaefc39c23208ad88b8e53a1f2  ./meetings.db-shm
+39d3f807c49cd38ed929eafe097afdc9b9cfa82125af593cbc9b2540c5a97b08  ./meetings.db-wal
+env_sha256: 76bc86850553b6590826abdc3943552dc41c13eaf8f92917fa60b7edd6ebf1b6
