@@ -151,7 +151,11 @@ describe("라이브 MeetingCard 렌더", () => {
       const box = el.getBoundingClientRect();
       const spills = [...el.querySelectorAll<HTMLElement>("*")]
         .filter((child) => {
+          const style = getComputedStyle(child);
+          if (style.display === "none" || style.visibility === "hidden") return false;
           const r = child.getBoundingClientRect();
+          // display:none 은 0 사각형이라 left 비교에서 오탐 난다.
+          if (r.width <= 0 || r.height <= 0) return false;
           return r.right > box.right + 1 || r.left < box.left - 1;
         })
         .map((child) => child.className);

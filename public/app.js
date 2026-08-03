@@ -115,36 +115,128 @@ sessionListEl.addEventListener("click", (ev) => {
     : `과거 세션 열기는 준비 중입니다: ${meeting.title}`);
 });
 
-// 라이브 MeetingCard: title(필수) + kicker/emphasis(선택) + bullets.
-// 라이브 무대는 항상 이 단일 레이아웃 하나만 쓴다 (kind별 분기는 컴파일 덱 전용).
-// kicker/emphasis가 없는 레거시 슬라이드도 제목/불릿만으로 정상 렌더된다.
+// 라이브 MeetingCard → 실시간 kind 추론 후 레이아웃 분기.
+// 예전에는 단일 카드만 써서 "디자인이 안 바뀌는" 느낌이 났고,
+// kind별 비주얼은 컴파일 덱에만 있었다. 라이브 무대에서도 전환이 보여야 한다.
+function inferLiveKind(slide) {
+  const emphasis = typeof slide.emphasis === "string" ? slide.emphasis.trim() : "";
+  const kicker = typeof slide.kicker === "string" ? slide.kicker.trim() : "";
+  const bullets = Array.isArray(slide.bullets) ? slide.bullets : [];
+  const actionHits = bullets.filter((b) => /담당|까지|하기로|액션|마감|완료|공유/.test(b)).length;
+  if (/^결정\s*:/.test(emphasis) || /결정|합의|확정/.test(kicker)) return "decision";
+  if (/^액션\s*:/.test(emphasis) || /액션|할\s*일|TODO|후속/.test(kicker) || actionHits >= 2) return "actions";
+  if (/요약|정리|회고|클로징/.test(kicker) || bullets.length >= 5) return "summary";
+  if (Number(slide.index) === 1 && bullets.length <= 2 && !emphasis) return "cover";
+  if (bullets.length === 0) return "section";
+  return "topic";
+}
+
 function slideHtml(slide) {
+  const kind = inferLiveKind(slide);
   const kicker = typeof slide.kicker === "string" ? slide.kicker.trim() : "";
   const emphasis = typeof slide.emphasis === "string" ? slide.emphasis.trim() : "";
-  const bullets = (slide.bullets ?? [])
-    .map((b) => `<li>${escapeHtml(b)}</li>`)
-    .join("");
+  const title = escapeHtml(slide.title ?? "");
+  const idx = escapeHtml(String(slide.index).padStart(2, "0"));
+  const bullets = (slide.bullets ?? []).map((b) => escapeHtml(b));
   const kickerHtml = kicker
     ? `<span class="slide__kicker">${escapeHtml(kicker)}</span>`
     : "";
-  const bulletsHtml = bullets
-    ? `<ul class="slide__bullets">${bullets}</ul>`
+  const bulletsHtml = bullets.length
+    ? `<ul class="slide__bullets">${bullets.map((b) => `<li>${b}</li>`).join("")}</ul>`
     : "";
   const emphasisHtml = emphasis
     ? `<p class="slide__emphasis"><span class="slide__emphasis-label">핵심</span>${escapeHtml(emphasis)}</p>`
     : "";
-  return `
-    <div class="slide__inner">
-      <header class="slide__header">
-        <div class="slide__meta">
-          <span class="slide__index">${escapeHtml(String(slide.index).padStart(2, "0"))}</span>
-          ${kickerHtml}
-        </div>
-        <h2 class="slide__title">${escapeHtml(slide.title)}</h2>
-      </header>
-      <div class="slide__accent"></div>
+  const kindLabel = {
+    cover: "COVER",
+    section: "SECTION",
+    topic: "TOPIC",
+    decision: "DECISION",
+    actions: "ACTIONS",
+    summary: "SUMMARY",
+  }[kind] ?? "TOPIC";
+
+  // cover: 히어로 타이틀 중심
+  if (kind === "cover") {
+    return `
+    <div class="slide__inner slide__inner--live slide__inner--cover" data-live-kind="cover">
+      <div class="slide__kindchip">${kindLabel}</div>
+      <p class="slide__cover-eyebrow">${kickerHtml || `<span class="slide__kicker">LIVE DECK</span>`}</p>
+      <h2 class="slide__title slide__title--hero">${title}</h2>
       ${bulletsHtml}
+      <div class="slide__cover-foot"><span class="slide__index">${idx}</span><span>실시간 구성 중</span></div>
+    </div>`;
+  }
+
+  // section: 큰 제목 + 얇은 본문
+  if (kind === "section") {
+    return `
+    <div class="slide__inner slide__inner--live slide__inner--section" data-live-kind="section">
+      <div class="slide__kindchip">${kindLabel}</div>
+      <div class="slide__meta"><span class="slide__index">${idx}</span>${kickerHtml}</div>
+      <h2 class="slide__title slide__title--section">${title}</h2>
+      <div class="slide__accent"></div>
       ${emphasisHtml}
+    </div>`;
+  }
+
+  // decision: 강조 박스가 주인공
+  if (kind === "decision") {
+    return `
+    <div class="slide__inner slide__inner--live slide__inner--decision" data-live-kind="decision">
+      <div class="slide__kindchip">${kindLabel}</div>
+      <div class="slide__meta"><span class="slide__index">${idx}</span>${kickerHtml}</div>
+      <h2 class="slide__title">${title}</h2>
+      ${emphasisHtml || `<p class="slide__emphasis"><span class="slide__emphasis-label">결정</span>${title}</p>`}
+      ${bulletsHtml}
+    </div>`;
+  }
+
+  // actions: 체크리스트 톤
+  if (kind === "actions") {
+    const items = bullets.map((b, i) =>
+      `<li class="slide__action"><span class="slide__action-no">${String(i + 1).padStart(2, "0")}</span><span class="slide__action-text">${b}</span></li>`
+    ).join("");
+    return `
+    <div class="slide__inner slide__inner--live slide__inner--actions" data-live-kind="actions">
+      <div class="slide__kindchip">${kindLabel}</div>
+      <div class="slide__meta"><span class="slide__index">${idx}</span>${kickerHtml}</div>
+      <h2 class="slide__title">${title}</h2>
+      <div class="slide__accent"></div>
+      <ul class="slide__actions">${items}</ul>
+      ${emphasisHtml}
+    </div>`;
+  }
+
+  // summary: 2열 불릿 느낌
+  if (kind === "summary") {
+    return `
+    <div class="slide__inner slide__inner--live slide__inner--summary" data-live-kind="summary">
+      <div class="slide__kindchip">${kindLabel}</div>
+      <div class="slide__meta"><span class="slide__index">${idx}</span>${kickerHtml}</div>
+      <h2 class="slide__title">${title}</h2>
+      <div class="slide__accent"></div>
+      <div class="slide__summary-grid">${bulletsHtml}</div>
+      ${emphasisHtml}
+    </div>`;
+  }
+
+  // topic (default): 좌 텍스트 + 우 비주얼 밴드 — 실시간 "디자인 중"이 보이게
+  return `
+    <div class="slide__inner slide__inner--live slide__inner--topic" data-live-kind="topic">
+      <div class="slide__topic-main">
+        <div class="slide__kindchip">${kindLabel}</div>
+        <div class="slide__meta"><span class="slide__index">${idx}</span>${kickerHtml}</div>
+        <h2 class="slide__title">${title}</h2>
+        <div class="slide__accent"></div>
+        ${bulletsHtml}
+        ${emphasisHtml}
+      </div>
+      <aside class="slide__topic-visual" aria-hidden="true">
+        <div class="slide__topic-orb"></div>
+        <div class="slide__topic-grid"></div>
+        <p class="slide__topic-caption">LIVE · DESIGNING</p>
+      </aside>
     </div>`;
 }
 
