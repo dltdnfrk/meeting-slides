@@ -137,8 +137,6 @@ export async function compileDeckOutline(
     }
   }
 
-  const outline = buildFallbackDeckOutline(input);
   const plannerError = failures.join("; ");
-  store.saveDeckOutline(outline, plannerError);
-  return { outline, plannerError, usedFallback: true };
+  throw new Error(`덱 플래너 실패: ${plannerError}`);
 }

@@ -190,6 +190,35 @@ async function readStoredLayout(target: Page): Promise<{ leftPx: number; rightPx
   }, STORAGE_KEY);
 }
 
+async function pressSeparatorKey(
+  target: Page,
+  selector: string,
+  key: "ArrowLeft" | "ArrowRight" | "Home" | "End",
+): Promise<number> {
+  await target.focus(selector);
+  await target.evaluate((sel) => {
+    const separator = document.querySelector(sel)!;
+    (globalThis as unknown as { __separatorValue: Promise<number> }).__separatorValue =
+      new Promise<number>((resolve, reject) => {
+        const timer = setTimeout(() => {
+          observer.disconnect();
+          reject(new Error(`separator value did not change: ${sel}`));
+        }, 2_000);
+        const observer = new MutationObserver(() => {
+          const value = Number(separator.getAttribute("aria-valuenow"));
+          clearTimeout(timer);
+          observer.disconnect();
+          resolve(value);
+        });
+        observer.observe(separator, { attributes: true, attributeFilter: ["aria-valuenow"] });
+      });
+  }, selector);
+  await target.keyboard.press(key);
+  return target.evaluate(
+    () => (globalThis as unknown as { __separatorValue: Promise<number> }).__separatorValue,
+  );
+}
+
 describe("워크스페이스 스플리터", () => {
   beforeEach(async () => {
     await page.evaluate((key) => localStorage.removeItem(key), STORAGE_KEY);
@@ -210,6 +239,54 @@ describe("워크스페이스 스플리터", () => {
     ]);
   });
 
+  test("포커스 가능한 스플리터가 방향과 현재·최소·최대 폭을 노출한다", async () => {
+    const aria = await page.evaluate(() =>
+      ["splitter-rail", "splitter-transcript"].map((id) => {
+        const separator = document.getElementById(id)!;
+        return {
+          orientation: separator.getAttribute("aria-orientation"),
+          min: Number(separator.getAttribute("aria-valuemin")),
+          max: Number(separator.getAttribute("aria-valuemax")),
+          now: Number(separator.getAttribute("aria-valuenow")),
+        };
+      }),
+    );
+
+    for (const value of aria) {
+      expect(value.orientation).toBe("vertical");
+      expect(value.min).toBeGreaterThan(0);
+      expect(value.max).toBeGreaterThan(value.min);
+      expect(value.now).toBeGreaterThanOrEqual(value.min);
+      expect(value.now).toBeLessThanOrEqual(value.max);
+    }
+  });
+
+  test("키보드 Arrow/Home/End가 양쪽 스플리터 폭과 ARIA 현재값을 동기화한다", async () => {
+    const before = await paneWidths(page);
+    const railAfterArrow = await pressSeparatorKey(page, "#splitter-rail", "ArrowRight");
+    const afterRailArrow = await paneWidths(page);
+    expect(afterRailArrow.left).toBeGreaterThan(before.left);
+    expect(railAfterArrow).toBeCloseTo(afterRailArrow.left, 0);
+
+    const railAtMin = await pressSeparatorKey(page, "#splitter-rail", "Home");
+    expect(railAtMin).toBe(180);
+    const railAtMax = await pressSeparatorKey(page, "#splitter-rail", "End");
+    const railMax = await page.$eval("#splitter-rail", (node) =>
+      Number(node.getAttribute("aria-valuemax")),
+    );
+    expect(railAtMax).toBe(railMax);
+
+    const transcriptBefore = (await paneWidths(page)).right;
+    const transcriptAfterArrow = await pressSeparatorKey(
+      page,
+      "#splitter-transcript",
+      "ArrowLeft",
+    );
+    const afterTranscriptArrow = await paneWidths(page);
+    expect(afterTranscriptArrow.right).toBeGreaterThan(transcriptBefore);
+    expect(transcriptAfterArrow).toBeCloseTo(afterTranscriptArrow.right, 0);
+  });
+
   test("좌 스플리터를 끌면 레일이 넓어지고 무대가 그만큼 줄어든다", async () => {
     const before = await paneWidths(page);
     await dragSplitter(page, "#splitter-rail", 120);
@@ -218,6 +295,9 @@ describe("워크스페이스 스플리터", () => {
     expect(after.left - before.left).toBeGreaterThan(100);
     expect(before.stage - after.stage).toBeGreaterThan(100);
     expect(after.right).toBeCloseTo(before.right, 0);
+    expect(
+      await page.$eval("#splitter-rail", (node) => Number(node.getAttribute("aria-valuenow"))),
+    ).toBeCloseTo(after.left, 0);
   });
 
   test("우 스플리터를 왼쪽으로 끌면 전사 패널이 넓어진다", async () => {

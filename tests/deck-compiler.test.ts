@@ -4,7 +4,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import {
-  buildFallbackDeckOutline,
   compileDeckOutline,
   validatePlannedOutline,
 } from "../src/deck-compiler.ts";
@@ -87,7 +86,7 @@ describe("deck outline planner", () => {
     store.close();
   });
 
-  test("two invalid responses produce and persist a deterministic fallback with an error", async () => {
+  test("two invalid responses fail without persisting a fake deck", async () => {
     const { store, meetingId } = populatedStore();
     let calls = 0;
     const planner: DeckPlanner = {
@@ -97,20 +96,15 @@ describe("deck outline planner", () => {
       },
     };
 
-    const result = await compileDeckOutline(store, meetingId, planner);
+    let failure = "";
+    try {
+      await compileDeckOutline(store, meetingId, planner);
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+    }
+    expect(failure).toMatch(/attempt 1:.*attempt 2:/);
     expect(calls).toBe(2);
-    expect(result.usedFallback).toBe(true);
-    expect(result.plannerError).toContain("attempt 1");
-    expect(result.plannerError).toContain("attempt 2");
-    expect(result.outline.slides[0]?.kind).toBe("cover");
-    expect(result.outline.slides.at(-1)?.kind).toBe("closing");
-    expect(result.outline.slides.some((slide) => slide.kind === "summary")).toBe(true);
-    expect(store.deckOutline(meetingId)?.plannerError).toBe(result.plannerError);
-    expect(buildFallbackDeckOutline({
-      meetingId,
-      transcript: store.lines(meetingId),
-      liveSlideAnchors: store.slides(meetingId),
-    })).toEqual(result.outline);
+    expect(store.deckOutline(meetingId)).toBeNull();
     store.close();
   });
 

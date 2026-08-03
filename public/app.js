@@ -29,6 +29,8 @@ const btnSettingsEl = $("btn-settings");
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
 const btnRecheckEl = $("btn-recheck");
+const btnRecheckSttEl = $("btn-recheck-stt");
+const sttListEl = $("stt-list");
 const btnRecordEl = $("btn-record");
 // 전사는 우측 도킹 패널(.transcript-pane)이 1차 거처다 — 하단 도크 복제본은 없았다.
 const transcriptStreamEl = $("transcript-stream");
@@ -110,9 +112,10 @@ sessionListEl.addEventListener("click", (ev) => {
   selectedMeetingId = Number(row.dataset.meetingId);
   renderMeetings(meetings);
   const meeting = meetings.find((item) => item.id === selectedMeetingId);
-  if (meeting) renderStatus(meeting.status === "open"
-    ? `진행 중인 세션: ${meeting.title}`
-    : `과거 세션 열기는 준비 중입니다: ${meeting.title}`);
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "selectMeeting", meetingId: selectedMeetingId }));
+    renderStatus(`세션 불러오는 중… ${meeting?.title ?? `#${selectedMeetingId}`}`);
+  }
 });
 
 // 라이브 MeetingCard → 실시간 kind 추론 후 레이아웃 분기.
@@ -292,10 +295,18 @@ function renderGlance() {
   glanceLinesEl.textContent = String(transcriptLineCount);
 }
 
-function renderThumbnails(history) {
-  historyCountEl.textContent = String(history.length);
+function allSlides() {
+  const slides = [...slideHistory];
+  if (currentSlide && !slides.some((slide) => slide.index === currentSlide.index)) slides.push(currentSlide);
+  return slides;
+}
 
-  if (history.length === 0) {
+function renderThumbnails(history) {
+  const slides = [...history];
+  if (currentSlide && !slides.some((slide) => slide.index === currentSlide.index)) slides.push(currentSlide);
+  historyCountEl.textContent = String(slides.length);
+
+  if (slides.length === 0) {
     thumbnailsEl.innerHTML = `
       <div class="filmstrip__empty">
         <span class="filmstrip__empty-ring"></span>
@@ -303,7 +314,7 @@ function renderThumbnails(history) {
       </div>`;
     return;
   }
-  thumbnailsEl.innerHTML = history.map((s) => `
+  thumbnailsEl.innerHTML = slides.map((s) => `
     <div class="thumbnail${viewingHistory && viewingHistory.index === s.index ? " thumbnail--viewing" : ""}" data-index="${escapeHtml(String(s.index))}" tabindex="0" role="button" aria-label="슬라이드 ${escapeHtml(String(s.index))} 미리보기">
       <div class="thumbnail__index">SLIDE ${escapeHtml(String(s.index).padStart(2, "0"))}</div>
       <div class="thumbnail__title">${escapeHtml(s.title)}</div>
@@ -447,26 +458,56 @@ function renderProviders(msg) {
   providerListEl.innerHTML = list.map((p) => {
     const isCli = p.id.startsWith("cli:");
     const keyBased = p.id === "openai" || p.id === "alibaba";
-    const showActions = isCli || !p.available;
+    const status = providerStatus(p);
+    const showActions = isCli || !status.selectable;
     return `
-    <div class="provider-row${p.id === currentProvider ? " provider-row--current" : ""}${p.available ? "" : " provider-row--disabled"}" data-id="${escapeHtml(p.id)}">
-      <button type="button" class="provider-row__select" ${p.available ? "" : "disabled"}>
+    <div class="provider-row${p.id === currentProvider ? " provider-row--current" : ""}${status.selectable ? "" : " provider-row--disabled"}" data-id="${escapeHtml(p.id)}" data-auth="${escapeHtml(status.auth)}" data-installed="${status.installed ? "true" : "false"}">
+      <button type="button" class="provider-row__select" ${status.selectable ? "" : "disabled"} aria-pressed="${p.id === currentProvider ? "true" : "false"}">
         <span class="provider-row__name">${escapeHtml(p.label)}</span>
         <span class="provider-row__detail">${escapeHtml(p.detail)}</span>
-        ${p.id === currentProvider
-          ? '<span class="provider-row__badge">● 사용 중</span>'
-          : (p.available ? "" : '<span class="provider-row__badge provider-row__badge--off">미설정</span>')}
+        <span class="provider-row__badge provider-row__badge--${status.tone}">${escapeHtml(status.badge)}</span>
       </button>
       ${showActions ? `
         <div class="provider-row__actions">
-          ${isCli ? `<button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">${p.available ? "재인증" : "연결"}</button>` : ""}
-          ${keyBased && !p.available ? `
+          ${isCli ? `<button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">${escapeHtml(status.connectLabel)}</button>` : ""}
+          ${keyBased && !status.selectable ? `
             <button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">연결</button>
             <input class="provider-row__key" type="password" placeholder="API 키 붙여넣기" autocomplete="off">
             <button type="button" class="provider-row__save" data-id="${escapeHtml(p.id)}">저장</button>` : ""}
         </div>` : ""}
     </div>`;
   }).join("");
+}
+
+/**
+ * 품질 기준: 설치/인증 상태를 진실하게 분리한다.
+ * auth=="unknown"은 어뜘가 확인되지 않은 것이므로 절대 "연결됨"으로 표시하지 않고,
+ * 설치된 CLI는 여전히 사용자가 직접 선택할 수 있게 남긴다.
+ */
+function providerStatus(p) {
+  const isCli = p.id.startsWith("cli:");
+  const auth = typeof p.auth === "string" ? p.auth : (p.available ? "connected" : "unavailable");
+  const installed = typeof p.installed === "boolean" ? p.installed : Boolean(p.available);
+  if (!isCli) {
+    return {
+      auth, installed,
+      selectable: Boolean(p.available),
+      tone: p.available ? "ok" : "absent",
+      badge: p.available ? "설정됨" : "미설정",
+      connectLabel: "연결",
+    };
+  }
+  if (!installed || auth === "unavailable") {
+    return { auth, installed, selectable: false, tone: "absent", badge: "미설치", connectLabel: "연결" };
+  }
+  if (auth === "connected") {
+    return { auth, installed, selectable: true, tone: "ok", badge: "연결됨", connectLabel: "재인증" };
+  }
+  if (auth === "disconnected") {
+    return { auth, installed, selectable: true, tone: "absent", badge: "로그인 필요", connectLabel: "연결" };
+  }
+  // unknown: 설치는 확인되지만 인증은 토킹할 수 없는 상태
+  return { auth, installed, selectable: true, tone: "unknown", badge: "인증 미확인", connectLabel: "연결" };
 }
 
 // ── 현재 프로바이더의 모델/effort 선택 ──
@@ -485,6 +526,91 @@ function renderProviderConfig(msg) {
   ).join("");
 }
 
+// ── 음성 인식(whisper.cpp) 모델 관리 ──
+// 서버가 디스크 기준의 진실을 보내주므로 클라이언트는 상태를 추측하지 않고 그대로 반영한다.
+let sttSelectedModelId = null;
+
+function formatBytes(bytes) {
+  const value = Number(bytes);
+  if (!Number.isFinite(value) || value <= 0) return "—";
+  if (value >= 1024 ** 3) return `${(value / 1024 ** 3).toFixed(1)} GB`;
+  return `${Math.round(value / 1024 ** 2)} MB`;
+}
+
+function sttStatusView(model) {
+  switch (model.status) {
+    case "selected": return { tone: "selected", badge: "사용 중" };
+    case "installed": return { tone: "installed", badge: "설치됨" };
+    case "downloading": return { tone: "downloading", badge: "내려받는 중" };
+    case "failed": return { tone: "failed", badge: "실패" };
+    default: return { tone: "absent", badge: "미설치" };
+  }
+}
+
+function sttActions(model) {
+  const id = escapeHtml(model.id);
+  switch (model.status) {
+    case "downloading":
+      return `<button type="button" class="stt-btn stt-btn--quiet stt-row__cancel" data-id="${id}">취소</button>`;
+    case "installed":
+      return `<button type="button" class="stt-btn stt-row__select" data-id="${id}">선택</button>`;
+    case "selected":
+      return `<button type="button" class="stt-btn stt-row__select" data-id="${id}" disabled>선택됨</button>`;
+    case "failed":
+      return `<button type="button" class="stt-btn stt-row__install" data-id="${id}">다시 시도</button>`;
+    default:
+      return `<button type="button" class="stt-btn stt-row__install" data-id="${id}">내려받기</button>`;
+  }
+}
+
+function renderSttModels(msg) {
+  const models = Array.isArray(msg.models) ? msg.models : [];
+  sttSelectedModelId = msg.selectedModelId ?? null;
+  sttListEl.innerHTML = models.map((model) => {
+    const view = sttStatusView(model);
+    const downloading = model.status === "downloading";
+    const total = downloading ? Number(model.totalBytes) || 0 : 0;
+    const received = downloading ? Number(model.receivedBytes) || 0 : 0;
+    const percent = total > 0 ? Math.min(100, Math.round((received / total) * 100)) : 0;
+    const meta = downloading
+      ? `${formatBytes(received)} / ${formatBytes(total || model.sizeBytes)} · ${percent}%`
+      : `${formatBytes(model.sizeBytes)} · ${escapeHtml(model.license ?? "—")}`;
+    return `
+    <div class="stt-row${model.status === "selected" ? " stt-row--selected" : ""}${model.status === "failed" ? " stt-row--failed" : ""}" data-id="${escapeHtml(model.id)}" data-status="${escapeHtml(model.status)}">
+      <div class="stt-row__head">
+        <span class="stt-row__name">${escapeHtml(model.label ?? model.id)}</span>
+        <span class="stt-row__badge stt-row__badge--${view.tone}">${view.badge}</span>
+      </div>
+      <span class="stt-row__meta">${meta}</span>
+      ${downloading ? `<div class="stt-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}"><div class="stt-progress__fill" style="width:${percent}%"></div></div>` : ""}
+      ${model.status === "failed" && model.error ? `<span class="stt-row__error">${escapeHtml(model.error)}</span>` : ""}
+      <div class="stt-row__actions">${sttActions(model)}</div>
+    </div>`;
+  }).join("");
+}
+
+function sendSttAction(action, modelId) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action, modelId }));
+  }
+}
+
+sttListEl.addEventListener("click", (ev) => {
+  const install = ev.target.closest(".stt-row__install");
+  if (install) return sendSttAction("installSttModel", install.dataset.id);
+  const cancel = ev.target.closest(".stt-row__cancel");
+  if (cancel) return sendSttAction("cancelSttModel", cancel.dataset.id);
+  const select = ev.target.closest(".stt-row__select");
+  if (select && !select.disabled) return sendSttAction("selectSttModel", select.dataset.id);
+});
+
+btnRecheckSttEl.onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "recheckSttModels" }));
+    renderStatus("음성 인식 모델 재검사 중…");
+  }
+};
+
 function sendProviderSelection() {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({
@@ -498,9 +624,18 @@ function sendProviderSelection() {
 selectModelEl.onchange = sendProviderSelection;
 selectEffortEl.onchange = sendProviderSelection;
 
+btnSettingsEl.setAttribute("aria-controls", providerPanelEl.id);
+btnSettingsEl.setAttribute("aria-expanded", "false");
+
+function setProviderPanelOpen(open, restoreFocus = false) {
+  providerPanelEl.hidden = !open;
+  btnSettingsEl.setAttribute("aria-expanded", String(open));
+  if (restoreFocus) btnSettingsEl.focus({ preventScroll: true });
+}
+
 btnSettingsEl.onclick = (ev) => {
   ev.stopPropagation();
-  providerPanelEl.hidden = !providerPanelEl.hidden;
+  setProviderPanelOpen(providerPanelEl.hidden);
 };
 
 providerListEl.addEventListener("click", (ev) => {
@@ -534,7 +669,7 @@ btnRecheckEl.onclick = () => {
 
 document.addEventListener("click", (ev) => {
   if (!providerPanelEl.hidden && !ev.target.closest("#provider-panel") && !ev.target.closest("#btn-settings")) {
-    providerPanelEl.hidden = true;
+    setProviderPanelOpen(false, true);
   }
 });
 
@@ -569,6 +704,7 @@ function renderTranscriptLine(entry) {
 function renderTranscriptBacklog(entries) {
   transcriptStreamEl.replaceChildren();
   transcriptLineCount = 0;
+  meetingStartTs = 0;
   transcriptCountEl.textContent = "0";
   transcriptBodyEl.scrollTop = 0;
   if (!entries || entries.length === 0) {
@@ -642,9 +778,13 @@ btnRecordEl.onclick = () => {
 renderCaptureButton();
 
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
+function meetingTarget() {
+  return selectedMeetingId === null ? {} : { meetingId: selectedMeetingId };
+}
+
 btnExportMdEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "saveNotes" }));
+    ws.send(JSON.stringify({ action: "saveNotes", ...meetingTarget() }));
     renderStatus("Markdown 저장 중…");
   } else {
     renderStatus("연결되지 않음 — 저장 불가");
@@ -652,7 +792,7 @@ btnExportMdEl.onclick = () => {
 };
 btnExportJsonEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "saveJson" }));
+    ws.send(JSON.stringify({ action: "saveJson", ...meetingTarget() }));
     renderStatus("JSON 저장 중…");
   } else {
     renderStatus("연결되지 않음 — 저장 불가");
@@ -660,8 +800,7 @@ btnExportJsonEl.onclick = () => {
 };
 btnExportTranscriptEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    // anarlog 방식: 서버 디스크(exports/)에 저장 — 브라우저 다운로드 차단과 무관
-    ws.send(JSON.stringify({ action: "saveNotes" }));
+    ws.send(JSON.stringify({ action: "saveTranscript", ...meetingTarget() }));
     renderStatus("전사본 저장 중…");
   } else {
     renderStatus("연결되지 않음 — 저장 불가");
@@ -670,8 +809,8 @@ btnExportTranscriptEl.onclick = () => {
 
 btnCompileDeckEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "compileDeck" }));
-    btnCompileDeckEl.disabled = true;
+    ws.send(JSON.stringify({ action: "compileDeck", ...meetingTarget() }));
+    setJobControlsBusy(true);
     compileStatusEl.hidden = false;
     compileStatusEl.dataset.state = "started";
     compileStatusEl.textContent = "컴파일 중…";
@@ -681,29 +820,84 @@ btnCompileDeckEl.onclick = () => {
   }
 };
 
+const conflictingJobControls = [btnCompileDeckEl, btnExportPdfEl, btnExportPngEl];
+let activeJobId = null;
+function setJobControlsBusy(busy) {
+  for (const control of conflictingJobControls) control.disabled = busy;
+}
+function showRetry(action, meetingId) {
+  document.querySelector(".job-retry")?.remove();
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "job-retry dock__btn";
+  retry.dataset.action = action;
+  retry.textContent = "재시도";
+  retry.onclick = () => {
+    retry.remove();
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ action, ...(meetingId === undefined ? meetingTarget() : { meetingId }) }));
+      setJobControlsBusy(true);
+    }
+  };
+  compileStatusEl.insertAdjacentElement("afterend", retry);
+}
+function progressText(label, msg) {
+  const count = Number.isFinite(msg.completed) && Number.isFinite(msg.total) ? ` ${msg.completed}/${msg.total}` : "";
+  return `${label} · ${msg.stage || "처리"}${count}`;
+}
 function renderCompileStatus(msg) {
   compileStatusEl.hidden = false;
   compileStatusEl.dataset.state = msg.status;
-  if (msg.status === "started") {
-    btnCompileDeckEl.disabled = true;
-    compileStatusEl.textContent = "컴파일 중…";
-    renderStatus("발표 덱 컴파일 중…");
+  if (msg.status === "started" || msg.status === "progress") {
+    activeJobId = msg.jobId ?? activeJobId;
+    setJobControlsBusy(true);
+    compileStatusEl.textContent = msg.status === "progress" ? progressText("컴파일", msg) : "컴파일 중…";
+    renderStatus(compileStatusEl.textContent);
   } else if (msg.status === "success") {
-    btnCompileDeckEl.disabled = false;
+    if (activeJobId && msg.jobId && msg.jobId !== activeJobId) return;
+    setJobControlsBusy(false);
+    activeJobId = null;
+    document.querySelector(".job-retry")?.remove();
     const count = msg.outline?.slideCount;
     compileStatusEl.textContent = `컴파일 완료${Number.isFinite(count) ? ` · ${count}장` : ""}`;
     renderStatus(`컴파일 완료${msg.path ? `: ${msg.path}` : ""}`);
   } else {
-    btnCompileDeckEl.disabled = false;
-    compileStatusEl.textContent = `컴파일 실패: ${msg.error || "알 수 없는 오류"}`;
+    if (activeJobId && msg.jobId && msg.jobId !== activeJobId) return;
+    setJobControlsBusy(false);
+    activeJobId = null;
+    compileStatusEl.textContent = `${msg.status === "timeout" ? "컴파일 시간 초과" : "컴파일 실패"}: ${msg.error || "알 수 없는 오류"}`;
     renderStatus(compileStatusEl.textContent);
+    showRetry("compileDeck", msg.meetingId);
+  }
+}
+
+function renderExportStatus(msg) {
+  const label = msg.action === "exportPdf" ? "PDF" : "PNG";
+  if (msg.status === "started" || msg.status === "progress") {
+    activeJobId = msg.jobId ?? activeJobId;
+    setJobControlsBusy(true);
+    renderStatus(msg.status === "progress" ? progressText(label, msg) : `${label} 준비 중…`);
+    return;
+  }
+  if (activeJobId && msg.jobId && msg.jobId !== activeJobId) return;
+  setJobControlsBusy(false);
+  activeJobId = null;
+  if (msg.status === "success") {
+    document.querySelector(".job-retry")?.remove();
+    renderStatus(`${label} 저장됨${msg.path ? `: ${msg.path}` : ""}`);
+  } else {
+    const busy = msg.code === "job-busy" || msg.code === "compile-busy";
+    renderStatus(busy
+      ? "컴파일 중에는 내보낼 수 없습니다"
+      : `${label} ${msg.status === "timeout" ? "시간 초과" : "실패"}: ${msg.error || "알 수 없는 오류"}`);
+    if (!busy) showRetry(msg.action, msg.meetingId);
   }
 }
 
 btnExportDeckEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     // lecture-deck 템플릿으로 reveal.js 강의 덱 생성 → exports/deck-*/
-    ws.send(JSON.stringify({ action: "exportDeck" }));
+    ws.send(JSON.stringify({ action: "exportDeck", ...meetingTarget() }));
     renderStatus("강의 덱 생성 중…");
   } else {
     renderStatus("연결되지 않음 — 덱 저장 불가");
@@ -712,8 +906,9 @@ btnExportDeckEl.onclick = () => {
 
 btnExportPdfEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "exportPdf" }));
-    renderStatus("초안 PDF 준비 중… (design-gate 미적용)");
+    ws.send(JSON.stringify({ action: "exportPdf", ...meetingTarget() }));
+    setJobControlsBusy(true);
+    renderStatus("PDF 준비 중…");
   } else {
     renderStatus("연결되지 않음 — PDF 저장 불가");
   }
@@ -721,8 +916,9 @@ btnExportPdfEl.onclick = () => {
 
 btnExportPngEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "exportPng" }));
-    renderStatus("초안 PNG 준비 중… (design-gate 미적용)");
+    ws.send(JSON.stringify({ action: "exportPng", ...meetingTarget() }));
+    setJobControlsBusy(true);
+    renderStatus("PNG 준비 중…");
   } else {
     renderStatus("연결되지 않음 — PNG 저장 불가");
   }
@@ -749,7 +945,7 @@ btnResetEl.onclick = () => {
 /** @param {HTMLElement} card */
 function toggleThumbnailPreview(card) {
   const idx = Number(card.dataset.index);
-  const slide = slideHistory.find((s) => s.index === idx);
+  const slide = allSlides().find((s) => s.index === idx);
   if (!slide) return;
   viewingHistory = viewingHistory && viewingHistory.index === slide.index ? null : slide;
   renderMain();
@@ -774,10 +970,6 @@ currentSlideEl.addEventListener("click", (ev) => {
 });
 
 window.addEventListener("keydown", (ev) => {
-  if (ev.key === "Escape" && !providerPanelEl.hidden) {
-    providerPanelEl.hidden = true;
-    return;
-  }
   if (ev.key === "Escape" && viewingHistory) {
     viewingHistory = null;
     renderMain();
@@ -793,6 +985,12 @@ window.addEventListener("keydown", (ev) => {
   }
 });
 
+window.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Escape" || providerPanelEl.hidden) return;
+  // 키보드 사용자가 패널 닫은 뒤 포커스를 잃지 않게 트리거로 되돌린다.
+  setProviderPanelOpen(false, true);
+});
+
 // ── WebSocket ──
 function connect() {
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
@@ -806,6 +1004,7 @@ function connect() {
     try {
       const msg = JSON.parse(ev.data);
       if (msg.type === "slide") {
+        if (selectedMeetingId !== null) return;
         currentSlide = msg.current;
         slideHistory = Array.isArray(msg.history) ? msg.history : [];
         // 미리보기 중인 슬라이드가 히스토리에서 사라졌으면(예: reset) 라이브로 복귀
@@ -821,7 +1020,26 @@ function connect() {
         renderCaption(msg.text, msg.speaker);
       } else if (msg.type === "meetings") {
         renderMeetings(msg.items);
+      } else if (msg.type === "meeting") {
+        if (msg.meetingId !== selectedMeetingId) return;
+        currentSlide = msg.current ?? null;
+        slideHistory = Array.isArray(msg.history) ? msg.history : [];
+        viewingHistory = null;
+        renderTranscriptBacklog(msg.transcript);
+        renderMain();
+        renderThumbnails(slideHistory);
+        docTitleEl.textContent = msg.title || `회의 #${msg.meetingId}`;
+        if (msg.compiled) {
+          compileStatusEl.hidden = false;
+          compileStatusEl.dataset.state = "success";
+          compileStatusEl.textContent = `컴파일됨 · ${msg.compiled.slideCount}장`;
+        } else {
+          compileStatusEl.hidden = true;
+          compileStatusEl.textContent = "";
+        }
+        renderStatus(`세션 불러옴: ${msg.title || `#${msg.meetingId}`}`);
       } else if (msg.type === "transcript") {
+        if (selectedMeetingId !== null && msg.reason === "snapshot") return;
         if (msg.reason === "snapshot") {
           renderTranscriptBacklog(msg.entries);
           transcriptTruncEl.hidden = !msg.truncated;
@@ -829,9 +1047,11 @@ function connect() {
           exportTranscript(msg.entries);
         }
       } else if (msg.type === "line") {
-        renderTranscriptLine(msg);
+        if (selectedMeetingId === null) renderTranscriptLine(msg);
       } else if (msg.type === "providers") {
         renderProviders(msg);
+      } else if (msg.type === "sttModels") {
+        renderSttModels(msg);
       } else if (msg.type === "capture") {
         capturing = !!msg.capturing;
         inputMode = msg.mode ?? "mic";
@@ -847,8 +1067,8 @@ function connect() {
         renderPill();
       } else if (msg.type === "compile") {
         renderCompileStatus(msg);
-      } else if (msg.type === "export" && msg.status === "error") {
-        renderStatus(msg.code === "compile-busy" ? "컴파일 중에는 내보낼 수 없습니다" : msg.error);
+      } else if (msg.type === "export") {
+        renderExportStatus(msg);
       } else if (msg.type === "saved") {
         renderStatus(`저장됨: ${msg.path}`);
         requestMeetings();
@@ -866,7 +1086,8 @@ function connect() {
     }
   };
   ws.onclose = () => {
-    btnCompileDeckEl.disabled = false;
+    activeJobId = null;
+    setJobControlsBusy(false);
     renderStatus("연결 끊김. 3초 후 재시도...");
     setTimeout(connect, 3000);
   };

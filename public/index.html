@@ -53,19 +53,21 @@
     <!-- ── 상단 바 ─────────────────────────────── -->
     <header class="topbar">
       <div class="topbar__brand">
-        <span class="brand__mark">◧</span>
-        <span class="brand__name">MEETING<em>SLIDES</em></span>
+        <span class="brand__mark" aria-hidden="true">●</span>
+        <span class="brand__name">Meeting <em>Slides</em></span>
       </div>
 
-      <button id="btn-record" class="record-btn" type="button">
-        <span class="record-btn__dot"></span>
-        <span class="record-btn__label">녹음 시작</span>
-      </button>
+      <div class="topbar__center">
+        <button id="btn-record" class="record-btn" type="button" aria-label="녹음 시작">
+          <span class="record-btn__dot" aria-hidden="true"></span>
+          <span class="record-btn__label">녹음 시작</span>
+        </button>
+      </div>
 
       <div class="topbar__right">
         <div class="onair" id="onair">
           <span class="onair__dot"></span>
-          <span class="onair__label">ON AIR</span>
+          <span class="onair__label">대기</span>
         </div>
         <div class="topbar__status">
           <span class="status__indicator" id="status-indicator"></span>
@@ -75,19 +77,33 @@
       </div>
     </header>
 
-    <!-- ── LLM 프로바이더 선택 패널 ────────────── -->
-    <div class="provider-panel" id="provider-panel" hidden>
-      <div class="provider-panel__head">LLM 프로바이더 <button id="btn-recheck" class="icon-btn icon-btn--sm" type="button" title="재검사" aria-label="프로바이더 재검사">↻</button></div>
-      <div class="provider-panel__list" id="provider-list"></div>
-      <div class="provider-config" id="provider-config">
-        <label class="provider-config__row">모델
-          <select id="select-model" class="provider-config__select"></select>
-        </label>
-        <label class="provider-config__row" id="effort-row">Effort
-          <select id="select-effort" class="provider-config__select"></select>
-        </label>
-      </div>
-      <p class="provider-panel__hint">선택 즉시 다음 블록 감지부터 적용됩니다</p>
+    <!-- ── 설정 패널: LLM 프로바이더 + 음성 인식 모델 ────────────── -->
+    <div class="provider-panel" id="provider-panel" role="dialog" aria-modal="false" aria-label="설정" hidden>
+      <section class="settings-section" aria-labelledby="provider-section-title">
+        <div class="provider-panel__head">
+          <span id="provider-section-title">LLM 프로바이더</span>
+          <button id="btn-recheck" class="icon-btn icon-btn--sm" type="button" title="재검사" aria-label="프로바이더 재검사">↻</button>
+        </div>
+        <div class="provider-panel__list" id="provider-list"></div>
+        <div class="provider-config" id="provider-config">
+          <label class="provider-config__row">모델
+            <select id="select-model" class="provider-config__select"></select>
+          </label>
+          <label class="provider-config__row" id="effort-row">Effort
+            <select id="select-effort" class="provider-config__select"></select>
+          </label>
+        </div>
+        <p class="provider-panel__hint">선택 즉시 다음 블록 감지부터 적용됩니다</p>
+      </section>
+
+      <section class="settings-section settings-section--stt" aria-labelledby="stt-section-title">
+        <div class="provider-panel__head">
+          <span id="stt-section-title">음성 인식 모델</span>
+          <button id="btn-recheck-stt" class="icon-btn icon-btn--sm" type="button" title="재검사" aria-label="음성 인식 모델 재검사">↻</button>
+        </div>
+        <div class="stt-list" id="stt-list" aria-live="polite"></div>
+        <p class="provider-panel__hint" id="stt-hint">모델을 내려받아 선택하면 다음 녹음부터 적용됩니다</p>
+      </section>
     </div>
 
     <!-- ── 글랜서블 상태 스트립 (진행 과정 한눈에) ── -->
@@ -98,22 +114,22 @@
       </div>
       <div class="glance__chip glance__chip--detect" id="glance-detect" hidden>
         <span class="glance__dot"></span>
-        <span class="glance__label">AI 생성 중</span>
+        <span class="glance__label">정리 중</span>
       </div>
       <div class="glance__metric">
-        <span class="glance__metric-label">SLIDE</span>
+        <span class="glance__metric-label">슬라이드</span>
         <span class="glance__metric-value" id="glance-slide">00</span>
       </div>
       <div class="glance__metric">
-        <span class="glance__metric-label">LINES</span>
+        <span class="glance__metric-label">문장</span>
         <span class="glance__metric-value" id="glance-lines">0</span>
       </div>
       <div class="glance__metric glance__metric--provider">
-        <span class="glance__metric-label">LLM</span>
+        <span class="glance__metric-label">모델</span>
         <span class="glance__metric-value" id="glance-provider">—</span>
       </div>
       <div class="glance__metric glance__metric--rec" id="glance-rec" hidden>
-        <span class="glance__metric-label">REC</span>
+        <span class="glance__metric-label">시간</span>
         <span class="glance__metric-value" id="capture-timer">00:00</span>
       </div>
     </div>
@@ -186,7 +202,7 @@
         </div>
         <!-- 남/남서 리사이즈 손잡이: 서쪽 폭은 워크스페이스 스플리터가 담당 -->
         <div class="transcript-grip transcript-grip--s" id="transcript-grip-s" role="separator" aria-orientation="horizontal" aria-label="전사 패널 높이 조절" tabindex="0"></div>
-        <div class="transcript-grip transcript-grip--sw" id="transcript-grip-sw" role="separator" aria-label="전사 패널 너비·높이 조절" tabindex="0"></div>
+        <div class="transcript-grip transcript-grip--sw" id="transcript-grip-sw" role="separator" aria-orientation="horizontal" aria-label="전사 패널 너비·높이 조절" tabindex="0"></div>
       </section>
     </aside>
 

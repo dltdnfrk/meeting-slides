@@ -201,7 +201,7 @@ describe("Hybrid live -> compile -> export hermetic path", () => {
     reopened.close();
   });
 
-  test("rejects an invalid outline, falls back after model HTML, and surfaces compile-busy export without starting work", async () => {
+  test("rejects invalid planner output without a fake deck and blocks export while compiling", async () => {
     expect(() => renderCompiledOutline({
       meetingId: 1,
       title: "invalid",
@@ -225,22 +225,25 @@ describe("Hybrid live -> compile -> export hermetic path", () => {
       },
     };
 
-    const result = await compileDeckToDisk(store, meetingId, planner, {
-      exportsDirectory: join(directory, "exports"),
-      projectDirectory,
-    });
-    expect(plannerCalls).toBe(2);
-    expect(result.usedFallback).toBe(true);
-    expect(result.plannerError).toContain("kind must be cover");
-    expect(result.plannerError).toContain("must not contain HTML");
-    expect(result.outline.slides.map((slide) => slide.kind)).toEqual(["cover", "summary", "closing"]);
-    for (const { html } of result.files) {
-      expect(html).not.toContain("<script>bad()</script>");
-      expect(html).not.toContain("<h1>bad</h1>");
+    const exportsDirectory = join(directory, "exports");
+    let plannerError = "";
+    try {
+      await compileDeckToDisk(store, meetingId, planner, {
+        exportsDirectory,
+        projectDirectory,
+      });
+    } catch (error) {
+      plannerError = error instanceof Error ? error.message : String(error);
     }
-    expect(prepareExportDeck(store, meetingId).source).toBe("compiled");
+    expect(plannerCalls).toBe(2);
+    expect(plannerError).toContain("kind must be cover");
+    expect(plannerError).toContain("must not contain HTML");
+    expect(store.deckOutline(meetingId)).toBeNull();
+    expect(prepareExportDeck(store, meetingId).source).toBe("legacy");
 
-    const exportDirectoryCount = readdirSync(join(directory, "exports")).length;
+    const exportDirectoryCount = existsSync(exportsDirectory)
+      ? readdirSync(exportsDirectory).length
+      : 0;
     broadcast({
       type: "export",
       status: "error",
@@ -252,7 +255,8 @@ describe("Hybrid live -> compile -> export hermetic path", () => {
       () => document.getElementById("status-text")?.textContent === "컴파일 중에는 내보낼 수 없습니다",
       { timeout: 5_000 },
     );
-    expect(readdirSync(join(directory, "exports"))).toHaveLength(exportDirectoryCount);
+    expect(existsSync(exportsDirectory) ? readdirSync(exportsDirectory).length : 0)
+      .toBe(exportDirectoryCount);
     store.close();
   });
 });

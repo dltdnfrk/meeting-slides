@@ -11,6 +11,7 @@
 
   // 헤드 + 몇 줄은 보이는 하한. 그 아래로는 패널이 정보 가치를 잃는다.
   const MIN_CARD_H = 160;
+  const KEYBOARD_STEP = 16;
 
   const pane = document.getElementById("transcript-pane");
   const card = document.getElementById("transcript-card");
@@ -24,15 +25,27 @@
 
   const isFull = (heightPx) => heightPx >= pane.clientHeight - 1;
 
+  const syncAria = () => {
+    const max = Math.max(MIN_CARD_H, Math.round(pane.clientHeight));
+    const now = Math.max(MIN_CARD_H, Math.min(Math.round(card.getBoundingClientRect().height), max));
+    for (const grip of [gripS, gripSW]) {
+      grip.setAttribute("aria-valuemin", String(MIN_CARD_H));
+      grip.setAttribute("aria-valuemax", String(max));
+      grip.setAttribute("aria-valuenow", String(now));
+    }
+  };
+
   /** null이면 pane을 꽉 채우는 기본 상태(높이 제약 없음)로 되돌린다. */
   const applyHeight = (heightPx) => {
     if (heightPx === null || isFull(heightPx)) {
       pane.style.removeProperty("--transcript-card-h");
       pane.classList.remove("transcript-pane--sized");
+      syncAria();
       return null;
     }
     pane.style.setProperty("--transcript-card-h", `${heightPx}px`);
     pane.classList.add("transcript-pane--sized");
+    syncAria();
     return heightPx;
   };
 
@@ -113,7 +126,29 @@
   bind(gripS, false, commit);
   bind(gripSW, true, commit);
 
+  const bindKeyboard = (grip) => {
+    grip.addEventListener("keydown", (event) => {
+      if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+
+      const current = card.getBoundingClientRect().height;
+      const requested = event.key === "Home"
+        ? MIN_CARD_H
+        : event.key === "End"
+          ? pane.clientHeight
+          : current + (event.key === "ArrowDown" ? KEYBOARD_STEP : -KEYBOARD_STEP);
+      const committed = applyHeight(clampHeight(requested));
+      commit(committed);
+      persist(committed);
+    });
+  };
+
+  bindKeyboard(gripS);
+  bindKeyboard(gripSW);
+  syncAria();
+
   window.addEventListener("resize", () => {
     if (preferred !== null) applyHeight(clampHeight(preferred));
+    else syncAria();
   });
 })();

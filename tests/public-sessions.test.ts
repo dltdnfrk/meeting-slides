@@ -143,7 +143,7 @@ describe("세션 레일 listMeetings", () => {
       };
     });
     expect(after.selectedId).toBe("1");
-    expect(after.statusText).toContain("과거 세션 열기는 준비 중입니다");
+    expect(after.statusText).toContain("세션 불러오는 중");
     expect(after.statusText).toContain("킥오프");
   });
 

@@ -12,6 +12,7 @@
   const MIN_RAIL = 180;
   const MIN_TRANSCRIPT = 240;
   const MIN_STAGE = 320;
+  const KEYBOARD_STEP = 16;
 
   const workspace = document.getElementById("workspace");
   const railSplitter = document.getElementById("splitter-rail");
@@ -54,9 +55,28 @@
     return { leftPx: left, rightPx: right };
   };
 
+  const limits = () => {
+    const available = workspace.clientWidth - splitterWidth() * 2 - MIN_STAGE;
+    return {
+      maxLeft: Math.max(MIN_RAIL, Math.round(available - MIN_TRANSCRIPT)),
+      maxRight: Math.max(MIN_TRANSCRIPT, Math.round(available - MIN_RAIL)),
+    };
+  };
+
+  const syncAria = ({ leftPx, rightPx }) => {
+    const { maxLeft, maxRight } = limits();
+    railSplitter.setAttribute("aria-valuemin", String(MIN_RAIL));
+    railSplitter.setAttribute("aria-valuemax", String(maxLeft));
+    railSplitter.setAttribute("aria-valuenow", String(Math.round(leftPx)));
+    transcriptSplitter.setAttribute("aria-valuemin", String(MIN_TRANSCRIPT));
+    transcriptSplitter.setAttribute("aria-valuemax", String(maxRight));
+    transcriptSplitter.setAttribute("aria-valuenow", String(Math.round(rightPx)));
+  };
+
   const apply = ({ leftPx, rightPx }) => {
     workspace.style.setProperty("--rail-w", `${leftPx}px`);
     workspace.style.setProperty("--transcript-w", `${rightPx}px`);
+    syncAria({ leftPx, rightPx });
   };
 
   const persist = ({ leftPx, rightPx }) => {
@@ -140,6 +160,40 @@
   const commit = (widths) => { preferred = widths; };
   bind(railSplitter, "left", commit);
   bind(transcriptSplitter, "right", commit);
+
+  const bindKeyboard = (splitter, edge) => {
+    splitter.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+
+      const current = currentWidths();
+      const { maxLeft, maxRight } = limits();
+      let next;
+      if (edge === "left") {
+        const leftPx = event.key === "Home"
+          ? MIN_RAIL
+          : event.key === "End"
+            ? maxLeft
+            : current.leftPx + (event.key === "ArrowRight" ? KEYBOARD_STEP : -KEYBOARD_STEP);
+        next = { leftPx, rightPx: event.key === "End" ? MIN_TRANSCRIPT : current.rightPx };
+      } else {
+        const rightPx = event.key === "Home"
+          ? MIN_TRANSCRIPT
+          : event.key === "End"
+            ? maxRight
+            : current.rightPx + (event.key === "ArrowLeft" ? KEYBOARD_STEP : -KEYBOARD_STEP);
+        next = { leftPx: event.key === "End" ? MIN_RAIL : current.leftPx, rightPx };
+      }
+
+      const committed = clamp(next.leftPx, next.rightPx);
+      apply(committed);
+      commit(committed);
+      persist(committed);
+    });
+  };
+
+  bindKeyboard(railSplitter, "left");
+  bindKeyboard(transcriptSplitter, "right");
 
   window.addEventListener("resize", () => apply(clamp(preferred.leftPx, preferred.rightPx)));
 

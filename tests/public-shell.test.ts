@@ -165,6 +165,33 @@ describe("라이브 MeetingCard 렌더", () => {
     expect(overflow.spills).toEqual([]);
   });
 
+  test("한국어 제목과 불릿은 단어를 보존하고 예외적으로 긴 토큰만 줄바꿈한다", async () => {
+    await renderSlide(page, {
+      type: "slide",
+      current: card({
+        index: 5,
+        title: "회의 논의 결과",
+        bullets: ["제품 논의 결과를 공유합니다"],
+      }),
+      history: [],
+    });
+
+    const wrapping = await page.evaluate(() => {
+      const root = document.getElementById("current-slide")!;
+      const title = getComputedStyle(root.querySelector<HTMLElement>(".slide__title")!);
+      const bullet = getComputedStyle(root.querySelector<HTMLElement>(".slide__bullets li")!);
+      return {
+        title: { wordBreak: title.wordBreak, overflowWrap: title.overflowWrap },
+        bullet: { wordBreak: bullet.wordBreak, overflowWrap: bullet.overflowWrap },
+      };
+    });
+
+    expect(wrapping).toEqual({
+      title: { wordBreak: "keep-all", overflowWrap: "break-word" },
+      bullet: { wordBreak: "keep-all", overflowWrap: "break-word" },
+    });
+  });
+
   test("kicker/emphasis 없는 레거시 슬라이드도 제목/불릿만으로 렌더된다", async () => {
     await renderSlide(page, {
       type: "slide",

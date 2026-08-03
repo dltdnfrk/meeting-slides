@@ -141,6 +141,35 @@ async function geometry(target: Page): Promise<Geometry> {
   });
 }
 
+async function pressHeightSeparatorKey(
+  target: Page,
+  selector: string,
+  key: "ArrowUp" | "ArrowDown" | "Home" | "End",
+): Promise<number> {
+  await target.focus(selector);
+  await target.evaluate((sel) => {
+    const separator = document.querySelector(sel)!;
+    (globalThis as unknown as { __separatorValue: Promise<number> }).__separatorValue =
+      new Promise<number>((resolve, reject) => {
+        const timer = setTimeout(() => {
+          observer.disconnect();
+          reject(new Error(`separator value did not change: ${sel}`));
+        }, 2_000);
+        const observer = new MutationObserver(() => {
+          const value = Number(separator.getAttribute("aria-valuenow"));
+          clearTimeout(timer);
+          observer.disconnect();
+          resolve(value);
+        });
+        observer.observe(separator, { attributes: true, attributeFilter: ["aria-valuenow"] });
+      });
+  }, selector);
+  await target.keyboard.press(key);
+  return target.evaluate(
+    () => (globalThis as unknown as { __separatorValue: Promise<number> }).__separatorValue,
+  );
+}
+
 async function resetWorkspace(): Promise<void> {
   await page.evaluate(
     (keys: string[]) => keys.forEach((key) => localStorage.removeItem(key)),
@@ -265,6 +294,45 @@ describe("전사 패널 다중 모서리 리사이즈", () => {
     expect(grips).toEqual({ south: true, southWest: true, west: true, southEast: false });
   });
 
+  test("높이 그립이 방향과 현재·최소·최대 높이를 노출한다", async () => {
+    const aria = await page.evaluate(() =>
+      ["transcript-grip-s", "transcript-grip-sw"].map((id) => {
+        const separator = document.getElementById(id)!;
+        return {
+          orientation: separator.getAttribute("aria-orientation"),
+          min: Number(separator.getAttribute("aria-valuemin")),
+          max: Number(separator.getAttribute("aria-valuemax")),
+          now: Number(separator.getAttribute("aria-valuenow")),
+        };
+      }),
+    );
+
+    for (const value of aria) {
+      expect(value.orientation).toBe("horizontal");
+      expect(value.min).toBe(160);
+      expect(value.max).toBeGreaterThan(value.min);
+      expect(value.now).toBe(value.max);
+    }
+  });
+
+  test("키보드 Arrow/Home/End가 두 높이 그립과 ARIA 현재값을 동기화한다", async () => {
+    const southAfterArrow = await pressHeightSeparatorKey(page, "#transcript-grip-s", "ArrowUp");
+    expect(southAfterArrow).toBeCloseTo((await geometry(page)).cardH, 0);
+
+    const atMin = await pressHeightSeparatorKey(page, "#transcript-grip-s", "Home");
+    expect(atMin).toBe(160);
+    const atMax = await pressHeightSeparatorKey(page, "#transcript-grip-s", "End");
+    expect(atMax).toBeCloseTo((await geometry(page)).paneH, 0);
+
+    const southWestAfterArrow = await pressHeightSeparatorKey(
+      page,
+      "#transcript-grip-sw",
+      "ArrowUp",
+    );
+    expect(southWestAfterArrow).toBeLessThan(atMax);
+    expect(southWestAfterArrow).toBeCloseTo((await geometry(page)).cardH, 0);
+  });
+
   test("서(W) 드래그: 스플리터가 전사 폭을 넓힌다", async () => {
     const before = await geometry(page);
     await dragFrom(page, "#splitter-transcript", -160, 0);
@@ -283,6 +351,9 @@ describe("전사 패널 다중 모서리 리사이즈", () => {
     expect(before.cardH - after.cardH).toBeGreaterThan(200);
     expect(after.cardH).toBeGreaterThanOrEqual(160);
     expect(after.paneW).toBeCloseTo(before.paneW, 0);
+    expect(
+      await page.$eval("#transcript-grip-s", (node) => Number(node.getAttribute("aria-valuenow"))),
+    ).toBeCloseTo(after.cardH, 0);
     // 무대는 높이 조절과 무관하다
     expect(after.stageW).toBeCloseTo(before.stageW, 0);
     expect(after.stageH).toBeCloseTo(before.stageH, 0);

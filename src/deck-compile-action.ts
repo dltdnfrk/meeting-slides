@@ -14,7 +14,7 @@ import { copyDeckAssets } from "./deck-assets.js";
 import { renderSlideSpec, type SlideFile } from "./deck.js";
 import type { DeckPlanner } from "./llm.js";
 import { parseDeckOutline, type DeckOutline } from "./slide-spec.js";
-import type { CompileUpdate } from "./session.js";
+import type { CompileJobId, CompileUpdate, JobStage } from "./session.js";
 import type { MeetingStore } from "./store.js";
 
 export class CompileDeckActionError extends Error {
@@ -28,6 +28,7 @@ export interface CompileDeckDiskOptions {
   exportsDirectory: string;
   projectDirectory?: string;
   now?: () => Date;
+  onProgress?: (progress: { stage: JobStage; completed?: number; total?: number }) => void;
 }
 
 export interface CompiledDeckResult {
@@ -60,6 +61,7 @@ export async function compileDeckToDisk(
     throw new CompileDeckActionError("meeting-not-found", `Meeting ${meetingId} was not found`);
   }
 
+  options.onProgress?.({ stage: "planning" });
   const compiled = await compileDeckOutline(store, meetingId, planner);
   const rendered = renderCompiledOutline(compiled.outline);
   const projectDirectory = options.projectDirectory ?? join(import.meta.dir, "..");
@@ -82,7 +84,11 @@ export async function compileDeckToDisk(
       exportDirectory: stagingDirectory,
       slidesDirectory,
     });
-    for (const file of rendered.files) writeFileSync(join(slidesDirectory, file.filename), file.html, "utf-8");
+    for (const [index, file] of rendered.files.entries()) {
+      writeFileSync(join(slidesDirectory, file.filename), file.html, "utf-8");
+      options.onProgress?.({ stage: "render", completed: index + 1, total: rendered.files.length });
+    }
+    options.onProgress?.({ stage: "publish" });
     renameSync(stagingDirectory, finalDirectory);
     store.markDeckPublished(meetingId);
   } catch (error) {
@@ -105,6 +111,8 @@ export interface CompileDeckActionInput extends CompileDeckDiskOptions {
   store: MeetingStore;
   planner: DeckPlanner;
   meetingId?: number;
+  jobId?: CompileJobId;
+  timeoutMs?: number;
   send(message: CompileUpdate): void;
 }
 
@@ -114,17 +122,43 @@ export interface CompileDeckActionInput extends CompileDeckDiskOptions {
  */
 export async function runCompileDeckAction(input: CompileDeckActionInput): Promise<CompiledDeckResult | null> {
   const meetingId = input.meetingId ?? input.store.latestMeeting()?.id;
-  input.send({ type: "compile", status: "started", ...(meetingId === undefined ? {} : { meetingId }) });
+  const jobId = input.jobId ?? `compile-${randomUUID()}`;
+  input.send({ type: "compile", status: "started", jobId, ...(meetingId === undefined ? {} : { meetingId }) });
   if (meetingId === undefined) {
-    input.send({ type: "compile", status: "error", error: "No stored meeting was found" });
+    input.send({ type: "compile", status: "error", jobId, error: "No stored meeting was found" });
     return null;
   }
 
+  let terminal = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const work = compileDeckToDisk(input.store, meetingId, input.planner, {
+    ...input,
+    onProgress: (progress) => {
+      input.onProgress?.(progress);
+      if (!terminal) input.send({ type: "compile", status: "progress", jobId, meetingId, ...progress });
+    },
+  });
+  const timeoutMs = input.timeoutMs ?? 120_000;
+  const timeout = new Promise<null>((resolve) => {
+    timer = setTimeout(() => {
+      terminal = true;
+      input.send({
+        type: "compile", status: "timeout", jobId, meetingId,
+        error: `Deck compile timed out after ${timeoutMs}ms`,
+      });
+      resolve(null);
+    }, timeoutMs);
+  });
+
   try {
-    const result = await compileDeckToDisk(input.store, meetingId, input.planner, input);
+    const result = await Promise.race([work, timeout]);
+    if (result === null) return null;
+    if (timer) clearTimeout(timer);
+    terminal = true;
     input.send({
       type: "compile",
       status: "success",
+      jobId,
       meetingId,
       path: result.relativePath,
       outline: {
@@ -137,9 +171,12 @@ export async function runCompileDeckAction(input: CompileDeckActionInput): Promi
     });
     return result;
   } catch (error) {
+    if (timer) clearTimeout(timer);
+    terminal = true;
     input.send({
       type: "compile",
       status: "error",
+      jobId,
       meetingId,
       error: error instanceof Error ? error.message : String(error),
     });

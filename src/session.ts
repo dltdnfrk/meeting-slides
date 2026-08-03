@@ -64,7 +64,13 @@ export interface ProviderInfo {
   id: string;
   label: string;
   detail: string;
+  /** True only when authentication was positively verified. */
   available: boolean;
+  /** Installed providers with unverifiable auth remain explicitly selectable. */
+  selectable?: boolean;
+  installed?: boolean;
+  auth?: "connected" | "disconnected" | "unknown" | "unavailable";
+  version?: string;
   models?: string[];
   efforts?: string[];
 }
@@ -77,10 +83,33 @@ export interface ProvidersUpdate {
   currentEffort?: string;
 }
 
+export type CapturePhase = "idle" | "starting" | "capturing" | "stopping" | "switching-model";
+
 export interface CaptureUpdate {
   type: "capture";
   capturing: boolean;
   mode: string;
+  phase?: CapturePhase;
+  modelPath?: string;
+  selectedModelId?: SttModelInfo["id"];
+}
+
+export interface SttModelInfo {
+  id: "small" | "medium" | "large-v3-turbo" | "large-v3";
+  label: string;
+  sizeBytes: number;
+  license: "MIT" | "Apache-2.0";
+  status: "absent" | "downloading" | "installed" | "selected" | "failed";
+  path?: string;
+  receivedBytes?: number;
+  totalBytes?: number;
+  error?: string;
+}
+
+export interface SttModelsUpdate {
+  type: "sttModels";
+  models: SttModelInfo[];
+  selectedModelId: SttModelInfo["id"] | null;
 }
 
 export interface MeetingsUpdate {
@@ -105,10 +134,18 @@ export interface SavedUpdate {
   path: string;
 }
 
+export type CompileJobId = `compile-${string}`;
+export type ExportJobId = `png-${string}` | `pdf-${string}`;
+export type JobStage = "planning" | "render" | "publish" | "prepare" | "validate" | "preview" | "review" | "design-gate";
+
 export interface CompileUpdate {
   type: "compile";
-  status: "started" | "success" | "error";
+  status: "started" | "progress" | "success" | "error" | "timeout";
+  jobId: CompileJobId;
   meetingId?: number;
+  stage?: JobStage;
+  completed?: number;
+  total?: number;
   path?: string;
   outline?: {
     title: string;
@@ -122,29 +159,39 @@ export interface CompileUpdate {
 
 export interface ExportUpdate {
   type: "export";
-  status: "error";
-  action: "exportDeck" | "exportPdf" | "exportPng";
-  code: "compile-busy";
-  error: string;
+  status: "started" | "progress" | "success" | "error" | "timeout";
+  action: "exportPdf" | "exportPng";
+  jobId: ExportJobId;
+  meetingId?: number;
+  stage?: JobStage;
+  completed?: number;
+  total?: number;
+  path?: string;
+  code?: "job-busy" | "invalid-meeting-id" | "meeting-not-found" | "process-failed" | "review-failed" | "timeout";
+  error?: string;
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | MeetingsUpdate | LineUpdate | DetectUpdate | SavedUpdate | CompileUpdate | ExportUpdate;
+export interface MeetingDetailUpdate {
+  type: "meeting";
+  meetingId: number;
+  title: string;
+  transcript: TranscriptEntry[];
+  current: Slide | null;
+  history: Slide[];
+  compiled: null | { title: string; slideCount: number; compiledAt: number; publishedAt: number | null };
+}
+
+export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | SttModelsUpdate | MeetingsUpdate | LineUpdate | DetectUpdate | SavedUpdate | CompileUpdate | ExportUpdate | MeetingDetailUpdate;
+
+export type ClientAction =
+  | { action: "startCapture" | "stopCapture" | "reset" | "status" | "listMeetings" | "transcript" | "recheckProviders" | "recheckSttModels" }
+  | { action: "selectMeeting" | "compileDeck" | "exportDeck" | "exportPdf" | "exportPng" | "saveNotes" | "saveTranscript" | "saveJson"; meetingId?: number }
+  | { action: "setProvider"; id: string; model?: string; effort?: string }
+  | { action: "connectProvider"; id: string }
+  | { action: "setProviderKey"; id: string; key: string }
+  | { action: "installSttModel" | "cancelSttModel" | "selectSttModel"; modelId: SttModelInfo["id"] };
 
 export type ClientListener = (msg: ServerMessage) => void;
-
-interface TopicRule {
-  title: string;
-  pattern: RegExp;
-}
-
-const TOPIC_RULES: readonly TopicRule[] = [
-  { title: "고객 피드백", pattern: /고객|피드백|온보딩|가입|사용자|의견/ },
-  { title: "출시 일정", pattern: /출시|일정|배포|베타|QA|큐에이|월요일|화요일/ },
-  { title: "액션 아이템", pattern: /담당자|작업 목록|공유|할 일|액션|마지막/ },
-];
-
-const TOPIC_SHIFT_PATTERN = /첫\s*번째|두\s*번째|세\s*번째|마지막|다음\s*안건|다음은|첫째|둘째|셋째/;
-const BULLET_PREFIX_PATTERN = /^(?:첫\s*번째|두\s*번째|세\s*번째)(?:는|로|으로)?\s*|^마지막(?:으로)?\s*/;
 
 export class MeetingSession {
   private sentences: string[] = [];
@@ -294,47 +341,11 @@ export class MeetingSession {
     } catch (e) {
       if (epoch !== this.epoch) return;
       const message = e instanceof Error ? e.message : String(e);
-      this.broadcast({ type: "status", text: `LLM 오류: ${message} — 로컬 요약 fallback 사용` });
-      this.applyDetection(this.fallbackDetect(context));
+      this.broadcast({ type: "status", text: `LLM 오류: ${message}` });
     } finally {
       this.detecting = false;
       this.broadcast({ type: "detect", detecting: false });
     }
-  }
-
-  private fallbackDetect(context: string[]): BlockDetectionResult {
-    if (context.length === 0) {
-      return { shouldAdvance: false, title: "", bullets: [] };
-    }
-
-    const joined = context.join(" ");
-    let title = "회의 요약";
-    let startIndex = Math.max(0, context.length - 5);
-    for (const rule of TOPIC_RULES) {
-      const idx = context.findIndex((s) => rule.pattern.test(s));
-      if (idx >= 0) {
-        title = rule.title;
-        startIndex = idx;
-        break;
-      }
-    }
-
-    const bullets = context.slice(startIndex)
-      .map((s) => s
-        .replace(BULLET_PREFIX_PATTERN, "")
-        .replace(/^[은는]\s*/, "")
-        .trim())
-      .filter((s) => s.length > 0)
-      .slice(0, 5);
-
-    const shouldAdvance = this.currentSlide === null
-      || (this.currentSlide.title !== title && TOPIC_SHIFT_PATTERN.test(joined));
-
-    const card = { title, bullets, kicker: "로컬 회의 요약" as const };
-    if (isLowQualityMeetingCard(card)) {
-      return { shouldAdvance: false, title: "", bullets: [] };
-    }
-    return { shouldAdvance, ...card };
   }
 
   private applyDetection(result: BlockDetectionResult): void {
@@ -345,7 +356,7 @@ export class MeetingSession {
       this.pendingAdvanceTitle = null;
       return;
     }
-    // LLM/fallback 모두 메타·공허 카드는 스테이지에 올리지 않는다.
+    // LLM의 메타·공허 카드는 스테이지에 올리지 않는다.
     if (result.title && isLowQualityMeetingCard({
       title: result.title,
       bullets: result.bullets,

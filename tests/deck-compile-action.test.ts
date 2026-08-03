@@ -87,10 +87,17 @@ describe("compiled deck disk action", () => {
     });
 
     expect(result).not.toBeNull();
-    expect(messages.map((message) => message.status)).toEqual(["started", "success"]);
-    expect(messages[1]).toMatchObject({
+    expect(messages[0]).toMatchObject({ type: "compile", status: "started", jobId: expect.stringMatching(/^compile-/) });
+    expect(messages.filter((message) => message.status === "progress")).toEqual(expect.arrayContaining([
+      expect.objectContaining({ stage: "planning" }),
+      expect.objectContaining({ stage: "render", completed: 6, total: 6 }),
+      expect.objectContaining({ stage: "publish" }),
+    ]));
+    const terminal = messages.at(-1);
+    expect(terminal).toMatchObject({
       type: "compile",
       status: "success",
+      jobId: messages[0]?.jobId,
       meetingId,
       outline: { title: "출시 준비", style: "clear-editorial", slideCount: 6, usedFallback: false, plannerError: null },
     });
@@ -129,6 +136,8 @@ describe("compiled deck disk action", () => {
     expect(result).toBeNull();
     expect(plannerCalls).toBe(0);
     expect(messages.map((message) => message.status)).toEqual(["started", "error"]);
+    expect(messages[0]?.jobId).toMatch(/^compile-/);
+    expect(messages[1]?.jobId).toBe(messages[0]?.jobId);
     expect(messages[1]?.error).toContain("Meeting 999 was not found");
     expect(existsSync(exportsDirectory)).toBe(false);
     store.close();

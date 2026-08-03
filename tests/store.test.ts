@@ -83,6 +83,42 @@ describe("MeetingStore", () => {
     store.close();
   });
 
+  test("전사 전용 export는 노트의 슬라이드 요약과 구별되고 지정 회의만 대상으로 한다", () => {
+    const store = new MeetingStore(":memory:");
+    const firstId = store.startMeeting("cli:codex");
+    store.addLine({ ts: 1000, speaker: 1, text: "첫 회의 원문" });
+    store.addSlide({ idx: 1, title: "첫 회의 요약", bullets: ["요약 불렛"], startedAt: 1000 });
+    store.endMeeting();
+    store.startMeeting("cli:codex");
+    store.addLine({ ts: 2000, text: "둘째 회의 원문" });
+
+    const transcript = store.exportTranscript(firstId);
+    expect(transcript).toContain("# Meeting Transcript");
+    expect(transcript).toContain("첫 회의 원문");
+    expect(transcript).not.toContain("첫 회의 요약");
+    expect(transcript).not.toContain("둘째 회의 원문");
+    expect(transcript).not.toBe(store.exportMarkdown(firstId));
+    store.close();
+  });
+
+  test("meeting detail은 마지막 슬라이드를 current로, 나머지를 history로 hydrate한다", () => {
+    const store = new MeetingStore(":memory:");
+    const id = store.startMeeting("cli:codex");
+    store.addLine({ ts: 1000, text: "과거 전사" });
+    store.addSlide({ idx: 1, title: "첫 장", bullets: ["하나"], startedAt: 1000 });
+    store.addSlide({ idx: 2, title: "현재 장", bullets: ["둘"], startedAt: 2000 });
+    store.endMeeting();
+
+    const detail = store.meetingDetail(id);
+    expect(detail?.meetingId).toBe(id);
+    expect(detail?.transcript).toEqual([{ text: "과거 전사", ts: 1000 }]);
+    expect(detail?.current).toMatchObject({ index: 2, title: "현재 장" });
+    expect(detail?.history[0]).toMatchObject({ index: 1, title: "첫 장" });
+    expect(detail?.compiled).toBeNull();
+    expect(store.meetingDetail(999)).toBeNull();
+    store.close();
+  });
+
   test("같은 idx 슬라이드 갱신은 upsert되어 export에 최신 불렛이 남는다", () => {
     const store = new MeetingStore(":memory:");
     store.startMeeting("cli:codex");

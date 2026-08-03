@@ -153,16 +153,11 @@ describe("MeetingSession", () => {
     expect(await caption).toMatchObject({ type: "caption", text: "자막 문장" });
   });
 
-  test("LLM 실패는 fallback MeetingCard를 만들고 detecting을 안전하게 해제", async () => {
+  test("LLM 실패는 가짜 MeetingCard 없이 detecting을 안전하게 해제", async () => {
     const harness = makeSession({ detectBlock: async () => { throw new Error("invalid JSON"); } });
     await addAndDetect(harness, "고객 피드백을 정리합니다");
     expect(harness.messages.some((message) => message.type === "status" && message.text.includes("LLM 오류"))).toBe(true);
-    expect(harness.session.snapshot().current).toMatchObject({
-      title: "고객 피드백",
-      kicker: "로컬 회의 요약",
-      bullets: ["고객 피드백을 정리합니다"],
-    });
-    expect(harness.session.snapshot().current?.title).not.toContain("파싱 실패");
+    expect(harness.session.snapshot().current).toBeNull();
     expect(harness.messages.at(-1)).toEqual({ type: "detect", detecting: false });
   });
 

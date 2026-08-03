@@ -277,6 +277,60 @@ export class MeetingStore {
     return rows;
   }
 
+  /** 선택한 회의를 UI의 세 패인에 재구성할 canonical payload로 읽는다. */
+  meetingDetail(meetingId: number): {
+    meetingId: number;
+    title: string;
+    transcript: Array<{ text: string; ts: number; speaker?: number }>;
+    current: null | { index: number; title: string; bullets: string[]; startedAt: number; sentenceCount: number };
+    history: Array<{ index: number; title: string; bullets: string[]; startedAt: number; sentenceCount: number }>;
+    compiled: null | { title: string; slideCount: number; compiledAt: number; publishedAt: number | null };
+  } | null {
+    if (this.meeting(meetingId) === null) return null;
+    const summary = this.listMeetings().find((item) => item.id === meetingId);
+    const lines = this.lines(meetingId);
+    const slides = this.slides(meetingId).map((slide) => ({
+      index: slide.idx,
+      title: slide.title,
+      bullets: slide.bullets,
+      startedAt: slide.startedAt,
+      sentenceCount: lines.filter((line) => line.ts <= slide.startedAt).length,
+    }));
+    const current = slides.at(-1) ?? null;
+    const outline = this.deckOutline(meetingId);
+    return {
+      meetingId,
+      title: summary?.title ?? `회의 #${meetingId}`,
+      transcript: lines.map((line) => ({
+        text: line.text,
+        ts: line.ts,
+        ...(line.speaker === null ? {} : { speaker: line.speaker }),
+      })),
+      current,
+      history: current === null ? [] : slides.slice(0, -1),
+      compiled: outline === null ? null : {
+        title: outline.outline.title,
+        slideCount: outline.outline.slides.length,
+        compiledAt: outline.compiledAt,
+        publishedAt: outline.publishedAt,
+      },
+    };
+  }
+
+  /** 슬라이드 요약 없이 발화 원문만 내보내는 전사 전용 포맷. */
+  exportTranscript(meetingId?: number): string {
+    const id = meetingId ?? this.meetingId ?? undefined;
+    const lines = this.lines(id);
+    const fmtTime = (ts: number) => new Date(ts).toLocaleTimeString("ko-KR", { hour12: false });
+    const out = ["# Meeting Transcript", ""];
+    for (const line of lines) {
+      const who = line.speaker ? `화자 ${line.speaker}` : "전사";
+      out.push(`**[${fmtTime(line.ts)}] ${who}** — ${line.text}`);
+    }
+    out.push("");
+    return out.join("\n");
+  }
+
   /** anarlog식 Markdown export: 헤더 + 슬라이드 요약 + 전체 전사본 */
   exportMarkdown(meetingId?: number): string {
     const id = meetingId ?? this.meetingId ?? undefined;
