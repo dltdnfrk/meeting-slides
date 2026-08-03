@@ -1,12 +1,26 @@
 import { describe, expect, test } from "bun:test";
 
-import { buildProviderEntries, createDetector, upsertEnvText } from "../src/providers.ts";
+import { buildProviderEntries, buildProviderEntriesFromStates, createDetector, upsertEnvText } from "../src/providers.ts";
 
 describe("buildProviderEntries", () => {
   test("구독 CLI 가용성은 주입된 탐지 결과를 따른다", () => {
     const list = buildProviderEntries({}, { claude: true, codex: false });
     expect(list.find((p) => p.id === "cli:claude")?.available).toBe(true);
     expect(list.find((p) => p.id === "cli:codex")?.available).toBe(false);
+  });
+
+  test("설치된 CLI 는 auth unknown 이어도 선택 가능하다", () => {
+    const list = buildProviderEntriesFromStates({}, [
+      { id: "cli:grok", installed: true, auth: "unknown", executable: "/tmp/grok" },
+      { id: "cli:claude", installed: true, auth: "disconnected", executable: "/tmp/claude" },
+      { id: "cli:codex", installed: false, auth: "unavailable", executable: "/tmp/codex" },
+    ]);
+    expect(list.find((p) => p.id === "cli:grok")?.available).toBe(false);
+    expect(list.find((p) => p.id === "cli:grok")?.selectable).toBe(true);
+    expect(list.find((p) => p.id === "cli:claude")?.available).toBe(false);
+    expect(list.find((p) => p.id === "cli:claude")?.selectable).toBe(true);
+    expect(list.find((p) => p.id === "cli:codex")?.available).toBe(false);
+    expect(list.find((p) => p.id === "cli:codex")?.selectable).toBe(false);
   });
 
   test("HTTP 프로바이더는 키/URL 존재로 가용 판정", () => {
@@ -19,9 +33,11 @@ describe("buildProviderEntries", () => {
     expect(list.find((p) => p.id === "local")?.available).toBe(false);
   });
 
-  test("5개 카드를 순서대로 제공 (구독 2 + API 3)", () => {
+  test("7개 카드를 순서대로 제공 (구독 4 + API 3)", () => {
     const list = buildProviderEntries({}, {});
-    expect(list.map((p) => p.id)).toEqual(["cli:claude", "cli:codex", "alibaba", "openai", "local"]);
+    expect(list.map((p) => p.id)).toEqual([
+      "cli:codex", "cli:grok", "cli:claude", "cli:gemini", "alibaba", "openai", "local",
+    ]);
   });
 
   test("모델/effort 옵션 목록 제공", () => {
@@ -60,8 +76,9 @@ describe("upsertEnvText", () => {
 
 describe("createDetector", () => {
   test("cli 프리셋은 API 키 없이 생성", () => {
-    expect(createDetector("cli:claude", { cliTimeoutMs: 1000 })).not.toBeNull();
-    expect(createDetector("cli:codex", { cliTimeoutMs: 1000 })).not.toBeNull();
+    for (const id of ["cli:codex", "cli:grok", "cli:claude", "cli:gemini"]) {
+      expect(createDetector(id, { cliTimeoutMs: 1000 })).not.toBeNull();
+    }
   });
 
   test("알 수 없는 id는 null", () => {

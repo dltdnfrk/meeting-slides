@@ -1,14 +1,8 @@
 // ============================================================
-// llm-cli.ts - 구독 서비스 CLI 백엔드 (API 키 대신 기존 구독 인증 사용)
+// llm-cli.ts - subscription-backed CLI LLM runtime
 // ============================================================
-// claude (Claude Pro/Max) 또는 codex (ChatGPT) CLI를 자식 프로세스로 실행해
-// 블록 감지를 수행한다. 별도의 LLM API 키 없이 사용자의 구독 인증을 재사용한다.
-//
-// 출력 계약:
-//   claude: `claude -p <prompt> --output-format text` → 최종 텍스트가 stdout
-//           최종 메시지만 파일로 받아 읽는다 (서버 종료 시 자동 정리되는 단일 재사용 파일).
 
-import { spawn } from "child_process";
+import { spawn } from "node:child_process";
 import { readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -23,65 +17,147 @@ import {
   type DeckPlannerRepair,
   type MeetingLLM,
 } from "./llm.js";
-import type { CliLLMConfig } from "./config.js";
+import { cliProcessEnvironment } from "./config.js";
+import type { ProviderCliPreset } from "./provider-adapters.js";
 
-export function buildCliArgs(cfg: CliLLMConfig, prompt: string, outFile?: string): string[] {
-  if (cfg.preset === "codex") {
-    const args = ["exec", "--skip-git-repo-check"];
-    if (cfg.model) args.push("-m", cfg.model);
-    // reasoning effort는 codex config 오버라이드로 전달 (TOML 문자열)
-    if (cfg.effort) args.push("-c", `model_reasoning_effort="${cfg.effort}"`);
-    args.push("-o", outFile ?? join(tmpdir(), "codex-last.txt"), prompt);
-    return args;
-  }
-  const args = ["-p", prompt, "--output-format", "text"];
-  if (cfg.model) args.push("--model", cfg.model);
-  return args;
+export interface ProviderCliConfig {
+  bin: string;
+  preset: ProviderCliPreset;
+  timeoutMs: number;
+  model?: string;
+  effort?: string;
 }
 
-function runCli(cfg: CliLLMConfig, prompt: string): Promise<string> {
-  // codex preset만 임시 출력 파일이 필요. 매 호출마다 mkdtempSync/rmSync 하면
-  // 회의 한 번에 수십~수백 회 I/O 발생 → 파일 하나 재사용 (서버 종료 시 OS가 정리).
-  const outFile = cfg.preset === "codex" ? join(tmpdir(), `meeting-slides-codex-${process.pid}.txt`) : undefined;
+export function buildCliArgs(cfg: ProviderCliConfig, prompt: string, outFile?: string): string[] {
+  switch (cfg.preset) {
+    case "codex": {
+      const args = [
+        "exec",
+        "--ephemeral",
+        "--ignore-user-config",
+        "--skip-git-repo-check",
+      ];
+      if (cfg.model) args.push("-m", cfg.model);
+      if (cfg.effort) args.push("-c", `model_reasoning_effort="${cfg.effort}"`);
+      args.push("-o", outFile ?? join(tmpdir(), "codex-last.txt"), prompt);
+      return args;
+    }
+    case "grok": {
+      const args = ["-p", prompt, "--output-format", "streaming-json"];
+      if (cfg.model) args.push("-m", cfg.model);
+      return args;
+    }
+    case "gemini": {
+      const args = ["-p", prompt, "--output-format", "json"];
+      if (cfg.model) args.push("-m", cfg.model);
+      return args;
+    }
+    case "claude": {
+      const args = ["-p", prompt, "--output-format", "text"];
+      if (cfg.model) args.push("--model", cfg.model);
+      return args;
+    }
+  }
+}
+
+function record(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function parseGrokStreamingJson(output: string): string {
+  const chunks: string[] = [];
+  const lines = output.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  for (const line of lines) {
+    let event: unknown;
+    try {
+      event = JSON.parse(line);
+    } catch (error) {
+      throw new Error("Invalid Grok streaming-json event", { cause: error });
+    }
+    const update = record(record(event)?.update);
+    if (update?.sessionUpdate !== "agent_message_chunk") continue;
+    const content = record(update.content);
+    if (content?.type === "text" && typeof content.text === "string") {
+      chunks.push(content.text);
+    }
+  }
+  if (chunks.length === 0) throw new Error("Grok streaming-json contained no assistant text");
+  return chunks.join("");
+}
+
+export function parseCliOutput(preset: ProviderCliPreset, output: string): string {
+  if (preset === "grok") return parseGrokStreamingJson(output);
+  if (preset === "gemini") {
+    try {
+      const value = record(JSON.parse(output));
+      if (!value || typeof value.response !== "string") throw new Error("missing response");
+      return value.response;
+    } catch (error) {
+      throw new Error("Invalid Gemini JSON output", { cause: error });
+    }
+  }
+  return output;
+}
+
+let codexInvocation = 0;
+
+export function runCliPrompt(
+  cfg: ProviderCliConfig,
+  prompt: string,
+  environment: NodeJS.ProcessEnv = process.env,
+): Promise<string> {
+  const outFile = cfg.preset === "codex"
+    ? join(tmpdir(), `meeting-slides-codex-${process.pid}-${++codexInvocation}.txt`)
+    : undefined;
   const cleanup = () => {
-    if (outFile) try { rmSync(outFile, { force: true }); } catch {}
+    if (!outFile) return;
+    try { rmSync(outFile, { force: true }); } catch { /* best-effort temporary cleanup */ }
   };
 
   return new Promise<string>((resolve, reject) => {
-    const proc = spawn(cfg.bin, buildCliArgs(cfg, prompt, outFile), { stdio: ["ignore", "pipe", "pipe"] });
+    const proc = spawn(cfg.bin, buildCliArgs(cfg, prompt, outFile), {
+      env: cliProcessEnvironment(cfg.bin, environment),
+      stdio: ["ignore", "pipe", "pipe"],
+    });
     let stdout = "";
     let stderrTail = "";
     let settled = false;
     const timer = setTimeout(() => {
       if (settled) return;
+      settled = true;
       proc.kill("SIGKILL");
-      // 타임아웃 후에도 stdout/stderr 'data' 콜백이 들어와 메모리/CPU 낭비 → 파괴.
       proc.stdout?.destroy();
       proc.stderr?.destroy();
       cleanup();
-      settled = true;
-      reject(new Error(`CLI 타임아웃 (${cfg.timeoutMs}ms): ${cfg.bin}`));
+      reject(new Error(`CLI timeout (${cfg.timeoutMs}ms): ${cfg.bin}`));
     }, cfg.timeoutMs);
 
-    proc.stdout?.on("data", (d: Buffer) => { stdout += d.toString("utf-8"); });
-    proc.stderr?.on("data", (d: Buffer) => { stderrTail = (stderrTail + d.toString("utf-8")).slice(-500); });
-    proc.on("error", (err) => {
+    proc.stdout?.on("data", (data: Buffer) => { stdout += data.toString("utf-8"); });
+    proc.stderr?.on("data", (data: Buffer) => {
+      stderrTail = (stderrTail + data.toString("utf-8")).slice(-500);
+    });
+    proc.on("error", (error) => {
       if (settled) return;
+      settled = true;
       clearTimeout(timer);
       cleanup();
-      settled = true;
-      reject(err);
+      reject(error);
     });
     proc.on("close", (code) => {
       if (settled) return;
-      clearTimeout(timer);
       settled = true;
+      clearTimeout(timer);
       try {
         if (code !== 0) {
-          reject(new Error(`${cfg.bin} 종료 코드 ${code}: ${stderrTail.trim() || "(stderr 없음)"}`));
+          reject(new Error(`${cfg.bin} exited with code ${code}: ${stderrTail.trim() || "(no stderr)"}`));
           return;
         }
-        resolve(outFile ? readFileSync(outFile, "utf-8") : stdout);
+        const raw = outFile ? readFileSync(outFile, "utf-8") : stdout;
+        resolve(parseCliOutput(cfg.preset, raw));
+      } catch (error) {
+        reject(error);
       } finally {
         cleanup();
       }
@@ -90,29 +166,29 @@ function runCli(cfg: CliLLMConfig, prompt: string): Promise<string> {
 }
 
 export class CliLLMClient implements MeetingLLM {
-  constructor(private cfg: CliLLMConfig) {}
+  constructor(private cfg: ProviderCliConfig) {}
 
   async detectBlock(sentences: string[]): Promise<BlockDetectionResult> {
-    if (sentences.length === 0) {
-      return { shouldAdvance: false, title: "", bullets: [] };
-    }
+    if (sentences.length === 0) return { shouldAdvance: false, title: "", bullets: [] };
     const userPrompt = `최근 회의 문장들:
-${sentences.map((s, i) => `${i + 1}. ${s}`).join("\n")}
+${sentences.map((sentence, index) => `${index + 1}. ${sentence}`).join("\n")}
 
 JSON으로만 응답하세요.`;
-    const output = await runCli(this.cfg, `${SYSTEM_PROMPT}\n\n${userPrompt}`);
+    const output = await runCliPrompt(this.cfg, `${SYSTEM_PROMPT}\n\n${userPrompt}`);
     return parseBlockDetectionJson(output);
   }
 
   async planDeck(input: DeckPlannerInput, repair?: DeckPlannerRepair): Promise<unknown> {
     const prompt = `${DECK_PLANNER_SYSTEM_PROMPT}\n\n${buildDeckPlannerUserPrompt(input, repair)}`;
-    return runCli(this.cfg, prompt);
+    return runCliPrompt(this.cfg, prompt);
   }
 
   async ping(): Promise<boolean> {
-    // 구독 과금 없이 바이너리 존재/실행 가능 여부만 확인한다.
     return new Promise<boolean>((resolve) => {
-      const proc = spawn(this.cfg.bin, ["--version"], { stdio: "ignore" });
+      const proc = spawn(this.cfg.bin, ["--version"], {
+        env: cliProcessEnvironment(this.cfg.bin),
+        stdio: "ignore",
+      });
       proc.on("error", () => resolve(false));
       proc.on("close", (code) => resolve(code === 0));
     });

@@ -2,6 +2,9 @@
 // config.ts - 환경 설정 로더
 // ============================================================
 
+import { accessSync, constants } from "node:fs";
+import { delimiter, dirname, join } from "node:path";
+
 export interface LLMProviderConfig {
   baseURL: string;
   apiKey: string;
@@ -9,8 +12,8 @@ export interface LLMProviderConfig {
 }
 
 export interface CliLLMConfig {
-  bin: string;                    // claude | codex (또는 전체 경로)
-  preset: "claude" | "codex";     // 출력 계약 프리셋
+  bin: string;                    // provider CLI name or absolute path
+  preset: "claude" | "codex" | "grok" | "gemini";
   timeoutMs: number;
   model?: string;                 // 미지정 시 CLI 기본 모델
   effort?: string;                // codex: model_reasoning_effort (low|medium|high)
@@ -95,19 +98,78 @@ export function resolveLLMConfig(provider: string): LLMProviderConfig {
   }
 }
 
-function resolveCliConfig(): CliLLMConfig {
-  const bin = env("LLM_CLI_BIN", "claude");
-  const presetEnv = env("LLM_CLI_PRESET", "").trim();
-  if (presetEnv && presetEnv !== "claude" && presetEnv !== "codex") {
-    throw new Error(`LLM_CLI_PRESET은 claude|codex 중 하나여야 함: ${presetEnv}`);
+function canExecute(path: string): boolean {
+  try {
+    accessSync(path, constants.X_OK);
+    return true;
+  } catch {
+    return false;
   }
-  // 프리셋 미지정 시 바이너리 이름에서 자동 감지
-  const preset: CliLLMConfig["preset"] = presetEnv === "claude" || presetEnv === "codex"
-    ? presetEnv
-    : bin.includes("codex") ? "codex" : "claude";
+}
+
+function cliSearchDirectories(environment: NodeJS.ProcessEnv): string[] {
+  const home = environment.HOME?.trim();
+  return [
+    ...(environment.PATH ?? "").split(delimiter),
+    ...(home ? [
+      join(home, ".npm-global", "bin"),
+      join(home, ".bun", "bin"),
+      join(home, ".local", "bin"),
+      join(home, ".grok", "bin"),
+    ] : []),
+    "/opt/homebrew/bin",
+    "/usr/local/bin",
+  ].filter((directory, index, directories) =>
+    directory.length > 0 && directories.indexOf(directory) === index
+  );
+}
+
+export function resolveCliExecutable(
+  bin: string,
+  environment: NodeJS.ProcessEnv = process.env,
+): string {
+  if (bin.includes("/")) return bin;
+
+  return cliSearchDirectories(environment)
+    .map((directory) => join(directory, bin))
+    .find(canExecute) ?? bin;
+}
+
+export function cliProcessEnvironment(
+  bin: string,
+  environment: NodeJS.ProcessEnv = process.env,
+): NodeJS.ProcessEnv {
+  const path = [
+    ...(bin.includes("/") ? [dirname(bin)] : []),
+    ...cliSearchDirectories(environment),
+  ].filter((directory, index, directories) =>
+    directories.indexOf(directory) === index
+  ).join(delimiter);
+  return { ...environment, PATH: path };
+}
+
+function resolveCliConfig(): CliLLMConfig {
+  const bin = resolveCliExecutable(env("LLM_CLI_BIN", "claude"));
+  const presetEnv = env("LLM_CLI_PRESET", "").trim();
+  const supportedPresets: readonly CliLLMConfig["preset"][] = ["claude", "codex", "grok", "gemini"];
+  if (presetEnv && !supportedPresets.includes(presetEnv as CliLLMConfig["preset"])) {
+    throw new Error(`LLM_CLI_PRESET은 claude|codex|grok|gemini 중 하나여야 함: ${presetEnv}`);
+  }
+  const inferredPreset = supportedPresets.find((candidate) => bin.includes(candidate));
+  const preset: CliLLMConfig["preset"] = presetEnv
+    ? presetEnv as CliLLMConfig["preset"]
+    : inferredPreset ?? "claude";
   const timeoutMs = intEnv("LLM_CLI_TIMEOUT_MS", 120_000);
   if (timeoutMs < 1000) throw new Error(`LLM_CLI_TIMEOUT_MS는 1000 이상이어야 함: ${timeoutMs}`);
-  return { bin, preset, timeoutMs };
+  const model = env("LLM_CLI_MODEL", preset === "codex" ? "gpt-5.6-sol" : "").trim();
+  const effort = env("LLM_CLI_EFFORT", preset === "codex" ? "high" : "").trim();
+  return {
+    bin,
+    preset,
+    timeoutMs,
+    ...(model ? { model } : {}),
+    ...(effort ? { effort } : {}),
+  };
 }
 
 export function loadWhisperConfig(): WhisperConfig {
