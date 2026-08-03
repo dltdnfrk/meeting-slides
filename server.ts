@@ -616,7 +616,11 @@ async function startCapture(): Promise<void> {
 }
 
 async function stopCapture(): Promise<void> {
-  if (!capturing) return;
+  if (!capturing) {
+    broadcast(captureMessage());
+    broadcast({ type: "status", text: "이미 녹음이 중지된 상태입니다" });
+    return;
+  }
   capturing = false;
   broadcast(captureMessage());
   // startCapture가 await stopPromise로 기다릴 수 있도록 promise를 노출.

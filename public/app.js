@@ -527,7 +527,12 @@ function renderCaptureButton() {
 }
 
 btnRecordEl.onclick = () => {
-  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    renderStatus("서버 연결 중… 잠시 후 다시 눌러주세요");
+    return;
+  }
+  // 즉시 피드백 — 서버 capture 이벤트가 오기 전에도 클릭 반응을 보여준다.
+  renderStatus(capturing ? "녹음 중지 요청…" : "녹음 시작 요청…");
   ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
   requestMeetings();
 };

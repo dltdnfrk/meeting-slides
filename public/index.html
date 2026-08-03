@@ -8,23 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <script id="runtime-bootstrap">
-    const runtime = location.protocol === "file:" ? "file" : "server";
-    document.documentElement.dataset.runtime = runtime;
-    if (runtime === "server") {
-      for (const href of ["/style.css", "/workspace-shell.css"]) {
-        const stylesheet = document.createElement("link");
-        stylesheet.rel = "stylesheet";
-        stylesheet.href = href;
-        document.head.append(stylesheet);
-      }
-      window.addEventListener("DOMContentLoaded", () => {
-        for (const src of ["/workspace-split.js", "/transcript-resize.js", "/app.js"]) {
-          const script = document.createElement("script");
-          script.src = src;
-          document.body.append(script);
-        }
-      }, { once: true });
-    }
+    // Meeting Slides.app health check signature + file:// guard flag.
+    document.documentElement.dataset.runtime = location.protocol === "file:" ? "file" : "server";
   </script>
   <style>
     .direct-file-guard { display: none; }
@@ -40,8 +25,9 @@
     .direct-file-guard__command span { color: #7f7f89; font-size: 12px; font-weight: 600; letter-spacing: .08em; }
     .direct-file-guard code { width: fit-content; padding: 10px 14px; border: 1px solid #27272a; border-radius: 8px; background: #131316; color: #f4f4f5; font: 600 14px/1.4 "JetBrains Mono", monospace; }
     .direct-file-guard a { width: fit-content; margin-top: 6px; color: #09090b; background: #34d399; padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; }
-    .direct-file-guard a:focus-visible { outline: 3px solid #f4f4f5; outline-offset: 4px; }
   </style>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/workspace-shell.css">
 </head>
 <body>
   <main class="direct-file-guard">
@@ -238,5 +224,8 @@
     </div>
   </div>
 
+  <script src="/workspace-split.js"></script>
+  <script src="/transcript-resize.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>

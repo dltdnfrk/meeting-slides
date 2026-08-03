@@ -358,8 +358,10 @@ abstract class WhisperBase {
       const s = data.toString("utf-8");
       rawLog(s);
       // 장치/권한/바이너리 실패 포괄 — no audio device, permission denied 등.
-      if (/error|fail|cannot|not found|no such|no audio|device|permission|denied|unavailable|no capture/i.test(s)) {
-        opts.onStatus?.(`[whisper stderr] ${s.trim()}`);
+      // "device" 단독 매칭 금지: ggml Metal 로그(GPU device)가 UI status를 폭주시켜
+      // 버튼 클릭/전사가 멈춘 것처럼 보이게 만든다. 오디오 캡처 실패만 노출.
+      if (/(no audio device|invalid capture|cannot open|failed to open|permission denied|not authorized|no capture device|coreaudio|audio unit|input device .*fail)/i.test(s)) {
+        opts.onStatus?.(`[whisper stderr] ${s.trim().slice(0, 300)}`);
       }
     });
     // spawn 실패(바이너리 없음/권한) 시 onError 호출 → start() Promise reject로 전파.
