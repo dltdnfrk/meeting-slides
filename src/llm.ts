@@ -57,6 +57,13 @@ export function parseBlockDetectionJson(content: string): BlockDetectionResult {
   }
 
   const value = parsed as Record<string, unknown>;
+
+  // 구 프롬프트 호환: isNewBlock → shouldAdvance
+  if (!("shouldAdvance" in value) && typeof value.isNewBlock === "boolean") {
+    value.shouldAdvance = value.isNewBlock;
+    delete value.isNewBlock;
+  }
+
   const allowed = new Set(["shouldAdvance", "title", "kicker", "bullets", "emphasis"]);
   const unknown = Object.keys(value).find((key) => !allowed.has(key));
   if (unknown) throw new TypeError(`detection.${unknown} is not allowed`);
@@ -64,17 +71,46 @@ export function parseBlockDetectionJson(content: string): BlockDetectionResult {
     throw new TypeError("detection.shouldAdvance must be a boolean");
   }
 
+  if (!value.shouldAdvance) {
+    return { shouldAdvance: false, title: "", bullets: [] };
+  }
+
   const card = parseLiveMeetingCard({
     title: value.title,
-    ...(value.kicker === undefined ? {} : { kicker: value.kicker }),
     bullets: value.bullets,
-    ...(value.emphasis === undefined ? {} : { emphasis: value.emphasis }),
+    kicker: value.kicker,
+    emphasis: value.emphasis,
   });
-  if (card.bullets.length < 1) {
-    throw new TypeError("detection.bullets must contain 1-6 items");
+
+  if (isLowQualityMeetingCard(card)) {
+    return { shouldAdvance: false, title: "", bullets: [] };
   }
-  return { shouldAdvance: value.shouldAdvance, ...card };
+
+  return { shouldAdvance: true, ...card };
 }
+
+/** 스크린샷의 "회의 종료 / 회의가 종료되었습니다" 류 메타 카드 하드 차단. */
+const META_TITLE = /^(회의\s*(시작|종료|재개|진행|안내|정리)?|인사|테스트|녹음|연결|대기|마무리|클로징|오프닝|안건\s*없음|논의\s*진행)$/i;
+const META_BULLET = /(회의가\s*(시작|종료)|녹음을\s*(시작|중지)|안녕하세요|테스트입니다|들(?:리|리시)나요|접속(?:됐| 됐)|슬라이드\s*앱|논의를\s*진행)/i;
+const HOLLOW_BULLET = /^(네|좋아요|알겠습니다|좋습니다|그렇습니다|진행합니다|논의합니다|확인합니다|확인이 필요합니다)[.!…]?$/i;
+
+export function isLowQualityMeetingCard(card: LiveMeetingCard): boolean {
+  const title = card.title.trim();
+  if (!title || META_TITLE.test(title)) return true;
+  if (/^(회의|미팅)/.test(title) && /(종료|시작|재개|진행)/.test(title)) return true;
+
+  const bullets = card.bullets.map((b) => b.trim()).filter(Boolean);
+  if (bullets.length === 0) return true;
+  if (bullets.every((b) => META_BULLET.test(b) || HOLLOW_BULLET.test(b) || b.length < 6)) return true;
+
+  const norm = (s: string) => s.replace(/[\s.。·]/g, "");
+  if (bullets.length === 1 && (norm(bullets[0]) === norm(title) || norm(bullets[0]).includes(norm(title)))) {
+    if (bullets[0].length <= title.length + 8) return true;
+  }
+  if (bullets.length === 1 && /되었습니다\.?$/.test(bullets[0]) && bullets[0].length < 24) return true;
+  return false;
+}
+
 
 interface ChatChoice {
   message?: {
@@ -87,30 +123,46 @@ interface ChatResponse {
   choices?: ChatChoice[];
 }
 
-export const SYSTEM_PROMPT = `당신은 실시간 한국어 회의를 화면용 MeetingCard로 구조화합니다.
-최근 발언에 실제로 나온 정보만 사용하고, 아래 JSON 스키마를 정확히 따르세요.
+export const SYSTEM_PROMPT = `당신은 실시간 회의 서기입니다. 대화에 실제로 나온 사실·결정·액션만 MeetingCard JSON으로 정리합니다.
 
+스키마 (키 이름 절대 변경 금지):
 {
   "shouldAdvance": boolean,
   "title": string,
   "kicker"?: string,
-  "bullets": string[1..6],
+  "bullets": string[],
   "emphasis"?: string
 }
 
-필드 작성 규칙:
-- title: 현재 안건을 분명하게 요약한 짧은 한국어 제목
-- kicker: 회의 단계나 맥락이 유용할 때만 쓰는 짧은 라벨
-- bullets: 핵심 사실, 논점, 합의 또는 할 일을 1~6개의 간결한 한국어 문장으로 정리
-- emphasis: 결정, 위험 또는 다음 행동 중 특히 강조할 한 줄이 있을 때만 작성
-- 선택 필드는 근거가 없으면 키 자체를 생략
+## shouldAdvance=true 조건
+원문에 구체 정보(결정/액션/수치/담당/기한/리스크)가 있고 아래 중 하나일 때만 true:
+1) 주제가 바뀜  2) 다음 안건으로 명시 전환  3) 결론 후 새 논의 시작
+부연·동의·한두 문장·주제 불명이면 false.
 
-shouldAdvance 판단 규칙:
-- 완전히 다른 안건으로 넘어가거나, 이전 논의를 맺고 새 논의를 시작하면 true
-- 같은 안건의 보충 설명, 화자 교체, 세부 질문은 false
-- 확신이 없으면 false
+## 절대 금지 → shouldAdvance=false, title="", bullets=[]
+- 회의 메타: 시작/종료/휴식/재개/녹음/테스트/연결 (예: "회의 종료", "회의 시작")
+- 인사·잡담·리액션만 ("안녕하세요", "네", "들리나요")
+- 앱/버튼/프롬프트/에러 등 도구 이야기
+- 원문에 없는 창작, 상투적 마무리, 제목 반복 불릿
+- 공허 서술: "~되었습니다", "논의를 진행합니다"
 
-반드시 유효한 JSON 객체만 출력하세요. 마크다운, 설명, 사고 과정, 추가 키는 금지합니다.`;
+나쁜 예 (절대 출력 금지):
+{"shouldAdvance":true,"title":"회의 종료","bullets":["회의가 종료되었습니다."]}
+{"shouldAdvance":true,"title":"인사","bullets":["안녕하세요"]}
+{"shouldAdvance":true,"title":"논의 진행","bullets":["논의를 진행합니다"]}
+
+## 카드 작성 (shouldAdvance=true일 때만)
+- title: 8~18자 명사구. 동사 종결·감탄·메타 제목 금지.
+- bullets: 1~4개, 각 18~40자. 결정/액션/수치/담당/기한/리스크만.
+- kicker?: 2~8자 안건 분류
+- emphasis?: "결정: "|"액션: "|"리스크: "로 시작
+shouldAdvance=false면 반드시 {"shouldAdvance":false,"title":"","bullets":[]}.
+JSON 객체 하나만. 코드펜스·설명 금지.
+
+좋은 예:
+{"shouldAdvance":true,"title":"베타 배포 일정","kicker":"일정","bullets":["금요일 베타 배포로 확정","QA 마감 수요일 18시","릴리스 노트 민수 담당"],"emphasis":"결정: 금요일 베타 배포"}
+{"shouldAdvance":false,"title":"","bullets":[]}
+`;
 
 export const DECK_PLANNER_SYSTEM_PROMPT = `당신은 전체 한국어 회의 전사와 실시간 슬라이드 앵커를 바탕으로 발표용 DeckOutline을 설계합니다.
 모델은 HTML/CSS/마크다운을 절대 출력하지 않고 아래 JSON 객체만 출력합니다.
