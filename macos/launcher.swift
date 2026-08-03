@@ -1,20 +1,32 @@
-// ============================================================
-// launcher.swift — Meeting Slides 네이티브 macOS 런처
-// ============================================================
-// 스크립트 번들로는 TCC(마이크 권한)의 주체가 될 수 없다:
-// macOS는 Mach-O 네이티브 바이너리 + 번들 조합만 "앱"으로 인정한다.
-// 그래서 이 런처가 직접 AVFoundation으로 권한을 요청해
-// 프롬프트에 "Meeting Slides"가 뜨게 하고, 그 다음 서버를 실행한다.
+// Meeting Slides webapp launcher: mic TCC + bun server + default browser.
+// UI is http://localhost browser webapp.
 
 import AVFoundation
 import AppKit
 import Foundation
 
-let bundlePath = Bundle.main.bundlePath
-let projectDir = (bundlePath as NSString).deletingLastPathComponent
+let bundleURL = Bundle.main.bundleURL
+let resourcesURL = Bundle.main.resourceURL
 
 func log(_ s: String) {
     FileHandle.standardOutput.write((s + "\n").data(using: .utf8)!)
+    // 사용자 로그 디렉터리에도 남긴다.
+    let dir = (NSHomeDirectory() as NSString).appendingPathComponent("Library/Logs/Meeting Slices")
+        .replacingOccurrences(of: "Meeting Slices", with: "Meeting Slides")
+    try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+    let path = (dir as NSString).appendingPathComponent("launcher.log")
+    let line = "\(ISO8601DateFormatter().string(from: Date()))  \(s)\n"
+    if let data = line.data(using: .utf8) {
+        if FileManager.default.fileExists(atPath: path) {
+            if let handle = FileHandle(forWritingAtPath: path) {
+                handle.seekToEndOfFile()
+                handle.write(data)
+                try? handle.close()
+            }
+        } else {
+            try? data.write(to: URL(fileURLWithPath: path))
+        }
+    }
 }
 
 func findBun() -> String? {
@@ -30,7 +42,7 @@ func findBun() -> String? {
     which.arguments = ["which", "bun"]
     let pipe = Pipe()
     which.standardOutput = pipe
-    which.standardError = Pipe()
+    which.standardError = FileHandle.nullDevice
     try? which.run()
     which.waitUntilExit()
     let out = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
@@ -38,7 +50,22 @@ func findBun() -> String? {
     return (out?.isEmpty == false) ? out : nil
 }
 
-/// 번들 주체로 마이크 권한 요청. 최초 1회만 프롬프트가 뜬다.
+/// 빌드 시 기록한 프로젝트 경로 → 없으면 .app 상위 디렉터리(레거시).
+func resolveProjectDir() -> String {
+    if let resourcesURL {
+        let marker = resourcesURL.appendingPathComponent("project-path.txt")
+        if let text = try? String(contentsOf: marker, encoding: .utf8) {
+            let path = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            var isDir: ObjCBool = false
+            if !path.isEmpty, FileManager.default.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue {
+                return path
+            }
+        }
+    }
+    // 레거시: Meeting Slides.app 이 프로젝트 루트 안에 있을 때
+    return bundleURL.deletingLastPathComponent().path
+}
+
 func requestMicAccess() -> Bool {
     switch AVCaptureDevice.authorizationStatus(for: .audio) {
     case .authorized:
@@ -57,42 +84,95 @@ func requestMicAccess() -> Bool {
     }
 }
 
-// ── 1. 마이크 권한 (앱 이름으로) ──
-let micOK = requestMicAccess()
-let statusMsg = micOK
-    ? "마이크 권한 확인됨"
-    : "⚠️ 마이크 권한 없음 — 시스템 설정에서 Meeting Slides를 켜야 합니다"
-log(statusMsg)
-try? statusMsg.write(toFile: "/tmp/ms-launcher-status.log", atomically: true, encoding: .utf8)
+func readHttpPort(projectDir: String) -> Int {
+    let envFile = (projectDir as NSString).appendingPathComponent(".env")
+    guard let contents = try? String(contentsOfFile: envFile, encoding: .utf8) else { return 8787 }
+    for raw in contents.split(whereSeparator: \.isNewline) {
+        let line = raw.trimmingCharacters(in: .whitespaces)
+        if line.hasPrefix("#") || line.isEmpty { continue }
+        let parts = line.split(separator: "=", maxSplits: 1).map(String.init)
+        guard parts.count == 2, parts[0].trimmingCharacters(in: .whitespaces) == "HTTP_PORT" else { continue }
+        if let port = Int(parts[1].trimmingCharacters(in: .whitespacesAndNewlines)), (1...65535).contains(port) {
+            return port
+        }
+    }
+    return 8787
+}
 
-// ── 2. 서버 실행 ──
+/// 서버 readiness: 웹앱 HTML 시그니처 (WKWebView 아님).
+func waitUntilWebAppReady(port: Int, timeoutSeconds: Double = 30) -> Bool {
+    let url = URL(string: "http://127.0.0.1:\(port)/")!
+    let deadline = Date().addingTimeInterval(timeoutSeconds)
+    while Date() < deadline {
+        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 1.5)
+        req.httpMethod = "GET"
+        let sem = DispatchSemaphore(value: 0)
+        var ok = false
+        let task = URLSession.shared.dataTask(with: req) { data, response, _ in
+            defer { sem.signal() }
+            guard
+                let http = response as? HTTPURLResponse, http.statusCode == 200,
+                let data, let body = String(data: data, encoding: .utf8)
+            else { return }
+            // launcher health: title + runtime-bootstrap
+            ok = body.contains("<title>Meeting Slides") && body.contains("runtime-bootstrap")
+        }
+        task.resume()
+        _ = sem.wait(timeout: .now() + 2)
+        if ok { return true }
+        Thread.sleep(forTimeInterval: 0.25)
+    }
+    return false
+}
+
+// ── 1. 프로젝트 / bun ──
+let projectDir = resolveProjectDir()
+log("프로젝트: \(projectDir)")
+log("모드: 웹앱(브라우저)")
+
 guard let bun = findBun() else {
-    log("bun을 찾을 수 없습니다 — https://bun.sh 에서 설치해주세요")
+    log("bun을 찾을 수 없습니다 — https://bun.sh")
     exit(1)
 }
 
+let port = readHttpPort(projectDir: projectDir)
+let appURL = URL(string: "http://localhost:\(port)/")!
+
+// ── 2. 마이크 권한 (번들 이름 = Meeting Slides) ──
+let micOK = requestMicAccess()
+log(micOK ? "마이크 권한 확인됨" : "⚠️ 마이크 권한 없음 — 시스템 설정에서 Meeting Slides 허용 필요")
+
+// ── 3. 서버 (웹앱). 브라우저 자동 오픈은 런처가 1회만 담당. ──
 let server = Process()
 server.executableURL = URL(fileURLWithPath: bun)
 server.arguments = ["run", "server.ts"]
 server.currentDirectoryURL = URL(fileURLWithPath: projectDir)
 var env = ProcessInfo.processInfo.environment
-if env["OPEN_BROWSER"] == nil { env["OPEN_BROWSER"] = "true" }
+env["OPEN_BROWSER"] = "false" // 서버 쪽 중복 open 방지
+env["HTTP_PORT"] = String(port)
 server.environment = env
 server.standardOutput = FileHandle.standardOutput
 server.standardError = FileHandle.standardError
 
 do {
     try server.run()
+    log("서버 시작 pid=\(server.processIdentifier) port=\(port)")
 } catch {
     log("서버 실행 실패: \(error.localizedDescription)")
     exit(1)
 }
 
-// ── 3. 브라우저 오픈 (서버가 자체 오픈하지만 이중으로 열리지 않게 짧게 대기 후 확인) ──
-Thread.sleep(forTimeInterval: 3.0)
-if let url = URL(string: "http://localhost:8787/") {
-    NSWorkspace.shared.open(url)
+// ── 4. 웹앱 ready 후 기본 브라우저로 오픈 ──
+if waitUntilWebAppReady(port: port) {
+    log("웹앱 ready → 브라우저 오픈 \(appURL.absoluteString)")
+    NSWorkspace.shared.open(appURL)
+} else {
+    log("서버가 \(port)에서 준비되지 않았습니다. 로그를 확인하세요.")
+    server.terminate()
+    exit(1)
 }
 
-// ── 4. 서버 생명주기와 함께 종료 ──
+// ── 5. 서버 생명주기 ──
 server.waitUntilExit()
+log("서버 종료 code=\(server.terminationStatus)")
+exit(server.terminationStatus)
