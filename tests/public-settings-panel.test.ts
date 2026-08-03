@@ -281,7 +281,10 @@ describe("설정 패널 접근성", () => {
     await page.setViewport({ width: 360, height: 720 });
     harness.pushMessage(providers());
     harness.pushMessage(sttModels());
-    await waitForStt("small", "absent");
+    // 이전 테스트가 large-v3-turbo=installed를 남겼을 수 있으므로 새 메시지가 실제로
+    // 반영된 신선한 렌더(모두 absent)까지 기다린다. small은 이전 렌더에서 이미
+    // absent여서 stale 상태로 즉시 resolve될 수 있고, 재렌더링과 포커스 검사가 경쟁한다.
+    await waitForStt("large-v3-turbo", "absent");
     await page.evaluate(() => {
       const panel = document.getElementById("provider-panel");
       if (!(panel?.hidden)) (document.getElementById("btn-settings") as HTMLButtonElement).click();
@@ -308,8 +311,13 @@ describe("설정 패널 접근성", () => {
     expect(fits.triggerVisible).toBe(true);
 
     // 액션 버튼에 키보드 포커스가 닿는다.
-    const focusable = await page.$eval('.stt-row[data-id="small"] .stt-row__install', (button) => {
-      (button as HTMLButtonElement).focus();
+    // page.$eval은 셀렉터 조회와 콜백 실행이 별도 CDP 왕복이라, 그 사이에 대기 중인
+    // sttModels 메시지가 innerHTML을 재렌더하면 캡처된 노드가 detached되어 focus()가
+    // 조용히 무시된다. 조회+포커스+검증을 한 evaluate로 묶어 원자적으로 만든다.
+    const focusable = await page.evaluate(() => {
+      const button = document.querySelector<HTMLButtonElement>('.stt-row[data-id="small"] .stt-row__install');
+      if (!button) return false;
+      button.focus();
       return document.activeElement === button;
     });
     expect(focusable).toBe(true);
