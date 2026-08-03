@@ -230,3 +230,31 @@ describe("MeetingSession", () => {
     expect(slides.every((slide) => slide.index === slides[0].index)).toBe(true);
   });
 });
+
+
+describe("meta card rejection", () => {
+  test("LLM이 회의 종료 카드를 내도 스테이지에 올리지 않는다", async () => {
+    const harness = makeSession({
+      detectBlock: async () => ({
+        shouldAdvance: true,
+        title: "회의 종료",
+        bullets: ["회의가 종료되었습니다."],
+      }),
+    });
+    await addAndDetect(harness, "회의를 종료합니다");
+    expect(harness.session.snapshot().current).toBeNull();
+  });
+
+  test("fallback 경로의 메타성 문장도 슬라이드를 만들지 않는다", async () => {
+    const harness = makeSession({
+      detectBlock: async () => {
+        throw new Error("boom");
+      },
+    });
+    await addAndDetect(harness, "회의를 종료합니다");
+    await addAndDetect(harness, "회의가 종료되었습니다");
+    await addAndDetect(harness, "수고하셨습니다");
+    const current = harness.session.snapshot().current;
+    expect(current).toBeNull();
+  });
+});

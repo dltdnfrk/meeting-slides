@@ -4,7 +4,7 @@
 // 전사 청크를 누적하고, 주기적으로 LLM에 블록 감지를 요청한다.
 // 블록 전환 감지 시 WebSocket 클라이언트에 슬라이드 push.
 
-import type { BlockDetectionResult, BlockDetector } from "./llm.js";
+import { isLowQualityMeetingCard, type BlockDetectionResult, type BlockDetector } from "./llm.js";
 import type { LiveMeetingCard } from "./slide-spec.js";
 import type { TranscriptChunk } from "./whisper.js";
 
@@ -139,7 +139,7 @@ interface TopicRule {
 
 const TOPIC_RULES: readonly TopicRule[] = [
   { title: "고객 피드백", pattern: /고객|피드백|온보딩|가입|사용자|의견/ },
-  { title: "출시 일정", pattern: /출시|일정|배포|베타|QA|큐에이|월요일|화요일|마무리/ },
+  { title: "출시 일정", pattern: /출시|일정|배포|베타|QA|큐에이|월요일|화요일/ },
   { title: "액션 아이템", pattern: /담당자|작업 목록|공유|할 일|액션|마지막/ },
 ];
 
@@ -330,13 +330,28 @@ export class MeetingSession {
     const shouldAdvance = this.currentSlide === null
       || (this.currentSlide.title !== title && TOPIC_SHIFT_PATTERN.test(joined));
 
-    return { shouldAdvance, title, kicker: "로컬 회의 요약", bullets };
+    const card = { title, bullets, kicker: "로컬 회의 요약" as const };
+    if (isLowQualityMeetingCard(card)) {
+      return { shouldAdvance: false, title: "", bullets: [] };
+    }
+    return { shouldAdvance, ...card };
   }
 
   private applyDetection(result: BlockDetectionResult): void {
     // 빈 내부 no-op 결과(문장 없음)는 슬라이드를 만들지 않는다.
     const isEmpty = result.bullets.length === 0 && !result.title;
     if (isEmpty) {
+      this.advanceStreak = 0;
+      this.pendingAdvanceTitle = null;
+      return;
+    }
+    // LLM/fallback 모두 메타·공허 카드는 스테이지에 올리지 않는다.
+    if (result.title && isLowQualityMeetingCard({
+      title: result.title,
+      bullets: result.bullets,
+      ...(result.kicker === undefined ? {} : { kicker: result.kicker }),
+      ...(result.emphasis === undefined ? {} : { emphasis: result.emphasis }),
+    })) {
       this.advanceStreak = 0;
       this.pendingAdvanceTitle = null;
       return;
