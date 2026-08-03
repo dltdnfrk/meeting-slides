@@ -100,3 +100,21 @@ describe("parseBlockDetectionJson", () => {
     })).toBe(false);
   });
 });
+
+  test("kind 필드를 파싱해 카드에 실어 보낸다", () => {
+    const result = parseBlockDetectionJson(JSON.stringify({
+      shouldAdvance: true,
+      title: "베타 배포 일정",
+      bullets: ["금요일 베타 배포로 확정", "QA 마감 수요일 18시"],
+      emphasis: "결정: 금요일 베타 배포",
+      kind: "decision",
+    }));
+    expect(result.shouldAdvance).toBe(true);
+    expect(result.kind).toBe("decision");
+  });
+
+  test("SYSTEM_PROMPT는 kind 스키마를 포함한다", () => {
+    expect(SYSTEM_PROMPT).toContain('"kind"?');
+    expect(SYSTEM_PROMPT).toContain("decision");
+  });
+

@@ -386,6 +386,7 @@ export class MeetingSession {
       this.currentSlide = {
         index: this.slideIndex,
         title: result.title || `(블록 ${this.slideIndex})`,
+        ...(result.kind === undefined ? {} : { kind: result.kind }),
         ...(result.kicker === undefined ? {} : { kicker: result.kicker }),
         bullets: result.bullets,
         ...(result.emphasis === undefined ? {} : { emphasis: result.emphasis }),
@@ -410,6 +411,7 @@ export class MeetingSession {
       const cardChanged = result.title !== current.title
         || result.kicker !== current.kicker
         || result.emphasis !== current.emphasis
+        || result.kind !== current.kind
         || bulletsChanged;
       if (cardChanged) {
         current.title = result.title || current.title;
@@ -418,6 +420,8 @@ export class MeetingSession {
         else current.kicker = result.kicker;
         if (result.emphasis === undefined) delete current.emphasis;
         else current.emphasis = result.emphasis;
+        if (result.kind === undefined) delete current.kind;
+        else current.kind = result.kind;
         current.sentenceCount = this.sentences.length;
         try {
           this.sink?.onSlide(current);

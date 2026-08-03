@@ -131,8 +131,15 @@ function inferLiveKind(slide) {
   return "topic";
 }
 
+function resolveLiveKind(slide) {
+  const allowed = new Set(["cover", "section", "topic", "decision", "actions", "summary"]);
+  const raw = typeof slide.kind === "string" ? slide.kind.trim().toLowerCase() : "";
+  if (allowed.has(raw)) return raw;
+  return inferLiveKind(slide);
+}
+
 function slideHtml(slide) {
-  const kind = inferLiveKind(slide);
+  const kind = resolveLiveKind(slide);
   const kicker = typeof slide.kicker === "string" ? slide.kicker.trim() : "";
   const emphasis = typeof slide.emphasis === "string" ? slide.emphasis.trim() : "";
   const title = escapeHtml(slide.title ?? "");

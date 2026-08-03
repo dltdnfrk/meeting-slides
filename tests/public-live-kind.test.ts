@@ -96,3 +96,18 @@ describe("live multi-kind design", () => {
     expect(await page.$(".slide__actions")).not.toBeNull();
   });
 });
+
+  test("LLM kind가 휴리스틱보다 우선한다", async () => {
+    // emphasis/kicker 없이도 kind=summary 지정 시 summary 레이아웃
+    await pushSlide(page, {
+      title: "오늘 논의 요약",
+      bullets: ["일정 합의", "예산 보류", "채용 보류"],
+      kind: "summary",
+    });
+    const kind = await page.evaluate(() =>
+      document.querySelector(".slide__inner")?.getAttribute("data-live-kind")
+    );
+    expect(kind).toBe("summary");
+    expect(await page.$(".slide__inner--summary")).not.toBeNull();
+  });
+

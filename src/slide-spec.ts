@@ -6,11 +6,30 @@ export const MAX_ACTIONS = 8;
 export const MAX_SLIDES = 60;
 export const MAX_STYLE_LENGTH = 80;
 
+export type LiveMeetingCardKind =
+  | "cover"
+  | "section"
+  | "topic"
+  | "decision"
+  | "actions"
+  | "summary";
+
+export const LIVE_MEETING_CARD_KINDS = [
+  "cover",
+  "section",
+  "topic",
+  "decision",
+  "actions",
+  "summary",
+] as const satisfies readonly LiveMeetingCardKind[];
+
 export interface LiveMeetingCard {
   title: string;
   kicker?: string;
   bullets: string[];
   emphasis?: string;
+  /** 라이브 무대 레이아웃. 없으면 UI가 내용으로 추론한다. */
+  kind?: LiveMeetingCardKind;
 }
 
 export type SlideKind = "cover" | "section" | "summary" | "decision" | "actions" | "closing";
@@ -224,12 +243,21 @@ export function assertDeckOutline(value: unknown): asserts value is DeckOutline 
 
 export function parseLiveMeetingCard(value: unknown): LiveMeetingCard {
   const card = objectAt(parseJsonRoot(value, "card"), "card");
-  exactKeys(card, ["title", "kicker", "bullets", "emphasis"], "card");
+  exactKeys(card, ["title", "kicker", "bullets", "emphasis", "kind"], "card");
+  const kindRaw = card.kind;
+  let kind: LiveMeetingCardKind | undefined;
+  if (kindRaw !== undefined) {
+    if (typeof kindRaw !== "string" || !(LIVE_MEETING_CARD_KINDS as readonly string[]).includes(kindRaw)) {
+      throw new TypeError(`card.kind must be one of ${LIVE_MEETING_CARD_KINDS.join("|")}`);
+    }
+    kind = kindRaw as LiveMeetingCardKind;
+  }
   return {
     title: textAt(card.title, "card.title", MAX_TITLE_LENGTH),
     ...(card.kicker === undefined ? {} : { kicker: textAt(card.kicker, "card.kicker", MAX_SHORT_TEXT_LENGTH) }),
     bullets: stringsAt(card.bullets, "card.bullets", 0),
     ...(card.emphasis === undefined ? {} : { emphasis: textAt(card.emphasis, "card.emphasis", MAX_SHORT_TEXT_LENGTH) }),
+    ...(kind === undefined ? {} : { kind }),
   };
 }
 

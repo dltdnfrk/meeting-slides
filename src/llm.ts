@@ -64,7 +64,7 @@ export function parseBlockDetectionJson(content: string): BlockDetectionResult {
     delete value.isNewBlock;
   }
 
-  const allowed = new Set(["shouldAdvance", "title", "kicker", "bullets", "emphasis"]);
+  const allowed = new Set(["shouldAdvance", "title", "kicker", "bullets", "emphasis", "kind"]);
   const unknown = Object.keys(value).find((key) => !allowed.has(key));
   if (unknown) throw new TypeError(`detection.${unknown} is not allowed`);
   if (typeof value.shouldAdvance !== "boolean") {
@@ -80,6 +80,7 @@ export function parseBlockDetectionJson(content: string): BlockDetectionResult {
     bullets: value.bullets,
     kicker: value.kicker,
     emphasis: value.emphasis,
+    kind: value.kind,
   });
 
   if (isLowQualityMeetingCard(card)) {
@@ -136,7 +137,8 @@ export const SYSTEM_PROMPT = `당신은 실시간 회의 서기입니다. 대화
   "title": string,
   "kicker"?: string,
   "bullets": string[],
-  "emphasis"?: string
+  "emphasis"?: string,
+  "kind"?: "cover" | "section" | "topic" | "decision" | "actions" | "summary"
 }
 
 ## shouldAdvance=true 조건
@@ -157,6 +159,17 @@ export const SYSTEM_PROMPT = `당신은 실시간 회의 서기입니다. 대화
 {"shouldAdvance":true,"title":"논의 진행","bullets":["논의를 진행합니다"]}
 
 ## 카드 작성 (shouldAdvance=true일 때만)
+
+## kind (shouldAdvance=true일 때 권장)
+라이브 무대가 바로 쓰는 레이아웃. 내용에 맞게 하나만 고른다:
+- cover: 오프닝·아젠다 소개
+- section: 큰 구간 전환(불릿 거의 없음)
+- topic: 일반 논의(기본)
+- decision: 합의/확정 핵심 (emphasis는 "결정: "으로)
+- actions: 담당·기한·할 일
+- summary: 여러 포인트 묶음 정리
+불명확하면 topic.
+
 - title: 8~18자 명사구. 동사 종결·감탄·메타 제목 금지.
 - bullets: 1~4개, 각 18~40자. 결정/액션/수치/담당/기한/리스크만.
 - kicker?: 2~8자 안건 분류
@@ -165,7 +178,7 @@ shouldAdvance=false면 반드시 {"shouldAdvance":false,"title":"","bullets":[]}
 JSON 객체 하나만. 코드펜스·설명 금지.
 
 좋은 예:
-{"shouldAdvance":true,"title":"베타 배포 일정","kicker":"일정","bullets":["금요일 베타 배포로 확정","QA 마감 수요일 18시","릴리스 노트 민수 담당"],"emphasis":"결정: 금요일 베타 배포"}
+{"shouldAdvance":true,"title":"베타 배포 일정","kicker":"일정","bullets":["금요일 베타 배포로 확정","QA 마감 수요일 18시","릴리스 노트 민수 담당"],"emphasis":"결정: 금요일 베타 배포","kind":"decision"}
 {"shouldAdvance":false,"title":"","bullets":[]}
 `;
 
