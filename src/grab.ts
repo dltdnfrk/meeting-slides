@@ -72,7 +72,7 @@ Confidence: ${confidence}
 ${evidenceLine(input.previewFiles)}
 
 - [x] System consistency: PASS — reveal 덱과 동일 테마/레이아웃 체계 공유
-- [x] Color discipline: PASS — 단일 액센트(#10b981) 외 색상 남용 없음
+- [x] Color discipline: PASS — 종이·잉크·코랄·블루 역할 토큰만 사용
 - [x] AI slop tropes: PASS — 장식 배지·이모지 헤더·굵기 남발 없음
 - [x] Content discipline: PASS — 전사 원문(${input.lineCount}문장) 기반 요약만 사용
 ${note}
