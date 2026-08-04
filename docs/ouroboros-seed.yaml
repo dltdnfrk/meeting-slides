@@ -1,0 +1,181 @@
+# Ouroboros Seed — meeting-slides
+#
+# seed_id:      seed_071561354244
+# interview_id: interview_20260801_055926
+# generated_at: 2026-08-01
+# spec:         docs/PRODUCT_SPEC.md (사람이 읽는 명세서, 이 Seed를 부록 A에 포함)
+#
+# 이 파일은 인터뷰로 확정된 요구사항의 불변 스냅샷이다. 편집하지 않는다.
+# 요구사항이 바뀌면 인터뷰를 이어서 새 Seed를 생성한다.
+# 인터뷰 상태 원본: ~/.ouroboros/data/interview_interview_20260801_055926.json
+
+goal: From a real-time meeting session, generate a report-quality meeting minutes
+  PDF and a CRM-ready structured data bundle through an AI-propose / human-confirm
+  review workflow, eliminating post-meeting minute-writing labor to a few minutes
+  of candidate review.
+task_type: code
+brownfield_context:
+  project_type: brownfield
+  context_references:
+  - path: /Users/hyunjun/Documents/MUNI/meeting-slides
+    role: primary
+    summary: Existing Meeting Slides codebase with Bun runtime, whisper.cpp real-time
+      transcription with tinydiarize turn markers, LLM topic-block detection with
+      hysteresis, WebSocket push to browser, reveal.js slide deck and standalone HTML
+      export, shared theme stylesheet, and LLM-failure local-rule-based fallback
+  existing_patterns:
+  - LLM extraction with local rule-based fallback on LLM failure
+  - WebSocket push to browser for real-time subtitle and slide updates
+  - Hysteresis-based topic block transition requiring two consecutive LLM judgments
+  - Shared theme stylesheet for standalone document rendering
+  - Origin-checked WebSocket upgrade on localhost-only binding
+  - 200ms debounced subtitle display
+  - reveal.js deck HTML and standalone slide file export with co-located theme CSS
+  existing_dependencies:
+  - Bun
+  - whisper.cpp with tinydiarize
+  - reveal.js
+  - WebSocket
+  - Shared theme stylesheet
+constraints:
+- Runtime is Bun; local web app binding localhost only with Origin-checked WebSocket
+- Each extracted item (decision, action item, open issue) must reference its source
+  transcript segment; items without a verifiable source segment are never generated
+- No real-time speaker labeling; all attribution is post-meeting review via dropdown
+  from pre-registered attendee list
+- Speaker attribution scope is item-level (decisions and action items), not utterance-level;
+  data model must accommodate future utterance-level extension without schema migration
+- Meeting Slides never writes to CRM database; handoff is an exportable bundle ingested
+  through CRM's existing upload pipeline
+- Transcript is canonical once generated; downstream consumers (including CRM) must
+  not re-transcribe when a canonical transcript is present in the bundle
+- No email sending, no shared code library with CRM, no direct CRM integration API,
+  no real-time labeling buttons in initial scope
+- Commercial-grade robustness, data integrity, security, privacy, failure handling,
+  UX, and performance; no multi-tenancy, billing, or marketing features
+- Slide deck (landscape, real-time presentation) and meeting minutes (portrait, post-meeting
+  document) are sibling artifacts from the same session data — never merged into one
+acceptance_criteria:
+- description: User registers attendees at meeting start from a known set; attendee
+    list populates meeting metadata and constrains all subsequent speaker-attribution
+    selections to a closed candidate set
+  semantic_ac_key: ac_3fc90ec2184992de
+- description: At meeting end, a review screen presents LLM-extracted decision, action-item,
+    and open-item candidates each linked to its source transcript segment; user confirms,
+    edits, assigns attendees via dropdown, and finalizes within minutes
+  semantic_ac_key: ac_2939e14bffab74b0
+- description: After review confirmation, a portrait-layout meeting minutes PDF is
+    generated where the first page is self-contained with all decisions and action
+    items; discussion summary, speaker attributions, referenced materials, and transcript
+    appendix follow on subsequent pages
+  semantic_ac_key: ac_90e049b42573fcc3
+- description: An atomic meeting bundle is exported containing the minutes PDF, a
+    structured JSON file (attendee identifiers, decisions, action items with assignee
+    and deadline, open items, and source transcript coordinate references), and the
+    raw canonical transcript; the JSON is consumable by CRM's upload-based ingest
+    pipeline without re-transcription
+  semantic_ac_key: ac_17d4aaae6ebbea50
+ontology_schema:
+  name: MeetingSession
+  description: A meeting session from attendee registration through real-time transcription
+    to post-meeting review confirmation and artifact export
+  fields:
+  - name: session_id
+    type: string
+    description: Unique meeting session identifier
+    required: true
+  - name: meeting_date
+    type: string
+    description: ISO 8601 datetime of the meeting
+    required: true
+  - name: attendees
+    type: array
+    description: Registered attendees with display name and optional CRM person entity
+      ID
+    required: true
+  - name: purpose
+    type: string
+    description: Meeting purpose and agenda items
+    required: true
+  - name: duration_seconds
+    type: number
+    description: Total meeting duration in seconds
+    required: true
+  - name: transcript
+    type: object
+    description: Canonical transcription containing timestamped segments with speaker-turn
+      markers
+    required: true
+  - name: decisions
+    type: array
+    description: Confirmed decision items each with description, source segment reference,
+      and attribution
+    required: true
+  - name: action_items
+    type: array
+    description: Confirmed action items each with description, assignee attendee reference,
+      deadline, and source segment reference
+    required: true
+  - name: open_items
+    type: array
+    description: Unresolved items carried to next meeting with description and source
+      segment reference
+    required: true
+  - name: referenced_materials
+    type: array
+    description: Documents, figures, links, or data mentioned during the meeting
+    required: true
+  - name: review_status
+    type: string
+    description: Review workflow state — draft or confirmed
+    required: true
+  - name: artifacts
+    type: object
+    description: Generated output paths for PDF, JSON, transcript, and slide deck
+    required: true
+evaluation_principles:
+- name: source_traceability
+  description: Every extracted decision, action item, and open item links to a specific
+    transcript segment; items without verifiable provenance are excluded
+  weight: 0.3
+- name: review_efficiency
+  description: Post-meeting review reduces minute-writing labor to a few minutes of
+    candidate confirmation, not manual reconstruction
+  weight: 0.25
+- name: first_page_completeness
+  description: PDF first page contains all decisions and action items without requiring
+    the reader to turn pages for the executive summary
+  weight: 0.2
+- name: crm_interoperability
+  description: JSON bundle is directly consumable by CRM ingest pipeline with attendee
+    identifiers and canonical transcript coordinates
+  weight: 0.15
+- name: attribution_accuracy
+  description: Item-level speaker and assignee attribution is correct after human
+    review against the closed attendee set
+  weight: 0.1
+exit_conditions:
+- name: meeting_concluded
+  description: All review and generation steps are complete
+  criteria: Review status is confirmed, minutes PDF and structured JSON and canonical
+    transcript all exist, every extracted item has a source segment reference, and
+    the slide deck is preserved as a sibling artifact
+- name: bundle_exportable
+  description: Meeting bundle is ready for external consumption or CRM upload
+  criteria: PDF, JSON, and canonical transcript are co-located in a single atomic
+    bundle directory
+- name: review_cancelled
+  description: User abandons review without confirming
+  criteria: Extracted candidates and transcript are preserved for later review but
+    no final minutes PDF or JSON is generated; session is not marked concluded
+metadata:
+  seed_id: seed_071561354244
+  version: 1.0.0
+  created_at: '2026-08-01T07:03:09.286760Z'
+  ambiguity_score: 0.147
+  interview_id: interview_20260801_055926
+  parent_seed_id: null
+  generation_mode: normal
+  degraded: false
+  unresolved_slots: []
+  recovery_reason: null
