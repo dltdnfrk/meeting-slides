@@ -27,7 +27,7 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   /* 사이드 패널 면: 중앙 히어로가 떠 보이도록 한 단계 누른 바탕 */
-  --pane-surface: rgba(9, 9, 11, 0.5);
+  --pane-surface: rgba(16, 16, 18, 0.78);
   --rule: 1px solid rgba(255, 255, 255, 0.06);
   --rule-strong: 1px solid rgba(255, 255, 255, 0.09);
 }
@@ -67,10 +67,10 @@
   border-bottom: var(--rule);
 }
 .pane__title {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--z500);
 }
 .pane__count {
@@ -146,7 +146,7 @@
   color: var(--z500);
 }
 .session-row__status { white-space: nowrap; }
-.session-row__status--open { color: var(--live); }
+.session-row__status--open { color: #f0a59c; }
 
 /* ── 도킹된 전사 카드: 라이브 전사의 1차 거처 ── */
 /* 기본은 패널을 가득 채운다. S/SW 그립으로 높이를 잡으면
