@@ -58,9 +58,19 @@
       </div>
 
       <div class="topbar__center">
+        <button id="btn-attendees" class="attendee-btn" type="button" title="참석자 지정" aria-label="참석자 지정" aria-expanded="false" aria-controls="attendee-panel">
+          <span class="attendee-btn__icon" aria-hidden="true">◇</span>
+          <span class="attendee-btn__label">참석자</span>
+          <span class="attendee-btn__count" id="attendee-count" hidden>0</span>
+        </button>
         <button id="btn-record" class="record-btn" type="button" aria-label="녹음 시작">
           <span class="record-btn__dot" aria-hidden="true"></span>
           <span class="record-btn__label">녹음 시작</span>
+        </button>
+        <button id="btn-review" class="review-btn" type="button" title="회의록 검토" aria-label="회의록 검토" aria-expanded="false" aria-controls="review-panel" hidden>
+          <span class="review-btn__icon" aria-hidden="true">◈</span>
+          <span class="review-btn__label">검토</span>
+          <span class="review-btn__count" id="review-count" hidden>0</span>
         </button>
       </div>
 
@@ -104,6 +114,28 @@
         <div class="stt-list" id="stt-list" aria-live="polite"></div>
         <p class="provider-panel__hint" id="stt-hint">모델을 내려받아 선택하면 다음 녹음부터 적용됩니다</p>
       </section>
+    </div>
+
+    <!-- ── 참석자 지정 패널 (캡처 전 준비) ───────── -->
+    <div class="attendee-panel" id="attendee-panel" role="dialog" aria-label="참석자 지정" hidden>
+      <div class="attendee-panel__head">참석자 명단</div>
+      <form class="attendee-form" id="attendee-form" autocomplete="off">
+        <label class="attendee-form__row">
+          <span class="attendee-form__label">이름</span>
+          <input id="attendee-name" class="attendee-form__input" type="text" maxlength="120" placeholder="김현준" aria-describedby="attendee-error">
+        </label>
+        <label class="attendee-form__row">
+          <span class="attendee-form__label">CRM ID</span>
+          <input id="attendee-crm" class="attendee-form__input" type="text" maxlength="120" placeholder="선택 입력">
+        </label>
+        <button id="btn-attendee-add" class="attendee-form__add" type="submit">＋ 명단에 추가</button>
+      </form>
+      <p class="attendee-panel__error" id="attendee-error" role="alert" hidden></p>
+      <div class="attendee-list" id="attendee-list">
+        <p class="attendee-list__empty">아직 참석자가 없습니다</p>
+      </div>
+      <button id="btn-attendee-save" class="attendee-panel__save" type="button">참석자 저장</button>
+      <p class="attendee-panel__hint">녹음 시작 전에 지정하면 회의록 화자·담당자 후보로 쓰입니다 (선택 사항)</p>
     </div>
 
     <!-- ── 글랜서블 상태 스트립 (진행 과정 한눈에) ── -->
@@ -240,8 +272,32 @@
     </div>
   </div>
 
+  <div class="review-panel" id="review-panel" role="dialog" aria-modal="false" aria-label="회의록 후보 검토" aria-busy="false" data-state="idle" hidden>
+    <div class="review-panel__head">
+      <span class="review-panel__title">회의록 후보 검토</span>
+      <span class="review-panel__version" id="review-version"></span>
+      <button id="btn-review-close" class="icon-btn icon-btn--sm" type="button" title="검토 닫기" aria-label="검토 닫기">✕</button>
+    </div>
+    <p class="review-panel__notice" id="review-attendee-notice" hidden></p>
+    <p class="review-panel__error" id="review-error" role="alert" hidden></p>
+    <div class="review-loading" id="review-loading" hidden>
+      <span class="review-loading__ring" aria-hidden="true"></span>
+      <span class="review-loading__text">전사에서 결정·액션·미결 후보를 추출하는 중…</span>
+    </div>
+    <div class="review-list" id="review-list" role="list"></div>
+    <div class="review-panel__foot">
+      <button id="btn-review-retry" class="review-panel__retry" type="button" hidden>↻ 추출 재시도</button>
+      <span class="review-panel__hint">확정하면 이 후보들이 회의록 정본이 됩니다</span>
+      <button id="btn-review-confirm" class="review-panel__confirm" type="button" disabled>
+        검토 확정 <span class="review-panel__confirm-count" id="review-confirm-count">0</span>
+      </button>
+    </div>
+  </div>
+
   <script src="/workspace-split.js"></script>
   <script src="/transcript-resize.js"></script>
+  <script src="/review-panel-render.js"></script>
+  <script src="/review-panel.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

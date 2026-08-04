@@ -1,0 +1,19 @@
+{
+  "task": 8,
+  "base_commit": "b12706c2b1099f315f19c6bf528880789be18bbe",
+  "target_commit": "524292a3a23584bacf6787ccfce3e318293b0e47",
+  "target_subject": "feat(public): add review-panel overlay with attendee dropdown attribution",
+  "verified_by": "hephaestus / st_019fbe5a / gpt-5.6-sol",
+  "verified_at": "2026-08-01T17:25:46Z",
+  "gates": {
+    "focused_public_review": "32 pass, 0 fail",
+    "full_bun_test": "195 pass, 0 fail",
+    "tsc_no_emit": "pass",
+    "git_diff_check": "pass",
+    "real_chromium_dom_qa": "pass",
+    "adversarial_payload_probes": "pass"
+  },
+  "main_worktree_preserved": true,
+  "source_blob": "ea8ccf9c3969387bb3af6dc708940e37bd42b066",
+  "test_blob": "334bf122ed7358bab0a23f94bcd6f80331f741cb"
+}

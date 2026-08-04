@@ -1,0 +1,34 @@
+{
+  "task_id": "st_019fbe30",
+  "task": "T7 startReview WS extraction and version-scoped review broadcast",
+  "status": "DONE",
+  "target_commit": "b12706c2b1099f315f19c6bf528880789be18bbe",
+  "commit_subject": "feat(server): add startReview action running extraction to version-scoped review payload",
+  "verified_by": "senpi-task-st_019fbe30",
+  "verified_at": "2026-08-01T16:46:22Z",
+  "claims": {
+    "implementation": "startReview accepts no meeting/transcript identity from the client, requires a stopped and ended current meeting, extracts the canonical finalized transcript with persisted attendees, broadcasts a self-contained review payload, and keeps unconfirmed candidates in memory only.",
+    "lifecycle_and_scoping": "No-current, prepared, capturing, and no-canonical failures are requester-scoped; capture remains active on rejected startReview; successful reviews broadcast to all connected clients without duplicate concurrent extraction.",
+    "fallback_and_repeat": "MinutesExtractor local fallback is broadcast after forced LLM transport failure; concurrent and repeated requests share one stable version-scoped review and one extractor call.",
+    "persistence": "Real SQLite checks report zero rows in meeting_reviews, decisions, action_items, and open_items before confirmation.",
+    "verification": "Focused 4/4; full bun test 194/194; tsc exit 0; git diff --check exit 0; LSP 0 errors/warnings on all changed files; real Bun WS/SQLite adversarial driver exit 0.",
+    "scope": "Commit contains only server.ts, src/start-review.ts, tests/start-review.test.ts, and tests/start-review-action.test.ts. Existing unrelated worktree changes and evidence were not staged or modified."
+  },
+  "evidence_refs": [
+    "01-red-proof.txt",
+    "02-focused-green.txt",
+    "03-full-suite.txt",
+    "04-real-ws-adversarial.txt",
+    "05-tsc.txt",
+    "06-diff-check.txt",
+    "07-lsp-diagnostics.txt",
+    "real-ws-driver.ts",
+    "lsp-diagnostics.py",
+    "final-receipt.txt"
+  ],
+  "main_repository_fingerprint": {
+    "head": "921a01513593c0e10181cf01e535a7abe995deb3",
+    "status_sha256": "bbb59d8dfa97579799c653bdd683ae1b69097ae582588856f7dd00ea31a6403f",
+    "diff_sha256": "bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9"
+  }
+}

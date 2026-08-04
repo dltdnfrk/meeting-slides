@@ -1,0 +1,15 @@
+$ bun test tests/start-review.test.ts tests/start-review-action.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/start-review.test.ts:
+(pass) startReview > extracts canonical version lines, persists the exact candidate IDs, and returns a self-contained review payload [5.24ms]
+(pass) startReview > creates an empty version-scoped review for an empty canonical transcript [2.76ms]
+(pass) startReview > rejects extraction failures and wrong-version results without persisting a review [3.67ms]
+
+tests/start-review-action.test.ts:
+(pass) startReview is ended-only, requester-scoped, and single-flight for one canonical version [1632.01ms]
+
+ 4 pass
+ 0 fail
+ 25 expect() calls
+Ran 4 tests across 2 files. [2.09s]

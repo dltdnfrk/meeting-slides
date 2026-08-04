@@ -1,0 +1,17 @@
+COMMAND: pure-LOC and scope scan
+235 pure / 266 total  public/review-panel.js  PASS
+145 pure / 153 total  public/review-panel-render.js  PASS
+145 pure / 166 total  src/transcript-versioning.ts  PASS
+143 pure / 154 total  src/audio-recorder.ts  PASS
+
+CHANGED PRODUCT/TEST PATHS:
+ M public/index.html
+ M public/review-panel.js
+ M src/transcript-versioning.ts
+ M tests/public-review.test.ts
+?? public/review-panel-render.js
+?? src/audio-recorder.ts
+
+DIFF CHECK:
+
+FORBIDDEN PLAN/LEDGER/TODO CHANGES:

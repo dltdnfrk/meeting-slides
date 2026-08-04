@@ -1,0 +1,15 @@
+VERIFIED_HEAD: 17d09149bc5248652573142bc6e9ebd2eafcc8fd
+VERIFIED_TREE: 8a05e212c358d094fe78a5f66b4f7739f97a704c
+PRODUCT_DIFF_6711_TO_HEAD: PASS
+STRICT_TYPESCRIPT: exit 0
+BROWSER_CHECKJS: exit 0
+WORKTREE_DIFF_CHECK: exit 0
+BASELINE_RANGE_DIFF_CHECK: exit 0
+BASELINE_ANCESTRY: exit 0
+PROHIBITED_SCOPE_SCAN:
+src/minutes-store-meetings.ts:126:      INSERT INTO attendees (meeting_id, attendee_id, display_name, crm_person_entity_id, sort_order, created_at)
+SCOPE_INTERPRETATION: sole attendees.crm_person_entity_id local-column hit is explicitly allowed by D5 and is not a CRM database write.
+MAIN_HEAD: 921a01513593c0e10181cf01e535a7abe995deb3
+MAIN_STATUS_SHA256: fd8f369e099117cde16599f3059feaacd8f82c343bef327ac5f8a3beaf141cd9  -
+MAIN_DIFF_SHA256: bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9  -
+RESULT: PASS

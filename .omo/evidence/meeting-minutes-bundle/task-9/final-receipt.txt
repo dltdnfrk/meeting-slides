@@ -1,0 +1,25 @@
+Task 9 full-gate receipt
+
+target_parent=524292a3a23584bacf6787ccfce3e318293b0e47
+target_commit=a29d0d4856e7020edf031317ab9a91f0afa54218
+subject=feat(server): add updateItem/confirmReview with attendee validation and re-verification transaction
+verified_by=hephaestus/st_019fbe63
+verified_at=2026-08-01T17:38:01Z
+
+gates:
+  bun test tests/review-actions.test.ts -> PASS (8 pass, 0 fail)
+  bun test -> PASS (198 pass, 0 fail, 734 expect calls)
+  bunx tsc -p tsconfig.json --noEmit -> PASS
+  git diff --check + git diff --cached --check -> PASS
+  staged T8 tree focused test + tsc -> PASS
+  real event-driven WS+SQLite adversarial driver -> PASS (10 probes)
+
+qa:
+  malformed and missing wire requests return typed error codes
+  wrong-kind items, non-roster attendees, stale versions, transcript tampering, interior source gaps, and forced transaction aborts are rejected without review transition
+  all candidate items must be resolved; valid updates preserve deadlineText and emit typed reviewItemUpdated/reviewConfirmed messages
+  successful confirmReview atomically records confirmed_at and creates zero artifact_bundles/artifacts
+  failure paths leave the review draft and create no bundle/artifact output
+
+cleanup=PASS; temporary server, SQLite database, and staged-tree archive removed
+pre_existing_caveat=unrelated T10+ staged/unstaged/untracked changes were present and deliberately preserved; they are excluded from this commit

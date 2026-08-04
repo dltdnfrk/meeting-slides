@@ -1,0 +1,37 @@
+{
+  "task_id": "st_019fbe6e",
+  "worker": "hephaestus",
+  "task": "T10 portrait minutes HTML template with first-page-complete structure",
+  "status": "DONE",
+  "parent_commit": "a29d0d4856e7020edf031317ab9a91f0afa54218",
+  "target_commit": "94fea038c0ca47e8b32950a8d666550bd9dea448",
+  "commit_subject": "feat(minutes): add portrait minutes HTML template with first-page-complete structure",
+  "verified_by": "hephaestus-st_019fbe6e",
+  "verified_at": "2026-08-01T17:47:54Z",
+  "claims": {
+    "implementation": "pure portrait minutes HTML template with structurally complete metadata, decision, and action first page; forced appendix; open items, references, speaker attribution, and canonical transcript",
+    "provenance": "all sourced review items and every canonical transcript line expose exact visible (transcript_version_id,start_seq,end_seq) tuples and matching data attributes",
+    "escaping": "all generated untrusted text and attribute values pass through esc",
+    "tests": "focused 5/0; full 198/0 with 742 expectations; TypeScript and deterministic test bundle diagnostics clean",
+    "browser_qa": "real headless Chromium inspected populated and empty DOM after load and document.fonts.ready without sleeps or polling",
+    "scope": "only src/minutes.ts, deck/minutes.css, tests/minutes.test.ts, and task-10 evidence are committed",
+    "main_worktree_preservation": "main HEAD and dirty-status fingerprint remained unchanged"
+  },
+  "evidence_refs": [
+    "01-red-proof.txt",
+    "02-focused-green.txt",
+    "03-full-bun-test.txt",
+    "04-tsc.txt",
+    "05-static-scope-check.txt",
+    "06-real-render-driver.ts",
+    "06-real-render-driver.txt",
+    "06-real-render.png",
+    "06-real-render-empty.png",
+    "07-adversarial-driver.ts",
+    "07-adversarial-driver.txt",
+    "08-diagnostics.txt",
+    "09-diff-check.txt",
+    "final-receipt.txt"
+  ],
+  "caveat": "T9 already contains earlier T10 commit 22576ee; this is the minimal contract repair requested on top of T9."
+}

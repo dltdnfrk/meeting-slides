@@ -1,0 +1,16 @@
+T4 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T5 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T6 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T7 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T8 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T9 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T10 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T11 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T12 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T13 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+T14 checked=True tracked_pair=True full_hash_pair=True ancestor=True ledger_binding=True verdict=PASS
+F1 checked=True confirmed_events=2 rerun_required_events=1 latest_binding=0ebea1f1587f50e300e0ad3856fc54f55eeb338d binding_ancestor=True product_ancestor=True artifact_exists=True verdict=PASS
+F2 checked=True confirmed_events=2 rerun_required_events=0 latest_binding=7123fd986fceb981c358ad1b73531fab6bd8dc16 binding_ancestor=True product_ancestor=True artifact_exists=True verdict=PASS
+F3 checked=True confirmed_events=2 rerun_required_events=0 latest_binding=7123fd986fceb981c358ad1b73531fab6bd8dc16 binding_ancestor=True product_ancestor=True artifact_exists=True verdict=PASS
+F4 checked=True confirmed_events=2 rerun_required_events=1 latest_binding=0ebea1f1587f50e300e0ad3856fc54f55eeb338d binding_ancestor=True product_ancestor=True artifact_exists=True verdict=PASS
+SUMMARY errors=[] verdict=PASS

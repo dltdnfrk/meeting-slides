@@ -1,0 +1,31 @@
+[server] HTTP: http://localhost:20203
+입력 모드: mic
+[server] meeting-slides 서버 시작. 브라우저에서 http://localhost:20203 접속
+[ws] {"type":"status","text":"연결됨. LLM provider=cli model=cli:claude(/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-YXKGEl/fake-cli)"}
+[ws] {"type":"slide","current":null,"history":[]}
+[ws] {"type":"providers","list":[{"id":"cli:claude","label":"Claude (구독)","detail":"claude CLI — Claude Pro/Max 구독 인증","available":true,"models":["opus","sonnet","haiku"]},{"id":"cli:codex","label":"GPT (구독)","detail":"codex CLI — ChatGPT 구독 인증","available":true,"models":["gpt-5.6-sol","gpt-5.6-luna","gpt-5.6-terra"],"efforts":["low","medium","high"]},{"id":"alibaba","label":"Alibaba GLM","detail":"glm-5.2","available":false,"models":["glm-5.2","glm-5.1","glm-4.7"]},{"id":"openai","label":"OpenAI API","detail":"gpt-4o-mini","available":false,"models":["gpt-4o-mini","gpt-4o"]},{"id":"local","label":"로컬 llama.cpp","detail":"미설정","available":false,"models":[]}],"current":"cli:claude"}
+[ws] {"type":"capture","capturing":false,"mode":"mic"}
+[ws] {"type":"transcript","entries":[],"reason":"snapshot","truncated":false}
+[ws] {"type":"status","text":"서버 정상"}
+[server] [whisper] whisper-stream 시작: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-YXKGEl/fake-whisper -m /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-YXKGEl/model.bin -l ko -t 4 --step 3000 --length 5000 --keep 200 -c -1 -fa -kc
+[ws] {"type":"capture","capturing":true,"mode":"mic"}
+[ws] {"type":"status","text":"🎤 녹음 시작 — 말씀하세요"}
+[ws] {"type":"status","text":"whisper-stream 시작: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-YXKGEl/fake-whisper -m /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-manual-YXKGEl/model.bin -l ko -t 4 --step 3000 --length 5000 --keep 200 -c -1 -fa -kc"}
+[ws] {"type":"slide","current":null,"history":[]}
+[ws] {"type":"status","text":"세션 초기화"}
+[ws] {"type":"transcript","entries":[],"reason":"snapshot","truncated":false}
+[ws] {"type":"saved","path":"exports/meeting-2026-08-01T12-36-26-348Z.json"}
+[ws] {"type":"status","text":"저장됨: exports/meeting-2026-08-01T12-36-26-348Z.json"}
+[ws] {"type":"status","text":"서버 정상"}
+[cleanup] server_exited=false port=20203 db_removed=true exports_removed=true temp_removed=true
+114 |   const sentinel = waitForMessage(unknownStart, (m) => m.type === "status" && m.text === "서버 정상");
+115 |   ws.send(JSON.stringify({ action: "unknownAction" }));
+116 |   ws.send(JSON.stringify({ action: "status" }));
+117 |   await sentinel;
+118 |   const sentinelIndex = messages.findIndex((m, index) => index >= unknownStart && m.type === "status" && m.text === "서버 정상");
+119 |   if (messages.slice(unknownStart, sentinelIndex).length !== 0) throw new Error("unknown action emitted a message");
+                                                                                ^
+error: unknown action emitted a message
+      at /Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/.omo/evidence/meeting-minutes-bundle/task-1/real-ws-driver.ts:119:75
+
+Bun v1.3.14 (macOS arm64)

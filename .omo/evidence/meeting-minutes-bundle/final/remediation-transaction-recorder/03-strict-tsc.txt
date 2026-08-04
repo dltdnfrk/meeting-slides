@@ -1,0 +1,2 @@
+COMMAND: bunx tsc --noEmit --strict
+EXIT_CODE: 0

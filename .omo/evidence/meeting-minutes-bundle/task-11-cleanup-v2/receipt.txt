@@ -1,0 +1,7 @@
+PASS: pdf temp cleanup now removes meeting-minutes-pdf-* directories on all observed failure paths.
+Verification:
+- bun test tests/pdf.test.ts
+- bun test (pre-existing unrelated failure in tests/review-actions.test.ts)
+- bunx tsc -p tsconfig.json --noEmit
+- git diff --check
+- exact cleanup probe: .omo/evidence/meeting-minutes-bundle/task-11-cleanup-v2/exact-driver.ts

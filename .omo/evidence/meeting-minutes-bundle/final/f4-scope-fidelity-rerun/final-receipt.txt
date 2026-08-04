@@ -1,0 +1,33 @@
+F4 EXACT FINAL RECEIPT
+
+verdict=PASS
+audited_governance_target=b86610058e2cff22319976b23dd6d48282f7d678
+audited_governance_parent=7123fd986fceb981c358ad1b73531fab6bd8dc16
+audited_governance_tree=5e9c65aa72f9c59c7ae4554d137a069c56f12bd0
+product_target=6711ecfcb47f75b1bb22377d97dd551538568ad7
+baseline=921a01513593c0e10181cf01e535a7abe995deb3
+f4_evidence_commit=5187f3090e0d16a55be4b5e2bd88ab47406911a1
+f4_evidence_parent=b86610058e2cff22319976b23dd6d48282f7d678
+f4_evidence_tree=17a7dc557fa059c795405eee9b8b89807c037b1c
+report_git_blob=6cab158a8ec5be5a608917fd7f85086e999a8703
+report_sha256=3c4fdf55e46619ef2e6bc60623033ca0946ff07f84a45e1d00f90924a1a7011b
+receipt_carrier_parent=5187f3090e0d16a55be4b5e2bd88ab47406911a1
+verified_by=st_019fbee6 / PI session 019fbeef-0810-7757-a53c-3af346b6b243
+verified_at=2026-08-01T20:20:00Z
+
+Direct gates:
+- T4-T14 immutable target/parent/ancestor matrix: PASS
+- all T4-T14 committed receipt pairs: PASS
+- baseline ancestry and zero-merge range: PASS
+- prohibited-scope semantic scan: PASS
+- focused real surfaces: PASS 67/67
+- strict TypeScript: PASS
+- browser checkJs: PASS
+- deterministic isolated full suite: PASS 209/209 across 29/29 tracked test files
+- baseline/worktree/index diff checks: PASS
+- staged report scope: PASS, only f4-scope-fidelity-rerun evidence
+- untracked non-evidence paths: 0
+- temporary verification artifacts/processes: 0
+- main tracked product state: preserved
+
+The carrier commit contains only this exact receipt and receipt.json. Its own hash is intentionally not self-referential; obtain it with `git rev-parse HEAD`, whose parent must equal f4_evidence_commit above.

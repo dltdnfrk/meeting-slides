@@ -1,0 +1,1 @@
+{ "status": "pass", "source": "07-adversarial-driver.ts" }

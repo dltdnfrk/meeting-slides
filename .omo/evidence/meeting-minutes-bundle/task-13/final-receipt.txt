@@ -1,0 +1,7 @@
+task=st_019fbe94
+parent_commit=f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc
+target_commit=0c0d5aa55f4def8f8cd79ee398417b7acf8788d4
+refactor_commit=6711ecfcb47f75b1bb22377d97dd551538568ad7
+commit_subject=feat(store): add canonical transcript versioning, raw audio persistence, and audio-hash dedup
+verified_at=2026-08-01T00:00:00Z
+checks=bun test tests/minutes-store.test.ts tests/transcript-versioning.test.ts; bun .omo/evidence/meeting-minutes-bundle/task-13/real-event-driver.ts; bunx tsc --noEmit; git diff --check

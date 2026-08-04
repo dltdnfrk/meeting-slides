@@ -1,0 +1,14 @@
+DONE CLAIM
+
+Task 6 is complete in the existing implementation state.
+
+Scope delivered:
+- src/extract.ts: MinutesExtractor with versioned source-segment provenance, strict evidence checks, and precision local-rule fallback.
+- tests/extract.test.ts: focused coverage for grounded parsing, rejection codes, fallback behavior, and precision constraints.
+
+Verification already recorded in task-6 receipts:
+- focused green
+- full suite
+- tsc
+- real module QA adversarial
+- post-edit final gate

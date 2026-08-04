@@ -1,0 +1,14 @@
+diagnostic_method=direct TypeScript checkJs (LSP workspace is rooted at the main worktree and rejects delegated-worktree paths)
+public/review-panel.js(197,17): error TS2339: Property 'disabled' does not exist on type 'HTMLElement'.
+public/review-panel.js(221,15): error TS2339: Property 'disabled' does not exist on type 'HTMLElement'.
+public/review-panel.js(233,33): error TS2339: Property 'disabled' does not exist on type 'HTMLElement'.
+public/review-panel.js(261,67): error TS2339: Property 'dataset' does not exist on type 'Element'.
+public/review-panel.js(286,28): error TS2339: Property 'focus' does not exist on type 'Element'.
+public/review-panel.js(286,44): error TS2339: Property 'setSelectionRange' does not exist on type 'Element'.
+public/review-panel.js(286,69): error TS2339: Property 'value' does not exist on type 'Element'.
+public/review-panel.js(286,90): error TS2339: Property 'value' does not exist on type 'Element'.
+public/review-panel.js(297,29): error TS2339: Property 'value' does not exist on type 'Element'.
+public/review-panel.js(300,17): error TS2339: Property 'focus' does not exist on type 'Element'.
+public/review-panel.js(372,19): error TS2339: Property 'disabled' does not exist on type 'HTMLElement'.
+public/review-panel.js(380,19): error TS2339: Property 'disabled' does not exist on type 'HTMLElement'.
+public/review-panel.js(387,17): error TS2339: Property 'disabled' does not exist on type 'HTMLElement'.

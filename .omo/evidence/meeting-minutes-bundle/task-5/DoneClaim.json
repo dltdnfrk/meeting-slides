@@ -1,0 +1,122 @@
+{
+  "taskId": "st_019fbe18",
+  "plan": "meeting-minutes-bundle",
+  "checkbox": "T5",
+  "title": "참석자 지정 프론트엔드 — 캡처 전 입력 폼",
+  "worktree": "/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes",
+  "targetCommit": "dff8ea5bc92bdf454622c29b1748ef21d2300100",
+  "commitSubject": "feat(public): add attendee registration form and attendees state",
+  "status": "done",
+  "verifiedBy": "senpi-task-st_019fbe18",
+  "receiptReconciledBy": "st_019fbeea",
+  "receiptReconciledAt": "2026-08-01T20:12:43Z",
+
+  "startingState": {
+    "finding": "T5-shaped UI already existed from commit 8636b97 with a real Chromium contract suite (22 tests, all green). The plan checkbox was still unchecked, so this task verified the existing surface against the T5 contract rather than rebuilding it.",
+    "baselineFocused": "22 pass / 0 fail (00-baseline-focused.txt)"
+  },
+
+  "contractRequirements": [
+    {
+      "requirement": "attendee panel in public/index.html following provider-panel hidden toggle + outside-click pattern",
+      "state": "already satisfied",
+      "evidence": "index.html #attendee-panel[hidden] + #btn-attendees aria-expanded/aria-controls; outside-click closes (after-04-outside-click-closed.png)"
+    },
+    {
+      "requirement": "submit attendees through the setAttendees WS action",
+      "state": "already satisfied",
+      "evidence": "after-driver.txt [happy] setAttendees wire payload"
+    },
+    {
+      "requirement": "store meeting_id returned in the attendees message + roster for the later review dropdown",
+      "state": "already satisfied",
+      "evidence": "after-driver.txt [happy] stored dropdown source -> window.__attendeeState {meetingId:4242, attendees:[3]}"
+    },
+    {
+      "requirement": "send that exact ID in startCapture",
+      "state": "already satisfied",
+      "evidence": "after-driver.txt [happy] startCapture carries prepared id -> {\"action\":\"startCapture\",\"meeting_id\":4242}"
+    },
+    {
+      "requirement": "prevent recording when no prepared meeting ID exists while showing the save error",
+      "state": "already satisfied (soft, per guardrail)",
+      "evidence": "unsaved drafts surface '저장하지 않은 참석자가 있습니다 — 저장 후 시작하세요'; capture still proceeds because attendees must NOT be a hard gate"
+    },
+    {
+      "requirement": "restore draft attendees/meeting_id after reconnect",
+      "state": "BROKEN -> fixed this task",
+      "evidence": "client sent {action:'attendees'} but server handlerMap had no such key; request was silently dropped. See defect #1."
+    }
+  ],
+
+  "defectsFoundAndFixed": [
+    {
+      "id": 1,
+      "severity": "high",
+      "title": "Reconnect restoration was a silent no-op",
+      "detail": "public/app.js ws.onopen sent {action:'attendees'} on every reconnect, but server.ts handlerMap had no 'attendees' entry. server.ts message() only dispatches when a handler exists, so the restore request was dropped with no error. Draft attendees/meeting_id were never restored after a real WS reconnect, violating the T5 lifecycle contract.",
+      "redProof": "01-red.txt — unroutable actions = [\"attendees\"]",
+      "fix": "server.ts: added read-only handleAttendeesQuery returning {type:'attendees', meeting_id, attendees}; answers the requesting socket only (no broadcast). Returns meeting_id:null + [] when no meeting is prepared.",
+      "tests": [
+        "tests/public-attendees.test.ts: 'the reconnect restore query names an action the real server dispatches' (cross-checks client wire actions against the real server handlerMap)",
+        "tests/attendees-action.test.ts: restore round-trip against the real WS server, both with no prepared meeting and with a persisted roster",
+        "tests/server-handler-map.test.ts: registered the new action in the registry contract"
+      ]
+    },
+    {
+      "id": 2,
+      "severity": "high",
+      "title": "Stale meeting ID after reset made recording fail silently",
+      "detail": "server handleReset ends the prepared meeting and sets currentMeetingId=null, but the client kept attendeeState.meetingId. The next record click sent the dead ID, and startCapture rejected it with 'does not match the current prepared meeting' — recording appeared to do nothing.",
+      "redProof": "02-red-stale-id.txt — waitForFunction timed out; client never cleared the ID",
+      "fix": "public/app.js: added clearPreparedMeeting(), called from btnResetEl.onclick. Drops meetingId/attendees, marks drafts unsaved so the user can re-save, leaves the roster text intact.",
+      "tests": ["tests/public-attendees.test.ts: 'a reset clears the prepared meeting_id so capture never resends a dead id'"]
+    }
+  ],
+
+  "designSystem": {
+    "analysis": "public/style.css defines a token layer in :root (--line/--line-faint/--line-strong, --radius-sm/md/lg, --shadow-panel, --space-1..6, --text-label/xs/sm/body/md, --err-line/--err-soft, --live-line). The review panel (newest UI, commit 82ed28d) consumes these tokens throughout and is the established convention.",
+    "finding": "The attendee panel predated the token layer and duplicated those exact values as hardcoded literals (rgba(255,255,255,0.09), 14px, 0 18px 56px rgba(0,0,0,0.55), rgba(239,68,68,0.35), 10.5px, ...).",
+    "action": "Migrated the attendee CSS block to the existing tokens. Only literals with an exact token equivalent were substituted; genuine one-offs (999px pill radius, 13px pill padding, rgba(...,0.12) shared with provider-config, 9px micro-label) were left alone. No new tokens were invented and no values changed.",
+    "proof": "Pixel-neutrality proven by computed-style fingerprint captured from real Chromium before and after the migration (transitions disabled and hover/aria-expanded state pinned for determinism): before-computed-style.json == after-computed-style.json, and before-driver.txt == after-driver.txt. Both diffs empty."
+  },
+
+  "adversarialChecks": [
+    { "case": "duplicate names", "result": "rejected with '이미 추가된 참석자입니다: <name>'; existing draft untouched", "covered": "existing test" },
+    { "case": "whitespace-only name", "result": "blocked, nothing sent; error '이름을 입력하세요'", "covered": "after-driver.txt [empty] error=... sent=[]" },
+    { "case": "malformed attendees messages", "result": "attendees:'not-an-array', missing field, null/42/{display_name:null} rows all filtered; only valid rows kept; meeting_id:'nope' ignored (non-finite guard); panel stays usable", "covered": "existing test" },
+    { "case": "stale meeting IDs", "result": "DEFECT #2 — found and fixed; reset now clears the prepared ID", "covered": "new test" },
+    { "case": "WS disconnect/reconnect", "result": "DEFECT #1 — found and fixed; restore query now has a real server handler and round-trips the persisted roster", "covered": "new tests (client + real server)" },
+    { "case": "accidental capture hard-gating", "result": "NOT hard-gated — zero attendees still sends plain {action:'startCapture'}", "covered": "existing test 'capture is never hard-gated on attendees'" },
+    { "case": "XSS-safe rendering", "result": "escapeHtml on name and crm id; <img onerror> / <script> payloads render as text, 0 injected nodes, window.__pwned undefined", "covered": "existing test" },
+    { "case": "submit racing a capture transition", "result": "at most one setAttendees sent; capture lock disables the surface", "covered": "existing test" },
+    { "case": "no prepared meeting on restore query", "result": "server answers {meeting_id:null, attendees:[]}; client's finite-number guard leaves state coherent", "covered": "tests/attendees-action.test.ts" },
+    { "case": "free-text assignee field", "result": "none added — assignee remains a later dropdown (T8)", "covered": "scope review" }
+  ],
+
+  "verification": {
+    "focused": "bun test tests/public-attendees.test.ts -> 24 pass / 0 fail (03-focused-green.txt)",
+    "full": "bun test -> 192 pass / 0 fail across 26 files (04-full-bun-test.txt)",
+    "types": "bunx tsc -p tsconfig.json --noEmit -> exit 0 (05-tsc.txt)",
+    "whitespace": "git diff --check -> exit 0, no output (06-diff-check.txt)",
+    "browser": "Real headless Chromium (puppeteer) driving the actual public/ shell over HTTP with a fake WebSocket: happy path (3 names -> setAttendees -> attendees ack -> state restoration -> startCapture with prepared id), empty-name blocking, outside-click close, reconnect restoration. Screenshots after-01..after-05.png at deviceScaleFactor 2.",
+    "regressionNote": "Both new tests were confirmed RED before the fix and GREEN after; no test was weakened. server-handler-map.test.ts registry list grew by one entry because a genuinely new action was added."
+  },
+
+  "scope": {
+    "committed": [
+      "public/index.html (unchanged content-wise this task; already carried the panel)",
+      "public/app.js",
+      "public/style.css",
+      "server.ts",
+      "tests/public-attendees.test.ts",
+      "tests/attendees-action.test.ts",
+      "tests/server-handler-map.test.ts"
+    ],
+    "deliberatelyExcluded": [
+      "src/minutes-store.ts, src/session.ts, .env.example, tests/minutes-store.test.ts, tests/review-actions.test.ts — pre-existing dirty changes from other tasks, untouched",
+      ".omo/evidence/** — evidence is not product scope",
+      "public/app 2.js, public/index 2.html, public/style 2.css, meetings*.db* — untracked local cruft, left alone"
+    ]
+  }
+}

@@ -122,6 +122,68 @@ export interface MeetingsUpdate {
   }>;
 }
 
+export interface AttendeesUpdate {
+  type: "attendees";
+  meeting_id: number;
+  attendees: Array<{
+    attendee_id: string;
+    display_name: string;
+    crm_person_entity_id?: string;
+  }>;
+}
+
+export interface ReviewUpdate {
+  type: "review";
+  reviewId: string;
+  transcriptVersionId: string;
+  attendees: Array<{ attendeeId: string; displayName: string }>;
+  transcript: {
+    lines: Array<{ seq: number; speakerTurn: number | null; text: string }>;
+  };
+  items: Array<{
+    id: string;
+    kind: "decision" | "action_item" | "open_item";
+    description: string;
+    sourceSegment: {
+      transcript_version_id: string;
+      start_seq: number;
+      end_seq: number;
+    };
+    evidenceQuote: string;
+    segment_text: string;
+    attributedAttendeeId: string | null;
+    assigneeAttendeeId?: string | null;
+    deadline?: string | null;
+    deadlineText?: string | null;
+  }>;
+}
+
+export interface ReviewItemUpdated {
+  type: "reviewItemUpdated";
+  reviewId: string;
+  itemId: string;
+  kind: "decision" | "action_item" | "open_item";
+}
+
+export interface ReviewConfirmed {
+  type: "reviewConfirmed";
+  reviewId: string;
+  transcriptVersionId: string;
+  confirmedAt: number;
+}
+
+export interface MeetingConcluded {
+  type: "meetingConcluded";
+  concluded: true;
+  meetingId: number;
+  reviewId: string;
+  transcriptVersionId: string;
+  bundleId: string;
+  bundlePath: string;
+  manifest: { sha256: string; targetCommit: string };
+  concludedAt: number;
+}
+
 /** LLM 블록 감지 진행 표시 (관찰성: 사람·AI 모두 "지금 만드는 중"을 읽을 수 있게) */
 export interface DetectUpdate {
   type: "detect";
@@ -181,14 +243,37 @@ export interface MeetingDetailUpdate {
   compiled: null | { title: string; slideCount: number; compiledAt: number; publishedAt: number | null };
 }
 
-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | SttModelsUpdate | MeetingsUpdate | LineUpdate | DetectUpdate | SavedUpdate | CompileUpdate | ExportUpdate | MeetingDetailUpdate;
+export type ServerMessage =
+  | SlideUpdate
+  | CaptionUpdate
+  | StatusUpdate
+  | TranscriptUpdate
+  | ProvidersUpdate
+  | CaptureUpdate
+  | SttModelsUpdate
+  | MeetingsUpdate
+  | LineUpdate
+  | DetectUpdate
+  | SavedUpdate
+  | CompileUpdate
+  | ExportUpdate
+  | MeetingDetailUpdate
+  | AttendeesUpdate
+  | ReviewUpdate
+  | ReviewItemUpdated
+  | ReviewConfirmed
+  | MeetingConcluded;
 
 export type ClientAction =
-  | { action: "startCapture" | "stopCapture" | "reset" | "status" | "listMeetings" | "transcript" | "recheckProviders" | "recheckSttModels" }
+  | { action: "startCapture"; meeting_id?: number }
+  | { action: "stopCapture" | "reset" | "status" | "listMeetings" | "transcript" | "recheckProviders" | "recheckSttModels" | "attendees" | "startReview" }
   | { action: "selectMeeting" | "compileDeck" | "exportDeck" | "exportPdf" | "exportPng" | "saveNotes" | "saveTranscript" | "saveJson"; meetingId?: number }
   | { action: "setProvider"; id: string; model?: string; effort?: string }
   | { action: "connectProvider"; id: string }
   | { action: "setProviderKey"; id: string; key: string }
+  | { action: "setAttendees"; attendees: Array<{ name: string; crmPersonId?: string }> }
+  | { action: "updateItem"; reviewId: string; itemId: string; kind: "decision" | "action_item" | "open_item"; patch: Record<string, unknown> }
+  | { action: "confirmReview"; reviewId: string }
   | { action: "installSttModel" | "cancelSttModel" | "selectSttModel"; modelId: SttModelInfo["id"] };
 
 export type ClientListener = (msg: ServerMessage) => void;

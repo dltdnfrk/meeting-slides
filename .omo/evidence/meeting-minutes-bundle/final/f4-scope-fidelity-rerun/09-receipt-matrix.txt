@@ -1,0 +1,34 @@
+IMMUTABLE T4-T14 TARGET/PARENT MATRIX
+T4 target=6ec8905e686bd23ee351cfb08795ec2f959d291b expected_parent=6eac728c512d8c5aa86b200631df367c80693c11 actual_parent=6eac728c512d8c5aa86b200631df367c80693c11 ancestor=true result=PASS
+T5 target=dff8ea5bc92bdf454622c29b1748ef21d2300100 expected_parent=6ec8905e686bd23ee351cfb08795ec2f959d291b actual_parent=6ec8905e686bd23ee351cfb08795ec2f959d291b ancestor=true result=PASS
+T6 target=9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367 expected_parent=dff8ea5bc92bdf454622c29b1748ef21d2300100 actual_parent=dff8ea5bc92bdf454622c29b1748ef21d2300100 ancestor=true result=PASS
+T7 target=b12706c2b1099f315f19c6bf528880789be18bbe expected_parent=9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367 actual_parent=9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367 ancestor=true result=PASS
+T8 target=524292a3a23584bacf6787ccfce3e318293b0e47 expected_parent=b12706c2b1099f315f19c6bf528880789be18bbe actual_parent=b12706c2b1099f315f19c6bf528880789be18bbe ancestor=true result=PASS
+T9 target=a29d0d4856e7020edf031317ab9a91f0afa54218 expected_parent=524292a3a23584bacf6787ccfce3e318293b0e47 actual_parent=524292a3a23584bacf6787ccfce3e318293b0e47 ancestor=true result=PASS
+T10 target=94fea038c0ca47e8b32950a8d666550bd9dea448 expected_parent=a29d0d4856e7020edf031317ab9a91f0afa54218 actual_parent=a29d0d4856e7020edf031317ab9a91f0afa54218 ancestor=true result=PASS
+T11 target=f64fb18c83659dd6732d9481434d8758f98c231a expected_parent=94fea038c0ca47e8b32950a8d666550bd9dea448 actual_parent=94fea038c0ca47e8b32950a8d666550bd9dea448 ancestor=true result=PASS
+T12 target=f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc expected_parent=f64fb18c83659dd6732d9481434d8758f98c231a actual_parent=f64fb18c83659dd6732d9481434d8758f98c231a ancestor=true result=PASS
+T13 target=0c0d5aa55f4def8f8cd79ee398417b7acf8788d4 expected_parent=f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc actual_parent=f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc ancestor=true result=PASS
+T14 target=c2736c81fe6ca04167b4f2ded7e67804226471ce expected_parent=0c0d5aa55f4def8f8cd79ee398417b7acf8788d4 actual_parent=0c0d5aa55f4def8f8cd79ee398417b7acf8788d4 ancestor=true result=PASS
+COMMITTED_RECEIPT_PAIRS:
+T4 pair=committed
+T5 pair=committed
+T6 pair=committed
+T7 pair=committed
+T8 pair=committed
+T9 pair=committed
+T10 pair=committed
+T11 pair=committed
+T12 pair=committed
+T13 pair=committed
+T14 pair=committed
+FINAL_LEDGER_TAIL:
+{"event":"receipt-reconciled","plan":".omo/plans/meeting-minutes-bundle.md","work_id":"meeting-minutes-bundle-019fbcd2","task":"T4","target_commit":"6ec8905e686bd23ee351cfb08795ec2f959d291b","verdict":"confirmed","verified_by":"st_019fbeea","verified_at":"2026-08-01T20:12:43Z","artifact":[".omo/evidence/meeting-minutes-bundle/task-4/DoneClaim.json",".omo/evidence/meeting-minutes-bundle/task-4/final-receipt.txt"],"note":"full immutable target metadata normalized; behavioral evidence unchanged"}
+{"event":"receipt-reconciled","plan":".omo/plans/meeting-minutes-bundle.md","work_id":"meeting-minutes-bundle-019fbcd2","task":"T5","target_commit":"dff8ea5bc92bdf454622c29b1748ef21d2300100","verdict":"confirmed","verified_by":"st_019fbeea","verified_at":"2026-08-01T20:12:43Z","artifact":[".omo/evidence/meeting-minutes-bundle/task-5/DoneClaim.json",".omo/evidence/meeting-minutes-bundle/task-5/final-receipt.txt"],"note":"full immutable target metadata normalized; behavioral evidence unchanged"}
+{"event":"final-verification-superseded","plan":".omo/plans/meeting-minutes-bundle.md","work_id":"meeting-minutes-bundle-019fbcd2","task":"F1","audited_parent":"7123fd986fceb981c358ad1b73531fab6bd8dc16","verdict":"rerun-required","verified_by":"st_019fbeea","verified_at":"2026-08-01T20:12:43Z","artifact":".omo/evidence/meeting-minutes-bundle/final/governance-repair/receipt.md","supersedes_target":"17d09149bc5248652573142bc6e9ebd2eafcc8fd","reason":"17d0914 predates the committed authoritative plan and ledger; rerun against the commit containing this governance repair"}
+{"event":"final-verification-superseded","plan":".omo/plans/meeting-minutes-bundle.md","work_id":"meeting-minutes-bundle-019fbcd2","task":"F4","audited_parent":"7123fd986fceb981c358ad1b73531fab6bd8dc16","verdict":"rerun-required","verified_by":"st_019fbeea","verified_at":"2026-08-01T20:12:43Z","artifact":".omo/evidence/meeting-minutes-bundle/final/governance-repair/receipt.md","supersedes_target":"17d09149bc5248652573142bc6e9ebd2eafcc8fd","reason":"17d0914 predates the committed authoritative plan and ledger; rerun scope and receipt freshness against the commit containing this governance repair"}
+{"event":"final-receipt-current-parent-bound","plan":".omo/plans/meeting-minutes-bundle.md","work_id":"meeting-minutes-bundle-019fbcd2","task":"F2","audited_parent":"7123fd986fceb981c358ad1b73531fab6bd8dc16","product_target":"6711ecfcb47f75b1bb22377d97dd551538568ad7","verdict":"confirmed","verified_by":"st_019fbeea","verified_at":"2026-08-01T20:12:43Z","artifact":".omo/evidence/meeting-minutes-bundle/final/f2-code-quality-rerun/17-current-head-verification-receipt.md","basis":"product tree is unchanged outside .omo from the immutable F2 product target through the audited governance parent"}
+{"event":"final-receipt-current-parent-bound","plan":".omo/plans/meeting-minutes-bundle.md","work_id":"meeting-minutes-bundle-019fbcd2","task":"F3","audited_parent":"7123fd986fceb981c358ad1b73531fab6bd8dc16","product_target":"6711ecfcb47f75b1bb22377d97dd551538568ad7","verdict":"confirmed","verified_by":"st_019fbeea","verified_at":"2026-08-01T20:12:43Z","artifact":".omo/evidence/meeting-minutes-bundle/final/final-compliance-repair/F3-real-manual-qa-final.md","basis":"product tree is unchanged outside .omo from the immutable F3-tested product target through the audited governance parent"}
+PLAN_STATE:
+checked=16
+pending=2

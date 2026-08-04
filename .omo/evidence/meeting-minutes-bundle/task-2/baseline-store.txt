@@ -1,0 +1,19 @@
+Baseline legacy store characterization
+command: bun test tests/store.test.ts tests/slide-persist.test.ts
+started_at: 2026-08-01T12:43:41Z
+bun test v1.3.14 (0d9b296a)
+
+tests/store.test.ts:
+(pass) MeetingStore > 회의 라이프사이클: 시작 → 라인/슬라이드 → 종료 [1.92ms]
+(pass) MeetingStore > 회의가 열려있지 않으면 라인/슬라이드 무시 [0.17ms]
+(pass) MeetingStore > Markdown export: 헤더 + 슬라이드 + 전사본 [1.57ms]
+(pass) MeetingStore > 같은 idx 슬라이드 갱신은 upsert되어 export에 최신 불렛이 남는다 [0.40ms]
+
+tests/slide-persist.test.ts:
+(pass) same-topic slide persistence end-to-end > 세션 같은 토픽 갱신 → SQLite → deck export에 최신 불렛 [43.71ms]
+
+ 5 pass
+ 0 fail
+ 26 expect() calls
+Ran 5 tests across 2 files. [59.00ms]
+exit_code: 0

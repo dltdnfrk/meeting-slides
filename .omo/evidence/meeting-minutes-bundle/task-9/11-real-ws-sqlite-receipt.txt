@@ -1,0 +1,9 @@
+PASS wrong-attendee + partial-patch: deterministic rejection, zero mutation
+PASS malformed/missing requests: deterministic boundary rejection
+PASS wrong-version: canonical switch rejected, review remains draft
+PASS changed-transcript: hash mismatch rejected, review remains draft
+PASS persisted attendee tamper: roster revalidation rejected and review remains draft
+PASS source interior-gap: full range revalidation rejected and review remains draft
+PASS transaction failure: trigger abort rolled back status and timestamp
+PASS happy WS/SQLite: draft->confirmed atomically; artifact_bundles=0 artifacts=0
+{"database":"temporary","probes":10,"result":"PASS"}

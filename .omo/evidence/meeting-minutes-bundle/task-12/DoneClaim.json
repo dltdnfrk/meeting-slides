@@ -1,0 +1,14 @@
+{
+  "task": "T12",
+  "status": "done",
+  "parent_commit": "f64fb18c83659dd6732d9481434d8758f98c231a",
+  "target_commit": "f223c9aa0b3cb24ae01398b9efaaa7a8ea8aeccc",
+  "commit_subject": "feat(bundle): add atomic meeting bundle export with version-scoped provenance and manifest",
+  "summary": "Atomic bundle export is implemented and verified: confirmed/canonical review validation, minutes HTML/PDF and provenance-bearing minutes.json, transcript/audio/attendees/items, manifest hashes/sizes/content types, identity/deduplication, temp-dir atomic rename, cleanup, and hostile-input safety.",
+  "notes": [
+    "Focused bundle test suite passes.",
+    "Full bun test suite passes.",
+    "TypeScript check passes.",
+    "Real filesystem/PDF bundle driver and adversarial probes were run and passed."
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "canonicalAfterAbort": "ce52bb1e-30ed-44d8-ab8e-1c93514b7926",
+  "latestVersionNo": 2,
+  "abortedVersionId": "6ed18c05-7fa7-42cd-b164-878ed5769fcd",
+  "legacyDupErr": "Error: duplicate legacy transcript seq 1"
+}

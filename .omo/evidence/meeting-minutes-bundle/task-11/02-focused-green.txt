@@ -1,0 +1,13 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/pdf.test.ts:
+(pass) renderMinutesPdf > uses the project vendored ms-playwright Chromium executable [2.52ms]
+(pass) renderMinutesPdf > creates a nonempty portrait A4 PDF with every decision and action only on page one [267.32ms]
+(pass) renderMinutesPdf > applies the deterministic shrink stages when normal typography overflows [255.15ms]
+(pass) renderMinutesPdf > rejects unshrinkable first-page overflow without creating an output file [207.92ms]
+(pass) renderMinutesPdf > allows appendices to span multiple pages while keeping the complete summary on page one [232.49ms]
+
+ 5 pass
+ 0 fail
+ 28 expect() calls
+Ran 5 tests across 1 file. [1170.00ms]

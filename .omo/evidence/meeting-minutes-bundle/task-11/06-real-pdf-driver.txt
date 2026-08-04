@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-08-01T17:58:54.626Z",
+  "verified_by": "senpi/gpt-5.6-sol",
+  "target_commit": "94fea038c0ca47e8b32950a8d666550bd9dea448",
+  "executablePath": "/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/vendor/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+  "pdfPath": "/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/.omo/evidence/meeting-minutes-bundle/task-11/minutes-a4.pdf",
+  "shrinkPdfPath": "/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/.omo/evidence/meeting-minutes-bundle/task-11/minutes-a4-shrunk.pdf",
+  "bytes": 190966,
+  "pages": 8,
+  "pageSize": {
+    "width": 594.95996,
+    "height": 841.91998
+  },
+  "pageOneTextPreview": "RELEASE COUNCIL QA\nMEETING MINUTES\n\n\n\n\nVerify the A4 minutes export invariant.\n일시    2026-08-01 · Asia/Seoul                         참석자    Alice Kim\n전사 버전 qa-canonical-v1\n\n결정 사항\n 결정                                발언자                       ",
+  "overflow": "First-page overflow: decision/action summary is 3445.0px high and cannot fit within the 1031.8px A4 printable area after the minimum typography stage.",
+  "checks": {
+    "pdfHeader": true,
+    "nonempty": true,
+    "portraitA4": true,
+    "appendixMultipage": true,
+    "everyDecisionOnPageOne": true,
+    "everyActionOnPageOne": true,
+    "appendixAbsentFromPageOne": true,
+    "appendixPresentAfterPageOne": true,
+    "deterministicShrink": true,
+    "shrunkSummaryComplete": true,
+    "explicitOverflow": true,
+    "overflowOutputAbsent": true,
+    "overflowTempCleanup": true
+  }
+}

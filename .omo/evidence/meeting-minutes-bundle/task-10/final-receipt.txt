@@ -1,0 +1,42 @@
+T10 FINAL RECEIPT
+verified_by=hephaestus-st_019fbe6e
+verified_at=2026-08-01T17:47:54Z
+parent_commit=a29d0d4856e7020edf031317ab9a91f0afa54218
+target_commit=94fea038c0ca47e8b32950a8d666550bd9dea448
+commit_subject=feat(minutes): add portrait minutes HTML template with first-page-complete structure
+
+commands_results:
+- bun test tests/minutes.test.ts => 5 pass, 0 fail, 28 expectations
+- bun test => 198 pass, 0 fail, 742 expectations, 27 files
+- bunx tsc -p tsconfig.json --noEmit => exit 0
+- bun build tests/minutes.test.ts --target=bun => exit 0; temporary output removed
+- git diff --check => exit 0, clean
+- bun .omo/evidence/meeting-minutes-bundle/task-10/06-real-render-driver.ts => exit 0; populated and empty DOM contracts passed
+- bun .omo/evidence/meeting-minutes-bundle/task-10/07-adversarial-driver.ts => exit 0; hostile and empty checks passed
+
+qa_observations:
+- populated: two sections; break-after=page; break-before=page; metadata, decision, and action remain on the first page; action headers are speaker, assignee, deadline, and provenance; all six exact visible/data tuples are present; canonical transcript version is canonical-v2
+- empty: metadata and both decision/action tables remain structurally present with one explicit empty row each; all appendix empty states are present; no provenance is fabricated
+- visual: populated and empty Chromium screenshots are legible; action and canonical-transcript provenance columns do not overlap
+- synchronization: navigation waits for load and then document.fonts.ready; no sleeps or polling
+
+scope:
+- committed product/test paths are limited to src/minutes.ts, deck/minutes.css, and tests/minutes.test.ts
+- committed receipts are limited to .omo/evidence/meeting-minutes-bundle/task-10/
+- unrelated .env.example, minutes-store/session changes, T11+ and T13+ evidence/artifacts, duplicate databases, and duplicate public files remain unstaged and unmodified by this task
+- no PDF, bundle, or conclusion implementation was added
+
+cleanup:
+- Chromium closed in finally
+- per-run minutes-render temporary directory removed in finally
+- temporary diagnostic test bundle removed
+- no polling process, test fixture, or target temporary output remains
+
+main_worktree_fingerprint:
+- head_before=921a01513593c0e10181cf01e535a7abe995deb3
+- head_after=921a01513593c0e10181cf01e535a7abe995deb3
+- status_sha256_before=6c4f788dd1ca722616c93650f5dd97da57ee2cad60589e9e222293fb498ba0d4
+- status_sha256_after=6c4f788dd1ca722616c93650f5dd97da57ee2cad60589e9e222293fb498ba0d4
+
+caveat:
+- T9 already contains the earlier T10 commit 22576ee in its ancestry; this delivery is the minimal follow-up repair for action-speaker and canonical-transcript-line provenance contracts on top of the explicitly requested T9 parent.

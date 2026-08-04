@@ -1,0 +1,21 @@
+$ bun .omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/flow-driver.ts
+{
+  "targetCommit": "c2736c81fe6ca04167b4f2ded7e67804226471ce",
+  "meetingId": 1,
+  "reviewId": "07d4e0d8-58b1-4b44-8064-b6e09b715c02",
+  "itemId": "ff470f45-b7a2-4de6-a1fc-a8d5f94a6387",
+  "persistedBeforeBroadcastUse": {
+    "review_id": "07d4e0d8-58b1-4b44-8064-b6e09b715c02",
+    "status": "draft",
+    "decision_id": "ff470f45-b7a2-4de6-a1fc-a8d5f94a6387",
+    "review_state": "candidate"
+  },
+  "persistedAfter": {
+    "status": "confirmed",
+    "review_state": "confirmed",
+    "attributed_attendee_id": "alice",
+    "conclusions": 1
+  },
+  "concluded": true,
+  "uiState": "confirmed"
+}

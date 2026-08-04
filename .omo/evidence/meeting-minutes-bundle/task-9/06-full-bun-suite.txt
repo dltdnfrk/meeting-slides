@@ -1,0 +1,259 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/store.test.ts:
+(pass) MeetingStore > 회의 라이프사이클: 시작 → 라인/슬라이드 → 종료 [2.35ms]
+(pass) MeetingStore > 회의가 열려있지 않으면 라인/슬라이드 무시 [0.19ms]
+(pass) MeetingStore > Markdown export: 헤더 + 슬라이드 + 전사본 [1.39ms]
+(pass) MeetingStore > 같은 idx 슬라이드 갱신은 upsert되어 export에 최신 불렛이 남는다 [0.31ms]
+
+tests/sentence-assembler.test.ts:
+(pass) SentenceAssembler > 완결 구두점이면 즉시 방출 [0.05ms]
+(pass) SentenceAssembler > 미완결 조각은 보류 후 다음 조각과 병합 [0.02ms]
+(pass) SentenceAssembler > 구두점으로 끝난 뒤에는 새 문장 시작
+(pass) SentenceAssembler > 길이 상한을 넘으면 구두점 없이도 강제 방출 (실시간성 하한)
+(pass) SentenceAssembler > 화자 전환/종료 시 flush로 보류분 방출
+
+tests/deck.test.ts:
+(pass) linesForSlide > 블록 시작 시각 구간으로 라인 배정 [0.02ms]
+(pass) buildDeckHtml > 타이틀/본문/마무리 섹션 구성 [0.02ms]
+(pass) buildDeckHtml > 불렛과 발표자 노트(전사) 포함 [0.06ms]
+(pass) buildDeckHtml > HTML 이스케이프 [0.06ms]
+(pass) buildDeckHtml > Given meeting imagery assets, When reveal deck is built, Then semantic cover and topic content reference only local decorative images [0.10ms]
+(pass) buildSlideFiles (slides-grab 계약) > 타이틀+블록+마무리 개별 파일 생성 [0.02ms]
+(pass) buildSlideFiles (slides-grab 계약) > 16:9 고정 프레임과 로컬 테마 링크 [0.02ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given standalone slide files, When normal and empty decks are built, Then every page delegates styling and geometry to the shared theme [0.09ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given slides-grab's 960x540 presentation viewport, When standalone slide files are built, Then the shared frame adapter preserves the 1280x720 design surface [0.05ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given topic slide pages, When standalone files are built, Then cover and topics use their matching local decorative assets while closing remains typography-only [0.02ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given six product-limit Korean bullets, When a dense topic is built, Then both outputs use the compact presentation contract without losing text [0.17ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given a long Korean cover title, When deck outputs are built, Then both cover surfaces use the readable long-title contract without deleting text [0.06ms]
+
+tests/minutes-store.test.ts:
+(pass) MinutesStore SQLite contracts > rejects an attendee for a meeting that does not exist [0.86ms]
+(pass) MinutesStore SQLite contracts > creates and activates one prepared legacy-compatible meeting [0.69ms]
+(pass) MinutesStore SQLite contracts > stores local attendee keys independently from optional CRM ids [0.68ms]
+(pass) MinutesStore SQLite contracts > replaces prepared attendees and locks the roster after review confirmation [1.78ms]
+(pass) MinutesStore SQLite contracts > versions immutable transcript lines, finalizes, and selects canonical [0.84ms]
+(pass) MinutesStore SQLite contracts > saves sourced candidates and confirms only fully reviewed items [1.14ms]
+(pass) MinutesStore SQLite contracts > rejects endpoint-valid but interior-missing ranges and rolls back the whole review [0.89ms]
+(pass) MinutesStore SQLite contracts > revalidates source interiors during confirmation in the same transaction [0.88ms]
+(pass) MinutesStore SQLite contracts > enforces attendee provenance and successful-audio hash semantics [0.72ms]
+(pass) MinutesStore SQLite contracts > creates the complete additive minutes schema without changing legacy tables [0.51ms]
+
+tests/public-review.test.ts:
+(pass) review panel shell > the panel mounts hidden and leaves the slide shell intact [602.14ms]
+(pass) review panel shell > capture is not hard-gated by the review panel [38.03ms]
+(pass) candidate cards > a review message renders one card per candidate with quote and version-scoped coordinates [35.63ms]
+(pass) candidate cards > every candidate carries the immutable transcript version id, not just a seq [34.68ms]
+(pass) candidate cards > a multi-line segment shows the joined evidence text of the whole range [39.43ms]
+(pass) candidate cards > action items surface deadline text alongside the normalized deadline [40.84ms]
+(pass) candidate cards > decisions and open items have no assignee control — only action items do [43.23ms]
+(pass) attendee dropdown attribution > attribution options come only from the review attendees, never free text [49.06ms]
+(pass) attendee dropdown attribution > the suggested attribution is preselected and a change sends updateItem [56.48ms]
+(pass) attendee dropdown attribution > assigning an action item sends updateItem with the assignee patch [234.37ms]
+(pass) attendee dropdown attribution > with no attendees the dropdowns are disabled and explain why [48.94ms]
+(pass) edit and drop controls > editing a description sends updateItem with the trimmed text [103.77ms]
+(pass) edit and drop controls > an empty edit is rejected without sending anything [73.00ms]
+(pass) edit and drop controls > dropping a candidate marks it rejected and sends the review_state patch [75.57ms]
+(pass) edit and drop controls > a dropped candidate can be restored to candidate state [83.00ms]
+(pass) confirm action > confirm sends confirmReview with the review id [82.10ms]
+(pass) confirm action > the confirm button reports how many candidates will be kept [85.47ms]
+(pass) confirm action > confirming while every candidate is dropped is blocked [98.30ms]
+(pass) empty, error, and loading states > an empty candidate list shows the no-candidates notice and no cards [70.45ms]
+(pass) empty, error, and loading states > the extraction status message drives a loading state before the payload lands [91.97ms]
+(pass) empty, error, and loading states > an extraction failure status shows a retry affordance instead of stale cards [378.50ms]
+(pass) keyboard accessibility > Escape closes the panel and the toggle reopens it without refetching [67.54ms]
+(pass) keyboard accessibility > opening the panel moves focus into it and the toggle reflects expansion [50.26ms]
+(pass) keyboard accessibility > every control is reachable and labelled for assistive tech [52.82ms]
+(pass) keyboard accessibility > Enter on the drop control toggles it, so the panel is operable keyboard-only [64.80ms]
+(pass) reconnect and update handling > a second review message replaces the previous candidates rather than appending [73.04ms]
+(pass) reconnect and update handling > a dropped socket disables confirm and reconnect restores it [3091.38ms]
+(pass) reconnect and update handling > local edits survive a re-render triggered by an unrelated message [71.72ms]
+(pass) hostile payloads > markup in descriptions, quotes, and attendee names is escaped as text [78.61ms]
+(pass) hostile payloads > a malformed review payload is ignored without tearing down the shell [82.31ms]
+(pass) hostile payloads > a kind outside the updateItem wire contract is refused, not rendered as an actionable card [92.56ms]
+(pass) hostile payloads > items missing required evidence or source coordinates are refused rather than rendered uncited [90.13ms]
+
+tests/whisper-speaker.test.ts:
+(pass) extractSpeakerTurn > 마커가 있으면 turn=true + 텍스트에서 제거 [0.05ms]
+(pass) extractSpeakerTurn > 마커가 없으면 원문 유지 [0.03ms]
+(pass) extractSpeakerTurn > 마커만 있는 라인은 빈 텍스트
+(pass) isHallucinationLoop > 토큰 4회 이상 연속 반복은 환각 루프 [0.22ms]
+(pass) isHallucinationLoop > 실제 강조(3회 이하)와 정상 문장은 통과 [0.02ms]
+
+tests/server-ws-dispatch.test.ts:
+(pass) characterizes existing WS responses, broadcasts, saved path, active reset, and malformed input [44.23ms]
+
+tests/public-attendees.test.ts:
+(pass) pre-capture attendee registration form > the pre-capture shell exposes a keyboard-reachable attendee panel [609.18ms]
+(pass) pre-capture attendee registration form > Enter on the toggle opens the panel and focuses the name field [30.94ms]
+(pass) pre-capture attendee registration form > Escape closes the panel and returns focus to the toggle [44.28ms]
+(pass) pre-capture attendee registration form > a click outside the panel closes it, matching the provider-panel pattern [63.37ms]
+(pass) pre-capture attendee registration form > Enter in the form adds drafts with name and optional crm id, including CJK [66.82ms]
+(pass) pre-capture attendee registration form > an empty or whitespace-only name is rejected without sending anything [50.83ms]
+(pass) pre-capture attendee registration form > a duplicate name is rejected and the existing draft is left untouched [56.27ms]
+(pass) pre-capture attendee registration form > edit loads a draft back into the form and replaces it in place [114.14ms]
+(pass) pre-capture attendee registration form > edit and remove keep the panel open even though they re-render the list [95.09ms]
+(pass) pre-capture attendee registration form > remove drops exactly one draft [100.13ms]
+(pass) pre-capture attendee registration form > submit serializes the exact setAttendees wire payload [100.63ms]
+(pass) pre-capture attendee registration form > submitting an empty roster is blocked and sends nothing [215.61ms]
+(pass) pre-capture attendee registration form > an attendees ack stores meeting_id plus the dropdown source and marks rows saved [67.58ms]
+(pass) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved [81.51ms]
+(pass) pre-capture attendee registration form > capture is never hard-gated on attendees [58.29ms]
+(pass) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture [101.38ms]
+(pass) pre-capture attendee registration form > capture locks and hides the attendee surface, and release restores it [67.86ms]
+(pass) pre-capture attendee registration form > a submit racing a capture transition sends at most one setAttendees [73.88ms]
+(pass) pre-capture attendee registration form > a reconnect asks the server to restore the draft roster [3088.01ms]
+(pass) pre-capture attendee registration form > malformed attendees payloads leave the panel usable and state coherent [70.82ms]
+(pass) pre-capture attendee registration form > untrusted attendee text is rendered as text, never as markup [66.99ms]
+(pass) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id [81.91ms]
+(pass) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches [3190.25ms]
+(pass) pre-capture attendee registration form > existing slide rendering and dock controls survive the new panel [93.35ms]
+
+tests/server-handler-map.test.ts:
+(pass) the real WS registry contains executable handlers for every existing action [121.17ms]
+
+tests/start-review.test.ts:
+(pass) startReview > extracts canonical version lines without persistence and returns a self-contained review payload [1.52ms]
+(pass) startReview > creates an empty version-scoped review for an empty canonical transcript [0.76ms]
+(pass) startReview > rejects extraction failures and wrong-version results without persisting a review [1.73ms]
+
+tests/extract.test.ts:
+(pass) parseMinutesExtractionJson > accepts grounded candidates, assigns local ids, and preserves valid siblings [0.34ms]
+(pass) parseMinutesExtractionJson > normalizes deadlines only from explicit source text, never model inference [0.06ms]
+(pass) parseMinutesExtractionJson > diagnoses every provenance rejection without keeping invalid candidates [0.12ms]
+(pass) parseMinutesExtractionJson > empty/non-JSON and top-level version mismatch mark the whole batch for fallback [0.23ms]
+(pass) parseMinutesExtractionJson > does not extract JSON from prose or coerce malformed candidate fields [0.06ms]
+(pass) precision local-rule fallback > copies only explicit ending lines verbatim with single-line provenance [0.34ms]
+(pass) precision local-rule fallback > never joins lines, resolves pronouns, maps speaker turns, or infers relative dates [0.06ms]
+(pass) MinutesExtractor > round-trips through chat with the provenance prompt [0.20ms]
+(pass) MinutesExtractor > falls back on transport failure and batch failure, while valid empty JSON succeeds [0.15ms]
+
+tests/providers.test.ts:
+(pass) buildProviderEntries > 구독 CLI 가용성은 주입된 탐지 결과를 따른다 [0.06ms]
+(pass) buildProviderEntries > HTTP 프로바이더는 키/URL 존재로 가용 판정 [0.02ms]
+(pass) buildProviderEntries > 5개 카드를 순서대로 제공 (구독 2 + API 3) [0.01ms]
+(pass) buildProviderEntries > 모델/effort 옵션 목록 제공 [0.04ms]
+(pass) upsertEnvText > 기존 키는 값만 교체하고 다른 줄은 보존 [0.08ms]
+(pass) upsertEnvText > 없는 키는 끝에 추가 [0.01ms]
+(pass) upsertEnvText > 여러 키 동시 upsert
+(pass) upsertEnvText > 키 주변 공백이 있어도 매칭
+(pass) createDetector > cli 프리셋은 API 키 없이 생성 [0.04ms]
+(pass) createDetector > 알 수 없는 id는 null [0.04ms]
+
+tests/review-actions.test.ts:
+(pass) MinutesStore review mutation transaction > validates candidate ownership, attendee membership, and the whole patch before mutating [1.28ms]
+(pass) MinutesStore review mutation transaction > atomically transitions draft to confirmed only after every item is reviewed [0.94ms]
+(pass) MinutesStore review mutation transaction > rejects a review whose transcript version is no longer canonical [0.86ms]
+(pass) MinutesStore review mutation transaction > detects changed canonical transcript bytes and leaves review/artifact rows untouched [1.55ms]
+(pass) MinutesStore review mutation transaction > revalidates persisted attendee identities inside the confirmation transaction [1.10ms]
+(pass) MinutesStore review mutation transaction > rolls back confirmation when a confirmed source range has an interior gap [1.00ms]
+(pass) MinutesStore review mutation transaction > rolls back the status and timestamp when the confirmation transaction fails [0.90ms]
+(pass) real WS actions reject adversarial patches, persist valid changes, and confirm without artifacts [2.74ms]
+
+tests/slide-persist.test.ts:
+(pass) same-topic slide persistence end-to-end > 세션 같은 토픽 갱신 → SQLite → deck export에 최신 불렛 [45.24ms]
+
+tests/whisper-dedupe.test.ts:
+(pass) bigramSimilarity > 완전히 같은 문장은 1 [0.15ms]
+(pass) bigramSimilarity > 띄어쓰기·대소문자 차이는 정규화로 흡수 [0.02ms]
+(pass) bigramSimilarity > 같은 발화의 부분 수정(리비전)은 높은 유사도 [0.04ms]
+(pass) bigramSimilarity > 공통 어미(습니다)만 같은 무관한 문장은 낮은 유사도 [0.02ms]
+(pass) bigramSimilarity > 같은 글자를 어순만 바꾼 문장은 중복이 아님
+(pass) bigramSimilarity > 빈 문자열·한 글자는 0
+
+tests/session.test.ts:
+(pass) MeetingSession > 첫 감지에서 첫 슬라이드 생성 [12.25ms]
+(pass) MeetingSession > hysteresis: advance 1회는 불렛만 갱신, 2회 연속이면 새 슬라이드 [34.65ms]
+(pass) MeetingSession > advance 시그널이 끊기면 streak 리셋 [35.03ms]
+(pass) MeetingSession > reset()은 진행 중이던 감지 결과를 폐기 (epoch 무효화) [35.26ms]
+(pass) MeetingSession > detectInterval 문장이 쌓여야 LLM 호출 [22.98ms]
+(pass) MeetingSession > 자막은 200ms 디바운스 후 브로드캐스트 [262.78ms]
+(pass) MeetingSession > LLM 실패 시 status 브로드캐스트 + 로컬 fallback 슬라이드 [22.27ms]
+(pass) MeetingSession > setDetector로 런타임 LLM 교체 — 다음 감지부터 새 백엔드 사용 [12.11ms]
+(pass) MeetingSession > 전사 로그는 문장+시각+화자를 전부 보관하고 reset에서 비움 [0.15ms]
+(pass) MeetingSession > 화자 번호가 캡션에 실리고, 화자 변경 시 버퍼 즉시 플러시 [262.21ms]
+(pass) MeetingSession > 같은 토픽 불렛 갱신도 sink.onSlide로 영속화된다 [45.43ms]
+
+tests/minutes.test.ts:
+(pass) buildMinutesHtml > keeps metadata, every decision, and every action in the first-page section, including empty states [0.33ms]
+(pass) buildMinutesHtml > starts appendix content after a forced page break [1.21ms]
+(pass) buildMinutesHtml > prints immutable provenance coordinates for every sourced item [0.30ms]
+(pass) buildMinutesHtml > displays the canonical transcript version independently of item coordinates [0.04ms]
+(pass) buildMinutesHtml > escapes all untrusted text and attribute values [0.11ms]
+
+tests/pdf.test.ts:
+(pass) renderMinutesPdf > prints a non-empty portrait A4 PDF with the complete summary before the appendix [672.97ms]
+(pass) renderMinutesPdf > uses bounded shrink-to-fit for a dense summary without splitting its first page [686.26ms]
+(pass) renderMinutesPdf > rejects impossible first pages instead of emitting a split PDF [530.09ms]
+(pass) renderMinutesPdf > reports Chromium launch failures and removes its temporary directory [5.85ms]
+(pass) renderMinutesPdf > removes its temporary directory after overflow, launch failure, and measurement failure [1050.05ms]
+(pass) renderMinutesPdf > matches the exact leak probe without leaving meeting-minutes-pdf temp directories [1031.43ms]
+
+tests/transcript-versioning.test.ts:
+(pass) canonical transcript versioning > live capture dual-writes, finalizes a content hash, and makes canonical lines immutable [1.66ms]
+(pass) canonical transcript versioning > retranscription creates a new immutable coordinate space without changing canonical automatically [1.33ms]
+(pass) canonical transcript versioning > an interrupted retranscription leaves the previous canonical version intact [0.80ms]
+(pass) canonical transcript versioning > legacy snapshot rejects duplicate coordinates instead of guessing [0.66ms]
+(pass) raw audio hash and recorder contract > file audio claims are hash-deduplicated and preserve the first meeting on unique collision [1.04ms]
+(pass) raw audio hash and recorder contract > recorder waits for closure, hashes a valid WAV, and removes failed partial output [576.09ms]
+
+tests/start-review-action.test.ts:
+(pass) startReview is ended-only, requester-scoped, and single-flight for one canonical version [385.48ms]
+
+tests/deck-assets.test.ts:
+(pass) Given deck-local imagery, When export assets are copied, Then reveal and standalone roots receive byte-identical local files [5.15ms]
+
+tests/llm-transport.test.ts:
+(pass) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [3.19ms]
+(pass) existing LLM detectBlock transport behavior > HTTP preserves status and response text in rejection [1.35ms]
+(pass) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [369.68ms]
+(pass) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [184.40ms]
+(pass) generic chat transport > HTTP returns the provider's raw text [2.02ms]
+(pass) generic chat transport > HTTP sends user-only message with defaults and no response_format [1.52ms]
+(pass) generic chat transport > HTTP applies system/temperature/maxTokens options [1.32ms]
+(pass) generic chat transport > HTTP chat preserves status and response text in rejection [1.24ms]
+(pass) generic chat transport > HTTP chat falls back to reasoning_content when content is empty [1.15ms]
+(pass) generic chat transport > CLI passes the prompt verbatim (no SYSTEM_PROMPT) and returns raw stdout [421.89ms]
+(pass) generic chat transport > CLI prepends options.system to the prompt [372.70ms]
+(pass) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection [207.89ms]
+(pass) generic chat transport > CLI chat honors options.timeoutMs override [253.19ms]
+
+tests/attendees-action.test.ts:
+(pass) setAttendees replaces a prepared roster and rejects capturing or ended meetings [40.51ms]
+
+tests/bundle.test.ts:
+(pass) atomic CRM meeting bundle > exports confirmed review, immutable provenance, canonical metadata, raw audio, deck, and validated manifest [29.94ms]
+(pass) atomic CRM meeting bundle > rejects draft, stale, and cross-meeting reviews before creating files or artifact rows [6.48ms]
+(pass) atomic CRM meeting bundle > uses fixed safe paths for hostile IDs/text, preserves JSON text, and escapes both HTML render paths [22.42ms]
+(pass) atomic CRM meeting bundle > cleans every temporary/partial output and database row when PDF generation fails [9.70ms]
+(pass) atomic CRM meeting bundle > repeat export validates and deduplicates the same immutable bundle without rerendering [24.75ms]
+(pass) atomic CRM meeting bundle > rejects missing or hash-mismatched audio and leaves no partial bundle [15.31ms]
+
+tests/grab.test.ts:
+(pass) grab design-gate helpers > reviewed=false면 proceed 리포트 생성 거부 [0.17ms]
+(pass) grab design-gate helpers > reviewed=true면 계약 문구를 포함한 마크다운 생성 [0.12ms]
+
+tests/conclusion.test.ts:
+(pass) meeting conclusion > confirms, atomically builds the bundle, then persists and returns its complete identity [20.61ms]
+(pass) meeting conclusion > does not claim conclusion on bundle failure, then retries a confirmed review idempotently [24.28ms]
+(pass) meeting conclusion > revalidates attendee identity in the confirmation transaction before bundle publication [7.03ms]
+(pass) meeting conclusion > rejects pending and stale reviews before bundle publication [11.45ms]
+(pass) meeting conclusion > rejects exporter results whose manifest identity does not match the meeting without persisting conclusion [21.91ms]
+(pass) meeting conclusion > rejects unconfirmed direct publication and mismatched artifact links without a conclusion [24.44ms]
+
+tests/llm-cli.test.ts:
+(pass) buildCliArgs > claude 프리셋: -p + text 출력 [0.03ms]
+(pass) buildCliArgs > codex 프리셋: exec + 최종 메시지 파일 [0.03ms]
+(pass) buildCliArgs > codex: 모델/effort 오버라이드 인자 [0.02ms]
+(pass) buildCliArgs > claude: 모델 오버라이드 인자 [0.01ms]
+(pass) parseBlockDetectionJson > 정상 JSON 파싱 [0.02ms]
+(pass) parseBlockDetectionJson > 앞뒤 사고 과정이 붙은 출력에서 JSON 추출 (reasoning 대응) [0.01ms]
+[LLM] 블록 감지 JSON 파싱 실패: JSON이 아닌 응답
+(pass) parseBlockDetectionJson > 깨진 출력은 파싱 실패 fallback [0.06ms]
+(pass) parseBlockDetectionJson > 빈 출력은 빈 결과
+(pass) parseBlockDetectionJson > 제목 50자, 불렛 80자/6개 제한 [0.06ms]
+
+ 198 pass
+ 0 fail
+ 734 expect() calls
+Ran 198 tests across 27 files. [24.53s]

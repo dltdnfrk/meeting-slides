@@ -1,0 +1,2 @@
+COMMAND: bunx tsc --allowJs --checkJs --noEmit --target ES2022 --module ESNext --moduleResolution bundler --lib ES2022,DOM public/app.js public/review-panel-render.js public/review-panel.js --pretty false
+EXIT_CODE: 0

@@ -1,0 +1,47 @@
+APPENDIX
+
+논의 및 근거 기록
+정본 전사 버전 qa-canonical-v1
+
+논의 및 미결 사항
+1. APPENDIX-QA: retain follow-up discussion
+   발언자 미지정 · (qa-canonical-v1,6,6)
+
+참조 자료
+참조 자료 없음
+발언 귀속 및 정본 전사 원문
+   Alice Kim      APPENDIX-QA-LINE-1: canonical transcript evidence (qa-canonical-v1,7,7)
+                  retained for review.
+   Alice Kim      APPENDIX-QA-LINE-2: canonical transcript evidence (qa-canonical-v1,8,8)
+                  retained for review.
+   Alice Kim      APPENDIX-QA-LINE-3: canonical transcript evidence (qa-canonical-v1,9,9)
+                  retained for review.
+   Alice Kim      APPENDIX-QA-LINE-4: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,10,10)
+
+   Alice Kim      APPENDIX-QA-LINE-5: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,11,11)
+
+   Alice Kim      APPENDIX-QA-LINE-6: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,12,12)
+
+   Alice Kim      APPENDIX-QA-LINE-7: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,13,13)
+
+   Alice Kim      APPENDIX-QA-LINE-8: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,14,14)
+
+   Alice Kim      APPENDIX-QA-LINE-9: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,15,15)
+
+   Alice Kim      APPENDIX-QA-LINE-10: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,16,16)
+
+   Alice Kim      APPENDIX-QA-LINE-11: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,17,17)
+
+   Alice Kim      APPENDIX-QA-LINE-12: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,18,18)
+
+   Alice Kim      APPENDIX-QA-LINE-13: canonical transcript evidence (qa-canonical-
+                  retained for review.                               v1,19,19)

@@ -1,0 +1,25 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/server-handler-map.test.ts:
+42 |       LLM_CLI_PRESET: "claude",
+43 |       WHISPER_INPUT_MODE: "mic",
+44 |     },
+45 |   });
+46 |
+47 |   expect(result.status, result.stderr).toBe(0);
+                                            ^
+error: SyntaxError: Export named 'handlerMap' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/server.ts'.
+
+Bun v1.3.14 (macOS arm64)
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/server-handler-map.test.ts:47:40)
+(fail) the real WS registry contains executable handlers for every existing action [19.84ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [28.00ms]

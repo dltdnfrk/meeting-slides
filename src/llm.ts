@@ -39,6 +39,17 @@ export interface DeckPlanner {
 
 export type MeetingLLM = BlockDetector & DeckPlanner;
 
+export interface ChatOptions {
+  system?: string;
+  temperature?: number;
+  maxTokens?: number;
+  timeoutMs?: number;
+}
+
+export interface ChatTransport {
+  chat(prompt: string, options?: ChatOptions): Promise<string>;
+}
+
 /**
  * 모델 출력에서 MeetingCard JSON을 추출하고 엄격히 검증한다. GLM의
  * reasoning_content처럼 앞뒤에 텍스트가 붙어도 JSON 객체 자체는 추출한다.
@@ -210,8 +221,10 @@ export function buildDeckPlannerUserPrompt(input: DeckPlannerInput, repair?: Dec
 const DETECT_TIMEOUT_MS = 30_000;
 const PLAN_TIMEOUT_MS = 120_000;
 const PING_TIMEOUT_MS = 10_000;
+// 범용 chat은 긴 추출 프롬프트를 다룰 수 있어 감지보다 여유 있게 잡는다.
+const CHAT_TIMEOUT_MS = 60_000;
 
-export class LLMClient implements MeetingLLM {
+export class LLMClient implements MeetingLLM, ChatTransport {
   constructor(private cfg: LLMProviderConfig) {}
 
   private chatURL(): string {
@@ -220,6 +233,34 @@ export class LLMClient implements MeetingLLM {
       return `${base}/chat/completions`;
     }
     return `${base}/v1/chat/completions`;
+  }
+
+  async chat(prompt: string, options: ChatOptions = {}): Promise<string> {
+    const messages = [
+      ...(options.system ? [{ role: "system" as const, content: options.system }] : []),
+      { role: "user" as const, content: prompt },
+    ];
+    const resp = await fetch(this.chatURL(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.cfg.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.cfg.model,
+        messages,
+        temperature: options.temperature ?? 0,
+        max_tokens: options.maxTokens ?? 6000,
+      }),
+      signal: AbortSignal.timeout(options.timeoutMs ?? CHAT_TIMEOUT_MS),
+    });
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`LLM API ${resp.status}: ${errText.slice(0, 200)}`);
+    }
+    const data = (await resp.json()) as ChatResponse;
+    const message = data.choices?.[0]?.message;
+    return message?.content ?? message?.reasoning_content ?? "";
   }
 
   async detectBlock(sentences: string[]): Promise<BlockDetectionResult> {

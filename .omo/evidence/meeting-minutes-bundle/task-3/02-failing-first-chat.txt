@@ -1,0 +1,26 @@
+T3 failing-first: generic HTTP chat method is absent
+commit=7a3894e0fc8c67ff99cc297553f46096b455c5ba
+bun test v1.3.14 (0d9b296a)
+
+tests/llm-transport.test.ts:
+(pass) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [3.65ms]
+(pass) existing LLM detectBlock transport behavior > HTTP preserves status and response text in rejection [1.42ms]
+(pass) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [422.98ms]
+(pass) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [127.44ms]
+85 |       port: 0,
+86 |       fetch: () => Response.json({ choices: [{ message: { content: "raw provider text" } }] }),
+87 |     });
+88 |     try {
+89 |       const client = new LLMClient({ baseURL: server.url.toString(), apiKey: "x", model: "stub" });
+90 |       await expect(client.chat("raw prompt")).resolves.toBe("raw provider text");
+                               ^
+TypeError: client.chat is not a function. (In 'client.chat("raw prompt")', 'client.chat' is undefined)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/llm-transport.test.ts:90:27)
+(fail) generic chat transport > HTTP returns the provider's raw text [1.37ms]
+
+ 4 pass
+ 1 fail
+ 6 expect() calls
+Ran 5 tests across 1 file. [570.00ms]
+exit_code=1
+expected_failure=LLMClient.chat is absent

@@ -1,0 +1,12 @@
+{
+  "task": "T11 PDF temp-directory cleanup",
+  "status": "DONE",
+  "commit_subject": "fix(minutes): clean PDF temp directories on every exit",
+  "verified": [
+    "focused bun test",
+    "full bun test (known unrelated public-attendees failure)",
+    "tsc --noEmit",
+    "git diff --check",
+    "cleanup adversarial driver"
+  ]
+}

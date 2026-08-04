@@ -1,0 +1,52 @@
+F4 AUTHORITATIVE RERUN: MAIN/TASK WORKTREE PRESERVATION
+verified_at=2026-08-01T20:35:24Z
+main_path=/Users/hyunjun/Documents/MUNI/meeting-slides
+task_path=/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes
+
+[main before]
+head=921a01513593c0e10181cf01e535a7abe995deb3
+tree=80385a18820c17aea94ecc8b9901fe9b7d385097
+status_sha256=0449b9120369b2fa40d76bab57d842702d576ae05aa4705a572f24acc4127bc8
+tracked_diff_sha256=bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9
+index_diff_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+[main after]
+head=921a01513593c0e10181cf01e535a7abe995deb3
+tree=80385a18820c17aea94ecc8b9901fe9b7d385097
+status_sha256=0449b9120369b2fa40d76bab57d842702d576ae05aa4705a572f24acc4127bc8
+tracked_diff_sha256=bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9
+index_diff_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+staged_entries=0
+main_status:
+ D deck/THIRD_PARTY_NOTICES.md
+ M deck/assets/meeting-cover.png
+ M deck/assets/meeting-topic-map.png
+ M deck/theme.css
+ M public/app.js
+ M public/index.html
+ M public/style.css
+ M server.ts
+ M src/deck.ts
+ M src/grab.ts
+ M tests/deck.test.ts
+?? .omo/
+?? DESIGN.md
+?? docs/
+?? public/transcript-overlay.css
+?? public/transcript-overlay.js
+?? tests/public-overlay.test.ts
+?? tests/public-runtime-guard.test.ts
+?? tests/public-shell.test.ts
+
+[task carrier after]
+carrier_head=359562a6555dffe7e7a374c4dd1d1f7e57f63079
+carrier_tree=fe9a310cd9fa2cf88fbb5f46f1565e3e1fbd496a
+tracked_status_entries=0
+staged_entries=0
+untracked_non_evidence=0
+runtime_db_artifacts=0
+tracked_status:
+staged_paths:
+
+[preservation verdict]
+MAIN_WORKTREE_PRESERVATION=PASS

@@ -1,0 +1,263 @@
+diff --git a/server.ts b/server.ts
+index 89710b9..92b823a 100644
+--- a/server.ts
++++ b/server.ts
+@@ -10,7 +10,6 @@ import { LLMClient, type BlockDetector, type ChatTransport } from "./src/llm.ts"
+ import { CliLLMClient } from "./src/llm-cli.ts";
+ import { MinutesExtractor } from "./src/extract.ts";
+ import { startReview } from "./src/start-review.ts";
+-import { concludeMeeting, type ConclusionState } from "./src/conclusion.ts";
+ import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ReviewUpdate } from "./src/session.ts";
+ import { buildProviderEntries, checkCliBin, createDetector, KEY_BY_PROVIDER, upsertEnvText } from "./src/providers.ts";
+ import { MeetingStore } from "./src/store.ts";
+@@ -59,9 +58,6 @@ const broadcast = (msg: ServerMessage) => {
+ };
+ // anarlog(fastrepl) 방식: 전사·슬라이드를 로컬 SQLite에 영속 저장
+ const databasePath = process.env.MEETINGS_DB_PATH ?? join(import.meta.dir, "meetings.db");
+-const bundleOutputRoot = process.env.MEETING_BUNDLE_OUTPUT_ROOT ?? join(import.meta.dir, "exports");
+-const bundleTargetCommit = process.env.MEETING_BUNDLE_TARGET_COMMIT
+-  ?? spawnSync("git", ["rev-parse", "HEAD"], { cwd: import.meta.dir, encoding: "utf8" }).stdout.trim();
+ const store = new MeetingStore(databasePath);
+ const minutesStore = new MinutesStore(store.databaseHandle());
+ const transcriptWriter = new TranscriptVersionWriter(minutesStore);
+@@ -455,29 +451,16 @@ const handleUpdateItem: WsActionHandler = ({ cmd }) => {
+   broadcast({ type: "reviewItemUpdated", reviewId, itemId, kind });
+ };
+
+-const conclusionRuns = new Map<string, Promise<ConclusionState>>();
+-
+-function runConclusion(reviewId: string): Promise<ConclusionState> {
+-  const active = conclusionRuns.get(reviewId);
+-  if (active) return active;
+-  const run = concludeMeeting(reviewId, {
+-    store: minutesStore,
+-    outputRoot: bundleOutputRoot,
+-    projectRoot: import.meta.dir,
+-    targetCommit: bundleTargetCommit,
+-  });
+-  conclusionRuns.set(reviewId, run);
+-  void run.finally(() => {
+-    if (conclusionRuns.get(reviewId) === run) conclusionRuns.delete(reviewId);
+-  }).catch(() => {});
+-  return run;
+-}
+-
+-const handleConfirmReview: WsActionHandler = ({ ws, cmd }) => {
++const handleConfirmReview: WsActionHandler = ({ cmd }) => {
+   const reviewId = parseReviewId(cmd.reviewId, "reviewId");
+-  void runConclusion(reviewId)
+-    .then((conclusion) => broadcast(conclusion))
+-    .catch((error: unknown) => requestError(ws, error));
++  minutesStore.confirmReview(reviewId);
++  const review = minutesStore.review(reviewId)!;
++  broadcast({
++    type: "reviewConfirmed",
++    reviewId,
++    transcriptVersionId: review.transcriptVersionId,
++    confirmedAt: review.confirmedAt!,
++  });
+ };
+
+ const handleStatus: WsActionHandler = ({ ws, cmd }) => {
+diff --git a/src/minutes-store.ts b/src/minutes-store.ts
+index 1c9c414..9d34b19 100644
+--- a/src/minutes-store.ts
++++ b/src/minutes-store.ts
+@@ -773,17 +773,28 @@ export class MinutesStore {
+         if (pending.count > 0) {
+           throw reviewError("PENDING_REVIEW_ITEMS", "all review items must be confirmed or rejected");
+         }
+-        const sourced = this.db.query(`
+-          SELECT source_transcript_version_id, source_start_seq, source_end_seq FROM ${table}
+-          WHERE review_id = ? AND review_state = 'confirmed' AND source_transcript_version_id IS NOT NULL
++        const attendeeColumns = table === "action_items"
++          ? "attributed_attendee_id, assignee_attendee_id"
++          : table === "decisions" || table === "open_items"
++            ? "attributed_attendee_id, NULL AS assignee_attendee_id"
++            : "NULL AS attributed_attendee_id, NULL AS assignee_attendee_id";
++        const confirmed = this.db.query(`
++          SELECT source_transcript_version_id, source_start_seq, source_end_seq, ${attendeeColumns}
++          FROM ${table} WHERE review_id = ? AND review_state = 'confirmed'
+         `).all(reviewId) as Array<{
+-          source_transcript_version_id: string; source_start_seq: number; source_end_seq: number;
++          source_transcript_version_id: string | null; source_start_seq: number | null; source_end_seq: number | null;
++          attributed_attendee_id: string | null; assignee_attendee_id: string | null;
+         }>;
+-        for (const source of sourced) this.validateSource(review.meeting_id, review.transcript_version_id, {
+-          transcriptVersionId: source.source_transcript_version_id,
+-          startSeq: source.source_start_seq,
+-          endSeq: source.source_end_seq,
+-        });
++        for (const item of confirmed) {
++          if (item.source_transcript_version_id !== null) this.validateSource(review.meeting_id, review.transcript_version_id, {
++            transcriptVersionId: item.source_transcript_version_id,
++            startSeq: item.source_start_seq!,
++            endSeq: item.source_end_seq!,
++          });
++          for (const attendeeId of [item.attributed_attendee_id, item.assignee_attendee_id]) {
++            if (attendeeId !== null) this.validateAttendee(review.meeting_id, attendeeId);
++          }
++        }
+       }
+       const now = Date.now();
+       this.db.run(`
+diff --git a/src/session.ts b/src/session.ts
+index 319c0da..7a3d2bf 100644
+--- a/src/session.ts
++++ b/src/session.ts
+@@ -120,6 +120,20 @@ export interface ReviewUpdate {
+   }>;
+ }
+
++export interface ReviewItemUpdated {
++  type: "reviewItemUpdated";
++  reviewId: string;
++  itemId: string;
++  kind: "decision" | "action_item" | "open_item";
++}
++
++export interface ReviewConfirmed {
++  type: "reviewConfirmed";
++  reviewId: string;
++  transcriptVersionId: string;
++  confirmedAt: number;
++}
++
+ /** LLM 블록 감지 진행 표시 (관찰성: 사람·AI 모두 "지금 만드는 중"을 읽을 수 있게) */
+ export interface DetectUpdate {
+   type: "detect";
+@@ -132,7 +146,7 @@ export interface SavedUpdate {
+   path: string;
+ }
+
+-export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | LineUpdate | DetectUpdate | SavedUpdate;
++export type ServerMessage = SlideUpdate | CaptionUpdate | StatusUpdate | TranscriptUpdate | ProvidersUpdate | CaptureUpdate | AttendeesUpdate | ReviewUpdate | ReviewItemUpdated | ReviewConfirmed | LineUpdate | DetectUpdate | SavedUpdate;
+
+ export type ClientListener = (msg: ServerMessage) => void;
+
+diff --git a/tests/review-actions.test.ts b/tests/review-actions.test.ts
+index cd9dcd8..ca0c8c5 100644
+--- a/tests/review-actions.test.ts
++++ b/tests/review-actions.test.ts
+@@ -25,6 +25,7 @@ function fixture() {
+   store.addTranscriptVersionLines(version.transcriptVersionId, [
+     { seq: 1, text: "Ship Friday was confirmed." },
+     { seq: 2, text: "Alice will run QA by 2026-08-07." },
++    { seq: 3, text: "Bob agreed to verify the result." },
+   ]);
+   store.finalizeTranscriptVersion(version.transcriptVersionId, transcriptContentSha256(store, version.transcriptVersionId));
+   store.setCanonical(meetingId, version.transcriptVersionId);
+@@ -39,7 +40,7 @@ function fixture() {
+     actionItems: [{
+       id: "action-1",
+       description: "Run QA",
+-      source: { transcriptVersionId: version.transcriptVersionId, startSeq: 2, endSeq: 2 },
++      source: { transcriptVersionId: version.transcriptVersionId, startSeq: 1, endSeq: 3 },
+     }],
+   });
+   return { legacy, store, meetingId, transcriptVersionId: version.transcriptVersionId, reviewId };
+@@ -128,6 +129,59 @@ describe("MinutesStore review mutation transaction", () => {
+     expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
+     fx.legacy.close();
+   });
++
++  test("revalidates persisted attendee identities inside the confirmation transaction", () => {
++    const fx = fixture();
++    fx.store.updateItem(fx.reviewId, "decision", "decision-1", { reviewState: "rejected" });
++    fx.store.updateItem(fx.reviewId, "action_item", "action-1", {
++      assigneeAttendeeId: "alice", attributedAttendeeId: "bob", deadline: "2026-08-07", reviewState: "confirmed",
++    });
++    const db = fx.store.databaseHandle();
++    db.run("PRAGMA foreign_keys = OFF");
++    db.run("UPDATE action_items SET assignee_attendee_id = 'mallory' WHERE review_id = ?", [fx.reviewId]);
++    db.run("PRAGMA foreign_keys = ON");
++
++    expectCode(() => fx.store.confirmReview(fx.reviewId), "ATTENDEE_NOT_IN_MEETING");
++    expect(fx.store.review(fx.reviewId)).toMatchObject({ status: "draft", confirmedAt: null });
++    expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
++    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
++    fx.legacy.close();
++  });
++
++  test("rolls back confirmation when a confirmed source range has an interior gap", () => {
++    const fx = fixture();
++    fx.store.updateItem(fx.reviewId, "decision", "decision-1", { reviewState: "rejected" });
++    fx.store.updateItem(fx.reviewId, "action_item", "action-1", {
++      assigneeAttendeeId: "alice", attributedAttendeeId: "bob", deadline: "2026-08-07", reviewState: "confirmed",
++    });
++    const db = fx.store.databaseHandle();
++    db.run("DROP TRIGGER trg_finalized_transcript_lines_no_delete");
++    db.run("DELETE FROM transcript_version_lines WHERE transcript_version_id = ? AND seq = 2", [fx.transcriptVersionId]);
++    db.run("UPDATE transcript_versions SET content_sha256 = ? WHERE transcript_version_id = ?", [
++      transcriptContentSha256(fx.store, fx.transcriptVersionId), fx.transcriptVersionId,
++    ]);
++
++    expectCode(() => fx.store.confirmReview(fx.reviewId), "INVALID_SOURCE_SEGMENT");
++    expect(fx.store.review(fx.reviewId)).toMatchObject({ status: "draft", confirmedAt: null });
++    expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
++    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
++    fx.legacy.close();
++  });
++
++  test("rolls back the status and timestamp when the confirmation transaction fails", () => {
++    const fx = fixture();
++    fx.store.updateItem(fx.reviewId, "decision", "decision-1", { reviewState: "rejected" });
++    fx.store.updateItem(fx.reviewId, "action_item", "action-1", { reviewState: "rejected" });
++    const db = fx.store.databaseHandle();
++    db.run(`CREATE TRIGGER fail_review_confirmation BEFORE UPDATE OF status ON meeting_reviews
++      WHEN NEW.status = 'confirmed' BEGIN SELECT RAISE(ABORT, 'forced transaction failure'); END`);
++
++    expect(() => fx.store.confirmReview(fx.reviewId)).toThrow("forced transaction failure");
++    expect(fx.store.review(fx.reviewId)).toMatchObject({ status: "draft", confirmedAt: null });
++    expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
++    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
++    fx.legacy.close();
++  });
+ });
+
+ const root = join(import.meta.dir, "..");
+@@ -262,6 +316,13 @@ afterAll(async () => {
+
+ test("real WS actions reject adversarial patches, persist valid changes, and confirm without artifacts", async () => {
+   await wsError({ action: "confirmReview", reviewId: "not-started" }, "REVIEW_NOT_DRAFT");
++  await wsError({ action: "confirmReview" }, "INVALID_REVIEW_REQUEST");
++  await wsError({ action: "confirmReview", reviewId }, "PENDING_REVIEW_ITEMS");
++  await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", patch: {} }, "INVALID_REVIEW_REQUEST");
++  await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", kind: "action_item" }, "INVALID_REVIEW_PATCH");
++  await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", kind: "action_item", patch: {
++    attributedAttendeeId: "bob", reviewState: "confirmed",
++  } }, "INCOMPLETE_REVIEW_ITEM");
+   await wsError({
+     action: "updateItem", reviewId, itemId: "ws-action-1", kind: "decision", patch: { reviewState: "rejected" },
+   }, "UNKNOWN_REVIEW_ITEM");
+@@ -278,7 +339,7 @@ test("real WS actions reject adversarial patches, persist valid changes, and con
+     action: "updateItem", reviewId, itemId: "ws-action-1", kind: "action_item",
+     patch: {
+       description: "Run release QA", assigneeAttendeeId: "alice", attributedAttendeeId: "bob",
+-      deadline: "2026-08-07", reviewState: "confirmed",
++      deadline: "2026-08-07", deadlineText: "next Friday", reviewState: "confirmed",
+     },
+   }, (message) => message.type === "reviewItemUpdated" && message.reviewId === reviewId);
+   expect(updated).toEqual({ type: "reviewItemUpdated", reviewId, itemId: "ws-action-1", kind: "action_item" });
+@@ -290,14 +351,19 @@ test("real WS actions reject adversarial patches, persist valid changes, and con
+   expect(confirmed).toMatchObject({ type: "reviewConfirmed", reviewId, transcriptVersionId: "ws-canonical-v1" });
+
+   const db = new Database(dbPath, { readonly: true });
+-  expect(db.query("SELECT description, assignee_attendee_id, attributed_attendee_id, deadline, review_state FROM action_items WHERE action_item_id = 'ws-action-1'").get()).toEqual({
++  expect(db.query("SELECT description, assignee_attendee_id, attributed_attendee_id, deadline, deadline_text, review_state FROM action_items WHERE action_item_id = 'ws-action-1'").get()).toEqual({
+     description: "Run release QA",
+     assignee_attendee_id: "alice",
+     attributed_attendee_id: "bob",
+     deadline: "2026-08-07",
++    deadline_text: "next Friday",
+     review_state: "confirmed",
+   });
+-  expect(db.query("SELECT status FROM meeting_reviews WHERE review_id = ?").get(reviewId)).toEqual({ status: "confirmed" });
++  const persistedReview = db.query("SELECT status, confirmed_at FROM meeting_reviews WHERE review_id = ?").get(reviewId) as {
++    status: string; confirmed_at: number | null;
++  };
++  expect(persistedReview.status).toBe("confirmed");
++  expect(persistedReview.confirmed_at).toBeGreaterThan(0);
+   expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 0 });
+   expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 0 });
+   db.close();

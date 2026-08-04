@@ -6,10 +6,10 @@
 
 import { loadConfig, loadWhisperConfig } from "./src/config.ts";
 import { WhisperStream, WhisperCLI, listCaptureDevices, type TranscriptChunk } from "./src/whisper.ts";
-import { LLMClient, type MeetingLLM } from "./src/llm.ts";
+import { LLMClient, type ChatTransport, type MeetingLLM } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
-import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ExportUpdate } from "./src/session.ts";
-import { buildProviderEntriesFromStates, createDetector, inspectSubscriptionProviders, KEY_BY_PROVIDER, PROVIDER_ADAPTERS, providerAdapter, providerConnectCommand, upsertEnvText, type ProviderRuntimeState, type SubscriptionProviderId } from "./src/providers.ts";
+import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ExportUpdate, type ReviewUpdate } from "./src/session.ts";
+import { buildProviderEntriesFromStates, checkCliBin, createDetector, inspectSubscriptionProviders, KEY_BY_PROVIDER, PROVIDER_ADAPTERS, providerAdapter, providerConnectCommand, upsertEnvText, type ProviderRuntimeState, type SubscriptionProviderId } from "./src/providers.ts";
 import { AppSettingsStore } from "./src/app-settings.ts";
 import { SttModelManager } from "./src/stt-model-downloader.ts";
 import { createSelectSttModel } from "./src/stt-model-selection.ts";
@@ -17,6 +17,12 @@ import { isSttModelId, type SttModelId } from "./src/stt-model-catalog.ts";
 import { sttModelsMessage } from "./src/stt-model-protocol.ts";
 import { SttModelSettingsStore } from "./src/stt-model-settings.ts";
 import { MeetingStore } from "./src/store.ts";
+import { MinutesStore, type AttendeeInput, type ReviewState } from "./src/minutes-store.ts";
+import { CaptureFinalizer, RawAudioRecorder, TranscriptVersionWriter, claimFileAudioSource, sha256File } from "./src/transcript-versioning.ts";
+import { MinutesExtractor } from "./src/extract.ts";
+import { startReview } from "./src/start-review.ts";
+import { concludeMeeting } from "./src/conclusion.ts";
+import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
 import { runCompileDeckAction } from "./src/deck-compile-action.ts";
 import { prepareExportDeck } from "./src/deck-export.ts";
 import { copyDeckAssets } from "./src/deck-assets.ts";
@@ -25,7 +31,7 @@ import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
 import { createHash, randomUUID } from "node:crypto";
 import type { CompileJobId, ExportJobId } from "./src/session.ts";
 import { join, sep } from "node:path";
-import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { spawn, spawnSync } from "child_process";
 import type { ServerWebSocket } from "bun";
 
@@ -42,15 +48,20 @@ if (args.includes("--devices")) {
 const config = loadConfig(args);
 
 let llm: MeetingLLM;
+let extractionTransport: ChatTransport;
 let llmLabel: string;
 if (config.llm.cli) {
-  llm = new CliLLMClient(config.llm.cli);
+  const client = new CliLLMClient(config.llm.cli);
+  llm = client;
+  extractionTransport = client;
   const model = config.llm.cli.model ? ` · ${config.llm.cli.model}` : "";
   const effort = config.llm.cli.effort ? ` · effort=${config.llm.cli.effort}` : "";
   llmLabel = `cli:${config.llm.cli.preset}(${config.llm.cli.bin})${model}${effort}`;
 } else {
   if (!config.llm.config) throw new Error(`provider=${config.llm.provider}에 HTTP 설정이 없습니다`);
-  llm = new LLMClient(config.llm.config);
+  const client = new LLMClient(config.llm.config);
+  llm = client;
+  extractionTransport = client;
   llmLabel = config.llm.config.model;
 }
 const listeners = new Set<ClientListener>();
@@ -58,14 +69,20 @@ const broadcast = (msg: ServerMessage) => {
   for (const l of listeners) { try { l(msg); } catch {} }
 };
 // anarlog(fastrepl) 방식: 전사·슬라이드를 로컬 SQLite에 영속 저장
-const store = new MeetingStore(join(import.meta.dir, "meetings.db"));
+const databasePath = process.env.MEETINGS_DB_PATH ?? join(import.meta.dir, "meetings.db");
+const bundleOutputRoot = process.env.MEETING_BUNDLE_OUTPUT_ROOT ?? join(import.meta.dir, "exports");
+const bundleTargetCommit = process.env.MEETING_BUNDLE_TARGET_COMMIT
+  ?? spawnSync("git", ["rev-parse", "HEAD"], { cwd: import.meta.dir, encoding: "utf8" }).stdout.trim();
+const store = new MeetingStore(databasePath);
+const minutesStore = new MinutesStore(store.databaseHandle());
+const transcriptWriter = new TranscriptVersionWriter(minutesStore);
 const session = new MeetingSession(
   llm,
   config.block.detectInterval,
   config.block.contextWindow,
   listeners,
   {
-    onLine: (entry) => store.addLine(entry),
+    onLine: (entry) => transcriptWriter.append(entry),
     onSlide: (slide) => {
       store.addSlide({
         idx: slide.index,
@@ -101,6 +118,7 @@ try {
     if (restored) {
       llm = restored;
       session.setDetector(restored);
+      extractionTransport = restored;
       currentProviderId = saved.providerId;
       currentModel = saved.model;
       currentEffort = saved.effort;
@@ -367,6 +385,600 @@ const ALLOWED_WS_ORIGINS = new Set([
   `http://[::1]:${config.server.httpPort}`,
 ]);
 
+interface WsCommand {
+  action?: string;
+  id?: string;
+  key?: string;
+  model?: string;
+  effort?: string;
+  meeting_id?: unknown;
+  purpose?: unknown;
+  attendees?: unknown;
+  reviewId?: unknown;
+  itemId?: unknown;
+  kind?: unknown;
+  patch?: unknown;
+}
+
+let currentMeetingId: number | null = null;
+
+function requestError(ws: ServerWebSocket<undefined>, error: unknown): void {
+  const message = error instanceof Error ? error.message : String(error);
+  ws.send(JSON.stringify({ type: "status" as const, text: `요청 처리 실패: ${message}` }));
+}
+
+function parseAttendees(value: unknown): AttendeeInput[] {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error("attendees must contain at least one attendee");
+  }
+  const attendeeIds = new Set<string>();
+  const crmPersonIds = new Set<string>();
+  return value.map((raw, index) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      throw new Error(`attendees[${index}] must be an object`);
+    }
+    const attendee = raw as Record<string, unknown>;
+    if (typeof attendee.name !== "string" || !attendee.name.trim()) {
+      throw new Error(`attendees[${index}].name must be a non-blank string`);
+    }
+    let attendeeId: string;
+    if (attendee.attendeeId === undefined) attendeeId = randomUUID();
+    else if (typeof attendee.attendeeId !== "string" || !attendee.attendeeId.trim()) {
+      throw new Error(`attendees[${index}].attendeeId must be a non-blank string when provided`);
+    } else attendeeId = attendee.attendeeId.trim();
+    if (attendeeIds.has(attendeeId)) throw new Error(`duplicate attendeeId: ${attendeeId}`);
+    attendeeIds.add(attendeeId);
+
+    let crmPersonEntityId: string | null = null;
+    if (attendee.crmPersonId !== undefined && attendee.crmPersonId !== null) {
+      if (typeof attendee.crmPersonId !== "string" || !attendee.crmPersonId.trim()) {
+        throw new Error(`attendees[${index}].crmPersonId must be a non-blank string or null`);
+      }
+      crmPersonEntityId = attendee.crmPersonId.trim();
+      if (crmPersonIds.has(crmPersonEntityId)) throw new Error(`duplicate crmPersonId: ${crmPersonEntityId}`);
+      crmPersonIds.add(crmPersonEntityId);
+    }
+    return { attendeeId, displayName: attendee.name.trim(), crmPersonEntityId, sortOrder: index };
+  });
+}
+
+function parsePurpose(value: unknown): string | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (typeof value !== "string" || !value.trim()) throw new Error("purpose must be a non-blank string or null");
+  return value.trim();
+}
+
+type ReviewItemKind = "decision" | "action_item" | "open_item";
+type ReviewItemPatch = Parameters<MinutesStore["updateItem"]>[3];
+
+function reviewRequestError(code: string, message: string): Error {
+  return new Error(`[${code}] ${message}`);
+}
+
+function parseReviewId(value: unknown, field: "reviewId" | "itemId"): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw reviewRequestError("INVALID_REVIEW_REQUEST", `${field} must be a non-blank string`);
+  }
+  return value.trim();
+}
+
+function parseReviewKind(value: unknown): ReviewItemKind {
+  if (value !== "decision" && value !== "action_item" && value !== "open_item") {
+    throw reviewRequestError("INVALID_REVIEW_REQUEST", "kind must be decision, action_item, or open_item");
+  }
+  return value;
+}
+
+function parseReviewPatch(value: unknown, kind: ReviewItemKind): ReviewItemPatch {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw reviewRequestError("INVALID_REVIEW_PATCH", "patch must be an object");
+  }
+  const raw = value as Record<string, unknown>;
+  const allowed = new Set(["description", "attributedAttendeeId", "reviewState"]);
+  if (kind === "action_item") {
+    allowed.add("assigneeAttendeeId");
+    allowed.add("deadline");
+    allowed.add("deadlineText");
+  }
+  const unsupported = Object.keys(raw).filter((key) => !allowed.has(key));
+  if (unsupported.length > 0) {
+    throw reviewRequestError("INVALID_REVIEW_PATCH", `unsupported patch field: ${unsupported.sort()[0]}`);
+  }
+  if (Object.keys(raw).length === 0) throw reviewRequestError("INVALID_REVIEW_PATCH", "patch must not be empty");
+  const patch: ReviewItemPatch = {};
+  if (raw.description !== undefined) {
+    if (typeof raw.description !== "string" || !raw.description.trim()) {
+      throw reviewRequestError("INVALID_REVIEW_PATCH", "description must be a non-blank string");
+    }
+    patch.description = raw.description.trim();
+  }
+  for (const field of ["attributedAttendeeId", "assigneeAttendeeId"] as const) {
+    if (raw[field] !== undefined) {
+      if (raw[field] !== null && (typeof raw[field] !== "string" || !raw[field].trim())) {
+        throw reviewRequestError("INVALID_REVIEW_PATCH", `${field} must be a non-blank string or null`);
+      }
+      patch[field] = raw[field] === null ? null : (raw[field] as string).trim();
+    }
+  }
+  if (raw.deadline !== undefined) {
+    if (raw.deadline !== null && (typeof raw.deadline !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw.deadline))) {
+      throw reviewRequestError("INVALID_REVIEW_PATCH", "deadline must be YYYY-MM-DD or null");
+    }
+    patch.deadline = raw.deadline as string | null;
+  }
+  if (raw.deadlineText !== undefined) {
+    if (raw.deadlineText !== null && (typeof raw.deadlineText !== "string" || !raw.deadlineText.trim())) {
+      throw reviewRequestError("INVALID_REVIEW_PATCH", "deadlineText must be a non-blank string or null");
+    }
+    patch.deadlineText = raw.deadlineText === null ? null : (raw.deadlineText as string).trim();
+  }
+  if (raw.reviewState !== undefined) {
+    if (raw.reviewState !== "candidate" && raw.reviewState !== "confirmed" && raw.reviewState !== "rejected") {
+      throw reviewRequestError("INVALID_REVIEW_PATCH", "reviewState must be candidate, confirmed, or rejected");
+    }
+    patch.reviewState = raw.reviewState as ReviewState;
+  }
+  return patch;
+}
+
+type WsActionContext = {
+  ws: ServerWebSocket<undefined>;
+  cmd: WsCommand;
+};
+
+type WsActionHandler = (ctx: WsActionContext) => void;
+
+const handleStartCapture: WsActionHandler = ({ ws, cmd }) => {
+  void startCapture(cmd.meeting_id).catch((error) => requestError(ws, error));
+};
+
+const handleStopCapture: WsActionHandler = ({ ws, cmd }) => {
+  void stopCapture();
+};
+
+const reviewRuns = new Map<string, {
+  promise: Promise<ReviewUpdate>;
+  requesters: Set<ServerWebSocket<undefined>>;
+}>();
+const completedReviews = new Map<string, ReviewUpdate>();
+
+const handleStartReview: WsActionHandler = ({ ws }) => {
+  if (capturing) {
+    requestError(ws, new Error("capture must be stopped before starting review"));
+    return;
+  }
+  if (currentMeetingId === null) {
+    requestError(ws, new Error("no current meeting to review"));
+    return;
+  }
+
+  const meetingId = currentMeetingId;
+  const meta = minutesStore.meetingMeta(meetingId);
+  if (meta?.phase !== "ended") {
+    requestError(ws, new Error(`meeting ${meetingId} must be ended before review`));
+    return;
+  }
+  const canonical = minutesStore.canonicalVersion(meetingId);
+  if (!canonical) {
+    requestError(ws, new Error(`meeting ${meetingId} has no canonical transcript version`));
+    return;
+  }
+  const key = `${meetingId}:${canonical.transcriptVersionId}`;
+  const completed = completedReviews.get(key);
+  if (completed) {
+    broadcast(completed);
+    return;
+  }
+  const active = reviewRuns.get(key);
+  if (active) {
+    active.requesters.add(ws);
+    return;
+  }
+
+  broadcast({ type: "status", text: "회의록 후보 추출 중…" });
+  const promise = startReview({
+    meetingId,
+    store: minutesStore,
+    extractor: new MinutesExtractor(extractionTransport),
+  });
+  const run = { promise, requesters: new Set([ws]) };
+  reviewRuns.set(key, run);
+  void promise.then((review) => {
+    completedReviews.set(key, review);
+    broadcast(review);
+  }).catch((error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[review] 추출 실패: ${message}`);
+    for (const requester of run.requesters) {
+      try {
+        requester.send(JSON.stringify({ type: "status" as const, text: "회의록 후보 추출 실패·재시도" }));
+      } catch { /* requester disconnected */ }
+    }
+  }).finally(() => {
+    if (reviewRuns.get(key) === run) reviewRuns.delete(key);
+  });
+};
+
+const handleReset: WsActionHandler = ({ ws }) => {
+  if (capturing || captureRun) {
+    requestError(ws, new Error("capture must be stopped before reset"));
+    return;
+  }
+  session.reset();
+  store.endMeeting();
+  if (currentMeetingId !== null && minutesStore.meetingMeta(currentMeetingId)?.phase !== "ended") {
+    minutesStore.endMeeting(currentMeetingId);
+  }
+  currentMeetingId = null;
+  broadcast(session.transcript("snapshot"));
+  broadcast(meetingsMessage());
+};
+
+const handleSetAttendees: WsActionHandler = ({ cmd }) => {
+  const attendees = parseAttendees(cmd.attendees);
+  const purpose = parsePurpose(cmd.purpose);
+  const meetingId = currentMeetingId ?? minutesStore.ensurePreparedMeeting(currentProviderId, purpose ?? null);
+  const meta = minutesStore.meetingMeta(meetingId);
+  if (!meta) throw new Error(`unknown meeting ${meetingId}`);
+  if (meta.phase !== "prepared") throw new Error(`meeting ${meetingId} is not prepared`);
+  minutesStore.replaceAttendees(meetingId, attendees);
+  if (purpose !== undefined) minutesStore.setMeetingPurpose(meetingId, purpose);
+  currentMeetingId = meetingId;
+  broadcast({
+    type: "attendees",
+    meeting_id: meetingId,
+    attendees: minutesStore.attendeesFor(meetingId).map((attendee) => ({
+      attendee_id: attendee.attendeeId,
+      display_name: attendee.displayName,
+      ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
+    })),
+  });
+};
+
+/**
+ * 재연결 복원 질의 — 클라이언트가 보관 중인 draft 명단/meeting_id를 다시 요청한다.
+ * 준비된 회의가 없으면 빈 명단을 돌려 클라이언트 상태를 서버와 맞춘다.
+ * 읽기 전용이라 브로드캐스트하지 않고 요청한 소켓에만 답한다.
+ */
+const handleAttendeesQuery: WsActionHandler = ({ ws }) => {
+  const meetingId = currentMeetingId;
+  ws.send(JSON.stringify({
+    type: "attendees" as const,
+    meeting_id: meetingId,
+    attendees: meetingId === null ? [] : minutesStore.attendeesFor(meetingId).map((attendee) => ({
+      attendee_id: attendee.attendeeId,
+      display_name: attendee.displayName,
+      ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
+    })),
+  }));
+};
+
+const handleUpdateItem: WsActionHandler = ({ cmd }) => {
+  const reviewId = parseReviewId(cmd.reviewId, "reviewId");
+  const itemId = parseReviewId(cmd.itemId, "itemId");
+  const kind = parseReviewKind(cmd.kind);
+  const patch = parseReviewPatch(cmd.patch, kind);
+  minutesStore.updateItem(reviewId, kind, itemId, patch);
+  broadcast({ type: "reviewItemUpdated", reviewId, itemId, kind });
+};
+
+const handleConfirmReview: WsActionHandler = ({ ws, cmd }) => {
+  const reviewId = parseReviewId(cmd.reviewId, "reviewId");
+  void concludeMeeting(reviewId, {
+    store: minutesStore,
+    outputRoot: bundleOutputRoot,
+    projectRoot: import.meta.dir,
+    targetCommit: bundleTargetCommit,
+  }).then((conclusion) => {
+    const review = minutesStore.review(reviewId)!;
+    broadcast({
+      type: "reviewConfirmed",
+      reviewId,
+      transcriptVersionId: review.transcriptVersionId,
+      confirmedAt: review.confirmedAt!,
+    });
+    broadcast(conclusion);
+  }).catch((error: unknown) => requestError(ws, error));
+};
+
+const handleStatus: WsActionHandler = ({ ws, cmd }) => {
+  ws.send(JSON.stringify({ type: "status" as const, text: "서버 정상" }));
+};
+
+const handleTranscript: WsActionHandler = ({ ws, cmd }) => {
+  ws.send(JSON.stringify(session.transcript("export")));
+};
+
+const handleDeckExport: WsActionHandler = ({ ws, cmd }) => {
+  // lecture-deck 템플릿 기반 reveal.js 덱 + slides-grab 계약 파일 생성
+  // PDF/PNG는 초안 경로: validate 후 렌더. 가짜 design-gate proceed 영수증은 쓰지 않는다.
+  try {
+    const meta = store.latestMeeting();
+    if (!meta) {
+      broadcast({ type: "status", text: "저장된 회의가 없습니다" });
+    } else {
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const dir = join(import.meta.dir, "exports", `deck-${stamp}`);
+      const slidesDir = join(dir, "slides");
+      mkdirSync(slidesDir, { recursive: true });
+      copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
+      copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(slidesDir, "theme.css"));
+      copyDeckAssets({
+        sourceDirectory: join(import.meta.dir, "deck", "assets"),
+        exportDirectory: dir,
+        slidesDirectory: slidesDir,
+      });
+      const input = {
+        title: "Meeting Notes",
+        startedAt: meta.started_at,
+        provider: meta.provider,
+        slides: store.slides(meta.id),
+        lines: store.lines(meta.id),
+      };
+      writeFileSync(join(dir, "index.html"), buildDeckHtml(input), "utf-8");
+      for (const f of buildSlideFiles(input)) {
+        writeFileSync(join(slidesDir, f.filename), f.html, "utf-8");
+      }
+
+      // slides-grab CLI 실행 헬퍼 (프로젝트 로컬 chromium 사용)
+      const runGrab = (args: string[], onDone: (code: number | null, tail: string) => void) => {
+        const proc = spawn(process.execPath, ["x", "slides-grab", ...args], {
+          env: { ...process.env, PLAYWRIGHT_BROWSERS_PATH: join(import.meta.dir, "vendor", "ms-playwright") },
+          stdio: ["ignore", "pipe", "pipe"],
+        });
+        let tail = "";
+        proc.stderr?.on("data", (d: Buffer) => { tail = (tail + d.toString("utf-8")).slice(-400); });
+        proc.on("close", (code) => onDone(code, tail));
+      };
+
+      if (cmd.action === "exportDeck") {
+        lastSavedPath = `exports/deck-${stamp}/index.html`;
+        broadcast({ type: "saved", path: lastSavedPath });
+        broadcast({ type: "status", text: `덱 저장됨: ${lastSavedPath}` });
+        openUrl(`file://${join(dir, "index.html")}`);
+      } else if (cmd.action === "exportPng") {
+        // 초안 PNG: slides-grab png는 design-gate 대상이 아니라 validate 후 바로 렌더.
+        const out = join(import.meta.dir, "exports", `deck-${stamp}-png`);
+        broadcast({ type: "status", text: "초안 PNG 준비 중… (design-gate 불필요)" });
+        runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
+          if (vcode !== 0) {
+            broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
+            return;
+          }
+          broadcast({ type: "status", text: "초안 PNG 렌더 중… (chromium)" });
+          runGrab(["png", "--slides-dir", slidesDir, "--output-dir", out], (code, tail) => {
+            if (code === 0) {
+              lastSavedPath = `exports/deck-${stamp}-png`;
+              broadcast({ type: "saved", path: lastSavedPath });
+              broadcast({ type: "status", text: `초안 PNG 저장됨: ${lastSavedPath} (미검토)` });
+            } else {
+              broadcast({ type: "status", text: `PNG 실패: ${tail.trim().slice(0, 160)}` });
+            }
+          });
+        });
+      } else {
+        // 정식 PDF: slides-grab pdf는 design-gate proceed 영수증을 CLI 레벨에서 요구한다.
+        // 체인: validate → 정직한 Pass A/B 리포트(실제 수행한 검사를 기록) → design-gate → pdf.
+        const out = join(import.meta.dir, "exports", `deck-${stamp}.pdf`);
+        broadcast({ type: "status", text: "PDF 준비 중… (design-gate)" });
+        const slideFiles = buildSlideFiles(input);
+        const fingerprints = slideFiles.map((f) => ({
+          file: f.filename,
+          sha256: createHash("sha256").update(f.html, "utf-8").digest("hex"),
+        }));
+        runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
+          if (vcode !== 0) {
+            broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
+            return;
+          }
+          // 1) 미리보기 PNG 렌더 → 2) 독립 비전 리뷰 → 3) proceed면 게이트 기록 → 4) PDF
+          broadcast({ type: "status", text: "PDF 미리보기 렌더 중… (chromium)" });
+          runGrab(["png", "--slides-dir", slidesDir, "--output-dir", join(slidesDir, ".slides-grab", "gate-preview")], (_pcode, _ptail) => {
+            void (async () => {
+              try {
+                broadcast({ type: "status", text: "독립 시각 리뷰 중… (codex)" });
+                const previewDir = join(slidesDir, ".slides-grab", "gate-preview");
+                const previewFiles = readdirSync(previewDir)
+                  .filter((f) => f.endsWith(".png"));
+                // 리뷰 모델은 비전 검증된 기본값 사용 (사용자 선택 모델이
+                // 이미지 입력을 거부할 수 있어 슬라이드 생성 모델과 분리)
+                const reviewOpts = { images: previewFiles.map((f) => join(previewDir, f)) };
+                const review = await runVisualReview(
+                  buildReviewPrompt(reviewOpts),
+                  reviewOpts,
+                );
+                if (review.verdict !== "proceed") {
+                  appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-REVISE ${review.summary} ${review.blockingFindings.join("; ")}\n`);
+                  broadcast({
+                    type: "status",
+                    text: `시각 리뷰 revise: ${review.blockingFindings.join("; ").slice(0, 160) || review.summary}`,
+                  });
+                  return;
+                }
+                appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-PROCEED ${review.confidence}\n`);
+                const gateInput = {
+                  slideFiles: fingerprints,
+                  previewFiles,
+                  slideCount: input.slides.length,
+                  maxBullets: Math.max(0, ...input.slides.map((s) => s.bullets.length)),
+                  lineCount: input.lines.length,
+                  reviewed: true,
+                  confidence: review.confidence,
+                  notes: `독립 시각 리뷰 요약: ${review.summary}`,
+                };
+                writeFileSync(join(slidesDir, ".pass-a.md"), buildPassAReport(gateInput), "utf-8");
+                writeFileSync(join(slidesDir, ".pass-b.md"), buildPassBReport(gateInput), "utf-8");
+                broadcast({ type: "status", text: `리뷰 통과 (${review.confidence}) — 게이트 기록 중…` });
+                runGrab(
+                  ["design-gate", "--slides-dir", slidesDir, "--verdict", "proceed",
+                    "--pass-a-report", join(slidesDir, ".pass-a.md"),
+                    "--pass-b-report", join(slidesDir, ".pass-b.md")],
+                  (gcode, gtail) => {
+                    if (gcode !== 0) {
+                      broadcast({ type: "status", text: `design-gate 실패: ${gtail.trim().slice(0, 160)}` });
+                      return;
+                    }
+                    broadcast({ type: "status", text: "PDF 렌더 중… (chromium)" });
+                    runGrab(["pdf", "--slides-dir", slidesDir, "--output", out], (code, tail) => {
+                      if (code === 0) {
+                        lastSavedPath = `exports/deck-${stamp}.pdf`;
+                        broadcast({ type: "saved", path: lastSavedPath });
+                        broadcast({ type: "status", text: `PDF 저장됨: ${lastSavedPath}` });
+                      } else {
+                        broadcast({ type: "status", text: `PDF 실패: ${tail.trim().slice(0, 160)}` });
+                      }
+                    });
+                  },
+                );
+              } catch (e) {
+                const message = e instanceof Error ? e.message : String(e);
+                appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-ERROR ${message.slice(0, 400)}\n`);
+                broadcast({ type: "status", text: `시각 리뷰 실패: ${message.slice(0, 160)}` });
+              }
+            })();
+          });
+        });
+      }
+    }
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    broadcast({ type: "status", text: `저장 실패: ${message}` });
+  }
+};
+
+const handleSaveNotes: WsActionHandler = ({ ws, cmd }) => {
+  // anarlog 방식: 브라우저 다운로드가 아니라 서버 디스크에 저장 (항상 동작)
+  try {
+    const dir = join(import.meta.dir, "exports");
+    mkdirSync(dir, { recursive: true });
+    const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.md`;
+    writeFileSync(join(dir, filename), store.exportMarkdown(), "utf-8");
+    lastSavedPath = `exports/${filename}`;
+    broadcast({ type: "saved", path: lastSavedPath });
+    broadcast({ type: "status", text: `저장됨: ${lastSavedPath}` });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    broadcast({ type: "status", text: `저장 실패: ${message}` });
+  }
+};
+
+const handleSaveJson: WsActionHandler = ({ ws, cmd }) => {
+  try {
+    const dir = join(import.meta.dir, "exports");
+    mkdirSync(dir, { recursive: true });
+    const meta = store.latestMeeting();
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      provider: meta?.provider ?? null,
+      slides: meta ? store.slides(meta.id) : [],
+      lines: meta ? store.lines(meta.id) : [],
+    };
+    const filename = `meeting-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+    writeFileSync(join(dir, filename), JSON.stringify(payload, null, 2), "utf-8");
+    lastSavedPath = `exports/${filename}`;
+    broadcast({ type: "saved", path: lastSavedPath });
+    broadcast({ type: "status", text: `저장됨: ${lastSavedPath}` });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    broadcast({ type: "status", text: `저장 실패: ${message}` });
+  }
+};
+
+const handleSetProvider: WsActionHandler = ({ ws, cmd }) => {
+  if (typeof cmd.id === "string") {
+    const entry = providerEntries.find((e) => e.id === cmd.id);
+    if (!entry) {
+      ws.send(JSON.stringify({ type: "status" as const, text: `알 수 없는 프로바이더: ${cmd.id}` }));
+    } else if (!entry.available) {
+      ws.send(JSON.stringify({ type: "status" as const, text: `${entry.label}은(는) 설정되지 않았습니다 (CLI 설치/API 키 확인)` }));
+    } else {
+      // 모델/effort 오버라이드 (빈 문자열이면 기본값, effort는 지원 프로바이더만)
+      const model = typeof cmd.model === "string" && cmd.model.trim() ? cmd.model.trim() : undefined;
+      const effort = typeof cmd.effort === "string" && cmd.effort.trim() && (entry.efforts ?? []).includes(cmd.effort.trim())
+        ? cmd.effort.trim()
+        : undefined;
+      const detector = createDetector(entry.id, { cliTimeoutMs, model, effort });
+      if (detector) {
+        session.setDetector(detector);
+        extractionTransport = detector;
+        currentProviderId = entry.id;
+        currentModel = model;
+        currentEffort = effort;
+        llmLabel = `${entry.label}${model ? `/${model}` : ""}${effort ? `·${effort}` : ""}`;
+        broadcast(providersMessage());
+        broadcast({ type: "status", text: `LLM 변경됨: ${llmLabel}` });
+        void detector.ping().then((ok) => {
+          if (!ok) broadcast({ type: "status", text: `⚠️ ${entry.label} 연결 확인에 실패했습니다` });
+        });
+      }
+    }
+  }
+};
+
+const handleConnectProvider: WsActionHandler = ({ ws, cmd }) => {
+  if (typeof cmd.id === "string") {
+    connectProvider(cmd.id);
+  }
+};
+
+const handleSetProviderKey: WsActionHandler = ({ ws, cmd }) => {
+  if (typeof cmd.id === "string" && typeof cmd.key === "string") {
+    const envKey = KEY_BY_PROVIDER[cmd.id];
+    const key = cmd.key.trim();
+    if (!envKey || !key || /[\r\n]/.test(key)) {
+      ws.send(JSON.stringify({ type: "status" as const, text: "잘못된 키 형식입니다" }));
+    } else {
+      // 런타임 즉시 적용 + .env에도 기록 (0600). 기록 실패해도 세션은 동작.
+      process.env[envKey] = key;
+      try {
+        const envPath = join(import.meta.dir, ".env");
+        const current = existsSync(envPath) ? readFileSync(envPath, "utf-8") : "";
+        writeFileSync(envPath, upsertEnvText(current, { [envKey]: key }), { mode: 0o600 });
+      } catch {
+        broadcast({ type: "status", text: "(.env 기록 실패 — 이번 세션에만 적용됩니다)" });
+      }
+      const entry = providerEntries.find((e) => e.id === cmd.id);
+      if (entry) entry.available = true;
+      broadcast(providersMessage());
+      broadcast({ type: "status", text: `${entry?.label ?? cmd.id} 키 저장됨 ✓` });
+    }
+  }
+};
+
+const handleRecheckProviders: WsActionHandler = ({ ws, cmd }) => {
+  const claudeOk = checkCliBin("claude");
+  const codexOk = checkCliBin("codex");
+  for (const e of providerEntries) {
+    if (e.id === "cli:claude") e.available = claudeOk;
+    if (e.id === "cli:codex") e.available = codexOk;
+  }
+  broadcast(providersMessage());
+};
+
+/** Existing WebSocket actions. Unknown actions intentionally have no handler. */
+export const handlerMap = new Map<string, WsActionHandler>([
+  ["startCapture", handleStartCapture],
+  ["stopCapture", handleStopCapture],
+  ["startReview", handleStartReview],
+  ["reset", handleReset],
+  ["setAttendees", handleSetAttendees],
+  ["attendees", handleAttendeesQuery],
+  ["updateItem", handleUpdateItem],
+  ["confirmReview", handleConfirmReview],
+  ["status", handleStatus],
+  ["transcript", handleTranscript],
+  ["exportDeck", handleDeckExport],
+  ["exportPdf", handleDeckExport],
+  ["exportPng", handleDeckExport],
+  ["saveNotes", handleSaveNotes],
+  ["saveJson", handleSaveJson],
+  ["setProvider", handleSetProvider],
+  ["connectProvider", handleConnectProvider],
+  ["setProviderKey", handleSetProviderKey],
+  ["recheckProviders", handleRecheckProviders],
+]);
+
 const httpServer = Bun.serve({
   port: config.server.httpPort,
   // 로컬 도구: LAN의 다른 기기가 전사 내용에 접근할 필요가 없으므로 루프백만 바인드.
@@ -393,15 +1005,22 @@ const httpServer = Bun.serve({
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
       try {
-        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as { action?: string; id?: string; key?: string; model?: string; effort?: string; modelId?: unknown; meetingId?: unknown };
-        if (cmd.action === "startCapture") void startCapture();
+        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as WsCommand & {
+          id?: string;
+          key?: string;
+          model?: string;
+          effort?: string;
+          modelId?: unknown;
+          meetingId?: unknown;
+        };
+        if (["startReview", "setAttendees", "attendees", "updateItem", "confirmReview"].includes(cmd.action ?? "")) {
+          handlerMap.get(cmd.action ?? "")?.({ ws, cmd });
+          return;
+        }
+        if (cmd.action === "startCapture") void startCapture(cmd.meeting_id);
         else if (cmd.action === "stopCapture") void stopCapture();
         else if (cmd.action === "reset") {
-          session.reset();
-          // 회의 저장소도 새 회의로 전환 (캡처 중이면 이어서 기록)
-          store.endMeeting();
-          if (capturing) store.startMeeting(currentProviderId);
-          broadcast(session.transcript("snapshot"));
+          handleReset({ ws, cmd });
           broadcast(meetingsMessage());
         }
         else if (cmd.action === "status") {
@@ -685,6 +1304,10 @@ if (config.server.openBrowser) {
 // 데모용으로 부팅 즉시 자동 시작.
 let capturing = false;
 let stopPromise: Promise<void> | null = null;
+let captureRun: Promise<void> | null = null;
+let stopRequested = false;
+let rawAudioRecorder: RawAudioRecorder | null = null;
+let captureFinalizer: CaptureFinalizer | null = null;
 
 const selectSttModel = createSelectSttModel(sttManager, {
   isCapturing: () => capturing,
@@ -713,67 +1336,150 @@ const whisperHandlers = {
   },
 };
 
-async function startCapture(): Promise<void> {
-  if (capturing) return;
-  capturing = true;
-  // 빠른 시작/중지 반복 시 이전 whisper 자식이 완전히 종료되기 전에
-  // 새 start가 들어오면 마이크 장치 경쟁이 발생한다. stop이 끝날 때까지 대기.
+async function startCapture(requestedMeetingId?: unknown): Promise<void> {
+  if (capturing) {
+    if (requestedMeetingId === undefined) return;
+    throw new Error("capture is already running");
+  }
   if (stopPromise) await stopPromise;
-  // 이전 실행의 고아 whisper-stream이 마이크 장치를 점유하면 새 캡처는 무음이
-  // 된다. 우리 바이너리+모델 경로 조합의 잔재만 정리하고 시작한다.
+  let preparedMeetingId: number | null = null;
+  if (requestedMeetingId !== undefined) {
+    if (!Number.isInteger(requestedMeetingId) || (requestedMeetingId as number) < 1) {
+      throw new Error("meeting_id must be a positive integer");
+    }
+    preparedMeetingId = requestedMeetingId as number;
+    if (currentMeetingId === null || preparedMeetingId !== currentMeetingId) {
+      throw new Error(`meeting ${preparedMeetingId} does not match the current prepared meeting`);
+    }
+    if (minutesStore.meetingMeta(preparedMeetingId)?.phase !== "prepared") {
+      throw new Error(`meeting ${preparedMeetingId} is not prepared`);
+    }
+  }
+  if (config.input.mode === "file" && config.input.filePath) {
+    const duplicateMeetingId = minutesStore.findMeetingByAudioHash(sha256File(config.input.filePath));
+    if (duplicateMeetingId !== null) {
+      currentMeetingId = duplicateMeetingId;
+      throw new Error(`[DUPLICATE_AUDIO] audio already belongs to meeting ${duplicateMeetingId}`);
+    }
+  }
   if (config.input.mode === "mic") {
     spawnSync("pkill", ["-f", `${config.whisper.streamBin} -m ${config.whisper.modelPath}`], { stdio: "ignore" });
   }
-  store.startMeeting(currentProviderId);
+  if (preparedMeetingId === null) {
+    currentMeetingId = store.startMeeting(currentProviderId);
+    minutesStore.registerCapturingMeeting(currentMeetingId);
+  } else {
+    minutesStore.activatePreparedMeeting(preparedMeetingId);
+    store.activateMeeting(preparedMeetingId);
+  }
+  if (currentMeetingId === null) throw new Error("capture meeting was not created");
+  const meetingId = currentMeetingId;
+  if (config.input.mode === "file" && config.input.filePath) {
+    const claimed = claimFileAudioSource(minutesStore, meetingId, config.input.filePath);
+    if (claimed.duplicateMeetingId !== null) throw new Error(`[DUPLICATE_AUDIO] audio already belongs to meeting ${claimed.duplicateMeetingId}`);
+  }
+  rawAudioRecorder = null;
+  if (config.input.mode === "mic" && config.whisper.audioRecorderBin) {
+    mkdirSync(join(import.meta.dir, "exports"), { recursive: true });
+    const outputPath = join(import.meta.dir, "exports", `audio-${meetingId}-${Date.now()}.tmp.wav`);
+    try {
+      rawAudioRecorder = await RawAudioRecorder.start({
+        bin: config.whisper.audioRecorderBin,
+        captureId: config.whisper.captureId,
+        outputPath,
+      });
+    } catch (error) {
+      rawAudioRecorder = null;
+      store.endMeeting();
+      if (minutesStore.meetingMeta(meetingId)?.phase === "capturing") minutesStore.endMeeting(meetingId);
+      throw error;
+    }
+  }
+  transcriptWriter.begin(meetingId, {
+    sourceKind: config.input.mode === "file" ? "file_transcription" : "live_capture",
+    engine: "whisper.cpp",
+    engineModel: config.whisper.modelPath,
+    dualWriteLegacy: true,
+  });
+  captureFinalizer = new CaptureFinalizer(minutesStore, transcriptWriter, meetingId, rawAudioRecorder);
+  capturing = true;
+  stopRequested = false;
   broadcast(captureMessage());
   broadcast(meetingsMessage());
   broadcast({ type: "status", text: "🎤 녹음 시작 — 말씀하세요" });
-  void whisper.start(whisperHandlers).then(async () => {
-    await session.flush();
-    const wasCapturing = capturing;
-    capturing = false;
-    broadcast(captureMessage());
-    if (config.input.mode === "mic" && wasCapturing) {
-      // 사용자가 중지하지 않았는데 캡처가 끝남 = 장치/권한 이상
-      console.warn("[whisper] 마이크 캡처가 종료됨 — 장치/권한 확인 필요");
-      broadcast({ type: "status", text: "⚠️ 마이크 캡처가 종료되었습니다 — 장치/권한 확인 후 다시 시작하세요" });
-    } else {
-      broadcast({ type: "status", text: "입력 종료" });
+  const finalizer = captureFinalizer;
+  captureRun = (async () => {
+    let failure: unknown = null;
+    try {
+      await whisper.start(whisperHandlers);
+    } catch (error) {
+      failure = error;
+    } finally {
+      try {
+        await session.flush();
+        const finalized = await finalizer.finish();
+        if (finalized.audio.status === "unavailable" && config.input.mode === "mic") {
+          broadcast({ type: "status", text: "원본 오디오를 보존하지 못했습니다 (recorder_failed)" });
+        }
+      } finally {
+        rawAudioRecorder = null;
+        captureFinalizer = null;
+        store.endMeeting();
+        if (minutesStore.meetingMeta(meetingId)?.phase === "capturing") minutesStore.endMeeting(meetingId);
+        const endedNaturally = capturing && !stopRequested;
+        capturing = false;
+        broadcast(captureMessage());
+        if (endedNaturally && config.input.mode === "mic") {
+          broadcast({ type: "status", text: "⚠️ 마이크 캡처가 종료되었습니다 — 장치/권한 확인 후 다시 시작하세요" });
+        } else if (!stopRequested) {
+          broadcast({ type: "status", text: "입력 종료" });
+        }
+      }
     }
-  }).catch((e: unknown) => {
-    capturing = false;
-    broadcast(captureMessage());
-    const message = e instanceof Error ? e.message : String(e);
-    console.error(`[whisper fatal] ${message}`);
-    broadcast({ type: "status", text: `whisper 치명 오류: ${message}` });
-  });
+    if (failure) {
+      const message = failure instanceof Error ? failure.message : String(failure);
+      console.error(`[capture fatal] ${message}`);
+      broadcast({ type: "status", text: `캡처 치명 오류: ${message}` });
+    }
+  })();
 }
 
 async function stopCapture(): Promise<void> {
-  if (!capturing) {
+  if (!capturing || !captureRun) {
     broadcast(captureMessage());
     broadcast({ type: "status", text: "이미 녹음이 중지된 상태입니다" });
     return;
   }
   capturing = false;
+  stopRequested = true;
   broadcast(captureMessage());
-  // startCapture가 await stopPromise로 기다릴 수 있도록 promise를 노출.
-  const p = whisper.stop();
-  stopPromise = p;
-  try {
-    await p;
-    await session.flush();
-    store.endMeeting();
-    broadcast(meetingsMessage());
-    broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
-  } finally {
-    stopPromise = null;
-  }
+  const run = captureRun;
+  stopPromise = (async () => {
+    try {
+      await whisper.stop();
+      await run;
+      broadcast(meetingsMessage());
+      broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
+    } finally {
+      captureRun = null;
+      stopPromise = null;
+    }
+  })();
+  await stopPromise;
 }
 
 if (config.input.mode === "file") {
   void startCapture();
 }
+
+const shutdown = async () => {
+  console.log("\n종료 중...");
+  if (capturing && captureRun) await stopCapture();
+  else if (captureRun) await captureRun;
+  process.exit(0);
+};
+process.on("SIGINT", () => { void shutdown(); });
+process.on("SIGTERM", () => { void shutdown(); });
 
 const ok = await llm.ping();
 if (ok) {
@@ -781,13 +1487,3 @@ if (ok) {
 } else {
   console.warn(`LLM 핑 실패 - 서버는 동작함. provider=${config.llm.provider}`);
 }
-
-const shutdown = async () => {
-  console.log("\n종료 중...");
-  // 캡처를 먼저 멈춰야 flush 도중 새 청크가 끼어들어 문장이 유실되지 않는다.
-  await whisper.stop();
-  await session.flush();
-  process.exit(0);
-};
-process.on("SIGINT", () => { void shutdown(); });
-process.on("SIGTERM", () => { void shutdown(); });

@@ -1,0 +1,20 @@
+{
+  "taskId": "st_019fbe63",
+  "task": "Finish T9 only on top of T8",
+  "status": "done",
+  "parentCommit": "524292a3a23584bacf6787ccfce3e318293b0e47",
+  "targetCommit": "a29d0d4856e7020edf031317ab9a91f0afa54218",
+  "verifiedBy": "hephaestus/st_019fbe63",
+  "verifiedAt": "2026-08-01T17:38:01Z",
+  "gates": {
+    "focusedReviewActions": "8 pass, 0 fail",
+    "fullBunTest": "198 pass, 0 fail",
+    "tsc": "pass",
+    "diffCheck": "pass",
+    "realWsSqliteDriver": "10 probes, pass",
+    "stagedT8Compatibility": "pass"
+  },
+  "cleanup": "pass",
+  "mainWorktree": "fingerprint unchanged",
+  "caveat": "unrelated T10+ dirty changes preserved and excluded"
+}

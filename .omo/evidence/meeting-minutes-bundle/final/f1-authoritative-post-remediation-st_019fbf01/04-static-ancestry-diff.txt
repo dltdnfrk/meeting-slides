@@ -1,0 +1,9 @@
+head=a958f969ce96c9b8c2f02871090ce1587cfbe146
+baseline_ancestor_exit=
+0
+merge_count=0
+baseline_diff_check_exit=0
+worktree_diff_check_exit=0
+index_diff_check_exit=0
+post_product_non_omo_delta_exit=0
+post_product_changed_paths:

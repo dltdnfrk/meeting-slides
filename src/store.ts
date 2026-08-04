@@ -114,12 +114,28 @@ export class MeetingStore {
     });
   }
 
+  /** MinutesStore 등 형제 도메인이 같은 SQLite 연결과 트랜잭션 설정을 공유한다. */
+  databaseHandle(): Database {
+    return this.db;
+  }
+
   /** 캡처 시작 = 새 회의 */
   startMeeting(provider: string): number {
     const res = this.db.run("INSERT INTO meetings (started_at, provider) VALUES (?, ?)", [Date.now(), provider]);
     this.meetingId = Number(res.lastInsertRowid);
     this.lineSeq = 0;
     return this.meetingId;
+  }
+
+  /** 준비 단계에서 이미 만든 회의를 현재 캡처 대상으로 연결한다. */
+  activateMeeting(meetingId: number): void {
+    const meeting = this.db.query("SELECT id FROM meetings WHERE id = ?").get(meetingId);
+    if (!meeting) throw new Error(`unknown meeting ${meetingId}`);
+    const latest = this.db.query(
+      "SELECT coalesce(MAX(seq), 0) AS seq FROM transcript_lines WHERE meeting_id = ?",
+    ).get(meetingId) as { seq: number };
+    this.meetingId = meetingId;
+    this.lineSeq = latest.seq;
   }
 
   endMeeting(): void {

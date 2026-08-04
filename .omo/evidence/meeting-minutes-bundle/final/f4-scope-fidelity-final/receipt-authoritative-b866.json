@@ -1,0 +1,43 @@
+{
+  "verdict": "PASS",
+  "audited_target": "b86610058e2cff22319976b23dd6d48282f7d678",
+  "audited_parent": "7123fd986fceb981c358ad1b73531fab6bd8dc16",
+  "audited_tree": "5e9c65aa72f9c59c7ae4554d137a069c56f12bd0",
+  "baseline": "921a01513593c0e10181cf01e535a7abe995deb3",
+  "product_target": "6711ecfcb47f75b1bb22377d97dd551538568ad7",
+  "verification_carrier_at_start": "359562a6555dffe7e7a374c4dd1d1f7e57f63079",
+  "verified_by": "st_019fbef9 / 019fbf06-0e6b-7eb4-a523-21e3ec9f30b2",
+  "verified_at": "2026-08-01T20:37:02Z",
+  "gates": {
+    "baseline_ancestry": "PASS: 36 commits, 0 merges, one target parent",
+    "baseline_diff_check": "PASS",
+    "post_product_non_omo_diff": "PASS: zero paths",
+    "target_commit_paths": "PASS: governance/ledger/plan/evidence only",
+    "t4_t14_receipt_matrix": "PASS: 11/11",
+    "f1_f4_binding_state_at_target": "PASS: intentional pre-rerun state",
+    "current_carrier_terminal_bindings": "PASS: F1-F4 confirmed, 15/15 plan checked",
+    "semantic_prohibited_scope": "PASS: zero hits",
+    "plan_literal_scope": "PASS with one approved local attendee CRM metadata hit",
+    "strict_typescript": "PASS",
+    "browser_checkjs": "PASS",
+    "task_tracked_and_staged_clean": "PASS: 0/0",
+    "untracked_non_evidence": "PASS: 0",
+    "runtime_evidence_cleanup": "PASS: 0 runtime DB artifacts remain",
+    "main_worktree_preservation": "PASS"
+  },
+  "main_worktree": {
+    "head": "921a01513593c0e10181cf01e535a7abe995deb3",
+    "status_sha256": "0449b9120369b2fa40d76bab57d842702d576ae05aa4705a572f24acc4127bc8",
+    "tracked_diff_sha256": "bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9",
+    "index_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "evidence_sha256": {
+    "07-authoritative-b866-static-scope-diff.txt": "70c9994e3e320272b54ca4832751d227aedf51d87166f4667ea46f262ec99519",
+    "08-authoritative-b866-receipt-bindings.txt": "381163e969c64a491e1f71b5369a0ce1793750f0751b2ef1010e196672eb4667",
+    "09-authoritative-b866-strict-typescript.txt": "2a946bdea37c79f3f664f95b5f2c02ccd014ff32bbf16747bc2bfc036b7c81d7",
+    "10-authoritative-b866-browser-checkjs.txt": "3c4c941b5dd4bf06a0a4ea6f849fd1974345595408a52de40f1a33ad6e7003fb",
+    "11-authoritative-b866-preservation-cleanup.txt": "1a7aac6344ad99d2c0ccf688ae25e278a44e7c89bb43505baa8e3893f9035699",
+    "F4-authoritative-b866-rerun.md": "bf9101ed26de1c5c9fad49053520db58c19e52eab020cd811f7ca665254e8b52"
+  },
+  "blockers": []
+}

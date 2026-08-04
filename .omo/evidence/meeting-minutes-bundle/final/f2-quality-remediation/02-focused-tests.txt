@@ -1,0 +1,9 @@
+command: bun test tests/minutes-store.test.ts tests/transcript-versioning.test.ts tests/review-actions.test.ts tests/start-review.test.ts tests/bundle.test.ts tests/conclusion.test.ts tests/meeting-conclusion.test.ts tests/public-attendees.test.ts tests/public-review.test.ts
+bun test v1.3.14 (0d9b296a)
+
+tests/meeting-conclusion.test.ts:
+(pass) meeting-conclusion transaction > confirmReview publishes a complete version-linked manifest and only then closes the meeting [47.37ms]
+(pass) meeting-conclusion transaction > rejects unresolved, invalid-source, and stale-version reviews before exporting [22.71ms]
+(pass) meeting-conclusion transaction > PDF failure rolls back review, complete rows, conclusion, and all artifacts, and retry succeeds [40.01ms]
+(pass) meeting-conclusion transaction > post-export hash failure rolls back review state without destructively deleting the published bundle [34.86ms]
+(pass) meeting-conclusion transaction > repeated and concurrent conclusion shares one export and never duplicates bundle state [34.49ms]

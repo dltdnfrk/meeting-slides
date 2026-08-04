@@ -1,0 +1,102 @@
+{
+  "task_id": "st_019fbe24",
+  "task": "T6 src/extract.ts - MinutesExtractor (LLM + precision-rule fallback + strict parser)",
+  "status": "DONE",
+  "target_commit": "9b0b79c0f0cfcd5b8169c11bbd8d4fd4c18ce367",
+  "parent_commit": "dff8ea5bc92bdf454622c29b1748ef21d2300100",
+  "commit_subject": "feat(extract): add MinutesExtractor with versioned source-segment provenance and precision fallback",
+  "verified_by": "senpi-task-st_019fbe24",
+  "verified_at": "2026-08-01T16:32:04Z",
+  "main_worktree_fingerprint": {
+    "path": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+    "read_only": true,
+    "branch": "main",
+    "head": "921a01513593c0e10181cf01e535a7abe995deb3",
+    "status_entries": 19,
+    "status_porcelain_v1_z_sha256": "0449b9120369b2fa40d76bab57d842702d576ae05aa4705a572f24acc4127bc8",
+    "tracked_diff_sha256": "bbc5b3cae564b3bfe1fad06d873589a6860692ac3361005b27b8df5ae15190e9"
+  },
+  "claims": {
+    "strict_parser": "Candidates retain immutable transcript-version and positive contiguous seq provenance only when every requested line exists, the quote occurs in the cited span, and attendee suggestions belong to the request; invalid siblings produce diagnostic rejection codes and no candidate output.",
+    "batch_behavior": "Non-JSON and top-level transcript-version mismatch fail the whole model batch into deterministic fallback; valid empty JSON remains a successful empty extraction.",
+    "model_boundary": "Model IDs are ignored and candidate IDs are allocated locally after validation. Absolute deadlines are derived only from a verbatim source-contained deadlineText; relative or model-inferred dates remain null.",
+    "fallback": "The deterministic fallback copies only explicit decision/action/open endings verbatim with one-line versioned provenance and performs no pronoun resolution, speakerTurn identity mapping, summarization, or line joining.",
+    "persistence": "The real in-memory startReview/SQLite driver persisted one valid sibling and zero rejected siblings.",
+    "independence": "src/extract.ts has no BlockDetector, MeetingSession, or session-memory dependency and consumes only versioned lines carrying seq coordinates.",
+    "scope": "Commit contains exactly src/extract.ts and tests/extract.test.ts; unrelated worktree changes and all evidence files remain uncommitted."
+  },
+  "verification": [
+    {
+      "command": "bun test tests/extract.test.ts",
+      "phase": "red",
+      "result": "expected exit 1; 8 pass, 1 fail; model deadlines were incorrectly trusted",
+      "evidence_ref": "09-red-deadline-grounding.txt",
+      "sha256": "fc8baa8a2b060d2c517cf867a56a4fcdb6b1826711b363674eed3a2e02a7b49d"
+    },
+    {
+      "command": "bun test tests/extract.test.ts",
+      "phase": "green",
+      "result": "exit 0; 9 pass, 0 fail, 53 assertions",
+      "evidence_ref": "10-focused-green.txt",
+      "sha256": "1bb4d32efe7b97d35d09f5130c1e19d2caf578d6fa6568741ee659d38404e18e"
+    },
+    {
+      "command": "bun test",
+      "result": "exit 0; 193 pass, 0 fail, 714 assertions across 26 files",
+      "evidence_ref": "11-full-bun-test.txt",
+      "sha256": "81818f6c646a1bfec61153060fbf93e52c878fb82bb9df09cb6548b8983a1e67"
+    },
+    {
+      "command": "bunx tsc -p tsconfig.json --noEmit",
+      "result": "exit 0; no diagnostics",
+      "evidence_ref": "12-tsc.txt",
+      "sha256": "0c538fda9d662c0c62745ebec53fd1f61e2445be59c39005bee0830daeb90dc0"
+    },
+    {
+      "command": "git diff --check",
+      "result": "exit 0",
+      "evidence_ref": "13-diff-check.txt",
+      "sha256": "750f3e5bc32e23c14bdfab75360a8824faade8f4b53d3e9706a78c27bc45ef7b"
+    },
+    {
+      "command": "bun run .omo/evidence/meeting-minutes-bundle/task-6/14-adversarial-driver.ts",
+      "result": "exit 0; every rejection code, sibling survival, both batch fallbacks, grounded deadlines, duplicates, untrusted text, and zero rejected persistence observed",
+      "evidence_ref": "14-adversarial-driver.txt",
+      "sha256": "6c8bc70fd2d5029a36584034a631a84864f2bbc26ba853c9451dede66840457e"
+    },
+    {
+      "command": "exact-path git add + git diff --cached --check + git commit",
+      "result": "exit 0; only src/extract.ts and tests/extract.test.ts committed",
+      "evidence_ref": "15-scoped-commit.txt",
+      "sha256": "e16a278ab11f6e0542261b2991aec5f181f44074fada0524f8c1141811d4b954"
+    },
+    {
+      "command": "! rg -n 'BlockDetector|MeetingSession|session-memory' src/extract.ts; wc -l src/extract.ts",
+      "result": "exit 0; no forbidden dependency; 231 lines; no project lint script is configured",
+      "evidence_ref": "16-static-contract.txt",
+      "sha256": "0da6ad2e28570d9107311b616d7d0dc5d1df96604d6f8649bc6c68ced1452749"
+    }
+  ],
+  "driver_observations": {
+    "rejection_codes": [
+      "missing_source",
+      "wrong_transcript_version",
+      "invalid_seq_range",
+      "line_not_in_request",
+      "line_not_found",
+      "non_contiguous_range",
+      "evidence_quote_mismatch"
+    ],
+    "valid_sibling_count": 1,
+    "wrong_version_batch_fallback": true,
+    "malformed_json_batch_fallback": true,
+    "unknown_attendee_rejected": true,
+    "duplicate_suggestions": 2,
+    "duplicate_local_id_count": 2,
+    "rejected_rows_persisted": 0
+  },
+  "residual_risks": [
+    "The T6 contract defines no duplicate-candidate rejection code, so two independently grounded duplicate suggestions survive with distinct local IDs for downstream human review.",
+    "Deadline normalization is deliberately conservative: an absolute model deadline without a verbatim source-contained deadlineText is returned as null rather than inferred."
+  ]
+}

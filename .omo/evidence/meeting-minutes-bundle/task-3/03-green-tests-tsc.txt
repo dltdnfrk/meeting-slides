@@ -1,0 +1,39 @@
+T3 post-implementation: focused LLM tests + tsc
+commit_base=7a3894e0fc8c67ff99cc297553f46096b455c5ba
+--- bun test ---
+bun test v1.3.14 (0d9b296a)
+
+tests/llm-transport.test.ts:
+(pass) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [3.18ms]
+(pass) existing LLM detectBlock transport behavior > HTTP preserves status and response text in rejection [1.17ms]
+(pass) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [428.41ms]
+(pass) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [314.86ms]
+(pass) generic chat transport > HTTP returns the provider's raw text [1.76ms]
+(pass) generic chat transport > HTTP sends user-only message with defaults and no response_format [1.75ms]
+(pass) generic chat transport > HTTP applies system/temperature/maxTokens options [1.25ms]
+(pass) generic chat transport > HTTP chat preserves status and response text in rejection [1.30ms]
+(pass) generic chat transport > HTTP chat falls back to reasoning_content when content is empty [1.24ms]
+(pass) generic chat transport > CLI passes the prompt verbatim (no SYSTEM_PROMPT) and returns raw stdout [308.66ms]
+(pass) generic chat transport > CLI prepends options.system to the prompt [317.82ms]
+(pass) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection [307.50ms]
+(pass) generic chat transport > CLI chat honors options.timeoutMs override [252.19ms]
+
+tests/llm-cli.test.ts:
+(pass) buildCliArgs > claude 프리셋: -p + text 출력 [0.02ms]
+(pass) buildCliArgs > codex 프리셋: exec + 최종 메시지 파일 [0.03ms]
+(pass) buildCliArgs > codex: 모델/effort 오버라이드 인자 [0.02ms]
+(pass) buildCliArgs > claude: 모델 오버라이드 인자 [0.01ms]
+(pass) parseBlockDetectionJson > 정상 JSON 파싱 [0.03ms]
+(pass) parseBlockDetectionJson > 앞뒤 사고 과정이 붙은 출력에서 JSON 추출 (reasoning 대응)
+[LLM] 블록 감지 JSON 파싱 실패: JSON이 아닌 응답
+(pass) parseBlockDetectionJson > 깨진 출력은 파싱 실패 fallback [0.05ms]
+(pass) parseBlockDetectionJson > 빈 출력은 빈 결과
+(pass) parseBlockDetectionJson > 제목 50자, 불렛 80자/6개 제한 [0.11ms]
+
+ 22 pass
+ 0 fail
+ 39 expect() calls
+Ran 22 tests across 2 files. [1.96s]
+bun_exit=0
+--- tsc --noEmit ---
+tsc_exit=0

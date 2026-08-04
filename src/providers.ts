@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 
 import { cliProcessEnvironment, resolveCliExecutable, resolveLLMConfig } from "./config.js";
 import { CliLLMClient } from "./llm-cli.js";
-import { LLMClient, type MeetingLLM } from "./llm.js";
+import { LLMClient, type ChatTransport, type MeetingLLM } from "./llm.js";
 import {
   PROVIDER_ADAPTERS,
   inspectSubscriptionProviders,
@@ -112,7 +112,7 @@ export function createDetector(
     effort?: string;
     environment?: NodeJS.ProcessEnv;
   },
-): MeetingLLM | null {
+): (MeetingLLM & ChatTransport) | null {
   const adapter = providerAdapter(id);
   if (adapter) {
     return new CliLLMClient({

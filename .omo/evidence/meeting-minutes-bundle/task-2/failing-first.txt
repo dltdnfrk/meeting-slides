@@ -1,0 +1,20 @@
+Failing-first DB contract
+contract: attendee outside meetings must fail via SQLite foreign key
+command: bun test tests/minutes-store.test.ts
+started_at: 2026-08-01T12:44:24Z
+bun test v1.3.14 (0d9b296a)
+
+tests/minutes-store.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module '../src/minutes-store.ts' from '/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/minutes-store.test.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [9.00ms]
+observed_exit_code: 1
+expected_red: implementation module/API absent before production edits

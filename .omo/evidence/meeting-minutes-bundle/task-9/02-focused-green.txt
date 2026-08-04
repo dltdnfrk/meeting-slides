@@ -1,0 +1,36 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/minutes-store.test.ts:
+(pass) MinutesStore SQLite contracts > rejects an attendee for a meeting that does not exist [2.48ms]
+(pass) MinutesStore SQLite contracts > creates and activates one prepared legacy-compatible meeting [0.79ms]
+(pass) MinutesStore SQLite contracts > stores local attendee keys independently from optional CRM ids [0.65ms]
+(pass) MinutesStore SQLite contracts > replaces prepared attendees and locks the roster after review confirmation [1.43ms]
+(pass) MinutesStore SQLite contracts > versions immutable transcript lines, finalizes, and selects canonical [0.75ms]
+(pass) MinutesStore SQLite contracts > saves sourced candidates and confirms only fully reviewed items [1.05ms]
+(pass) MinutesStore SQLite contracts > rejects endpoint-valid but interior-missing ranges and rolls back the whole review [0.81ms]
+(pass) MinutesStore SQLite contracts > revalidates source interiors during confirmation in the same transaction [0.82ms]
+(pass) MinutesStore SQLite contracts > enforces attendee provenance and successful-audio hash semantics [0.70ms]
+(pass) MinutesStore SQLite contracts > creates the complete additive minutes schema without changing legacy tables [0.48ms]
+
+tests/server-handler-map.test.ts:
+(pass) the real WS registry contains executable handlers for every existing action [119.29ms]
+
+tests/start-review.test.ts:
+(pass) startReview > extracts canonical version lines, persists candidates, and returns a self-contained review payload [1.54ms]
+(pass) startReview > creates an empty version-scoped review for an empty canonical transcript [0.74ms]
+(pass) startReview > rejects extraction failures and wrong-version results without persisting a review [2.50ms]
+
+tests/review-actions.test.ts:
+(pass) MinutesStore review mutation transaction > validates candidate ownership, attendee membership, and the whole patch before mutating [1.28ms]
+(pass) MinutesStore review mutation transaction > atomically transitions draft to confirmed only after every item is reviewed [0.97ms]
+(pass) MinutesStore review mutation transaction > rejects a review whose transcript version is no longer canonical [0.82ms]
+(pass) MinutesStore review mutation transaction > detects changed canonical transcript bytes and leaves review/artifact rows untouched [0.83ms]
+(pass) real WS actions reject adversarial patches, persist valid changes, and confirm without artifacts [2.80ms]
+
+tests/attendees-action.test.ts:
+(pass) setAttendees persists replacement rosters and startCapture activates exactly that prepared meeting [38.95ms]
+
+ 20 pass
+ 0 fail
+ 92 expect() calls
+Ran 20 tests across 5 files. [445.00ms]

@@ -1,0 +1,25 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/minutes-store.test.ts:
+(pass) MinutesStore SQLite contracts > rejects an attendee for a meeting that does not exist [2.23ms]
+(pass) MinutesStore SQLite contracts > creates and activates one prepared legacy-compatible meeting [0.85ms]
+(pass) MinutesStore SQLite contracts > stores local attendee keys independently from optional CRM ids [0.67ms]
+(pass) MinutesStore SQLite contracts > replaces prepared attendees and locks the roster after review confirmation [1.37ms]
+(pass) MinutesStore SQLite contracts > versions immutable transcript lines, finalizes, and selects canonical [0.81ms]
+(pass) MinutesStore SQLite contracts > saves sourced candidates and confirms only fully reviewed items [1.46ms]
+(pass) MinutesStore SQLite contracts > rejects endpoint-valid but interior-missing ranges and rolls back the whole review [1.08ms]
+(pass) MinutesStore SQLite contracts > revalidates source interiors during confirmation in the same transaction [1.19ms]
+(pass) MinutesStore SQLite contracts > enforces attendee provenance and successful-audio hash semantics [0.91ms]
+(pass) MinutesStore SQLite contracts > creates the complete additive minutes schema without changing legacy tables [0.57ms]
+
+tests/server-ws-dispatch.test.ts:
+(pass) characterizes existing WS responses, broadcasts, saved path, active reset, and malformed input [48.43ms]
+
+tests/server-handler-map.test.ts:
+(pass) the real WS registry contains executable handlers for every existing action [297.47ms]
+
+ 12 pass
+ 0 fail
+ 58 expect() calls
+Ran 12 tests across 3 files. [677.00ms]
+EXIT_CODE=0

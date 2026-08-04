@@ -1,0 +1,24 @@
+command: bun .omo/evidence/meeting-minutes-bundle/final/f2-quality-remediation/chromium-dom-smoke.ts
+{
+  "chromium": "Chrome/150.0.7871.24",
+  "pageErrors": [],
+  "sent": [
+    {
+      "action": "attendees"
+    },
+    {
+      "action": "setProvider",
+      "id": "openai"
+    },
+    {
+      "action": "setAttendees",
+      "attendees": [
+        {
+          "name": "DOM Smoke"
+        }
+      ]
+    }
+  ],
+  "attendeeRows": 1,
+  "attendeePanelOpen": true
+}

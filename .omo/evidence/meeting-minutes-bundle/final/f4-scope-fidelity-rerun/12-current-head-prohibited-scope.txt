@@ -1,0 +1,18 @@
+F4 PROHIBITED-SCOPE CHECK
+CAPTURED_AT=2026-08-01T20:18:01Z
+HEAD=b86610058e2cff22319976b23dd6d48282f7d678
+EXACT_PLAN_PATTERN_RESULTS:
+src/minutes-store-meetings.ts:126:      INSERT INTO attendees (meeting_id, attendee_id, display_name, crm_person_entity_id, sort_order, created_at)
+EXACT_GREP_EXIT=0
+NOTE=The sole exact-pattern hit, if present, is INSERT INTO attendees with the plan-required local crm_person_entity_id field; it is not INSERT/UPDATE against an external CRM table.
+SEMANTIC_EXTERNAL_INTEGRATION_RESULTS:
+SEMANTIC_PROHIBITED_SCAN_EXIT=1
+SEMANTIC_PROHIBITED_HITS=0
+ALLOWED_LOCAL_FIELD_DECLARATION:
+src/minutes-store-schema-core.ts:14:  crm_person_entity_id TEXT,
+src/minutes-store-schema-core.ts:21:  ON attendees(meeting_id, crm_person_entity_id) WHERE crm_person_entity_id IS NOT NULL;
+src/minutes-store-meetings.ts:126:      INSERT INTO attendees (meeting_id, attendee_id, display_name, crm_person_entity_id, sort_order, created_at)
+src/minutes-store-meetings.ts:130:        crm_person_entity_id = excluded.crm_person_entity_id,
+src/minutes-store-meetings.ts:140:      SELECT attendee_id, display_name, crm_person_entity_id, sort_order
+src/minutes-store-meetings.ts:143:      attendee_id: string; display_name: string; crm_person_entity_id: string | null; sort_order: number;
+src/minutes-store-meetings.ts:147:      crmPersonEntityId: row.crm_person_entity_id, sortOrder: row.sort_order,

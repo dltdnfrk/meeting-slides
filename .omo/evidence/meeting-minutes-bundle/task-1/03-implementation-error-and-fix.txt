@@ -1,0 +1,48 @@
+Implementation error receipt (caused by this task)
+
+Attempt 1 exact validator output:
+server.ts(652,11): error TS1472: 'catch' or 'finally' expected.
+server.ts(652,13): error TS1005: ',' expected.
+server.ts(657,9): error TS1005: ',' expected.
+server.ts(657,14): error TS1005: ':' expected.
+server.ts(657,21): error TS1005: ',' expected.
+server.ts(657,44): error TS1005: ',' expected.
+server.ts(657,46): error TS1005: ',' expected.
+server.ts(659,15): error TS1005: ':' expected.
+server.ts(660,19): error TS1005: ':' expected.
+server.ts(660,57): error TS1005: ',' expected.
+server.ts(667,11): error TS1128: Declaration or statement expected.
+server.ts(667,13): error TS1005: 'try' expected.
+server.ts(671,9): error TS1128: Declaration or statement expected.
+server.ts(672,9): error TS1128: Declaration or statement expected.
+server.ts(753,7): error TS1128: Declaration or statement expected.
+server.ts(753,9): error TS1005: 'try' expected.
+server.ts(761,5): error TS1128: Declaration or statement expected.
+server.ts(761,6): error TS1128: Declaration or statement expected.
+server.ts(762,13): error TS1005: ',' expected.
+server.ts(762,43): error TS1005: ';' expected.
+server.ts(768,6): error TS1128: Declaration or statement expected.
+server.ts(769,3): error TS1128: Declaration or statement expected.
+server.ts(769,4): error TS1128: Declaration or statement expected.
+server.ts(770,12): error TS1005: ',' expected.
+server.ts(770,29): error TS1005: ',' expected.
+server.ts(770,53): error TS1005: ';' expected.
+server.ts(770,96): error TS1005: ';' expected.
+server.ts(794,4): error TS1128: Declaration or statement expected.
+server.ts(795,1): error TS1128: Declaration or statement expected.
+server.ts(795,2): error TS1128: Declaration or statement expected.
+
+Root cause: insertion changed source offsets before the old dispatch was removed, so the second slice targeted the newly inserted handler and retained part of the old chain.
+
+Attempt 2 exact helper error:
+Traceback (most recent call last):
+  File "<stdin>", line 51, in <module>
+  File "<stdin>", line 44, in action_body
+  File "<stdin>", line 32, in interior
+AssertionError: ('{', '        }')
+
+Root cause: the helper compared the closing-brace line before trimming indentation.
+
+Fix: reset only server.ts to HEAD, remove the original dispatch before inserting handlers, and normalize brace lines with strip(). Post-fix `bunx tsc --noEmit` exit 0 and `git diff --check` exit 0 (both produced no output).
+
+Formatter limitation: no formatter is configured in package.json/lockfile. `bunx prettier --write server.ts` was attempted but unavailable/non-operative and produced no retained output. Strongest configured exact checks used: TypeScript compiler, LSP diagnostics where available from workspace root, tests, and git diff --check.

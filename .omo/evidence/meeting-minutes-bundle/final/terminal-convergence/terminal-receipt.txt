@@ -1,0 +1,35 @@
+TERMINAL RECEIPT: PASS
+
+convergence_commit=77d02584472c090cd22748c8e0afd19fee79c3f6
+convergence_tree=63053ad81a3b528cb38652509791a89adc253ca9
+convergence_parent=0ebea1f1587f50e300e0ad3856fc54f55eeb338d
+product_target=6711ecfcb47f75b1bb22377d97dd551538568ad7
+baseline=921a01513593c0e10181cf01e535a7abe995deb3
+receipt_carrier_parent=77d02584472c090cd22748c8e0afd19fee79c3f6
+verified_by=st_019fbeed / PI session 019fbefd-be85-729e-95ce-0eeaeae9811e
+verified_at=2026-08-01T20:27:01Z
+
+RESULTS
+- T4-T14 and F1-F4 plan checkboxes: PASS, 15/15 checked, 0 unchecked.
+- Completion ledger: PASS, 30 valid JSONL records; every T4-T14/F1-F4 item has a confirmed immutable event.
+- Final isolated serial full suite: PASS, 209/209 tests, 29/29 tracked test files, zero failed files.
+- Recovery rerun after absent vendor-link failure: PASS, 20/20 across the four affected files.
+- Strict TypeScript: PASS.
+- Browser checkJs: PASS.
+- Baseline/worktree/index diff checks: PASS.
+- Baseline ancestry: PASS; merge count: 0.
+- Semantic prohibited integration scan: PASS, zero hits.
+- Product paths changed after 6711ecf: zero.
+- Owned temporary vendor/SQLite artifacts: zero after cleanup.
+- Untracked non-evidence paths: zero; unrelated untracked task evidence preserved.
+- Main worktree: preserved at 921a01513593c0e10181cf01e535a7abe995deb3 with empty index and status fingerprint 6c4f788dd1ca722616c93650f5dd97da57ee2cad60589e9e222293fb498ba0d4.
+
+COMMANDS
+- One process per `git ls-files 'tests/*.test.ts' | sort`: PASS 209/209.
+- `bunx tsc -p tsconfig.json --noEmit --strict`: exit 0.
+- `bunx tsc --allowJs --checkJs --noEmit --target ES2022 --module ESNext --moduleResolution bundler --lib ES2022,DOM public/app.js public/review-panel-render.js public/review-panel.js --pretty false`: exit 0.
+- `git diff --check 921a015..HEAD`; `git diff --check`; `git diff --cached --check`: exit 0.
+- `git merge-base --is-ancestor 921a015 HEAD`: exit 0.
+- `git rev-list --merges --count 921a015..HEAD`: 0.
+
+This file is the terminal carrier. Its own commit hash is intentionally non-self-referential; the carrier commit's parent must equal receipt_carrier_parent above.

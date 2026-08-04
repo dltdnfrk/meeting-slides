@@ -1,0 +1,68 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/meeting-conclusion.test.ts:
+(pass) meeting-conclusion transaction > confirmReview publishes a complete version-linked manifest and only then closes the meeting [25.64ms]
+(pass) meeting-conclusion transaction > rejects unresolved, invalid-source, and stale-version reviews before exporting [11.94ms]
+170 |   test("PDF failure rolls back review, complete rows, conclusion, and all artifacts, and retry succeeds", async () => {
+171 |     const fx = fixture();
+172 |     await expect(concludeMeeting(fx.reviewId, options(fx, {
+173 |       renderPdf: async () => { throw new Error("[PDF_RENDER_FAILED] induced"); },
+174 |     }))).rejects.toThrow("[PDF_RENDER_FAILED]");
+175 |     expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
+                                                       ^
+error: expect(received).toBe(expected)
+
+Expected: "draft"
+Received: "confirmed"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/meeting-conclusion.test.ts:175:50)
+(fail) meeting-conclusion transaction > PDF failure rolls back review, complete rows, conclusion, and all artifacts, and retry succeeds [3.69ms]
+187 |     const corruptingExporter = async (...args: Parameters<typeof exportBundle>) => {
+188 |       const result = await exportBundle(...args);
+189 |       writeFileSync(join(result.bundlePath, "minutes.pdf"), "%PDF-corrupted-after-export");
+190 |       return result;
+191 |     };
+192 |     await expect(concludeMeeting(fx.reviewId, options(fx, { exporter: corruptingExporter }))).rejects.toThrow("[BUNDLE_HASH_MISMATCH]");
+                                                                                                            ^
+error:
+
+Expected promise that rejects
+Received promise that resolved: Promise { <resolved> }
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/meeting-conclusion.test.ts:192:103)
+(fail) meeting-conclusion transaction > post-export hash failure rolls back and removes the atomically published bundle [16.74ms]
+112 |     await put("audio.ref.json", json({ path: audio?.original_audio_path ?? null, original_audio_sha256: audio?.original_audio_sha256 ?? null }));
+113 |     const slides = s.db.query("SELECT x.idx, x.title, x.bullets, x.started_at FROM slides x JOIN (SELECT idx, MAX(id) id FROM slides WHERE meeting_id = ? GROUP BY idx) y ON x.id=y.id ORDER BY x.idx").all(meetingId) as Array<{ idx: number; title: string; bullets: string; started_at: number }>;
+114 |     const deck: DeckInput = { title: "Meeting Notes", startedAt: s.meeting.started_at as number, provider: s.meeting.provider as string | null, slides: slides.map((slide) => ({ idx: slide.idx, title: slide.title, bullets: JSON.parse(slide.bullets), startedAt: slide.started_at })), lines: s.lines.map((line) => ({ seq: line.seq, ts: line.capturedAtMs ?? 0, speaker: line.speakerTurn, text: line.text })) };
+115 |     const root = options.projectRoot ?? process.cwd(); await put("deck/index.html", buildDeckHtml(deck)); await put("deck/theme.css", await readFile(join(root, "deck", "theme.css"))); for (const file of buildSlideFiles(deck)) await put(`deck/slides/${file.filename}`, file.html); await put("deck/slides/theme.css", await readFile(join(root, "deck", "theme.css"))); for (const name of ["meeting-cover.png", "meeting-topic-map.png"]) { const bytes = await readFile(join(root, "deck", "assets", name)); await put(`deck/assets/${name}`, bytes); await put(`deck/slides/assets/${name}`, bytes); }
+116 |     entries.sort((a, b) => a.path.localeCompare(b.path)); const manifest: BundleManifest = { schema_version: 1, bundle_id: bundleId, meeting_id: meetingId, review_id: reviewId, target_commit: targetCommit, created_at: new Date(s.review.confirmed_at as number).toISOString(), entries, artifacts: entries }; await writeFile(join(temporary, "manifest.json"), json(manifest)); await validateBundle(temporary, bundleId, targetCommit);
+117 |     await rename(temporary, target); published = true; recordComplete(s, bundleId, target, entries); return { bundleId, bundlePath: target, manifest, deduplicated: false };
+                ^
+ENOTEMPTY: directory not empty, rename '/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-conclusion-t14-nEZPEb/exports/.bundle-1-2026-08-01T18-31-29-439Z-41c63079-040a-4d91-86f1-f0e27632a72b.tmp' -> '/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-conclusion-t14-nEZPEb/exports/bundle-1-2026-08-01T18-31-29-439Z'
+    path: "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-conclusion-t14-nEZPEb/exports/.bundle-1-2026-08-01T18-31-29-439Z-41c63079-040a-4d91-86f1-f0e27632a72b.tmp",
+    dest: "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-conclusion-t14-nEZPEb/exports/bundle-1-2026-08-01T18-31-29-439Z",
+ syscall: "rename",
+   errno: -66,
+    code: "ENOTEMPTY"
+
+      at async exportBundle (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/src/bundle.ts:117:11)
+      at async concludeMeeting (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/src/conclusion.ts:151:24)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/meeting-conclusion.test.ts:206:38)
+(fail) meeting-conclusion transaction > repeated and concurrent conclusion shares one export and never duplicates bundle state [86.69ms]
+85 |   return existsSync(fx.outputRoot) ? readdirSync(fx.outputRoot).sort() : [];
+86 | }
+87 |
+88 | function waitFor<T>(subscribe: (resolve: (value: T) => void, reject: (error: Error) => void) => void, timeoutMs = 20_000): Promise<T> {
+89 |   return new Promise((resolve, reject) => {
+90 |     const timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);
+                                                   ^
+error: timed out after 30000ms
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/meeting-conclusion.test.ts:90:47)
+(fail) meeting-conclusion transaction > real WS confirmReview reaches SQLite, bundle publication, and MeetingConcluded [30133.95ms]
+
+ 2 pass
+ 4 fail
+ 18 expect() calls
+Ran 6 tests across 1 file. [30.42s]
+
+exit=1

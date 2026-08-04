@@ -20,18 +20,28 @@ const statusTextEl = $("status-text");
 const btnExportMdEl = $("btn-export-md");
 const btnExportJsonEl = $("btn-export-json");
 const btnExportTranscriptEl = $("btn-export-transcript");
-const btnCompileDeckEl = $("btn-compile-deck");
+const btnCompileDeckEl = /** @type {HTMLButtonElement} */ ($("btn-compile-deck"));
 const compileStatusEl = $("compile-status");
 const btnExportDeckEl = $("btn-export-deck");
-const btnExportPdfEl = $("btn-export-pdf");
-const btnExportPngEl = $("btn-export-png");
-const btnSettingsEl = $("btn-settings");
+const btnExportPdfEl = /** @type {HTMLButtonElement} */ ($("btn-export-pdf"));
+const btnExportPngEl = /** @type {HTMLButtonElement} */ ($("btn-export-png"));
+const btnSettingsEl = /** @type {HTMLButtonElement} */ ($("btn-settings"));
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
 const btnRecheckEl = $("btn-recheck");
 const btnRecheckSttEl = $("btn-recheck-stt");
 const sttListEl = $("stt-list");
-const btnRecordEl = $("btn-record");
+const btnRecordEl = /** @type {HTMLButtonElement} */ ($("btn-record"));
+const btnAttendeesEl = /** @type {HTMLButtonElement} */ ($("btn-attendees"));
+const attendeePanelEl = $("attendee-panel");
+const attendeeFormEl = /** @type {HTMLFormElement} */ ($("attendee-form"));
+const attendeeNameEl = /** @type {HTMLInputElement} */ ($("attendee-name"));
+const attendeeCrmEl = /** @type {HTMLInputElement} */ ($("attendee-crm"));
+const attendeeListEl = $("attendee-list");
+const attendeeErrorEl = $("attendee-error");
+const attendeeCountEl = $("attendee-count");
+const btnAttendeeAddEl = /** @type {HTMLButtonElement} */ ($("btn-attendee-add"));
+const btnAttendeeSaveEl = /** @type {HTMLButtonElement} */ ($("btn-attendee-save"));
 // 전사는 우측 도킹 패널(.transcript-pane)이 1차 거처다 — 하단 도크 복제본은 없았다.
 const transcriptStreamEl = $("transcript-stream");
 const transcriptCountEl = $("transcript-count");
@@ -56,8 +66,8 @@ const lastSavedEl = $("last-saved");
 const docTitleEl = $("doc-title");
 const docMetaEl = $("doc-meta");
 const pillMetaEl = $("pill-meta");
-const selectModelEl = $("select-model");
-const selectEffortEl = $("select-effort");
+const selectModelEl = /** @type {HTMLSelectElement} */ ($("select-model"));
+const selectEffortEl = /** @type {HTMLSelectElement} */ ($("select-effort"));
 const effortRowEl = $("effort-row");
 
 const transcriptTruncEl = $("transcript-trunc");
@@ -107,8 +117,8 @@ function renderMeetings(items) {
 }
 
 sessionListEl.addEventListener("click", (ev) => {
-  const row = ev.target.closest(".session-row");
-  if (!row) return;
+  const row = ev.target instanceof Element ? ev.target.closest(".session-row") : null;
+  if (!(row instanceof HTMLElement)) return;
   selectedMeetingId = Number(row.dataset.meetingId);
   renderMeetings(meetings);
   const meeting = meetings.find((item) => item.id === selectedMeetingId);
@@ -596,12 +606,12 @@ function sendSttAction(action, modelId) {
 }
 
 sttListEl.addEventListener("click", (ev) => {
-  const install = ev.target.closest(".stt-row__install");
-  if (install) return sendSttAction("installSttModel", install.dataset.id);
-  const cancel = ev.target.closest(".stt-row__cancel");
-  if (cancel) return sendSttAction("cancelSttModel", cancel.dataset.id);
-  const select = ev.target.closest(".stt-row__select");
-  if (select && !select.disabled) return sendSttAction("selectSttModel", select.dataset.id);
+  const install = ev.target instanceof Element ? ev.target.closest(".stt-row__install") : null;
+  if (install instanceof HTMLElement) return sendSttAction("installSttModel", install.dataset.id);
+  const cancel = ev.target instanceof Element ? ev.target.closest(".stt-row__cancel") : null;
+  if (cancel instanceof HTMLElement) return sendSttAction("cancelSttModel", cancel.dataset.id);
+  const select = ev.target instanceof Element ? ev.target.closest(".stt-row__select") : null;
+  if (select instanceof HTMLButtonElement && !select.disabled) return sendSttAction("selectSttModel", select.dataset.id);
 });
 
 btnRecheckSttEl.onclick = () => {
@@ -639,24 +649,27 @@ btnSettingsEl.onclick = (ev) => {
 };
 
 providerListEl.addEventListener("click", (ev) => {
+  if (!(ev.target instanceof Element)) return;
   const connectBtn = ev.target.closest(".provider-row__connect");
-  if (connectBtn && ws && ws.readyState === WebSocket.OPEN) {
+  if (connectBtn instanceof HTMLElement && ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "connectProvider", id: connectBtn.dataset.id }));
     return;
   }
   const saveBtn = ev.target.closest(".provider-row__save");
-  if (saveBtn && ws && ws.readyState === WebSocket.OPEN) {
+  if (saveBtn instanceof HTMLElement && ws && ws.readyState === WebSocket.OPEN) {
     const row = saveBtn.closest(".provider-row");
-    const input = row ? row.querySelector(".provider-row__key") : null;
-    if (input && input.value.trim()) {
+    const input = row?.querySelector(".provider-row__key");
+    if (input instanceof HTMLInputElement && input.value.trim()) {
       ws.send(JSON.stringify({ action: "setProviderKey", id: saveBtn.dataset.id, key: input.value.trim() }));
       input.value = "";
     }
     return;
   }
   const selectBtn = ev.target.closest(".provider-row__select");
-  if (selectBtn && !selectBtn.disabled && ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "setProvider", id: selectBtn.closest(".provider-row").dataset.id }));
+  const row = selectBtn?.closest(".provider-row");
+  if (selectBtn instanceof HTMLButtonElement && row instanceof HTMLElement &&
+      !selectBtn.disabled && ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "setProvider", id: row.dataset.id }));
   }
 });
 
@@ -668,6 +681,7 @@ btnRecheckEl.onclick = () => {
 };
 
 document.addEventListener("click", (ev) => {
+  if (!(ev.target instanceof Element)) return;
   if (!providerPanelEl.hidden && !ev.target.closest("#provider-panel") && !ev.target.closest("#btn-settings")) {
     setProviderPanelOpen(false, true);
   }
@@ -765,17 +779,240 @@ function renderCaptureButton() {
 }
 
 btnRecordEl.onclick = () => {
+  sendCaptureToggle();
+};
+
+renderCaptureButton();
+
+// ── 참석자 지정 (캡처 전 준비) ──
+// 로컬 초안(drafts)은 아직 서버에 없는 편집 상태, attendeeState는 서버가 확정해
+// 에코한 명단이다. 저장 버튼이 초안을 setAttendees로 보내고, attendees 메시지가
+// 오면 attendeeState(+meeting_id)를 교체한 뒤 초안을 서버 명단으로 되맞춘다.
+// meeting_id는 startCapture가 같은 draft meeting을 활성화하도록 함께 보낸다.
+let attendeeDrafts = [];
+let attendeeDirty = false;
+const attendeeState = { meetingId: null, attendees: [] };
+// 테스트/디버깅용 관찰 지점 — 드롭다운(T8)이 읽을 원천과 동일한 객체.
+/** @type {Window & typeof globalThis & { __attendeeState: typeof attendeeState }} */ (window).__attendeeState = attendeeState;
+
+function setAttendeeError(text) {
+  attendeeErrorEl.textContent = text ?? "";
+  attendeeErrorEl.hidden = !text;
+}
+
+function renderAttendeeList() {
+  attendeeCountEl.textContent = String(attendeeState.attendees.length);
+  attendeeCountEl.hidden = attendeeState.attendees.length === 0;
+  if (attendeeDrafts.length === 0) {
+    attendeeListEl.innerHTML = `<p class="attendee-list__empty">아직 참석자가 없습니다</p>`;
+    return;
+  }
+  attendeeListEl.innerHTML = attendeeDrafts.map((a, i) => `
+    <div class="attendee-row${a.saved ? " attendee-row--saved" : ""}" data-index="${i}">
+      <span class="attendee-row__body">
+        <span class="attendee-row__name">${escapeHtml(a.name)}</span>
+        ${a.crmPersonId ? `<span class="attendee-row__crm">${escapeHtml(a.crmPersonId)}</span>` : ""}
+      </span>
+      <button type="button" class="attendee-row__edit" aria-label="${escapeHtml(a.name)} 수정">수정</button>
+      <button type="button" class="attendee-row__remove" aria-label="${escapeHtml(a.name)} 삭제">삭제</button>
+    </div>`).join("");
+}
+
+function openAttendeePanel() {
+  if (btnAttendeesEl.disabled) return;
+  attendeePanelEl.hidden = false;
+  btnAttendeesEl.setAttribute("aria-expanded", "true");
+  attendeeNameEl.focus();
+}
+
+function closeAttendeePanel(restoreFocus = false) {
+  attendeePanelEl.hidden = true;
+  btnAttendeesEl.setAttribute("aria-expanded", "false");
+  if (restoreFocus) btnAttendeesEl.focus();
+}
+
+/** 캡처 중에는 명단을 잠근다 (서버가 draft meeting을 활성화한 뒤이므로 편집 불가). */
+function renderAttendeeLock() {
+  btnAttendeesEl.disabled = capturing;
+  attendeeNameEl.disabled = capturing;
+  attendeeCrmEl.disabled = capturing;
+  btnAttendeeAddEl.disabled = capturing;
+  btnAttendeeSaveEl.disabled = capturing;
+  if (capturing) closeAttendeePanel();
+}
+
+/** 초안 한 명 추가/수정 — 빈 이름·중복 이름은 거부하고 초안을 그대로 둔다. */
+function commitAttendeeDraft() {
+  if (capturing) return;
+  const name = attendeeNameEl.value.trim();
+  const crmPersonId = attendeeCrmEl.value.trim();
+  if (!name) {
+    setAttendeeError("이름을 입력하세요");
+    attendeeNameEl.focus();
+    return;
+  }
+  if (attendeeDrafts.some((a) => a.name === name)) {
+    setAttendeeError(`이미 추가된 참석자입니다: ${name}`);
+    attendeeNameEl.focus();
+    return;
+  }
+  attendeeDrafts.push({ name, crmPersonId, saved: false });
+  attendeeDirty = true;
+  attendeeNameEl.value = "";
+  attendeeCrmEl.value = "";
+  setAttendeeError("");
+  renderAttendeeList();
+  attendeeNameEl.focus();
+}
+
+attendeeFormEl.addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  commitAttendeeDraft();
+});
+
+attendeeListEl.addEventListener("click", (ev) => {
+  if (capturing || !(ev.target instanceof Element)) return;
+  const row = ev.target.closest(".attendee-row");
+  if (!(row instanceof HTMLElement)) return;
+  const index = Number(row.dataset.index);
+  if (ev.target.closest(".attendee-row__remove")) {
+    attendeeDrafts.splice(index, 1);
+    attendeeDirty = true;
+    setAttendeeError("");
+    renderAttendeeList();
+    return;
+  }
+  if (ev.target.closest(".attendee-row__edit")) {
+    // 수정은 행을 폼으로 되돌린다 — 확정(Enter)하면 원래 위치가 아닌 끝에 다시 붙는다.
+    const [entry] = attendeeDrafts.splice(index, 1);
+    attendeeNameEl.value = entry.name;
+    attendeeCrmEl.value = entry.crmPersonId ?? "";
+    attendeeDirty = true;
+    setAttendeeError("");
+    renderAttendeeList();
+    attendeeNameEl.focus();
+  }
+});
+
+/** 초안을 setAttendees 와이어 페이로드로 직렬화해 보낸다. */
+function sendAttendees() {
+  if (capturing) return;
+  if (attendeeDrafts.length === 0) {
+    setAttendeeError("참석자를 한 명 이상 추가하세요");
+    return;
+  }
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    setAttendeeError("연결되지 않음 — 참석자 저장 불가");
+    return;
+  }
+  ws.send(JSON.stringify({
+    action: "setAttendees",
+    attendees: attendeeDrafts.map((a) => (
+      a.crmPersonId ? { name: a.name, crmPersonId: a.crmPersonId } : { name: a.name }
+    )),
+  }));
+  setAttendeeError("");
+  renderStatus("참석자 저장 중…");
+}
+
+btnAttendeeSaveEl.onclick = sendAttendees;
+
+btnAttendeesEl.onclick = (ev) => {
+  ev.stopPropagation();
+  if (attendeePanelEl.hidden) openAttendeePanel();
+  else closeAttendeePanel();
+};
+
+document.addEventListener("click", (ev) => {
+  if (attendeePanelEl.hidden || !(ev.target instanceof Element)) return;
+  // 패널 안 버튼(수정/삭제)은 핸들러가 리스트를 다시 그려 버리므로, 이벤트가
+  // document까지 올라올 때 ev.target은 이미 DOM에서 떨어져 closest()가 패널을
+  // 찾지 못한다. 그런 분리된 타겟을 "바깥 클릭"으로 오인하지 않도록 제외한다.
+  if (!ev.target.isConnected) return;
+  if (!ev.target.closest("#attendee-panel") && !ev.target.closest("#btn-attendees")) {
+    closeAttendeePanel();
+  }
+});
+
+/**
+ * 준비된 draft 회의 참조를 버린다 (reset 이후). 서버가 그 회의를 이미 종료했으므로
+ * meeting_id는 재사용할 수 없다. 명단 초안은 사용자가 다시 저장할 수 있게 남겨두되
+ * 서버에 확정되지 않은 상태로 되돌린다.
+ */
+function clearPreparedMeeting() {
+  attendeeState.meetingId = null;
+  attendeeState.attendees = [];
+  attendeeDrafts = attendeeDrafts.map((a) => ({ ...a, saved: false }));
+  attendeeDirty = attendeeDrafts.length > 0;
+  setAttendeeError("");
+  renderAttendeeList();
+}
+
+/** 서버가 확정한 명단으로 상태와 초안을 되맞춘다 (재연결 복원 포함). */
+function applyAttendeesMessage(msg) {
+  const rows = Array.isArray(msg.attendees) ? msg.attendees : [];
+  const attendees = rows
+    .filter((a) => a && typeof a === "object" && typeof a.display_name === "string" && a.display_name.trim())
+    .map((a) => ({
+      attendeeId: typeof a.attendee_id === "string" ? a.attendee_id : "",
+      displayName: a.display_name,
+      crmPersonEntityId: typeof a.crm_person_entity_id === "string" ? a.crm_person_entity_id : null,
+    }));
+  if (typeof msg.meeting_id === "number" && Number.isFinite(msg.meeting_id)) {
+    attendeeState.meetingId = msg.meeting_id;
+  }
+  attendeeState.attendees = attendees;
+  attendeeDrafts = attendees.map((a) => ({
+    name: a.displayName,
+    crmPersonId: a.crmPersonEntityId ?? "",
+    saved: true,
+  }));
+  attendeeDirty = false;
+  setAttendeeError("");
+  renderAttendeeList();
+  renderStatus(`참석자 ${attendees.length}명 저장됨`);
+}
+
+/** 준비된 meeting_id가 있으면 startCapture에 실어 같은 draft 회의를 활성화한다. */
+function sendCaptureToggle() {
   if (!ws || ws.readyState !== WebSocket.OPEN) {
     renderStatus("서버 연결 중… 잠시 후 다시 눌러주세요");
     return;
   }
-  // 즉시 피드백 — 서버 capture 이벤트가 오기 전에도 클릭 반응을 보여준다.
   renderStatus(capturing ? "녹음 중지 요청…" : "녹음 시작 요청…");
-  ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
+  if (capturing) {
+    ws.send(JSON.stringify({ action: "stopCapture" }));
+    requestMeetings();
+    return;
+  }
+  if (attendeeDirty) {
+    setAttendeeError("저장하지 않은 참석자가 있습니다 — 저장 후 시작하세요");
+  }
+  // 참석자는 하드 게이트가 아니다 — 지정하지 않아도 캡처는 시작된다.
+  ws.send(JSON.stringify(attendeeState.meetingId === null
+    ? { action: "startCapture" }
+    : { action: "startCapture", meeting_id: attendeeState.meetingId }));
   requestMeetings();
-};
+}
 
-renderCaptureButton();
+renderAttendeeList();
+renderAttendeeLock();
+
+// ── 회의록 검토 오버레이 (review-panel.js) ──
+// 슬라이드 셸 위에 얹히는 세 번째 오버레이. 소켓은 app.js가 소유하므로
+// 전송/연결 여부만 얇은 transport로 넘긴다.
+const reviewPanel = window.createReviewPanel ? window.createReviewPanel({
+  send(payload) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return false;
+    ws.send(JSON.stringify(payload));
+    return true;
+  },
+  isOpen: () => !!ws && ws.readyState === WebSocket.OPEN,
+}) : {
+  syncTransport() {},
+  applyReview() {},
+  applyStatus() {},
+};
 
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
 function meetingTarget() {
@@ -932,6 +1169,7 @@ btnResetEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "reset" }));
     requestMeetings();
+    clearPreparedMeeting();
     renderStatus("세션 초기화 요청됨");
   } else {
     renderStatus("연결되지 않음 — 초기화 불가");
@@ -951,25 +1189,29 @@ function toggleThumbnailPreview(card) {
   renderMain();
 }
 thumbnailsEl.addEventListener("click", (ev) => {
-  const card = ev.target.closest(".thumbnail");
-  if (card) toggleThumbnailPreview(card);
+  const card = ev.target instanceof HTMLElement ? ev.target.closest(".thumbnail") : null;
+  if (card instanceof HTMLElement) toggleThumbnailPreview(card);
 });
 thumbnailsEl.addEventListener("keydown", (ev) => {
   if (ev.key !== "Enter" && ev.key !== " ") return;
   const card = (ev.target instanceof HTMLElement ? ev.target.closest(".thumbnail") : null);
-  if (!card) return;
+  if (!(card instanceof HTMLElement)) return;
   ev.preventDefault();
   toggleThumbnailPreview(card);
 });
 
 currentSlideEl.addEventListener("click", (ev) => {
-  if (ev.target.closest(".slide__notice")) {
+  if (ev.target instanceof Element && ev.target.closest(".slide__notice")) {
     viewingHistory = null;
     renderMain();
   }
 });
 
 window.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape" && !attendeePanelEl.hidden) {
+    closeAttendeePanel(true);
+    return;
+  }
   if (ev.key === "Escape" && viewingHistory) {
     viewingHistory = null;
     renderMain();
@@ -977,11 +1219,9 @@ window.addEventListener("keydown", (ev) => {
   }
   // 입력 필드/패널 안에서는 단축키 무시
   const tag = (ev.target instanceof HTMLElement ? ev.target.tagName : "").toLowerCase();
-  if (tag === "input" || tag === "textarea" || !providerPanelEl.hidden) return;
+  if (tag === "input" || tag === "textarea" || !providerPanelEl.hidden || !attendeePanelEl.hidden) return;
   if (ev.key === "r" && inputMode !== "file") {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ action: capturing ? "stopCapture" : "startCapture" }));
-    }
+    sendCaptureToggle();
   }
 });
 
@@ -999,6 +1239,8 @@ function connect() {
   ws.onopen = () => {
     renderStatus("서버 연결됨");
     requestMeetings();
+    ws.send(JSON.stringify({ action: "attendees" }));
+    reviewPanel.syncTransport();
   };
   ws.onmessage = (ev) => {
     try {
@@ -1052,11 +1294,16 @@ function connect() {
         renderProviders(msg);
       } else if (msg.type === "sttModels") {
         renderSttModels(msg);
+      } else if (msg.type === "attendees") {
+        applyAttendeesMessage(msg);
+      } else if (msg.type === "review") {
+        reviewPanel.applyReview(msg);
       } else if (msg.type === "capture") {
         capturing = !!msg.capturing;
         inputMode = msg.mode ?? "mic";
         renderCaptureButton();
         renderCaptureState();
+        renderAttendeeLock();
         renderPill();
         renderDocHead();
         // ON AIR 표시도 캡처 상태와 연동
@@ -1080,6 +1327,7 @@ function connect() {
         }
       } else if (msg.type === "status") {
         renderStatus(msg.text);
+        reviewPanel.applyStatus(msg.text);
       }
     } catch (e) {
       console.error("parse error", e);
@@ -1089,6 +1337,7 @@ function connect() {
     activeJobId = null;
     setJobControlsBusy(false);
     renderStatus("연결 끊김. 3초 후 재시도...");
+    reviewPanel?.syncTransport();
     setTimeout(connect, 3000);
   };
   ws.onerror = () => renderStatus("연결 오류");

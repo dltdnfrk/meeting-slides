@@ -1,0 +1,2 @@
+COMMAND: bunx tsc -p tsconfig.json --noEmit --strict --pretty false
+EXIT_CODE: 0

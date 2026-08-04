@@ -1,0 +1,17 @@
+target_commit=94fea038c0ca47e8b32950a8d666550bd9dea448
+command=bun test tests/pdf.test.ts
+
+bun test v1.3.14 (0d9b296a)
+
+tests/pdf.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'resolveVendoredChromiumExecutable' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/src/pdf.ts'.
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [85.00ms]

@@ -1,0 +1,40 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-review.test.ts:
+(pass) review panel shell > the panel mounts hidden and leaves the slide shell intact [503.68ms]
+(pass) review panel shell > capture is not hard-gated by the review panel [37.08ms]
+(pass) candidate cards > a review message renders one card per candidate with quote and version-scoped coordinates [33.96ms]
+(pass) candidate cards > every candidate carries the immutable transcript version id, not just a seq [37.47ms]
+(pass) candidate cards > a multi-line segment shows the joined evidence text of the whole range [37.57ms]
+(pass) candidate cards > action items surface deadline text alongside the normalized deadline [39.43ms]
+(pass) candidate cards > decisions and open items have no assignee control — only action items do [45.12ms]
+(pass) attendee dropdown attribution > attribution options come only from the review attendees, never free text [48.76ms]
+(pass) attendee dropdown attribution > the suggested attribution is preselected and a change sends updateItem [67.37ms]
+(pass) attendee dropdown attribution > assigning an action item sends updateItem with the assignee patch [244.51ms]
+(pass) attendee dropdown attribution > with no attendees the dropdowns are disabled and explain why [49.92ms]
+(pass) edit and drop controls > editing a description sends updateItem with the trimmed text [85.40ms]
+(pass) edit and drop controls > an empty edit is rejected without sending anything [74.27ms]
+(pass) edit and drop controls > dropping a candidate marks it rejected and sends the review_state patch [83.20ms]
+(pass) edit and drop controls > a dropped candidate can be restored to candidate state [92.06ms]
+(pass) confirm action > confirm sends confirmReview with the review id [81.75ms]
+(pass) confirm action > the confirm button reports how many candidates will be kept [84.59ms]
+(pass) confirm action > confirming while every candidate is dropped is blocked [99.48ms]
+(pass) empty, error, and loading states > an empty candidate list shows the no-candidates notice and no cards [74.40ms]
+(pass) empty, error, and loading states > the extraction status message drives a loading state before the payload lands [89.33ms]
+(pass) empty, error, and loading states > an extraction failure status shows a retry affordance instead of stale cards [93.53ms]
+(pass) keyboard accessibility > Escape closes the panel and the toggle reopens it without refetching [118.62ms]
+(pass) keyboard accessibility > opening the panel moves focus into it and the toggle reflects expansion [518.36ms]
+(pass) keyboard accessibility > every control is reachable and labelled for assistive tech [51.12ms]
+(pass) keyboard accessibility > Enter on the drop control toggles it, so the panel is operable keyboard-only [63.97ms]
+(pass) reconnect and update handling > a second review message replaces the previous candidates rather than appending [65.39ms]
+(pass) reconnect and update handling > a dropped socket disables confirm and reconnect restores it [3091.02ms]
+(pass) reconnect and update handling > local edits survive a re-render triggered by an unrelated message [66.16ms]
+(pass) hostile payloads > markup in descriptions, quotes, and attendee names is escaped as text [69.59ms]
+(pass) hostile payloads > a malformed review payload is ignored without tearing down the shell [72.42ms]
+(pass) hostile payloads > a kind outside the updateItem wire contract is refused, not rendered as an actionable card [83.24ms]
+(pass) hostile payloads > items missing required evidence or source coordinates are refused rather than rendered uncited [77.32ms]
+
+ 32 pass
+ 0 fail
+ 55 expect() calls
+Ran 32 tests across 1 file. [6.88s]

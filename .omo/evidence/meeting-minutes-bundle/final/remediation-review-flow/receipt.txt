@@ -1,0 +1,59 @@
+remediation_review_flow_receipt
+
+identity
+  target_commit=cf2660c60b6bb4d691389cf5f39109eb95dc8929
+  target_commit_role=committed HEAD repaired by this scoped change
+  verified_by=st_019fbebc (PI_SESSION_ID=019fbebc-a1d3-7959-86cb-2f12f84d9305, model=gpt-5.6-luna-fast)
+  verified_at=2026-08-01T19:11:49Z
+  workstation=darwin arm64
+
+scope
+  F2-01: startReview atomically calls MinutesStore.saveCandidates before returning to the server broadcaster; the returned reviewId and every decision/action/open item ID are the persisted IDs.
+  F2-02: the actual review panel exposes deadline correction and explicit candidate->confirmed transitions, and permits final confirmation only when no candidate remains.
+  T9/T14 contracts were not changed.
+  The inherited cancelled-worker delta was preserved; unrelated conclusion/transcript files and artifacts were neither reset nor selected for this repair.
+
+test_first_observation
+  command: bun test tests/public-review.test.ts tests/transcript-versioning.test.ts tests/start-review-action.test.ts tests/conclusion.test.ts
+  evidence: 01-red-tests.txt
+  observed before implementation: actual Chromium final-confirm readiness failed, all-rejected/empty review confirmation failed, and the real WS startReview payload had no matching meeting_reviews row. The same inherited run also contained unrelated broad-repair failures outside F2-01/F2-02.
+
+verified_commands
+  1. bun test tests/start-review.test.ts tests/start-review-action.test.ts
+     result: PASS, 4 tests / 25 expectations; real server test persists one review plus exact IDs in decisions, action_items, and open_items before UI mutations, then updates and concludes.
+     evidence: 02-server-sqlite-tests.txt
+  2. bun test tests/public-review.test.ts
+     result: PASS, 32 Chromium DOM tests / 54 expectations.
+     evidence: 03-dom-chromium-tests.txt
+  3. bunx tsc --noEmit --allowJs --checkJs --target ESNext --module ESNext --moduleResolution bundler --lib ESNext,DOM --skipLibCheck public/review-panel.js
+     result: PASS, zero diagnostics. The workspace LSP is rooted at the separate main worktree and rejected delegated-worktree paths, so this direct changed-public-file checkJs command is the diagnostic gate.
+     evidence: 04-review-panel-checkjs.txt
+  4. bunx tsc -p tsconfig.json --noEmit
+     result: PASS, zero diagnostics.
+     evidence: 05-tsc.txt
+  5. bun .omo/evidence/meeting-minutes-bundle/final/remediation-review-flow/flow-driver.ts
+     result: PASS; event-driven real HTTP/WS/Chromium/SQLite attendee -> startReview -> browser attribution -> browser item confirm -> browser confirmReview -> meetingConcluded flow.
+     observations: persisted draft review/item IDs exactly matched the broadcast IDs before UI use; final SQLite review_state/status were confirmed; one conclusion existed; DOM data-review-state was confirmed.
+     evidence: 06-event-driven-flow.txt
+  6. bun test tests/review-actions.test.ts tests/meeting-conclusion.test.ts
+     result: PASS, 14 tests / 70 expectations; unchanged T9 mutation and T14 conclusion/publication contracts.
+     evidence: 07-t9-t14-contracts.txt
+  7. git diff --check
+     result: PASS, no output.
+     evidence: 08-diff-check.txt
+
+cleanup
+  flow driver subscribed before every trigger and used bounded event waits; no sleeps or polling delays.
+  temporary SQLite database, fake executables, and export directory removed in finally.
+  browser, WebSocket, and server child closed in finally.
+  no plan, ledger, or todo file edited.
+  no reset, checkout, clean, or revert used.
+
+main_worktree_fingerprint
+  path=/Users/hyunjun/Documents/MUNI/meeting-slides
+  head=921a01513593c0e10181cf01e535a7abe995deb3
+  branch=main
+  index_tree=80385a18820c17aea94ecc8b9901fe9b7d385097
+  dirty_path_count=688
+  dirty_paths_sha256=4322fb5082f9d0550c575e4be37afee211d8d0e37dd7e339c436715a0261e5e7
+  evidence: 09-main-worktree-fingerprint.txt

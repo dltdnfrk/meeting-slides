@@ -1,0 +1,77 @@
+COMMAND: bun test tests/public-review.test.ts tests/transcript-versioning.test.ts tests/server-recorder-startup.test.ts tests/start-review-action.test.ts tests/review-actions.test.ts tests/meeting-conclusion.test.ts
+VERIFIED_HEAD: 6711ecfcb47f75b1bb22377d97dd551538568ad7
+bun test v1.3.14 (0d9b296a)
+
+tests/meeting-conclusion.test.ts:
+(pass) meeting-conclusion transaction > confirmReview publishes a complete version-linked manifest and only then closes the meeting [28.95ms]
+(pass) meeting-conclusion transaction > rejects unresolved, invalid-source, and stale-version reviews before exporting [11.72ms]
+(pass) meeting-conclusion transaction > PDF failure rolls back review, complete rows, conclusion, and all artifacts, and retry succeeds [21.50ms]
+(pass) meeting-conclusion transaction > post-export hash failure rolls back review state without destructively deleting the published bundle [23.50ms]
+(pass) meeting-conclusion transaction > repeated and concurrent conclusion shares one export and never duplicates bundle state [20.79ms]
+(pass) meeting-conclusion transaction > real WS confirmReview reaches SQLite, bundle publication, and MeetingConcluded [544.92ms]
+
+tests/public-review.test.ts:
+(pass) review panel shell > the panel mounts hidden and leaves the slide shell intact [512.58ms]
+(pass) review panel shell > capture is not hard-gated by the review panel [38.63ms]
+(pass) candidate cards > a review message renders one card per candidate with quote and version-scoped coordinates [35.65ms]
+(pass) candidate cards > every candidate carries the immutable transcript version id, not just a seq [37.36ms]
+(pass) candidate cards > a multi-line segment shows the joined evidence text of the whole range [39.13ms]
+(pass) candidate cards > action items surface deadline text alongside the normalized deadline [42.60ms]
+(pass) candidate cards > decisions and open items have no assignee control — only action items do [48.34ms]
+(pass) attendee dropdown attribution > attribution options come only from the review attendees, never free text [50.57ms]
+(pass) attendee dropdown attribution > the suggested attribution is preselected and a change sends updateItem [221.36ms]
+(pass) attendee dropdown attribution > assigning an action item sends updateItem with the assignee patch [52.85ms]
+(pass) attendee dropdown attribution > with no attendees the dropdowns are disabled and explain why [51.68ms]
+(pass) edit and drop controls > editing a description sends updateItem with the trimmed text [100.55ms]
+(pass) edit and drop controls > an empty edit is rejected without sending anything [82.45ms]
+(pass) edit and drop controls > dropping a candidate marks it rejected and sends the review_state patch [75.38ms]
+(pass) edit and drop controls > a dropped candidate can be restored to candidate state [92.57ms]
+(pass) confirm action > the actual browser flow confirms complete candidates, corrects an action deadline, then confirms the review [155.90ms]
+(pass) confirm action > the confirm button reports how many candidates will be kept [101.95ms]
+(pass) confirm action > a review with every candidate rejected remains confirmable [282.56ms]
+(pass) empty, error, and loading states > an empty candidate list shows the no-candidates notice and no cards [44.41ms]
+(pass) empty, error, and loading states > the extraction status message drives a loading state before the payload lands [54.49ms]
+(pass) empty, error, and loading states > an extraction failure status shows a retry affordance instead of stale cards [66.51ms]
+(pass) keyboard accessibility > Escape closes the panel and the toggle reopens it without refetching [69.35ms]
+(pass) keyboard accessibility > opening the panel moves focus into it and the toggle reflects expansion [66.30ms]
+(pass) keyboard accessibility > every control is reachable and labelled for assistive tech [71.05ms]
+(pass) keyboard accessibility > Enter on the drop control toggles it, so the panel is operable keyboard-only [80.26ms]
+(pass) reconnect and update handling > a second review message replaces the previous candidates rather than appending [96.03ms]
+(pass) reconnect and update handling > a dropped socket disables confirm and reconnect restores it [3116.43ms]
+(pass) reconnect and update handling > local edits survive a re-render triggered by an unrelated message [52.05ms]
+(pass) hostile payloads > markup in descriptions, quotes, and attendee names is escaped as text [57.81ms]
+(pass) hostile payloads > a malformed review payload is ignored without tearing down the shell [57.57ms]
+(pass) hostile payloads > a kind outside the updateItem wire contract is refused, not rendered as an actionable card [91.00ms]
+(pass) hostile payloads > items missing required evidence or source coordinates are refused rather than rendered uncited [62.27ms]
+
+tests/server-recorder-startup.test.ts:
+(pass) recorder startup failure leaves capture stopped and never launches whisper [683.14ms]
+
+tests/review-actions.test.ts:
+(pass) MinutesStore review mutation transaction > validates candidate ownership, attendee membership, and the whole patch before mutating [1.46ms]
+(pass) MinutesStore review mutation transaction > atomically transitions draft to confirmed only after every item is reviewed [1.07ms]
+(pass) MinutesStore review mutation transaction > rejects a review whose transcript version is no longer canonical [0.92ms]
+(pass) MinutesStore review mutation transaction > detects changed canonical transcript bytes and leaves review/artifact rows untouched [0.85ms]
+(pass) MinutesStore review mutation transaction > revalidates persisted attendee identities inside the confirmation transaction [0.89ms]
+(pass) MinutesStore review mutation transaction > rolls back confirmation when a confirmed source range has an interior gap [0.90ms]
+(pass) MinutesStore review mutation transaction > rolls back the status and timestamp when the confirmation transaction fails [0.88ms]
+(pass) real WS actions reject adversarial patches, persist valid changes, and conclude with one complete bundle [245.64ms]
+
+tests/transcript-versioning.test.ts:
+(pass) canonical transcript versioning > live capture dual-writes, finalizes a content hash, and makes canonical lines immutable [1.40ms]
+(pass) canonical transcript versioning > retranscription creates a new immutable coordinate space without changing canonical automatically [1.08ms]
+(pass) canonical transcript versioning > an interrupted retranscription leaves the previous canonical version intact [0.92ms]
+(pass) canonical transcript versioning > legacy snapshot rejects duplicate coordinates instead of guessing [0.72ms]
+(pass) raw audio hash and recorder contract > file audio claims reject same bytes without duplicate persistence and allow different bytes [1.28ms]
+(pass) raw audio hash and recorder contract > capture finalization stops the recorder exactly once on success and failure [2.05ms]
+(pass) raw audio hash and recorder contract > recorder startup timeout terminates and awaits the child exactly once [507.65ms]
+(pass) raw audio hash and recorder contract > recorder waits for closure, hashes a valid WAV, and removes failed partial output [442.04ms]
+
+tests/start-review-action.test.ts:
+(pass) startReview is ended-only, requester-scoped, and single-flight for one canonical version [622.99ms]
+
+ 56 pass
+ 0 fail
+ 183 expect() calls
+Ran 56 tests across 6 files. [10.33s]
+EXIT_CODE: 0

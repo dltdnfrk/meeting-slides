@@ -1,0 +1,7 @@
+semantic prohibited-scope audit
+head=a958f969ce96c9b8c2f02871090ce1587cfbe146
+broad plan regex (expected lexical false positive permitted only for local attendees.crm_person_entity_id):
+src/minutes-store-meetings.ts:126:      INSERT INTO attendees (meeting_id, attendee_id, display_name, crm_person_entity_id, sort_order, created_at)
+semantic scans:
+classification: src/minutes-store-meetings.ts:126 targets local table attendees and stores the plan-required crm_person_entity_id attribute; it is not a CRM DB write.
+semantic_hits=0

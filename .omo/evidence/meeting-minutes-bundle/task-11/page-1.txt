@@ -1,0 +1,25 @@
+RELEASE COUNCIL QA
+MEETING MINUTES
+
+
+
+
+Verify the A4 minutes export invariant.
+일시    2026-08-01 · Asia/Seoul                         참석자    Alice Kim
+전사 버전 qa-canonical-v1
+
+결정 사항
+ 결정                                발언자                                   근거 좌표
+ DECISION-QA-1: release evidence Alice Kim                               (qa-canonical-v1,1,1)
+ release evidence
+ DECISION-QA-2: release evidence Alice Kim                               (qa-canonical-v1,2,2)
+ release evidence
+ DECISION-QA-3: release evidence Alice Kim                               (qa-canonical-v1,3,3)
+ release evidence
+ DECISION-QA-4: release          Alice Kim                               (qa-canonical-v1,4,4)
+ evidence release evidence
+
+액션 항목
+ 액션                         발언자           담당자          기한                근거 좌표
+ ACTION-QA-1: publish the 미지정             Alice Kim    2026-08-07        (qa-canonical-v1,5,5)
+ signed verification report

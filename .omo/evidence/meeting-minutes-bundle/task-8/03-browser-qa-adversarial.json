@@ -1,0 +1,79 @@
+{
+  "chromium": "Chrome/150.0.7871.24",
+  "desktop": {
+    "rows": [
+      {
+        "id": "decision-1",
+        "quote": "Evidence 11",
+        "coords": "seq 11 · tv-task-8-immutable",
+        "attributionTag": "SELECT",
+        "assigneeTag": null
+      },
+      {
+        "id": "action-1",
+        "quote": "Evidence 12",
+        "coords": "seq 12 · tv-task-8-immutable",
+        "attributionTag": "SELECT",
+        "assigneeTag": "SELECT"
+      },
+      {
+        "id": "open-1",
+        "quote": "Evidence 13",
+        "coords": "seq 13 · tv-task-8-immutable",
+        "attributionTag": "SELECT",
+        "assigneeTag": null
+      }
+    ],
+    "freeTextAttributionSurfaces": 0
+  },
+  "wires": [
+    {
+      "action": "updateItem",
+      "reviewId": "review-task-8",
+      "itemId": "decision-1",
+      "kind": "decision",
+      "patch": {
+        "attributedAttendeeId": "att-2"
+      }
+    },
+    {
+      "action": "updateItem",
+      "reviewId": "review-task-8",
+      "itemId": "action-1",
+      "kind": "action_item",
+      "patch": {
+        "assigneeAttendeeId": "att-1"
+      }
+    },
+    {
+      "action": "confirmReview",
+      "reviewId": "review-task-8"
+    }
+  ],
+  "afterMalformedObject": 3,
+  "shellAliveAfterMalformedJson": true,
+  "unsupported": [
+    "valid-1"
+  ],
+  "malformedEvidence": [
+    "valid-2"
+  ],
+  "empty": {
+    "text": "추출된 후보가 없습니다 — 전사에 명시적인 결정·액션·미결 표현이 없었습니다",
+    "confirmDisabled": true,
+    "rows": 0
+  },
+  "mobile": {
+    "left": 12,
+    "right": 548,
+    "width": 536,
+    "viewport": 560,
+    "horizontalOverflow": false
+  },
+  "browserDiagnostics": {
+    "pageErrors": [],
+    "unexpectedConsoleErrors": [],
+    "expectedMalformedJsonConsoleCount": 1,
+    "expectedExternalFontErrorCount": 0
+  }
+}

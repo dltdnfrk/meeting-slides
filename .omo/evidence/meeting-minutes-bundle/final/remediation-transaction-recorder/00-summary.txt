@@ -1,0 +1,18 @@
+SALVAGE: transaction/publication/recorder repair
+FOCUSED_REVIEW_FLOW_COMMIT: 0f1588a453328f471c057ff9032007cad6cb5d5f
+FOCUSED_REVIEW_FLOW_TREE: 4235ba1e5a09f58c9a0b410bda71910ea104ef92
+REPAIR_CODE_TEST_PATCH_SHA256: 1ed3cc24e957e0585d8b6f19bb39004036fd702b0aabd277bded20644b41f073
+
+RESULTS:
+- focused tests: PASS (30 pass, 0 fail, 206 expectations; 5 files)
+- real event-driven WS/SQLite driver: PASS (10 probes; bundle=1, artifacts=4, conclusion=1)
+- strict TypeScript: PASS (bunx tsc --noEmit --strict)
+- diff check: PASS (git diff --check)
+
+INITIAL DRIVER FAILURE:
+The preserved Task 9 driver expected the pre-conclusion state (zero artifacts). Current review confirmation correctly concludes and publishes, so its stale assertion failed after all earlier WS/SQLite probes passed. The single targeted evidence-driver fix isolated output under its temporary directory and asserted one bundle, four artifacts, and one conclusion. The escaped initial output is in 02-real-ws-sqlite-initial-failure.txt.
+
+INVARIANTS VERIFIED:
+- no SQLite transaction spans awaited bundle/PDF/filesystem work
+- failed conclusion validation preserves an already-visible shared bundle for deduplicated retry
+- recorder startup failure terminates/awaits its child, removes partial output, ends capture state, and does not launch transcription

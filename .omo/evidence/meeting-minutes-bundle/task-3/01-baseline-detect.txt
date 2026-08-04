@@ -1,0 +1,26 @@
+T3 baseline detectBlock characterization
+commit=7a3894e0fc8c67ff99cc297553f46096b455c5ba
+bun test v1.3.14 (0d9b296a)
+
+tests/llm-transport.test.ts:
+(pass) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [3.98ms]
+(pass) existing LLM detectBlock transport behavior > HTTP preserves status and response text in rejection [1.18ms]
+(pass) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [426.96ms]
+(pass) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [322.10ms]
+
+tests/llm-cli.test.ts:
+(pass) buildCliArgs > claude 프리셋: -p + text 출력 [0.02ms]
+(pass) buildCliArgs > codex 프리셋: exec + 최종 메시지 파일 [0.03ms]
+(pass) buildCliArgs > codex: 모델/effort 오버라이드 인자 [0.02ms]
+(pass) buildCliArgs > claude: 모델 오버라이드 인자 [0.01ms]
+(pass) parseBlockDetectionJson > 정상 JSON 파싱 [0.02ms]
+(pass) parseBlockDetectionJson > 앞뒤 사고 과정이 붙은 출력에서 JSON 추출 (reasoning 대응)
+[LLM] 블록 감지 JSON 파싱 실패: JSON이 아닌 응답
+(pass) parseBlockDetectionJson > 깨진 출력은 파싱 실패 fallback [0.05ms]
+(pass) parseBlockDetectionJson > 빈 출력은 빈 결과 [0.01ms]
+(pass) parseBlockDetectionJson > 제목 50자, 불렛 80자/6개 제한 [0.12ms]
+
+ 13 pass
+ 0 fail
+ 28 expect() calls
+Ran 13 tests across 2 files. [766.00ms]

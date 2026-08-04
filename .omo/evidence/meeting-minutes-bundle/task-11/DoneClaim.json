@@ -1,0 +1,36 @@
+{
+  "task": "T11 Chromium A4 portrait minutes PDF",
+  "status": "pass",
+  "parent_commit": "94fea038c0ca47e8b32950a8d666550bd9dea448",
+  "target_commit": "f64fb18c83659dd6732d9481434d8758f98c231a",
+  "cleanup_commits": [
+    "cde7e1902e6a79565c5b010e4cb76fe64a4317e4",
+    "0c56aa683f58b2be44835aaef2d3517b46d5a33a"
+  ],
+  "commit_subject": "feat(pdf): add chromium A4 portrait print with first-page overflow measure-and-shrink",
+  "verified_by": "senpi/gpt-5.6-sol",
+  "verified_at": "2026-08-01T17:58:54Z",
+  "gates": {
+    "focused": { "passed": 5, "failed": 0, "expectations": 28 },
+    "full": { "passed": 197, "failed": 0, "expectations": 750, "files": 27 },
+    "tsc": "pass",
+    "diff_check": "pass",
+    "real_pdf_qa": { "passed": 13, "failed": 0 }
+  },
+  "cleanup": "pass",
+  "main_worktree_fingerprint": "08-main-worktree-fingerprint.txt",
+  "evidence": [
+    "02-focused-green.txt",
+    "03-full-bun-test.txt",
+    "04-tsc.txt",
+    "05-diff-check.txt",
+    "06-real-pdf-driver.ts",
+    "06-real-pdf-driver.txt",
+    "08-main-worktree-fingerprint.txt",
+    "minutes-a4.pdf",
+    "minutes-a4-shrunk.pdf",
+    "page-1.txt",
+    "page-2.txt",
+    "final-receipt.txt"
+  ]
+}

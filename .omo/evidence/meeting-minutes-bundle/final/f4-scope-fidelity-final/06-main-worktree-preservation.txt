@@ -1,0 +1,23 @@
+MAIN_HEAD=921a01513593c0e10181cf01e535a7abe995deb3
+MAIN_STATUS_SHA256=6c4f788dd1ca722616c93650f5dd97da57ee2cad60589e9e222293fb498ba0d4
+EXPECTED_MAIN_STATUS_SHA256=6c4f788dd1ca722616c93650f5dd97da57ee2cad60589e9e222293fb498ba0d4
+MAIN_STATUS:
+ D deck/THIRD_PARTY_NOTICES.md
+ M deck/assets/meeting-cover.png
+ M deck/assets/meeting-topic-map.png
+ M deck/theme.css
+ M public/app.js
+ M public/index.html
+ M public/style.css
+ M server.ts
+ M src/deck.ts
+ M src/grab.ts
+ M tests/deck.test.ts
+?? .omo/
+?? DESIGN.md
+?? docs/
+?? public/transcript-overlay.css
+?? public/transcript-overlay.js
+?? tests/public-overlay.test.ts
+?? tests/public-runtime-guard.test.ts
+?? tests/public-shell.test.ts

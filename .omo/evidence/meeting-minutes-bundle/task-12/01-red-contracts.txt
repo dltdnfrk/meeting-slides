@@ -1,0 +1,92 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/bundle.test.ts:
+103 |     fx.store.confirmReview(fx.reviewId, "bundle-test");
+104 |
+105 |     const result = await run(fx);
+106 |
+107 |     expect(outputNames(fx.outputRoot)).toEqual([basename(result.bundlePath)]);
+108 |     expect(outputNames(result.bundlePath)).toEqual([
+                                                 ^
+error: expect(received).toEqual(expected)
+
+  [
+    "audio.ref.json",
+    "deck",
+    "manifest.json",
++   "minutes.css",
++   "minutes.html",
+    "minutes.json",
+    "minutes.pdf",
++   "original-audio.wav",
++   "theme.css",
+    "transcript.v1.jsonl",
+  ]
+
+- Expected  - 0
++ Received  + 4
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/bundle.test.ts:108:44)
+(fail) exportBundle > publishes six logical outputs atomically and records four required artifacts only after validation [35.35ms]
+139 |     expect(Object.keys(minutes)).toEqual(expect.arrayContaining([
+140 |       "attendees", "decisions", "action_items", "open_items", "referenced_materials",
+141 |     ]));
+142 |     for (const item of [...minutes.decisions, ...minutes.action_items, ...minutes.open_items, ...minutes.referenced_materials]) {
+143 |       const source = item.source;
+144 |       expect(source.transcript_version_id).toBe(fx.version.transcriptVersionId);
+                   ^
+TypeError: undefined is not an object (evaluating 'source.transcript_version_id')
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/bundle.test.ts:144:14)
+(fail) exportBundle > mirrors the minutes ontology and keeps every source tuple equal to JSONL coordinates [22.73ms]
+154 |     const transcriptBytes = readFileSync(join(result.bundlePath, "transcript.v1.jsonl"));
+155 |     const lines = transcriptBytes.toString("utf8").trim().split("\n").map(JSON.parse);
+156 |     const minutes = JSON.parse(readFileSync(join(result.bundlePath, "minutes.json"), "utf8"));
+157 |     const manifest = JSON.parse(readFileSync(join(result.bundlePath, "manifest.json"), "utf8")) as BundleManifest;
+158 |
+159 |     expect(lines.map(Object.keys)).toEqual([
+                                         ^
+error: expect(received).toEqual(expected)
+
+  [
+    [
+      "seq",
+-     "ts",
++     "captured_at_ms",
++     "audio_start_ms",
++     "audio_end_ms",
+      "speaker_turn",
+      "text",
+    ],
+    [
+      "seq",
+-     "ts",
++     "captured_at_ms",
++     "audio_start_ms",
++     "audio_end_ms",
+      "speaker_turn",
+      "text",
+    ],
+    [
+      "seq",
+-     "ts",
++     "captured_at_ms",
++     "audio_start_ms",
++     "audio_end_ms",
+      "speaker_turn",
+      "text",
+    ],
+  ]
+
+- Expected  - 3
++ Received  + 9
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides-worktree-meeting-minutes/tests/bundle.test.ts:159:36)
+(fail) exportBundle > writes canonical four-field JSONL and binds its exact bytes to content_sha256 and manifest hashes [24.42ms]
+(pass) exportBundle > refuses unconfirmed, stale-canonical, and version-mismatched confirmed items without artifact rows [12.72ms]
+(pass) exportBundle > refuses a missing required deck output and removes the staging tree [10.40ms]
+(pass) exportBundle > cleans the atomic .tmp directory on PDF failure and never publishes or records partial output [7.52ms]
+
+ 3 pass
+ 3 fail
+ 18 expect() calls
+Ran 6 tests across 1 file. [265.00ms]
