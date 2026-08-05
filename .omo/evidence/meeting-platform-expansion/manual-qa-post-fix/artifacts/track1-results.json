@@ -1,0 +1,354 @@
+{
+  "results": [
+    {
+      "id": "T1.1-enumerate-sessions",
+      "status": "PASS",
+      "detail": {
+        "sessionCount": "43",
+        "rows": 43,
+        "firstThree": [
+          {
+            "id": "43",
+            "title": "회의 요약",
+            "selected": false,
+            "ariaPressed": "false"
+          },
+          {
+            "id": "42",
+            "title": "회의 종료",
+            "selected": false,
+            "ariaPressed": "false"
+          },
+          {
+            "id": "41",
+            "title": "회의 #41",
+            "selected": false,
+            "ariaPressed": "false"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T1.2-select-historical-meeting",
+      "status": "PASS",
+      "detail": {
+        "selected": true,
+        "title": "제품 출시 일정 논의",
+        "wsFrameMeetingId": 28
+      }
+    },
+    {
+      "id": "T1.3-transcript-hydration",
+      "status": "PASS",
+      "detail": {
+        "wsTranscriptLines": 18,
+        "uiTranscriptCount": "18",
+        "uiRendered": 18
+      }
+    },
+    {
+      "id": "T1.4-current-slide-hydration",
+      "status": "PASS",
+      "detail": {
+        "wsCurrentTitle": "가입 절차 개선 논의",
+        "uiCurrentTitle": "가입 절차 개선 논의",
+        "placeholder": false
+      }
+    },
+    {
+      "id": "T1.5-history-slides-hydration",
+      "status": "PASS",
+      "detail": {
+        "wsHistoryLen": 1,
+        "wsHistoryIdx": [
+          1
+        ]
+      }
+    },
+    {
+      "id": "T1.6-filmstrip-total-includes-current",
+      "status": "PASS",
+      "detail": {
+        "serverHistory": 1,
+        "serverCurrent": 1,
+        "expectedTotal": 2,
+        "uiHistoryCount": "2",
+        "uiThumbnails": 2,
+        "thumbIdx": [
+          "1",
+          "2"
+        ],
+        "currentIncluded": true
+      }
+    },
+    {
+      "id": "T1.7-selection-switches-all-panes",
+      "status": "PASS",
+      "detail": {
+        "m28": {
+          "title": "제품 출시 일정 논의",
+          "tc": "18",
+          "hc": "2"
+        },
+        "m43": {
+          "title": "회의 요약",
+          "tc": "5",
+          "hc": "1",
+          "current": "회의 요약"
+        }
+      }
+    },
+    {
+      "id": "T1.8-compiled-state-hydration",
+      "status": "PASS",
+      "detail": {
+        "wsCompiled": {
+          "title": "회의 요약",
+          "slideCount": 3,
+          "compiledAt": 1785720745751,
+          "publishedAt": 1785720745756
+        },
+        "uiCompileStatus": {
+          "hidden": false,
+          "state": "success",
+          "text": "컴파일됨 · 3장"
+        }
+      }
+    },
+    {
+      "id": "T1.9-transcript-export-ui",
+      "status": "PASS",
+      "detail": {
+        "wsPath": "exports/transcript-2026-08-03T12-07-36-811Z.md",
+        "absPath": "/Users/hyunjun/Documents/MUNI/meeting-slides/exports/transcript-2026-08-03T12-07-36-811Z.md",
+        "bytes": 692,
+        "uiLastSaved": "저장: exports/transcript-2026-08-03T12-07-36-811Z.md"
+      }
+    },
+    {
+      "id": "T1.10-transcript-differs-from-md-notes",
+      "status": "PENDING-DIFF",
+      "detail": {
+        "transcriptPath": "exports/transcript-2026-08-03T12-07-36-811Z.md",
+        "notesPath": "exports/meeting-2026-08-03T12-07-36-903Z.md"
+      }
+    },
+    {
+      "id": "T1.11-json-export-ui",
+      "status": "PASS",
+      "detail": {
+        "path": "exports/meeting-2026-08-03T12-07-36-929Z.json"
+      }
+    },
+    {
+      "id": "T1.12-deck-export-ui",
+      "status": "PASS",
+      "detail": {
+        "path": "exports/deck-2026-08-03T12-07-36-954Z/index.html",
+        "abs": "/Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T12-07-36-954Z/index.html",
+        "bytes": 1247
+      }
+    },
+    {
+      "id": "T1.13-export-progress-started",
+      "status": "PASS",
+      "detail": {
+        "jobId": "pdf-bf28153b-b883-4adb-b1e6-812d5f77eb27",
+        "stage": "prepare",
+        "uiStatus": "PDF · validate 0/1"
+      }
+    },
+    {
+      "id": "T1.14-conflicting-controls-disabled-while-busy",
+      "status": "PASS",
+      "detail": [
+        {
+          "id": "btn-compile-deck",
+          "disabled": true
+        },
+        {
+          "id": "btn-export-pdf",
+          "disabled": true
+        },
+        {
+          "id": "btn-export-png",
+          "disabled": true
+        }
+      ]
+    },
+    {
+      "id": "T1.15-server-rejects-conflicting-job",
+      "status": "PASS",
+      "detail": {
+        "code": "job-busy",
+        "error": "A conflicting exportPdf job is already in progress"
+      }
+    },
+    {
+      "id": "T1.16-export-deterministic-progress",
+      "status": "PASS",
+      "detail": {
+        "stages": [
+          "started:prepare",
+          "progress:validate(0/1)",
+          "progress:validate(1/1)",
+          "progress:preview(0/3)",
+          "progress:review(0/1)",
+          "error:-"
+        ]
+      }
+    },
+    {
+      "id": "T1.17-controls-restored-on-terminal-state",
+      "status": "PASS",
+      "detail": {
+        "terminalStatus": "error",
+        "jobControls": [
+          {
+            "id": "btn-compile-deck",
+            "disabled": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "disabled": false
+          },
+          {
+            "id": "btn-export-png",
+            "disabled": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "T1.18-terminal-state-observable",
+      "status": "PASS",
+      "detail": {
+        "status": "error",
+        "code": "review-failed",
+        "error": "본문의 비문과 단어 결합 오류로 핵심 정책 문장의 의미가 불명확하다. 특히 '정책 의제화하기 위함이부터 없이' 구간은 정상적인 문장으로 해석하기 어렵다.",
+        "path": null,
+        "retryOffered": {
+          "text": "재시도",
+          "action": "exportPdf"
+        },
+        "uiStatus": "PDF 실패: 본문의 비문과 단어 결합 오류로 핵심 정책 문장의 의미가 불명확하다. 특히 '정책 의제화하기 위함이부터 없이' 구간은 정상적인 문장으로 해석하기 어렵다."
+      }
+    },
+    {
+      "id": "T1.19-bad-input-terminal-error",
+      "status": "PASS",
+      "detail": {
+        "code": "invalid-meeting-id",
+        "error": "meetingId must be a positive safe integer"
+      }
+    },
+    {
+      "id": "T1.20-error-recovery-retry-and-controls",
+      "status": "PASS",
+      "detail": {
+        "retry": {
+          "text": "재시도",
+          "action": "exportPdf"
+        },
+        "jobControls": [
+          {
+            "id": "btn-compile-deck",
+            "disabled": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "disabled": false
+          },
+          {
+            "id": "btn-export-png",
+            "disabled": false
+          }
+        ],
+        "status": "PDF 실패: meetingId must be a positive safe integer"
+      }
+    },
+    {
+      "id": "T1.21-missing-meeting-terminal-error",
+      "status": "PASS",
+      "detail": {
+        "code": "meeting-not-found",
+        "error": "Meeting 999999 was not found"
+      }
+    }
+  ],
+  "pdfTerminal": {
+    "type": "export",
+    "action": "exportPdf",
+    "jobId": "pdf-bf28153b-b883-4adb-b1e6-812d5f77eb27",
+    "meetingId": 43,
+    "status": "error",
+    "code": "review-failed",
+    "error": "본문의 비문과 단어 결합 오류로 핵심 정책 문장의 의미가 불명확하다. 특히 '정책 의제화하기 위함이부터 없이' 구간은 정상적인 문장으로 해석하기 어렵다."
+  },
+  "progressFrames": [
+    {
+      "type": "export",
+      "action": "exportPdf",
+      "jobId": "pdf-bf28153b-b883-4adb-b1e6-812d5f77eb27",
+      "meetingId": 43,
+      "status": "started",
+      "stage": "prepare"
+    },
+    {
+      "type": "export",
+      "action": "exportPdf",
+      "jobId": "pdf-bf28153b-b883-4adb-b1e6-812d5f77eb27",
+      "meetingId": 43,
+      "status": "progress",
+      "stage": "validate",
+      "completed": 0,
+      "total": 1
+    },
+    {
+      "type": "export",
+      "action": "exportPdf",
+      "jobId": "pdf-bf28153b-b883-4adb-b1e6-812d5f77eb27",
+      "meetingId": 43,
+      "status": "progress",
+      "stage": "validate",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "type": "export",
+      "action": "exportPdf",
+      "jobId": "pdf-bf28153b-b883-4adb-b1e6-812d5f77eb27",
+      "meetingId": 43,
+      "status": "progress",
+      "stage": "preview",
+      "completed": 0,
+      "total": 3
+    },
+    {
+      "type": "export",
+      "action": "exportPdf",
+      "jobId": "pdf-bf28153b-b883-4adb-b1e6-812d5f77eb27",
+      "meetingId": 43,
+      "status": "progress",
+      "stage": "review",
+      "completed": 0,
+      "total": 1
+    },
+    {
+      "type": "export",
+      "action": "exportPdf",
+      "jobId": "pdf-bf28153b-b883-4adb-b1e6-812d5f77eb27",
+      "meetingId": 43,
+      "status": "error",
+      "code": "review-failed",
+      "error": "본문의 비문과 단어 결합 오류로 핵심 정책 문장의 의미가 불명확하다. 특히 '정책 의제화하기 위함이부터 없이' 구간은 정상적인 문장으로 해석하기 어렵다."
+    }
+  ],
+  "exportsAdded": [
+    "deck-2026-08-03T12-07-36-954Z",
+    "deck-2026-08-03T12-07-37-046Z",
+    "meeting-2026-08-03T12-07-36-903Z.md",
+    "meeting-2026-08-03T12-07-36-929Z.json",
+    "transcript-2026-08-03T12-07-36-811Z.md"
+  ]
+}

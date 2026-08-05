@@ -1,0 +1,42 @@
+[PASS] T3.1-four-cards-present :: [{"id":"small","status":"absent","badge":"미설치"},{"id":"medium","status":"absent","badge":"미설치"},{"id":"large-v3-turbo","status":"absent","badge":"미설치"},{"id":"large-v3","status":"absent","badge":"미설치"}]
+[PASS] T3.2-card-metadata-truthful :: [{"id":"small","name":"Small (Q8_0)","meta":"252 MB · MIT"},{"id":"medium","name":"Medium (Q8_0)","meta":"785 MB · MIT"},{"id":"large-v3-turbo","name":"Large v3 Turbo (Q8_0)","meta":"834 MB · MIT"},{"id":"large-v3","name":"Large v3 (Q8_0)","meta":"1.5 GB · Apache-2.0"}]
+[PASS] T3.3-absent-state-matches-disk :: {"diskFiles":[],"uiStatuses":["small:absent","medium:absent","large-v3-turbo:absent","large-v3:absent"]}
+[PASS] T3.4-download-progress-observable :: {"row":{"id":"large-v3","status":"downloading","name":"Large v3 (Q8_0)","badge":"내려받는 중","meta":"4 MB / 1.5 GB · 0%","error":null,"progressNow":"0","actions":[{"cls":"stt-btn stt-btn--quiet stt-row__cancel","text":"취소","disabled":false}]},"partialFilesOnDisk":[".ggml-large-v3-q8_0.bin.part-75121-9fe9b4a2-40a5-4233-8275-0ed5bfdc083b"]}
+[PASS] T3.5-partial-file-is-hidden-temp :: {"partials":[".ggml-large-v3-q8_0.bin.part-75121-9fe9b4a2-40a5-4233-8275-0ed5bfdc083b"]}
+[PASS] T3.6-cancel-returns-to-absent :: {"id":"large-v3","status":"absent","name":"Large v3 (Q8_0)","badge":"미설치","meta":"1.5 GB · Apache-2.0","error":null,"progressNow":null,"actions":[{"cls":"stt-btn stt-row__install","text":"내려받기","disabled":false}]}
+[PASS] T3.7-cancel-cleans-partial-and-installs-nothing :: {"partialsAfter":[],"finalFileExists":false,"dir":[]}
+[PASS] T3.8-download-small :: {"wsStatus":"installed","elapsedSec":"14.2","progressFrameCount":14515,"maxProgressPct":100}
+[PASS] T3.9-size-exact-small :: {"onDisk":264464607,"expected":264464607}
+[PASS] T3.10-sha256-exact-small :: {"onDisk":"49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f","expected":"49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f"}
+[PASS] T3.11-no-partial-small :: {"partials":[]}
+[PASS] T3.8-download-medium :: {"wsStatus":"installed","elapsedSec":"37.1","progressFrameCount":42385,"maxProgressPct":100}
+[PASS] T3.9-size-exact-medium :: {"onDisk":823369779,"expected":823369779}
+[PASS] T3.10-sha256-exact-medium :: {"onDisk":"42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502","expected":"42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502"}
+[PASS] T3.11-no-partial-medium :: {"partials":[]}
+[PASS] T3.8-download-large-v3-turbo :: {"wsStatus":"installed","elapsedSec":"44.0","progressFrameCount":39004,"maxProgressPct":100}
+[PASS] T3.9-size-exact-large-v3-turbo :: {"onDisk":874188075,"expected":874188075}
+[PASS] T3.10-sha256-exact-large-v3-turbo :: {"onDisk":"317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1","expected":"317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1"}
+[PASS] T3.11-no-partial-large-v3-turbo :: {"partials":[]}
+[FAIL] T3-FATAL :: Waiting failed
+
+=== TRACK 3 SUMMARY ===
+PASS   T3.1-four-cards-present
+PASS   T3.2-card-metadata-truthful
+PASS   T3.3-absent-state-matches-disk
+PASS   T3.4-download-progress-observable
+PASS   T3.5-partial-file-is-hidden-temp
+PASS   T3.6-cancel-returns-to-absent
+PASS   T3.7-cancel-cleans-partial-and-installs-nothing
+PASS   T3.8-download-small
+PASS   T3.9-size-exact-small
+PASS   T3.10-sha256-exact-small
+PASS   T3.11-no-partial-small
+PASS   T3.8-download-medium
+PASS   T3.9-size-exact-medium
+PASS   T3.10-sha256-exact-medium
+PASS   T3.11-no-partial-medium
+PASS   T3.8-download-large-v3-turbo
+PASS   T3.9-size-exact-large-v3-turbo
+PASS   T3.10-sha256-exact-large-v3-turbo
+PASS   T3.11-no-partial-large-v3-turbo
+FAIL   T3-FATAL

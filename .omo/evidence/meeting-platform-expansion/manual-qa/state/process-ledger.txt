@@ -1,0 +1,12 @@
+# QA-owned process ledger
+launched_at: 2026-08-03T04:42:09Z
+command: open -n "/Users/hyunjun/Applications/Meeting Slides.app"
+
+## STARTED BY QA (terminate at cleanup)
+75770  launcher  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+75773  server    bun run server.ts (child of 75770), LISTEN 127.0.0.1:8787
+
+## PRE-EXISTING, NOT OWNED BY QA (must survive)
+22587/22591  orphan slides-grab png (deck-2026-08-03T01-33-22-735Z) started 10:33
+41168/41169  orphan slides-grab png gate-preview (deck-2026-08-03T01-36-48-245Z) started 10:36
+82341        unrelated bun server.ts for ~/.claude/plugins .../discord/0.0.4 (cwd verified)

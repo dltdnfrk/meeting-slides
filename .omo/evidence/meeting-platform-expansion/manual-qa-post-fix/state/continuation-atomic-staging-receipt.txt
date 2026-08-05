@@ -1,0 +1,15 @@
+staged_at: 2026-08-03T12:41:18Z
+method: verified-source hard link to hidden destination name, then same-directory atomic rename
+token: 15dfcbcc-b63c-4ed8-8b39-a4372aebfc7d
+entries:
+145154963 874188075 1785759561 models/stt/ggml-large-v3-turbo-q8_0.bin
+145154965 823369779 1785759557 models/stt/ggml-medium-q8_0.bin
+145154966 264464607 1785759521 models/stt/ggml-small-q8_0.bin
+145155211 1656538283 1785760828 models/stt/ggml-large-v3-q8_0.bin
+hidden_stage_count: 0
+partial_count: 0
+post_stage_sha256:
+24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e  models/stt/ggml-large-v3-q8_0.bin
+317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1  models/stt/ggml-large-v3-turbo-q8_0.bin
+42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502  models/stt/ggml-medium-q8_0.bin
+49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f  models/stt/ggml-small-q8_0.bin

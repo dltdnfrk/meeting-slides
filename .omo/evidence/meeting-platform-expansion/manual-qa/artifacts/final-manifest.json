@@ -1,0 +1,120 @@
+{
+  "taskId": "st_019fc770",
+  "scope": "Continuation-only manual QA from the interrupted Track 3 boundary; no product code or tests changed.",
+  "requirements": [
+    {
+      "requirement": "Historical sessions, hydration, exports, busy/error recovery",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/track1-results.json",
+        "artifacts/track1-export-paths.json",
+        "screens/t1-02-meeting28-hydrated.png",
+        "screens/t1-03-meeting43-hydrated-compiled.png",
+        "screens/t1-07-pdf-export-terminal.png",
+        "screens/t1-08-bad-input-error-recovery.png",
+        "logs/assertion-corrections.txt"
+      ]
+    },
+    {
+      "requirement": "Provider controls, truthful recheck, keyboard/narrow layout, reload persistence, safe connect controls",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/track2-results.json",
+        "artifacts/track2b-connect-results.json",
+        "logs/provider-cli-ground-truth.txt",
+        "logs/provider-connect-commands.txt",
+        "logs/assertion-corrections.txt",
+        "screens/t2-02-settings-desktop-after-recheck.png",
+        "screens/t2-08-settings-narrow-360-open.png",
+        "screens/t2-09-settings-after-reload.png",
+        "screens/t2b-after-connect-clicks.png"
+      ]
+    },
+    {
+      "requirement": "Four STT cards and truthful metadata/absent state",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/track3-stt-timeline.json",
+        "screens/t3-01-stt-all-four-absent.png"
+      ]
+    },
+    {
+      "requirement": "Active download progress, cancellation, hidden partial cleanup, no accidental install",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/track3-stt-timeline.json",
+        "screens/t3-02-stt-downloading-progress.png",
+        "screens/t3-03-stt-cancelled-cleanup.png"
+      ]
+    },
+    {
+      "requirement": "Production small, medium, and large-v3-turbo downloads with exact bytes/SHA-256 and no partial",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/track3-stt-timeline.json",
+        "screens/t3-04-installed-small.png",
+        "screens/t3-04-installed-medium.png",
+        "screens/t3-04-installed-large-v3-turbo.png"
+      ]
+    },
+    {
+      "requirement": "Production large-v3 download final state with exact bytes/SHA-256 and no partial",
+      "status": "PASS",
+      "detail": {
+        "size": 1656538283,
+        "sha256": "24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e",
+        "partialCount": 0,
+        "note": "The interrupted real-UI install completed after the original browser wait failed; continuation inspected the existing final rather than redownloading it."
+      },
+      "evidence": [
+        "artifacts/track3-stt-timeline.json",
+        "artifacts/track3-continuation.json",
+        "screens/t3-05-stt-all-installed.png"
+      ]
+    },
+    {
+      "requirement": "Every installed model selectable through UI; exactly one selected",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/track3-continuation.json",
+        "screens/t3-06-stt-all-model-selection-final.png"
+      ]
+    },
+    {
+      "requirement": "Recheck reflects disk truth and preserves selection",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/track3-continuation.json",
+        "screens/t3-08-stt-after-recheck.png"
+      ]
+    },
+    {
+      "requirement": "Selection survives a real QA-owned launcher/server restart",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/track3-restart-persistence.json",
+        "state/track3-restart-ledger.txt",
+        "screens/t3-09-stt-selection-after-restart.png"
+      ]
+    },
+    {
+      "requirement": "Restore backed-up user state and terminate only QA-owned processes",
+      "status": "PASS",
+      "evidence": [
+        "state/backup-receipt.txt",
+        "state/process-ledger.txt",
+        "state/cleanup-receipt.txt"
+      ]
+    }
+  ],
+  "evidenceGap": "No dedicated large-v3 server/download log exists: the signed launcher routes launcher and Bun stdout/stderr to /dev/null. Completion is instead proven by the prior real-UI install action, exact production artifact size/SHA-256, absence of partials, and installed state in the real UI.",
+  "cleanup": {
+    "qaPidsTerminated": [75770, 75773, 93617, 93620],
+    "port8787Listener": "none",
+    "meetingSlidesDirectory": "absent",
+    "managedSttEntryCount": 0,
+    "exportsInventoryDiffCount": 0,
+    "databaseFamilyMatchesBackup": true,
+    "envMatchesBackup": true
+  }
+}

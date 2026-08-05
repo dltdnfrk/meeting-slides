@@ -1,0 +1,27 @@
+# STT artifact reachability probe
+probed_at: 2026-08-03T04:40:57Z
+
+## small
+url: https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q8_0.bin
+final_http: 200
+content_length: 264464607 (catalog sizeBytes: 264464607) match=YES
+etag: 53268772a59b455b5582e60c9330689fe313317bdff7f38d5df9a9190f2dc598 (catalog xetEtag: 53268772a59b455b5582e60c9330689fe313317bdff7f38d5df9a9190f2dc598) match=YES
+
+## medium
+url: https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium-q8_0.bin
+final_http: 200
+content_length: 823369779 (catalog sizeBytes: 823369779) match=YES
+etag: c8116b244ec4960951435c4a244acdaee9efec098f3c7ca763a13762e66f7351 (catalog xetEtag: c8116b244ec4960951435c4a244acdaee9efec098f3c7ca763a13762e66f7351) match=YES
+
+## large-v3-turbo
+url: https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q8_0.bin
+final_http: 200
+content_length: 874188075 (catalog sizeBytes: 874188075) match=YES
+etag: 971539eabfa951d62cc5e06672e676da1e5e8768115056362fe6301b664b4ea4 (catalog xetEtag: 971539eabfa951d62cc5e06672e676da1e5e8768115056362fe6301b664b4ea4) match=YES
+
+## large-v3
+url: https://huggingface.co/Pomni/whisper-large-v3-ggml-allquants/resolve/main/ggml-large-v3-q8_0.bin
+final_http: 200
+content_length: 1656538283 (catalog sizeBytes: 1656538283) match=YES
+etag: f058e72bf9e0527ff2b514f91968430051c4dda3333b127b6f1077e53d008a0f (catalog xetEtag: f058e72bf9e0527ff2b514f91968430051c4dda3333b127b6f1077e53d008a0f) match=YES
+

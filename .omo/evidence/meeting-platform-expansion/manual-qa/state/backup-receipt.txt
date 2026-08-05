@@ -1,0 +1,26 @@
+backup_dir: /tmp/ms-qa-backup.STwa4W
+created_at: 2026-08-03T04:40:28Z
+
+## contents
+total 3104
+drwx------@  10 hyunjun  wheel      320 Aug  3 13:40 .
+drwxrwxrwt  116 root     wheel     3712 Aug  3 13:40 ..
+-rw-r--r--@   1 hyunjun  staff     1679 Jul 28 07:27 .env
+-rw-r--r--@   1 hyunjun  wheel     1312 Aug  3 13:40 exports-baseline.txt
+-rw-r--r--@   1 hyunjun  wheel        7 Aug  3 13:40 MEETING_SLIDES_DIR_STATE
+-rw-r--r--@   1 hyunjun  staff    28672 Jul 27 09:16 meetings.db
+-rw-r--r--@   1 hyunjun  staff    32768 Aug  3 13:37 meetings.db-shm
+-rw-r--r--@   1 hyunjun  staff  1507952 Aug  3 10:32 meetings.db-wal
+-rw-r--r--@   1 hyunjun  wheel       44 Aug  3 13:40 models-baseline.txt
+-rw-r--r--@   1 hyunjun  wheel        0 Aug  3 13:40 models-stt-baseline.txt
+
+## checksums
+99de34b89ef3ff0be5d87e8e8c5a92ed08b8839047d23a5069dc907ebc6256f5  /tmp/ms-qa-backup.STwa4W/meetings.db
+76bc86850553b6590826abdc3943552dc41c13eaf8f92917fa60b7edd6ebf1b6  /tmp/ms-qa-backup.STwa4W/.env
+
+## meeting_slides_dir baseline
+absent
+## exports baseline count
+      42
+## models/stt baseline count
+       0

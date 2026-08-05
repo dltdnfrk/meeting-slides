@@ -1,0 +1,144 @@
+{
+  "results": [
+    {
+      "id": "T2B.1-connect-control-present-all-cli",
+      "status": "PASS",
+      "detail": [
+        {
+          "id": "cli:codex",
+          "auth": "connected",
+          "connectLabel": "재인증"
+        },
+        {
+          "id": "cli:grok",
+          "auth": "unknown",
+          "connectLabel": "연결"
+        },
+        {
+          "id": "cli:claude",
+          "auth": "connected",
+          "connectLabel": "재인증"
+        },
+        {
+          "id": "cli:gemini",
+          "auth": "unknown",
+          "connectLabel": "연결"
+        }
+      ]
+    },
+    {
+      "id": "T2B.2-connect-label-matches-real-auth",
+      "status": "PASS",
+      "detail": [
+        {
+          "id": "cli:codex",
+          "auth": "connected",
+          "label": "재인증"
+        },
+        {
+          "id": "cli:grok",
+          "auth": "unknown",
+          "label": "연결"
+        },
+        {
+          "id": "cli:claude",
+          "auth": "connected",
+          "label": "재인증"
+        },
+        {
+          "id": "cli:gemini",
+          "auth": "unknown",
+          "label": "연결"
+        }
+      ]
+    },
+    {
+      "id": "T2B.3-http-provider-key-control-matches-state",
+      "status": "PASS",
+      "detail": [
+        {
+          "id": "alibaba",
+          "auth": "connected",
+          "hasKeyInput": false,
+          "badge": "설정됨"
+        },
+        {
+          "id": "openai",
+          "auth": "unavailable",
+          "hasKeyInput": true,
+          "badge": "미설정"
+        }
+      ]
+    },
+    {
+      "id": "T2B.4-external-write-controls-not-clicked",
+      "status": "BLOCKED-BY-DESIGN",
+      "detail": {
+        "notClicked": [
+          "cli:codex",
+          "cli:grok",
+          "cli:claude"
+        ],
+        "reason": "codex login / grok login / claude auth login are real interactive vendor logins that rewrite the live credential store; clicking them alters real external accounts",
+        "evidence": "logs/provider-connect-commands.txt records the exact executable+args each control would spawn"
+      }
+    },
+    {
+      "id": "T2B.5-connect-cli:gemini",
+      "status": "PASS",
+      "detail": {
+        "serverStatus": "Gemini (subscription) 연결/로그인 명령을 실행합니다 — 완료 후 재검사하세요",
+        "uiStatus": "Gemini (subscription) 연결/로그인 명령을 실행합니다 — 완료 후 재검사하세요"
+      }
+    },
+    {
+      "id": "T2B.5-connect-openai",
+      "status": "PASS",
+      "detail": {
+        "serverStatus": "OpenAI 키 발급 페이지를 엽니다 — 키를 카드에 붙여넣으세요",
+        "uiStatus": "OpenAI 키 발급 페이지를 엽니다 — 키를 카드에 붙여넣으세요"
+      }
+    },
+    {
+      "id": "T2B.5-connect-alibaba",
+      "status": "SKIP",
+      "detail": "no connect control rendered"
+    },
+    {
+      "id": "T2B.5-connect-local",
+      "status": "SKIP",
+      "detail": "no connect control rendered"
+    },
+    {
+      "id": "T2B.6-no-optimistic-auth-flip-after-connect",
+      "status": "PASS",
+      "detail": {
+        "connectedAfterClicks": [
+          "cli:claude",
+          "cli:codex"
+        ],
+        "expected": [
+          "cli:claude",
+          "cli:codex"
+        ]
+      }
+    }
+  ],
+  "clicked": [
+    {
+      "id": "cli:gemini",
+      "serverStatus": "Gemini (subscription) 연결/로그인 명령을 실행합니다 — 완료 후 재검사하세요",
+      "uiStatus": "Gemini (subscription) 연결/로그인 명령을 실행합니다 — 완료 후 재검사하세요"
+    },
+    {
+      "id": "openai",
+      "serverStatus": "OpenAI 키 발급 페이지를 엽니다 — 키를 카드에 붙여넣으세요",
+      "uiStatus": "OpenAI 키 발급 페이지를 엽니다 — 키를 카드에 붙여넣으세요"
+    }
+  ],
+  "externalWriteNotClicked": [
+    "cli:codex",
+    "cli:grok",
+    "cli:claude"
+  ]
+}

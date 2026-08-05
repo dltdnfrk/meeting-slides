@@ -1,0 +1,21 @@
+# Harness assertion corrections (product behavior is correct; QA expectation was wrong)
+
+## T1.8-compiled-state-hydration
+Logged status 'true' instead of PASS due to a JS ternary-precedence bug in the
+harness expression, not a product defect. Underlying data proves PASS:
+  ws compiled = {title:'회의 요약', slideCount:3, compiledAt:1785720745751, publishedAt:1785720745756}
+  ui compile-status = {hidden:false, state:'success', text:'컴파일됨 · 3장'}
+Verdict: PASS.
+
+## T2B.3-http-providers-expose-key-input
+Harness expected BOTH openai and alibaba to render a key input. public/app.js:471
+renders the key input only when 'keyBased && !status.selectable'.
+alibaba already has a configured key (badge '설정됨', selectable=true), so suppressing
+the key-entry affordance is the correct, non-redundant behavior.
+  openai  -> badge '미설정',  hasKeyInput=true   (correct: needs a key)
+  alibaba -> badge '설정됨',  hasKeyInput=false  (correct: already configured)
+Verdict: PASS for the product; the QA assertion was mis-specified.
+
+## T2B.5-connect-alibaba / T2B.5-connect-local  (SKIP)
+Both are selectable, so no connect control is rendered by design
+(showActions = isCli || !selectable). Nothing to click; not a product gap.

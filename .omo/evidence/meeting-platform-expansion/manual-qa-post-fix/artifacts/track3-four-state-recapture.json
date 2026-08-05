@@ -1,0 +1,499 @@
+{
+  "startedAt": "2026-08-03T12:43:18.970Z",
+  "launches": [
+    {
+      "sequence": 1,
+      "launcherPid": 89735,
+      "serverPid": 89774,
+      "logPath": "/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/meeting-platform-expansion/manual-qa-post-fix/logs/continuation-launch-1.log",
+      "startedAt": "2026-08-03T12:43:18.973Z",
+      "readyAt": "2026-08-03T12:43:20.648Z",
+      "puppeteerPid": 89851,
+      "puppeteerClosedAt": "2026-08-03T12:43:22.414Z",
+      "termRequestedAt": "2026-08-03T12:43:22.415Z",
+      "termTargetServerPid": 89774,
+      "exitedAt": "2026-08-03T12:43:22.431Z",
+      "exitCode": 0,
+      "exitSignal": null,
+      "terminatedOnlyOwnedPids": [
+        89774,
+        89735
+      ]
+    },
+    {
+      "sequence": 2,
+      "launcherPid": 90245,
+      "serverPid": 90256,
+      "logPath": "/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/meeting-platform-expansion/manual-qa-post-fix/logs/continuation-launch-2.log",
+      "startedAt": "2026-08-03T12:43:22.432Z",
+      "readyAt": "2026-08-03T12:43:23.743Z",
+      "puppeteerPid": 90321,
+      "puppeteerClosedAt": "2026-08-03T12:43:24.947Z",
+      "termRequestedAt": "2026-08-03T12:43:24.947Z",
+      "termTargetServerPid": 90256,
+      "exitedAt": "2026-08-03T12:43:24.981Z",
+      "exitCode": 0,
+      "exitSignal": null,
+      "terminatedOnlyOwnedPids": [
+        90256,
+        90245
+      ]
+    }
+  ],
+  "captures": [
+    {
+      "state": 15,
+      "file": "screens/t3-05-stt-all-installed.png",
+      "capturedAt": "2026-08-03T12:43:22.084Z",
+      "proof": {
+        "heading": "음성 인식 모델",
+        "headingVisible": true,
+        "cards": [
+          {
+            "id": "small",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "medium",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          }
+        ],
+        "panelScrollTop": 405
+      }
+    },
+    {
+      "state": 16,
+      "file": "screens/t3-06-stt-all-model-selection-final.png",
+      "capturedAt": "2026-08-03T12:43:22.244Z",
+      "proof": {
+        "heading": "음성 인식 모델",
+        "headingVisible": true,
+        "cards": [
+          {
+            "id": "small",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "medium",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3",
+            "status": "selected",
+            "badge": "사용 중",
+            "action": "선택됨",
+            "actionDisabled": true,
+            "visible": true
+          }
+        ],
+        "panelScrollTop": 421
+      }
+    },
+    {
+      "state": 17,
+      "file": "screens/t3-08-stt-after-recheck.png",
+      "capturedAt": "2026-08-03T12:43:22.339Z",
+      "proof": {
+        "heading": "음성 인식 모델",
+        "headingVisible": true,
+        "cards": [
+          {
+            "id": "small",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "medium",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3",
+            "status": "selected",
+            "badge": "사용 중",
+            "action": "선택됨",
+            "actionDisabled": true,
+            "visible": true
+          }
+        ],
+        "panelScrollTop": 421
+      }
+    },
+    {
+      "state": 18,
+      "file": "screens/t3-09-stt-selection-after-restart.png",
+      "capturedAt": "2026-08-03T12:43:24.891Z",
+      "proof": {
+        "heading": "음성 인식 모델",
+        "headingVisible": true,
+        "cards": [
+          {
+            "id": "small",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "medium",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3",
+            "status": "selected",
+            "badge": "사용 중",
+            "action": "선택됨",
+            "actionDisabled": true,
+            "visible": true
+          }
+        ],
+        "panelScrollTop": 405
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "state": 15,
+      "pass": true,
+      "proof": {
+        "heading": "음성 인식 모델",
+        "headingVisible": true,
+        "cards": [
+          {
+            "id": "small",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "medium",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          }
+        ],
+        "panelScrollTop": 405
+      }
+    },
+    {
+      "state": 16,
+      "pass": true,
+      "proof": {
+        "heading": "음성 인식 모델",
+        "headingVisible": true,
+        "cards": [
+          {
+            "id": "small",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "medium",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3",
+            "status": "selected",
+            "badge": "사용 중",
+            "action": "선택됨",
+            "actionDisabled": true,
+            "visible": true
+          }
+        ],
+        "panelScrollTop": 421
+      }
+    },
+    {
+      "state": 17,
+      "pass": true,
+      "proof": {
+        "heading": "음성 인식 모델",
+        "headingVisible": true,
+        "cards": [
+          {
+            "id": "small",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "medium",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3",
+            "status": "selected",
+            "badge": "사용 중",
+            "action": "선택됨",
+            "actionDisabled": true,
+            "visible": true
+          }
+        ],
+        "panelScrollTop": 421
+      }
+    },
+    {
+      "state": 18,
+      "pass": true,
+      "proof": {
+        "heading": "음성 인식 모델",
+        "headingVisible": true,
+        "cards": [
+          {
+            "id": "small",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "medium",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed",
+            "badge": "설치됨",
+            "action": "선택",
+            "actionDisabled": false,
+            "visible": true
+          },
+          {
+            "id": "large-v3",
+            "status": "selected",
+            "badge": "사용 중",
+            "action": "선택됨",
+            "actionDisabled": true,
+            "visible": true
+          }
+        ],
+        "panelScrollTop": 405
+      }
+    }
+  ],
+  "selectionCycle": [
+    {
+      "id": "small",
+      "persisted": {
+        "version": 1,
+        "selectedModelId": "small"
+      },
+      "ui": [
+        {
+          "id": "small",
+          "status": "selected"
+        },
+        {
+          "id": "medium",
+          "status": "installed"
+        },
+        {
+          "id": "large-v3-turbo",
+          "status": "installed"
+        },
+        {
+          "id": "large-v3",
+          "status": "installed"
+        }
+      ]
+    },
+    {
+      "id": "medium",
+      "persisted": {
+        "version": 1,
+        "selectedModelId": "medium"
+      },
+      "ui": [
+        {
+          "id": "small",
+          "status": "installed"
+        },
+        {
+          "id": "medium",
+          "status": "selected"
+        },
+        {
+          "id": "large-v3-turbo",
+          "status": "installed"
+        },
+        {
+          "id": "large-v3",
+          "status": "installed"
+        }
+      ]
+    },
+    {
+      "id": "large-v3-turbo",
+      "persisted": {
+        "version": 1,
+        "selectedModelId": "large-v3-turbo"
+      },
+      "ui": [
+        {
+          "id": "small",
+          "status": "installed"
+        },
+        {
+          "id": "medium",
+          "status": "installed"
+        },
+        {
+          "id": "large-v3-turbo",
+          "status": "selected"
+        },
+        {
+          "id": "large-v3",
+          "status": "installed"
+        }
+      ]
+    },
+    {
+      "id": "large-v3",
+      "persisted": {
+        "version": 1,
+        "selectedModelId": "large-v3"
+      },
+      "ui": [
+        {
+          "id": "small",
+          "status": "installed"
+        },
+        {
+          "id": "medium",
+          "status": "installed"
+        },
+        {
+          "id": "large-v3-turbo",
+          "status": "installed"
+        },
+        {
+          "id": "large-v3",
+          "status": "selected"
+        }
+      ]
+    }
+  ],
+  "completedAt": "2026-08-03T12:43:24.981Z",
+  "status": "PASS"
+}

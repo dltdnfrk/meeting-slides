@@ -1,0 +1,24 @@
+# Manual QA cleanup receipt
+completed_at: 2026-08-03T11:46:53Z
+backup_dir: /tmp/ms-qa-backup.STwa4W
+terminated_qa_parent: 93617 (/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides)
+terminated_qa_child: 93620 (ppid=93617; /Users/hyunjun/.bun/bin/bun run server.ts)
+qa_processes_absent: yes
+meetings_db_matches_backup_sha256: yes
+meetings_db_shm_matches_backup_sha256: yes
+meetings_db_wal_matches_backup_sha256: yes
+env_matches_backup_sha256: yes
+meeting_slides_dir_state: absent (baseline: absent)
+models_stt_entry_count: 0 (baseline: 0)
+exports_root_inventory_diff_count: 0 (baseline: 0)
+port_8787_listener_after_cleanup: none
+restored_checksums:
+99de34b89ef3ff0be5d87e8e8c5a92ed08b8839047d23a5069dc907ebc6256f5  meetings.db
+e09b57396988bdb5e1ddea2492918c26644510aaefc39c23208ad88b8e53a1f2  meetings.db-shm
+39d3f807c49cd38ed929eafe097afdc9b9cfa82125af593cbc9b2540c5a97b08  meetings.db-wal
+76bc86850553b6590826abdc3943552dc41c13eaf8f92917fa60b7edd6ebf1b6  .env
+surviving project-related processes (not touched):
+22587     1 node /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/.bin/slides-grab png --slides-dir /Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T01-33-22-735Z/slides --output-dir /Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T01-33-22-735Z-png
+22591 22587 /Users/hyunjun/.bun/bin/bun /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/slides-grab/scripts/html2png.js --slides-dir /Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T01-33-22-735Z/slides --output-dir /Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T01-33-22-735Z-png --slide-mode presentation --resolution 2160p
+41168     1 node /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/.bin/slides-grab png --slides-dir /Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T01-36-48-245Z/slides --output-dir /Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T01-36-48-245Z/slides/.slides-grab/gate-preview
+41169 41168 /Users/hyunjun/.bun/bin/bun /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/slides-grab/scripts/html2png.js --slides-dir /Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T01-36-48-245Z/slides --output-dir /Users/hyunjun/Documents/MUNI/meeting-slides/exports/deck-2026-08-03T01-36-48-245Z/slides/.slides-grab/gate-preview --slide-mode presentation --resolution 2160p

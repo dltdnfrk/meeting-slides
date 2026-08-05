@@ -1,0 +1,219 @@
+{
+  "capturedAt": "2026-08-03T11:45:11.055Z",
+  "disk": {
+    "small": {
+      "path": "/Users/hyunjun/Documents/MUNI/meeting-slides/models/stt/ggml-small-q8_0.bin",
+      "exists": true,
+      "size": 264464607,
+      "sha256": "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f"
+    },
+    "medium": {
+      "path": "/Users/hyunjun/Documents/MUNI/meeting-slides/models/stt/ggml-medium-q8_0.bin",
+      "exists": true,
+      "size": 823369779,
+      "sha256": "42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502"
+    },
+    "large-v3-turbo": {
+      "path": "/Users/hyunjun/Documents/MUNI/meeting-slides/models/stt/ggml-large-v3-turbo-q8_0.bin",
+      "exists": true,
+      "size": 874188075,
+      "sha256": "317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1"
+    },
+    "large-v3": {
+      "path": "/Users/hyunjun/Documents/MUNI/meeting-slides/models/stt/ggml-large-v3-q8_0.bin",
+      "exists": true,
+      "size": 1656538283,
+      "sha256": "24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e"
+    }
+  },
+  "partials": [],
+  "selectionCycle": [
+    {
+      "id": "small",
+      "selectedCount": 1,
+      "persisted": {
+        "version": 1,
+        "selectedModelId": "small"
+      }
+    },
+    {
+      "id": "medium",
+      "selectedCount": 1,
+      "persisted": {
+        "version": 1,
+        "selectedModelId": "medium"
+      }
+    },
+    {
+      "id": "large-v3-turbo",
+      "selectedCount": 1,
+      "persisted": {
+        "version": 1,
+        "selectedModelId": "large-v3-turbo"
+      }
+    },
+    {
+      "id": "large-v3",
+      "selectedCount": 1,
+      "persisted": {
+        "version": 1,
+        "selectedModelId": "large-v3"
+      }
+    }
+  ],
+  "selectedBeforeRestart": {
+    "version": 1,
+    "selectedModelId": "large-v3"
+  },
+  "results": [
+    {
+      "id": "T3.8-download-large-v3-final-present",
+      "status": "PASS",
+      "detail": {
+        "path": "/Users/hyunjun/Documents/MUNI/meeting-slides/models/stt/ggml-large-v3-q8_0.bin",
+        "exists": true,
+        "size": 1656538283,
+        "sha256": "24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e"
+      }
+    },
+    {
+      "id": "T3.9-size-exact-large-v3",
+      "status": "PASS",
+      "detail": {
+        "onDisk": 1656538283,
+        "expected": 1656538283
+      }
+    },
+    {
+      "id": "T3.10-sha256-exact-large-v3",
+      "status": "PASS",
+      "detail": {
+        "onDisk": "24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e",
+        "expected": "24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e"
+      }
+    },
+    {
+      "id": "T3.11-no-partial-large-v3",
+      "status": "PASS",
+      "detail": {
+        "partials": []
+      }
+    },
+    {
+      "id": "T3.12-all-four-installed-in-ui",
+      "status": "PASS",
+      "detail": [
+        {
+          "id": "small",
+          "status": "installed",
+          "badge": "설치됨"
+        },
+        {
+          "id": "medium",
+          "status": "installed",
+          "badge": "설치됨"
+        },
+        {
+          "id": "large-v3-turbo",
+          "status": "installed",
+          "badge": "설치됨"
+        },
+        {
+          "id": "large-v3",
+          "status": "installed",
+          "badge": "설치됨"
+        }
+      ]
+    },
+    {
+      "id": "T3.13-select-small-through-ui",
+      "status": "PASS",
+      "detail": {
+        "id": "small",
+        "selectedCount": 1,
+        "persisted": {
+          "version": 1,
+          "selectedModelId": "small"
+        }
+      }
+    },
+    {
+      "id": "T3.13-select-medium-through-ui",
+      "status": "PASS",
+      "detail": {
+        "id": "medium",
+        "selectedCount": 1,
+        "persisted": {
+          "version": 1,
+          "selectedModelId": "medium"
+        }
+      }
+    },
+    {
+      "id": "T3.13-select-large-v3-turbo-through-ui",
+      "status": "PASS",
+      "detail": {
+        "id": "large-v3-turbo",
+        "selectedCount": 1,
+        "persisted": {
+          "version": 1,
+          "selectedModelId": "large-v3-turbo"
+        }
+      }
+    },
+    {
+      "id": "T3.13-select-large-v3-through-ui",
+      "status": "PASS",
+      "detail": {
+        "id": "large-v3",
+        "selectedCount": 1,
+        "persisted": {
+          "version": 1,
+          "selectedModelId": "large-v3"
+        }
+      }
+    },
+    {
+      "id": "T3.17-recheck-matches-disk-and-keeps-selection",
+      "status": "PASS",
+      "detail": {
+        "ws": [
+          {
+            "id": "small",
+            "status": "installed"
+          },
+          {
+            "id": "medium",
+            "status": "installed"
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed"
+          },
+          {
+            "id": "large-v3",
+            "status": "selected"
+          }
+        ],
+        "ui": [
+          {
+            "id": "small",
+            "status": "installed"
+          },
+          {
+            "id": "medium",
+            "status": "installed"
+          },
+          {
+            "id": "large-v3-turbo",
+            "status": "installed"
+          },
+          {
+            "id": "large-v3",
+            "status": "selected"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+## cli:codex (codex)
+   version_exit=0 err=none installed=true
+   version_out="codex-cli 0.146.0"
+   auth_probe(login status) exit=0 err=none
+   auth_stdout=""
+   auth_stderr="Logged in using ChatGPT"
+## cli:grok (grok)
+   version_exit=0 err=none installed=true
+   version_out="grok 0.2.118 (1e1687c1cf6a) [stable]"
+   auth_probe=NONE declared -> adapter reports auth "unknown"
+## cli:claude (claude)
+   version_exit=0 err=none installed=true
+   version_out="2.1.220 (Claude Code)"
+   auth_probe(auth status --json) exit=0 err=none
+   auth_stdout="{\n  \"loggedIn\": true,\n  \"authMethod\": \"claude.ai\",\n  \"apiProvider\": \"firstParty\",\n  \"email\": \"dltdnfrk@gmail.com\",\n  \"orgId\": \"305feb14-0994-4c90-8583-65cf418f194b\",\n  \"orgName\": \"dltdnfrk@gmail.com's"
+   auth_stderr=""
+## cli:gemini (gemini)
+   version_exit=0 err=none installed=true
+   version_out="0.49.0"
+   auth_probe=NONE declared -> adapter reports auth "unknown"

@@ -1,0 +1,4 @@
+{"id":"cli:codex","executable":"/Users/hyunjun/.npm-global/bin/codex","args":["login"],"interactive":true,"externalWriteRisk":"YES - vendor interactive login would mutate the real account credential store"}
+{"id":"cli:grok","executable":"/Users/hyunjun/.grok/bin/grok","args":["login"],"interactive":true,"externalWriteRisk":"YES - vendor interactive login would mutate the real account credential store"}
+{"id":"cli:claude","executable":"/Users/hyunjun/.npm-global/bin/claude","args":["auth","login"],"interactive":true,"externalWriteRisk":"YES - vendor interactive login would mutate the real account credential store"}
+{"id":"cli:gemini","executable":"/Users/hyunjun/.npm-global/bin/gemini","args":[],"interactive":true,"externalWriteRisk":"NO LOGIN ARGS - spawns bare CLI, no credential mutation"}

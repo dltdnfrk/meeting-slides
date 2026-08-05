@@ -1,0 +1,433 @@
+{
+  "results": [
+    {
+      "id": "T2.1-settings-opens-desktop",
+      "status": "PASS",
+      "detail": {
+        "panelHidden": false,
+        "ariaExpanded": "true",
+        "providerRows": 7
+      }
+    },
+    {
+      "id": "T2.2-truthful-status-cli:codex",
+      "status": "PASS",
+      "detail": {
+        "expected": {
+          "installed": true,
+          "auth": "connected",
+          "badge": "연결됨",
+          "selectable": true
+        },
+        "actual": {
+          "id": "cli:codex",
+          "auth": "connected",
+          "installed": "true",
+          "current": true,
+          "disabledClass": false,
+          "name": "GPT (subscription)",
+          "detail": "Codex CLI - ChatGPT subscription authentication",
+          "badge": "연결됨",
+          "selectDisabled": false,
+          "ariaPressed": "true",
+          "connectLabel": "재인증",
+          "hasKeyInput": false
+        }
+      }
+    },
+    {
+      "id": "T2.2-truthful-status-cli:grok",
+      "status": "PASS",
+      "detail": {
+        "expected": {
+          "installed": true,
+          "auth": "unknown",
+          "badge": "인증 미확인",
+          "selectable": true
+        },
+        "actual": {
+          "id": "cli:grok",
+          "auth": "unknown",
+          "installed": "true",
+          "current": false,
+          "disabledClass": false,
+          "name": "Grok (subscription)",
+          "detail": "Grok Build CLI - xAI browser authentication",
+          "badge": "인증 미확인",
+          "selectDisabled": false,
+          "ariaPressed": "false",
+          "connectLabel": "연결",
+          "hasKeyInput": false
+        }
+      }
+    },
+    {
+      "id": "T2.2-truthful-status-cli:claude",
+      "status": "PASS",
+      "detail": {
+        "expected": {
+          "installed": true,
+          "auth": "connected",
+          "badge": "연결됨",
+          "selectable": true
+        },
+        "actual": {
+          "id": "cli:claude",
+          "auth": "connected",
+          "installed": "true",
+          "current": false,
+          "disabledClass": false,
+          "name": "Claude (subscription)",
+          "detail": "Claude CLI - Claude Pro/Max authentication",
+          "badge": "연결됨",
+          "selectDisabled": false,
+          "ariaPressed": "false",
+          "connectLabel": "재인증",
+          "hasKeyInput": false
+        }
+      }
+    },
+    {
+      "id": "T2.2-truthful-status-cli:gemini",
+      "status": "PASS",
+      "detail": {
+        "expected": {
+          "installed": true,
+          "auth": "unknown",
+          "badge": "인증 미확인",
+          "selectable": true
+        },
+        "actual": {
+          "id": "cli:gemini",
+          "auth": "unknown",
+          "installed": "true",
+          "current": false,
+          "disabledClass": false,
+          "name": "Gemini (subscription)",
+          "detail": "Gemini CLI - Google sign-in",
+          "badge": "인증 미확인",
+          "selectDisabled": false,
+          "ariaPressed": "false",
+          "connectLabel": "연결",
+          "hasKeyInput": false
+        }
+      }
+    },
+    {
+      "id": "T2.3-no-optimistic-connected",
+      "status": "PASS",
+      "detail": {
+        "claimingConnected": [
+          "cli:codex",
+          "cli:claude"
+        ]
+      }
+    },
+    {
+      "id": "T2.4-recheck-returns-real-state",
+      "status": "PASS",
+      "detail": {
+        "current": "cli:codex",
+        "wsList": [
+          {
+            "id": "cli:codex",
+            "installed": true,
+            "auth": "connected"
+          },
+          {
+            "id": "cli:grok",
+            "installed": true,
+            "auth": "unknown"
+          },
+          {
+            "id": "cli:claude",
+            "installed": true,
+            "auth": "connected"
+          },
+          {
+            "id": "cli:gemini",
+            "installed": true,
+            "auth": "unknown"
+          },
+          {
+            "id": "alibaba"
+          },
+          {
+            "id": "openai"
+          },
+          {
+            "id": "local"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T2.5-recheck-preserves-truth-in-ui",
+      "status": "PASS",
+      "detail": [
+        {
+          "id": "cli:codex",
+          "auth": "connected",
+          "badge": "연결됨"
+        },
+        {
+          "id": "cli:grok",
+          "auth": "unknown",
+          "badge": "인증 미확인"
+        },
+        {
+          "id": "cli:claude",
+          "auth": "connected",
+          "badge": "연결됨"
+        },
+        {
+          "id": "cli:gemini",
+          "auth": "unknown",
+          "badge": "인증 미확인"
+        },
+        {
+          "id": "alibaba",
+          "auth": "connected",
+          "badge": "설정됨"
+        },
+        {
+          "id": "openai",
+          "auth": "unavailable",
+          "badge": "미설정"
+        },
+        {
+          "id": "local",
+          "auth": "connected",
+          "badge": "설정됨"
+        }
+      ]
+    },
+    {
+      "id": "T2.6-selectable-set",
+      "status": "PASS",
+      "detail": {
+        "selectable": [
+          "cli:codex",
+          "cli:grok",
+          "cli:claude",
+          "cli:gemini",
+          "alibaba",
+          "local"
+        ]
+      }
+    },
+    {
+      "id": "T2.7-select-cli:codex",
+      "status": "PASS",
+      "detail": {
+        "wsCurrent": "cli:codex",
+        "ariaPressed": "true",
+        "persisted": "cli:codex"
+      }
+    },
+    {
+      "id": "T2.7-select-cli:grok",
+      "status": "PASS",
+      "detail": {
+        "wsCurrent": "cli:grok",
+        "ariaPressed": "true",
+        "persisted": "cli:grok"
+      }
+    },
+    {
+      "id": "T2.7-select-cli:claude",
+      "status": "PASS",
+      "detail": {
+        "wsCurrent": "cli:claude",
+        "ariaPressed": "true",
+        "persisted": "cli:claude"
+      }
+    },
+    {
+      "id": "T2.7-select-cli:gemini",
+      "status": "PASS",
+      "detail": {
+        "wsCurrent": "cli:gemini",
+        "ariaPressed": "true",
+        "persisted": "cli:gemini"
+      }
+    },
+    {
+      "id": "T2.7-select-alibaba",
+      "status": "PASS",
+      "detail": {
+        "wsCurrent": "alibaba",
+        "ariaPressed": "true",
+        "persisted": "alibaba"
+      }
+    },
+    {
+      "id": "T2.7-select-local",
+      "status": "PASS",
+      "detail": {
+        "wsCurrent": "local",
+        "ariaPressed": "true",
+        "persisted": "local"
+      }
+    },
+    {
+      "id": "T2.8-model-and-effort-exposed",
+      "status": "PASS",
+      "detail": {
+        "model": {
+          "disabled": false,
+          "value": "gpt-5.6-sol",
+          "options": [
+            "",
+            "gpt-5.6-sol",
+            "gpt-5.6-luna",
+            "gpt-5.6-terra"
+          ]
+        },
+        "effort": {
+          "rowHidden": false,
+          "value": "high",
+          "options": [
+            "",
+            "low",
+            "medium",
+            "high"
+          ]
+        }
+      }
+    },
+    {
+      "id": "T2.9-change-model",
+      "status": "PASS",
+      "detail": {
+        "requested": "gpt-5.6-luna",
+        "wsCurrentModel": "gpt-5.6-luna",
+        "persisted": "gpt-5.6-luna"
+      }
+    },
+    {
+      "id": "T2.10-change-effort",
+      "status": "PASS",
+      "detail": {
+        "requested": "low",
+        "wsCurrentEffort": "low",
+        "persisted": {
+          "version": 1,
+          "providerId": "cli:codex",
+          "model": "gpt-5.6-luna",
+          "effort": "low"
+        }
+      }
+    },
+    {
+      "id": "T2.11-keyboard-open",
+      "status": "PASS",
+      "detail": {
+        "panelHidden": false,
+        "ariaExpanded": "true"
+      }
+    },
+    {
+      "id": "T2.12-escape-closes-and-restores-focus",
+      "status": "PASS",
+      "detail": {
+        "activeId": "btn-settings",
+        "ariaExpanded": "false",
+        "hidden": true
+      }
+    },
+    {
+      "id": "T2.13-narrow-360-panel-in-viewport",
+      "status": "PASS",
+      "detail": {
+        "panel": {
+          "left": 12,
+          "right": 348,
+          "width": 336
+        },
+        "innerWidth": 360,
+        "docScrollWidth": 360,
+        "overflowing": []
+      }
+    },
+    {
+      "id": "T2.14-narrow-360-no-cjk-clipping",
+      "status": "PASS",
+      "detail": {
+        "clipped": []
+      }
+    },
+    {
+      "id": "T2.15-narrow-360-controls-reachable",
+      "status": "PASS",
+      "detail": {
+        "buttons": 19,
+        "smallest": {
+          "text": "↻",
+          "w": 21,
+          "h": 17
+        }
+      }
+    },
+    {
+      "id": "T2.16-narrow-escape-focus-restored",
+      "status": "PASS",
+      "detail": {
+        "activeId": "btn-settings",
+        "hidden": true
+      }
+    },
+    {
+      "id": "T2.17-persistence-across-reload",
+      "status": "PASS",
+      "detail": {
+        "expected": {
+          "version": 1,
+          "providerId": "cli:codex",
+          "model": "gpt-5.6-luna",
+          "effort": "low"
+        },
+        "wsAfterReload": {
+          "current": "cli:codex",
+          "model": "gpt-5.6-luna",
+          "effort": "low"
+        },
+        "uiCurrentRow": "cli:codex",
+        "uiModelValue": "gpt-5.6-luna",
+        "uiEffortValue": "low"
+      }
+    }
+  ],
+  "groundTruth": {
+    "cli:codex": {
+      "installed": true,
+      "auth": "connected",
+      "badge": "연결됨",
+      "selectable": true
+    },
+    "cli:grok": {
+      "installed": true,
+      "auth": "unknown",
+      "badge": "인증 미확인",
+      "selectable": true
+    },
+    "cli:claude": {
+      "installed": true,
+      "auth": "connected",
+      "badge": "연결됨",
+      "selectable": true
+    },
+    "cli:gemini": {
+      "installed": true,
+      "auth": "unknown",
+      "badge": "인증 미확인",
+      "selectable": true
+    }
+  },
+  "persistedAfter": {
+    "version": 1,
+    "providerId": "cli:codex",
+    "model": "gpt-5.6-luna",
+    "effort": "low"
+  }
+}

@@ -1,0 +1,12 @@
+[stdout] 프로젝트: /Users/hyunjun/Documents/MUNI/meeting-slides
+[stdout] 모드: 웹앱(브라우저)
+[stdout] 마이크 권한 확인됨
+[stdout] 서버 시작 pid=90256 port=8787
+[stdout] HTTP: http://localhost:8787
+[stdout] 입력 모드: mic
+[stdout] meeting-slides 서버 시작. 브라우저에서 http://localhost:8787 접속
+[stdout] LLM 연결 OK: cli / cli:codex(/Users/hyunjun/.npm-global/bin/codex) · gpt-5.6-sol · effort=high
+[stdout] 웹앱 ready → 브라우저 오픈 http://localhost:8787/
+[stdout] 
+[stdout] 종료 중...
+[stdout] 서버 종료 code=0

@@ -1,0 +1,33 @@
+{
+  "capturedAt": "2026-08-03T11:46:03.434Z",
+  "status": "PASS",
+  "requirement": "T3.18-selection-survives-real-app-restart",
+  "expected": "large-v3",
+  "persisted": {
+    "version": 1,
+    "selectedModelId": "large-v3"
+  },
+  "ui": [
+    {
+      "id": "small",
+      "status": "installed",
+      "badge": "설치됨"
+    },
+    {
+      "id": "medium",
+      "status": "installed",
+      "badge": "설치됨"
+    },
+    {
+      "id": "large-v3-turbo",
+      "status": "installed",
+      "badge": "설치됨"
+    },
+    {
+      "id": "large-v3",
+      "status": "selected",
+      "badge": "사용 중"
+    }
+  ],
+  "partials": []
+}

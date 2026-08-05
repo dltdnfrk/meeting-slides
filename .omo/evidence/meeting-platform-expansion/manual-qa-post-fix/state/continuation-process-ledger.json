@@ -1,0 +1,44 @@
+{
+  "signedExecutable": "/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides",
+  "launches": [
+    {
+      "sequence": 1,
+      "launcherPid": 89735,
+      "serverPid": 89774,
+      "logPath": "/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/meeting-platform-expansion/manual-qa-post-fix/logs/continuation-launch-1.log",
+      "startedAt": "2026-08-03T12:43:18.973Z",
+      "readyAt": "2026-08-03T12:43:20.648Z",
+      "puppeteerPid": 89851,
+      "puppeteerClosedAt": "2026-08-03T12:43:22.414Z",
+      "termRequestedAt": "2026-08-03T12:43:22.415Z",
+      "termTargetServerPid": 89774,
+      "exitedAt": "2026-08-03T12:43:22.431Z",
+      "exitCode": 0,
+      "exitSignal": null,
+      "terminatedOnlyOwnedPids": [
+        89774,
+        89735
+      ]
+    },
+    {
+      "sequence": 2,
+      "launcherPid": 90245,
+      "serverPid": 90256,
+      "logPath": "/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/meeting-platform-expansion/manual-qa-post-fix/logs/continuation-launch-2.log",
+      "startedAt": "2026-08-03T12:43:22.432Z",
+      "readyAt": "2026-08-03T12:43:23.743Z",
+      "puppeteerPid": 90321,
+      "puppeteerClosedAt": "2026-08-03T12:43:24.947Z",
+      "termRequestedAt": "2026-08-03T12:43:24.947Z",
+      "termTargetServerPid": 90256,
+      "exitedAt": "2026-08-03T12:43:24.981Z",
+      "exitCode": 0,
+      "exitSignal": null,
+      "terminatedOnlyOwnedPids": [
+        90256,
+        90245
+      ]
+    }
+  ],
+  "note": "Only the recorded QA-owned launcher/server PIDs received SIGTERM; Puppeteer browser processes were closed through their owning API."
+}

@@ -1,0 +1,264 @@
+{
+  "timeline": [
+    {
+      "id": "small",
+      "elapsedSec": "14.2",
+      "size": 264464607,
+      "sha256": "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f",
+      "maxProgressPct": 100,
+      "progressFrames": 14515
+    },
+    {
+      "id": "medium",
+      "elapsedSec": "37.1",
+      "size": 823369779,
+      "sha256": "42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502",
+      "maxProgressPct": 100,
+      "progressFrames": 42385
+    },
+    {
+      "id": "large-v3-turbo",
+      "elapsedSec": "44.0",
+      "size": 874188075,
+      "sha256": "317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1",
+      "maxProgressPct": 100,
+      "progressFrames": 39004
+    }
+  ],
+  "results": [
+    {
+      "id": "T3.1-four-cards-present",
+      "status": "PASS",
+      "detail": [
+        {
+          "id": "small",
+          "status": "absent",
+          "badge": "미설치"
+        },
+        {
+          "id": "medium",
+          "status": "absent",
+          "badge": "미설치"
+        },
+        {
+          "id": "large-v3-turbo",
+          "status": "absent",
+          "badge": "미설치"
+        },
+        {
+          "id": "large-v3",
+          "status": "absent",
+          "badge": "미설치"
+        }
+      ]
+    },
+    {
+      "id": "T3.2-card-metadata-truthful",
+      "status": "PASS",
+      "detail": [
+        {
+          "id": "small",
+          "name": "Small (Q8_0)",
+          "meta": "252 MB · MIT"
+        },
+        {
+          "id": "medium",
+          "name": "Medium (Q8_0)",
+          "meta": "785 MB · MIT"
+        },
+        {
+          "id": "large-v3-turbo",
+          "name": "Large v3 Turbo (Q8_0)",
+          "meta": "834 MB · MIT"
+        },
+        {
+          "id": "large-v3",
+          "name": "Large v3 (Q8_0)",
+          "meta": "1.5 GB · Apache-2.0"
+        }
+      ]
+    },
+    {
+      "id": "T3.3-absent-state-matches-disk",
+      "status": "PASS",
+      "detail": {
+        "diskFiles": [],
+        "uiStatuses": [
+          "small:absent",
+          "medium:absent",
+          "large-v3-turbo:absent",
+          "large-v3:absent"
+        ]
+      }
+    },
+    {
+      "id": "T3.4-download-progress-observable",
+      "status": "PASS",
+      "detail": {
+        "row": {
+          "id": "large-v3",
+          "status": "downloading",
+          "name": "Large v3 (Q8_0)",
+          "badge": "내려받는 중",
+          "meta": "4 MB / 1.5 GB · 0%",
+          "error": null,
+          "progressNow": "0",
+          "actions": [
+            {
+              "cls": "stt-btn stt-btn--quiet stt-row__cancel",
+              "text": "취소",
+              "disabled": false
+            }
+          ]
+        },
+        "partialFilesOnDisk": [
+          ".ggml-large-v3-q8_0.bin.part-75121-9fe9b4a2-40a5-4233-8275-0ed5bfdc083b"
+        ]
+      }
+    },
+    {
+      "id": "T3.5-partial-file-is-hidden-temp",
+      "status": "PASS",
+      "detail": {
+        "partials": [
+          ".ggml-large-v3-q8_0.bin.part-75121-9fe9b4a2-40a5-4233-8275-0ed5bfdc083b"
+        ]
+      }
+    },
+    {
+      "id": "T3.6-cancel-returns-to-absent",
+      "status": "PASS",
+      "detail": {
+        "id": "large-v3",
+        "status": "absent",
+        "name": "Large v3 (Q8_0)",
+        "badge": "미설치",
+        "meta": "1.5 GB · Apache-2.0",
+        "error": null,
+        "progressNow": null,
+        "actions": [
+          {
+            "cls": "stt-btn stt-row__install",
+            "text": "내려받기",
+            "disabled": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "T3.7-cancel-cleans-partial-and-installs-nothing",
+      "status": "PASS",
+      "detail": {
+        "partialsAfter": [],
+        "finalFileExists": false,
+        "dir": []
+      }
+    },
+    {
+      "id": "T3.8-download-small",
+      "status": "PASS",
+      "detail": {
+        "wsStatus": "installed",
+        "elapsedSec": "14.2",
+        "progressFrameCount": 14515,
+        "maxProgressPct": 100
+      }
+    },
+    {
+      "id": "T3.9-size-exact-small",
+      "status": "PASS",
+      "detail": {
+        "onDisk": 264464607,
+        "expected": 264464607
+      }
+    },
+    {
+      "id": "T3.10-sha256-exact-small",
+      "status": "PASS",
+      "detail": {
+        "onDisk": "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f",
+        "expected": "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f"
+      }
+    },
+    {
+      "id": "T3.11-no-partial-small",
+      "status": "PASS",
+      "detail": {
+        "partials": []
+      }
+    },
+    {
+      "id": "T3.8-download-medium",
+      "status": "PASS",
+      "detail": {
+        "wsStatus": "installed",
+        "elapsedSec": "37.1",
+        "progressFrameCount": 42385,
+        "maxProgressPct": 100
+      }
+    },
+    {
+      "id": "T3.9-size-exact-medium",
+      "status": "PASS",
+      "detail": {
+        "onDisk": 823369779,
+        "expected": 823369779
+      }
+    },
+    {
+      "id": "T3.10-sha256-exact-medium",
+      "status": "PASS",
+      "detail": {
+        "onDisk": "42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502",
+        "expected": "42a1ffcbe4167d224232443396968db4d02d4e8e87e213d3ee2e03095dea6502"
+      }
+    },
+    {
+      "id": "T3.11-no-partial-medium",
+      "status": "PASS",
+      "detail": {
+        "partials": []
+      }
+    },
+    {
+      "id": "T3.8-download-large-v3-turbo",
+      "status": "PASS",
+      "detail": {
+        "wsStatus": "installed",
+        "elapsedSec": "44.0",
+        "progressFrameCount": 39004,
+        "maxProgressPct": 100
+      }
+    },
+    {
+      "id": "T3.9-size-exact-large-v3-turbo",
+      "status": "PASS",
+      "detail": {
+        "onDisk": 874188075,
+        "expected": 874188075
+      }
+    },
+    {
+      "id": "T3.10-sha256-exact-large-v3-turbo",
+      "status": "PASS",
+      "detail": {
+        "onDisk": "317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1",
+        "expected": "317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1"
+      }
+    },
+    {
+      "id": "T3.11-no-partial-large-v3-turbo",
+      "status": "PASS",
+      "detail": {
+        "partials": []
+      }
+    },
+    {
+      "id": "T3-FATAL",
+      "status": "FAIL",
+      "detail": "Waiting failed"
+    }
+  ],
+  "fatal": "Waiting failed",
+  "stack": "Error: Waiting failed\n    at <instance_members_initializer> (file:///Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:21:21)\n    at new WaitTask (file:///Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:27:16)\n    at IsolatedWorld.waitForFunction (file:///Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Realm.js:49:26)\n    at CdpFrame.waitForFunction (file:///Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:580:43)\n    at CdpFrame.<anonymous> (file:///Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27)\n    at CdpPage.waitForFunction (file:///Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:1447:37)\n    at waitForFrame (file:///Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/meeting-platform-expansion/manual-qa-post-fix/driver/qa-lib.mjs:73:29)\n    at file:///Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/meeting-platform-expansion/manual-qa-post-fix/driver/track3-stt.mjs:111:24"
+}

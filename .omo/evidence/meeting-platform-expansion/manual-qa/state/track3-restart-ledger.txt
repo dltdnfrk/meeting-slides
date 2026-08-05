@@ -1,0 +1,10 @@
+# Track 3 QA-owned restart ledger
+restart_at: 2026-08-03T11:45:57Z
+old_parent: 75770 /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+old_child: 75773 ppid=75770 /Users/hyunjun/.bun/bin/bun run server.ts
+old_processes_terminated: yes
+new_parent: 93617 /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+new_child: 93620 ppid=93617 /Users/hyunjun/.bun/bin/bun run server.ts
+port_8787_owner:
+COMMAND   PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+bun     93620 hyunjun    8u  IPv4 0xbcb512b3798428b5      0t0  TCP 127.0.0.1:8787 (LISTEN)

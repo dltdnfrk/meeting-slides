@@ -1,0 +1,8 @@
+launcher_pid=75107
+server_pid=75121
+server_ppid=75107
+ready_event=2026-08-03T12:04:48Z  웹앱 ready → 브라우저 오픈 http://localhost:8787/
+root_http=200
+health_signatures=<title>Meeting Slides + id="runtime-bootstrap"
+listener=COMMAND   PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+bun     75121 hyunjun    8u  IPv4 0xbe3aa916adb33e7a      0t0  TCP 127.0.0.1:8787 (LISTEN)

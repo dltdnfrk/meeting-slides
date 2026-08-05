@@ -1,0 +1,55 @@
+captured_at: 2026-08-03T12:04:01Z
+revision: c655ad023a450fa1d29f5c505b305ed50ad2af0c
+backup_dir: /tmp/ms-post-fix-qa-backup.vbM51W
+--- project state ---
+.meeting-slides: absent
+--- database family ---
+99de34b89ef3ff0be5d87e8e8c5a92ed08b8839047d23a5069dc907ebc6256f5  ./meetings.db
+e09b57396988bdb5e1ddea2492918c26644510aaefc39c23208ad88b8e53a1f2  ./meetings.db-shm
+39d3f807c49cd38ed929eafe097afdc9b9cfa82125af593cbc9b2540c5a97b08  ./meetings.db-wal
+--- managed STT ---
+--- exports inventory ---
+exports/deck-2026-07-26T14-52-29-350Z
+exports/deck-2026-07-27T22-29-52-393Z
+exports/deck-2026-07-27T23-37-40-434Z
+exports/deck-2026-07-27T23-41-21-418Z
+exports/deck-2026-07-28T01-25-17-465Z
+exports/deck-2026-07-28T01-33-25-094Z
+exports/deck-2026-07-28T01-49-39-148Z
+exports/deck-2026-07-28T01-54-10-349Z
+exports/deck-2026-07-28T02-07-22-022Z
+exports/deck-2026-07-28T02-16-49-224Z
+exports/deck-2026-07-28T02-16-49-224Z-png
+exports/deck-2026-07-28T02-16-53-073Z
+exports/deck-2026-07-28T02-30-03-944Z
+exports/deck-2026-07-28T03-01-32-975Z
+exports/deck-2026-07-28T03-09-46-893Z
+exports/deck-2026-07-28T05-18-27-268Z
+exports/deck-2026-07-28T07-33-53-496Z
+exports/deck-2026-07-28T07-54-35-026Z
+exports/deck-2026-07-28T07-54-35-026Z.pdf
+exports/deck-2026-07-29T14-58-56-138Z
+exports/deck-2026-07-29T15-18-28-713Z
+exports/deck-2026-07-29T15-19-35-610Z
+exports/deck-2026-07-29T15-19-59-919Z
+exports/deck-2026-07-29T15-27-50-570Z
+exports/deck-2026-07-29T15-31-20-417Z
+exports/deck-2026-07-29T15-32-23-426Z
+exports/deck-2026-07-29T23-32-02-441Z
+exports/deck-2026-08-02T23-51-35-822Z
+exports/deck-2026-08-03T01-28-56-763Z
+exports/deck-2026-08-03T01-31-59-518Z
+exports/deck-2026-08-03T01-32-25-752Z
+exports/deck-2026-08-03T01-32-46-506Z
+exports/deck-2026-08-03T01-33-22-735Z
+exports/deck-2026-08-03T01-33-22-735Z-png
+exports/deck-2026-08-03T01-36-48-245Z
+exports/meeting-2026-07-26T12-01-11-314Z.md
+exports/meeting-2026-07-26T12-08-33-107Z.md
+exports/meeting-2026-08-02T23-51-20-592Z.md
+exports/meeting-2026-08-03T01-31-14-284Z.md
+exports/meeting-2026-08-03T01-31-37-406Z.json
+exports/meeting-2026-08-03T01-31-46-330Z.md
+exports/meeting-slides-imagen-final.pdf
+--- port 8787 ---
+--- related processes ---

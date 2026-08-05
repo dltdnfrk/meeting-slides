@@ -1,0 +1,9 @@
+backup_dir: /tmp/ms-post-fix-qa-backup.vbM51W
+created_at: 2026-08-03T12:04:01Z
+76bc86850553b6590826abdc3943552dc41c13eaf8f92917fa60b7edd6ebf1b6  /tmp/ms-post-fix-qa-backup.vbM51W/.env
+9955a3d16e17f77670a46bdb3f1e3ce81db73e75b169ba472b4beb1c9d1dbe0c  /tmp/ms-post-fix-qa-backup.vbM51W/exports-baseline.txt
+7925d3e9a9613a093e5eb4054b32aa39de910d2b03ba7e8046c3b4550b8de1e4  /tmp/ms-post-fix-qa-backup.vbM51W/meeting-slides.state
+99de34b89ef3ff0be5d87e8e8c5a92ed08b8839047d23a5069dc907ebc6256f5  /tmp/ms-post-fix-qa-backup.vbM51W/meetings.db
+e09b57396988bdb5e1ddea2492918c26644510aaefc39c23208ad88b8e53a1f2  /tmp/ms-post-fix-qa-backup.vbM51W/meetings.db-shm
+39d3f807c49cd38ed929eafe097afdc9b9cfa82125af593cbc9b2540c5a97b08  /tmp/ms-post-fix-qa-backup.vbM51W/meetings.db-wal
+14bca160a84ec9e8e5b25cb86ec8b0945f870b8781c8e94ef883b58d27b508db  /tmp/ms-post-fix-qa-backup.vbM51W/models-stt.state

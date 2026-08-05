@@ -1,0 +1,52 @@
+[PASS] T2.1-settings-opens-desktop :: {"panelHidden":false,"ariaExpanded":"true","providerRows":7}
+[PASS] T2.2-truthful-status-cli:codex :: {"expected":{"installed":true,"auth":"connected","badge":"연결됨","selectable":true},"actual":{"id":"cli:codex","auth":"connected","installed":"true","current":true,"disabledClass":false,"name":"GPT (subscription)","detail":"Codex CLI - ChatGPT subscription authentication","badge":"연결됨","selectDisabled":false,"ariaPressed":"true","connectLabel":"재인증","hasKeyInput":false}}
+[PASS] T2.2-truthful-status-cli:grok :: {"expected":{"installed":true,"auth":"unknown","badge":"인증 미확인","selectable":true},"actual":{"id":"cli:grok","auth":"unknown","installed":"true","current":false,"disabledClass":false,"name":"Grok (subscription)","detail":"Grok Build CLI - xAI browser authentication","badge":"인증 미확인","selectDisabled":false,"ariaPressed":"false","connectLabel":"연결","hasKeyInput":false}}
+[PASS] T2.2-truthful-status-cli:claude :: {"expected":{"installed":true,"auth":"connected","badge":"연결됨","selectable":true},"actual":{"id":"cli:claude","auth":"connected","installed":"true","current":false,"disabledClass":false,"name":"Claude (subscription)","detail":"Claude CLI - Claude Pro/Max authentication","badge":"연결됨","selectDisabled":false,"ariaPressed":"false","connectLabel":"재인증","hasKeyInput":false}}
+[PASS] T2.2-truthful-status-cli:gemini :: {"expected":{"installed":true,"auth":"unknown","badge":"인증 미확인","selectable":true},"actual":{"id":"cli:gemini","auth":"unknown","installed":"true","current":false,"disabledClass":false,"name":"Gemini (subscription)","detail":"Gemini CLI - Google sign-in","badge":"인증 미확인","selectDisabled":false,"ariaPressed":"false","connectLabel":"연결","hasKeyInput":false}}
+[PASS] T2.3-no-optimistic-connected :: {"claimingConnected":["cli:codex","cli:claude"]}
+[PASS] T2.4-recheck-returns-real-state :: {"current":"cli:codex","wsList":[{"id":"cli:codex","installed":true,"auth":"connected"},{"id":"cli:grok","installed":true,"auth":"unknown"},{"id":"cli:claude","installed":true,"auth":"connected"},{"id":"cli:gemini","installed":true,"auth":"unknown"},{"id":"alibaba"},{"id":"openai"},{"id":"local"}]}
+[PASS] T2.5-recheck-preserves-truth-in-ui :: [{"id":"cli:codex","auth":"connected","badge":"연결됨"},{"id":"cli:grok","auth":"unknown","badge":"인증 미확인"},{"id":"cli:claude","auth":"connected","badge":"연결됨"},{"id":"cli:gemini","auth":"unknown","badge":"인증 미확인"},{"id":"alibaba","auth":"connected","badge":"설정됨"},{"id":"openai","auth":"unavailable","badge":"미설정"},{"id":"local","auth":"connected","badge":"설정됨"}]
+[PASS] T2.6-selectable-set :: {"selectable":["cli:codex","cli:grok","cli:claude","cli:gemini","alibaba","local"]}
+[PASS] T2.7-select-cli:codex :: {"wsCurrent":"cli:codex","ariaPressed":"true","persisted":"cli:codex"}
+[PASS] T2.7-select-cli:grok :: {"wsCurrent":"cli:grok","ariaPressed":"true","persisted":"cli:grok"}
+[PASS] T2.7-select-cli:claude :: {"wsCurrent":"cli:claude","ariaPressed":"true","persisted":"cli:claude"}
+[PASS] T2.7-select-cli:gemini :: {"wsCurrent":"cli:gemini","ariaPressed":"true","persisted":"cli:gemini"}
+[PASS] T2.7-select-alibaba :: {"wsCurrent":"alibaba","ariaPressed":"true","persisted":"alibaba"}
+[PASS] T2.7-select-local :: {"wsCurrent":"local","ariaPressed":"true","persisted":"local"}
+[PASS] T2.8-model-and-effort-exposed :: {"model":{"disabled":false,"value":"gpt-5.6-sol","options":["","gpt-5.6-sol","gpt-5.6-luna","gpt-5.6-terra"]},"effort":{"rowHidden":false,"value":"high","options":["","low","medium","high"]}}
+[PASS] T2.9-change-model :: {"requested":"gpt-5.6-luna","wsCurrentModel":"gpt-5.6-luna","persisted":"gpt-5.6-luna"}
+[PASS] T2.10-change-effort :: {"requested":"low","wsCurrentEffort":"low","persisted":{"version":1,"providerId":"cli:codex","model":"gpt-5.6-luna","effort":"low"}}
+[PASS] T2.11-keyboard-open :: {"panelHidden":false,"ariaExpanded":"true"}
+[PASS] T2.12-escape-closes-and-restores-focus :: {"activeId":"btn-settings","ariaExpanded":"false","hidden":true}
+[PASS] T2.13-narrow-360-panel-in-viewport :: {"panel":{"left":12,"right":348,"width":336},"innerWidth":360,"docScrollWidth":360,"overflowing":[]}
+[PASS] T2.14-narrow-360-no-cjk-clipping :: {"clipped":[]}
+[PASS] T2.15-narrow-360-controls-reachable :: {"buttons":19,"smallest":{"text":"↻","w":21,"h":17}}
+[PASS] T2.16-narrow-escape-focus-restored :: {"activeId":"btn-settings","hidden":true}
+[PASS] T2.17-persistence-across-reload :: {"expected":{"version":1,"providerId":"cli:codex","model":"gpt-5.6-luna","effort":"low"},"wsAfterReload":{"current":"cli:codex","model":"gpt-5.6-luna","effort":"low"},"uiCurrentRow":"cli:codex","uiModelValue":"gpt-5.6-luna","uiEffortValue":"low"}
+
+=== TRACK 2 SUMMARY ===
+PASS   T2.1-settings-opens-desktop
+PASS   T2.2-truthful-status-cli:codex
+PASS   T2.2-truthful-status-cli:grok
+PASS   T2.2-truthful-status-cli:claude
+PASS   T2.2-truthful-status-cli:gemini
+PASS   T2.3-no-optimistic-connected
+PASS   T2.4-recheck-returns-real-state
+PASS   T2.5-recheck-preserves-truth-in-ui
+PASS   T2.6-selectable-set
+PASS   T2.7-select-cli:codex
+PASS   T2.7-select-cli:grok
+PASS   T2.7-select-cli:claude
+PASS   T2.7-select-cli:gemini
+PASS   T2.7-select-alibaba
+PASS   T2.7-select-local
+PASS   T2.8-model-and-effort-exposed
+PASS   T2.9-change-model
+PASS   T2.10-change-effort
+PASS   T2.11-keyboard-open
+PASS   T2.12-escape-closes-and-restores-focus
+PASS   T2.13-narrow-360-panel-in-viewport
+PASS   T2.14-narrow-360-no-cjk-clipping
+PASS   T2.15-narrow-360-controls-reachable
+PASS   T2.16-narrow-escape-focus-restored
+PASS   T2.17-persistence-across-reload

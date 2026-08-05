@@ -1,0 +1,111 @@
+{
+  "innerWidth": 360,
+  "panel": {
+    "left": 12,
+    "right": 348,
+    "width": 336
+  },
+  "panelWithinViewport": true,
+  "docScrollWidth": 360,
+  "horizontalOverflow": false,
+  "overflowing": [],
+  "clipped": [],
+  "allButtonsReachable": true,
+  "buttonHitTargets": [
+    {
+      "text": "↻",
+      "w": 21,
+      "h": 17
+    },
+    {
+      "text": "GPT (subscri",
+      "w": 296,
+      "h": 58
+    },
+    {
+      "text": "재인증",
+      "w": 48,
+      "h": 21
+    },
+    {
+      "text": "Grok (subscr",
+      "w": 296,
+      "h": 58
+    },
+    {
+      "text": "연결",
+      "w": 39,
+      "h": 21
+    },
+    {
+      "text": "Claude (subs",
+      "w": 296,
+      "h": 58
+    },
+    {
+      "text": "재인증",
+      "w": 48,
+      "h": 21
+    },
+    {
+      "text": "Gemini (subs",
+      "w": 296,
+      "h": 58
+    },
+    {
+      "text": "연결",
+      "w": 39,
+      "h": 21
+    },
+    {
+      "text": "Alibaba GLM\n",
+      "w": 296,
+      "h": 58
+    },
+    {
+      "text": "OpenAI API\n ",
+      "w": 296,
+      "h": 58
+    },
+    {
+      "text": "연결",
+      "w": 39,
+      "h": 21
+    },
+    {
+      "text": "저장",
+      "w": 39,
+      "h": 21
+    },
+    {
+      "text": "Local llama.",
+      "w": 296,
+      "h": 58
+    },
+    {
+      "text": "↻",
+      "w": 21,
+      "h": 17
+    },
+    {
+      "text": "내려받기",
+      "w": 52,
+      "h": 21
+    },
+    {
+      "text": "내려받기",
+      "w": 52,
+      "h": 21
+    },
+    {
+      "text": "내려받기",
+      "w": 52,
+      "h": 21
+    },
+    {
+      "text": "내려받기",
+      "w": 52,
+      "h": 21
+    }
+  ]
+}

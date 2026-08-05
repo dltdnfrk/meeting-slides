@@ -1,0 +1,104 @@
+[
+  {
+    "id": "cli:codex",
+    "wsCurrent": "cli:codex",
+    "wsModel": "gpt-5.6-sol",
+    "wsEffort": "high",
+    "uiAriaPressed": "true",
+    "glance": "GPT (subscription)",
+    "persistedFile": {
+      "version": 1,
+      "providerId": "cli:codex",
+      "model": "gpt-5.6-sol",
+      "effort": "high"
+    },
+    "modelOptions": [
+      "",
+      "gpt-5.6-sol",
+      "gpt-5.6-luna",
+      "gpt-5.6-terra"
+    ],
+    "effortHidden": false
+  },
+  {
+    "id": "cli:grok",
+    "wsCurrent": "cli:grok",
+    "wsModel": "grok-4.5",
+    "uiAriaPressed": "true",
+    "glance": "Grok (subscription)",
+    "persistedFile": {
+      "version": 1,
+      "providerId": "cli:grok",
+      "model": "grok-4.5"
+    },
+    "modelOptions": [
+      "",
+      "grok-4.5"
+    ],
+    "effortHidden": true
+  },
+  {
+    "id": "cli:claude",
+    "wsCurrent": "cli:claude",
+    "uiAriaPressed": "true",
+    "glance": "Claude (subscription)",
+    "persistedFile": {
+      "version": 1,
+      "providerId": "cli:claude"
+    },
+    "modelOptions": [
+      "",
+      "opus",
+      "sonnet",
+      "haiku"
+    ],
+    "effortHidden": true
+  },
+  {
+    "id": "cli:gemini",
+    "wsCurrent": "cli:gemini",
+    "uiAriaPressed": "true",
+    "glance": "Gemini (subscription)",
+    "persistedFile": {
+      "version": 1,
+      "providerId": "cli:gemini"
+    },
+    "modelOptions": [
+      "",
+      "gemini-2.5-pro",
+      "gemini-2.5-flash"
+    ],
+    "effortHidden": true
+  },
+  {
+    "id": "alibaba",
+    "wsCurrent": "alibaba",
+    "uiAriaPressed": "true",
+    "glance": "Alibaba GLM",
+    "persistedFile": {
+      "version": 1,
+      "providerId": "alibaba"
+    },
+    "modelOptions": [
+      "",
+      "glm-5.2",
+      "glm-5.1",
+      "glm-4.7"
+    ],
+    "effortHidden": true
+  },
+  {
+    "id": "local",
+    "wsCurrent": "local",
+    "uiAriaPressed": "true",
+    "glance": "Local llama.cpp",
+    "persistedFile": {
+      "version": 1,
+      "providerId": "local"
+    },
+    "modelOptions": [
+      ""
+    ],
+    "effortHidden": true
+  }
+]
