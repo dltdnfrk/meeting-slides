@@ -194,8 +194,9 @@ describe("exportBundle", () => {
   test("refuses a missing required deck output and removes the staging tree", async () => {
     const fx = fixture();
     fx.store.confirmReview(fx.reviewId);
+    // 필수 deck 출력(theme.css)이 없는 프로젝트 루트에서는 번들이 실패해야 한다.
     const incompleteProject = join(fx.root, "incomplete-project");
-    await Bun.write(join(incompleteProject, "deck", "theme.css"), "body {}\n");
+    await Bun.write(join(incompleteProject, "deck", "index.html"), "<html></html>\n");
 
     await expect(run(fx, { projectRoot: incompleteProject })).rejects.toThrow();
 

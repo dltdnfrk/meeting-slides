@@ -67,6 +67,13 @@ beforeAll(async () => {
   await page.goto(harness.origin, { waitUntil: "load" });
   // 첫 push가 유실되지 않도록 클라이언트 WS 연결이 열린 뒤에 테스트를 시작한다.
   await harness.clientConnected;
+  // 실서버는 연결 직후 capture 상태를 전송한다. 슬라이드를 렌더하려면 녹음 중(capturing) 상태가 필요하다.
+  harness.pushMessage({ type: "capture", capturing: true, mode: "mic" });
+  // capture 처리가 끝나기를 기다린다 (버튼이 녹음 중 상태로 전환되면 반영 완료).
+  await page.waitForFunction(() =>
+    (document.getElementById("btn-record") as HTMLButtonElement)?.textContent?.includes("녹음 중지"),
+    { timeout: 5_000 },
+  );
 });
 
 afterAll(async () => {

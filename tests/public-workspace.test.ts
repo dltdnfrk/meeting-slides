@@ -15,6 +15,13 @@ beforeAll(async () => {
   await page.setViewport({ width: 1440, height: 900 });
   await page.goto(harness.origin, { waitUntil: "load" });
   await harness.clientConnected;
+  // 실서버는 연결 직후 capture 상태를 전송한다. 슬라이드를 렌더하려면 녹음 중(capturing) 상태가 필요하다.
+  harness.pushMessage({ type: "capture", capturing: true, mode: "mic" });
+  // capture 처리가 끝나기를 기다린다 (버튼이 녹음 중 상태로 전환되면 반영 완료).
+  await page.waitForFunction(() =>
+    (document.getElementById("btn-record") as HTMLButtonElement)?.textContent?.includes("녹음 중지"),
+    { timeout: 5_000 },
+  );
 });
 
 afterAll(async () => {
@@ -158,6 +165,20 @@ async function dragSplitter(target: Page, selector: string, dx: number): Promise
   await waitForStableLayout(target);
 }
 
+/** reload 후 WS가 다시 연결되면 capture 상태를 재전송하고 반영을 기다린다. */
+async function reconnectCapture(target: Page): Promise<void> {
+  await target.waitForFunction(
+    () => document.documentElement.dataset.connection === "connected",
+    { timeout: 5_000 },
+  );
+  harness.pushMessage({ type: "capture", capturing: true, mode: "mic" });
+  await target.waitForFunction(
+    () =>
+      (document.getElementById("btn-record") as HTMLButtonElement)?.textContent?.includes("녹음 중지"),
+    { timeout: 5_000 },
+  );
+}
+
 /** rAF 두 프레임 동안 세 패널 폭이 그대로면 레이아웃이 정착한 것으로 본다. */
 async function waitForStableLayout(target: Page): Promise<void> {
   await target.evaluate(
@@ -223,6 +244,7 @@ describe("워크스페이스 스플리터", () => {
   beforeEach(async () => {
     await page.evaluate((key) => localStorage.removeItem(key), STORAGE_KEY);
     await page.reload({ waitUntil: "load" });
+    await reconnectCapture(page);
     await waitForStableLayout(page);
   });
 
@@ -343,6 +365,7 @@ describe("워크스페이스 스플리터", () => {
     const dragged = await paneWidths(page);
 
     await page.reload({ waitUntil: "load" });
+    await reconnectCapture(page);
     await waitForStableLayout(page);
     const restored = await paneWidths(page);
 
@@ -353,6 +376,7 @@ describe("워크스페이스 스플리터", () => {
   test("저장값이 손상돼도 기본 레이아웃으로 뜬다", async () => {
     await page.evaluate((key) => localStorage.setItem(key, "{not json"), STORAGE_KEY);
     await page.reload({ waitUntil: "load" });
+    await reconnectCapture(page);
     await waitForStableLayout(page);
 
     const widths = await paneWidths(page);
@@ -368,7 +392,7 @@ describe("중앙 무대 잠금과 반응형", () => {
     await page.setViewport({ width: 1440, height: 900 });
     await page.evaluate(() => localStorage.removeItem("workspace.layout.v1"));
     await page.reload({ waitUntil: "load" });
-    await harness.clientConnected;
+    await reconnectCapture(page);
     await waitForStableLayout(page);
 
     // 렌더 대기 무장 후 슬라이드 push
@@ -432,7 +456,7 @@ describe("중앙 무대 잠금과 반응형", () => {
     await page.setViewport({ width: 820, height: 900 });
     await page.evaluate(() => localStorage.removeItem("workspace.layout.v1"));
     await page.reload({ waitUntil: "load" });
-    await harness.clientConnected;
+    await reconnectCapture(page);
     await waitForStableLayout(page);
 
     const narrow = await page.evaluate(() => {
@@ -466,7 +490,7 @@ describe("중앙 무대 잠금과 반응형", () => {
     await page.setViewport({ width: 375, height: 720 });
     await page.evaluate(() => localStorage.removeItem("workspace.layout.v1"));
     await page.reload({ waitUntil: "load" });
-    await harness.clientConnected;
+    await reconnectCapture(page);
     await waitForStableLayout(page);
 
     const tiny = await page.evaluate(() => {
@@ -498,7 +522,7 @@ describe("헤르메틱 워크스페이스 E2E", () => {
     await page.setViewport({ width: 1440, height: 900 });
     await page.evaluate((key) => localStorage.removeItem(key), STORAGE_KEY);
     await page.reload({ waitUntil: "load" });
-    await harness.clientConnected;
+    await reconnectCapture(page);
     await waitForStableLayout(page);
 
     // 1) three panes
@@ -575,7 +599,7 @@ describe("헤르메틱 워크스페이스 E2E", () => {
     // 5) layout persist roundtrip
     const dragged = await paneWidths(page);
     await page.reload({ waitUntil: "load" });
-    await harness.clientConnected;
+    await reconnectCapture(page);
     await waitForStableLayout(page);
     const restored = await paneWidths(page);
     expect(restored.left).toBeCloseTo(dragged.left, 0);

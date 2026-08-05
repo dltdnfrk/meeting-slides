@@ -41,7 +41,7 @@ function waitForSessionMessage(
 async function waitForCard(page: Page, title: string): Promise<void> {
   await page.evaluate((expectedTitle) => {
     const root = document.getElementById("current-slide")!;
-    const matches = () => root.querySelector(".slide__title")?.textContent === expectedTitle;
+    const matches = () => root.querySelector(".live-scene__text--title")?.textContent === expectedTitle;
     (globalThis as unknown as { __cardRendered: Promise<void> }).__cardRendered = new Promise((resolve, reject) => {
       if (matches()) {
         resolve();
@@ -91,6 +91,13 @@ beforeAll(async () => {
   });
   await page.goto(harness.origin, { waitUntil: "load" });
   await harness.clientConnected;
+  // 실서버는 연결 직후 capture 상태를 전송한다. 슬라이드를 렌더하려면 녹음 중(capturing) 상태가 필요하다.
+  harness.pushMessage({ type: "capture", capturing: true, mode: "mic" });
+  // capture 처리가 끝나기를 기다린다 (버튼이 녹음 중 상태로 전환되면 반영 완료).
+  await page.waitForFunction(() =>
+    (document.getElementById("btn-record") as HTMLButtonElement)?.textContent?.includes("녹음 중지"),
+    { timeout: 5_000 },
+  );
 });
 
 afterEach(() => {
@@ -143,17 +150,15 @@ describe("Hybrid live -> compile -> export hermetic path", () => {
     const liveCard = await page.evaluate(() => {
       const root = document.getElementById("current-slide")!;
       return {
-        kicker: root.querySelector(".slide__kicker")?.textContent,
-        title: root.querySelector(".slide__title")?.textContent,
-        bullets: [...root.querySelectorAll(".slide__bullets li")].map((item) => item.textContent),
-        emphasis: root.querySelector(".slide__emphasis")?.textContent,
+        title: root.querySelector(".live-scene__text--title")?.textContent,
+        statement: root.querySelector(".live-scene__text--statement")?.textContent,
+        body: root.querySelector(".live-scene__text--body")?.textContent,
       };
     });
     expect(liveCard).toEqual({
-      kicker: "라이브 감지",
       title: "출시 일정 확정",
-      bullets: ["베타는 금요일", "QA는 목요일까지"],
-      emphasis: "핵심결정: 금요일 베타 배포",
+      statement: "베타는 금요일 QA는 목요일까지",
+      body: "결정: 금요일 베타 배포",
     });
     expect(store.lines(meetingId).map((line) => line.text)).toEqual([
       "금요일에 베타를 배포하고 목요일까지 QA를 끝냅니다.",

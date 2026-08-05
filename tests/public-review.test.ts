@@ -208,8 +208,9 @@ describe("candidate cards", () => {
       { id: "open-1", kind: "open_item", description: "리브랜딩 방향 미정" },
     ]);
     expect(rows[0]!.quote).toBe("가격 정책은 구독으로 확정합니다.");
-    expect(rows[0]!.coords).toContain("1");
-    expect(rows[0]!.coords).toContain(VERSION_ID);
+    expect(rows[0]!.coords).toBe("1번째 문장");
+    // 좌표의 version 스코프는 data 속성으로 보존된다 (표시는 읽기 좋은 라벨).
+    expect(await page.evaluate(() => (document.querySelector(".review-item") as HTMLElement).dataset.transcriptVersionId)).toBe(VERSION_ID);
   });
 
   test("every candidate carries the immutable transcript version id, not just a seq", async () => {

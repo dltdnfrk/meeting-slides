@@ -481,21 +481,22 @@ describe("pre-capture attendee registration form", () => {
   test("existing slide rendering and dock controls survive the new panel", async () => {
     await page.click("#btn-attendees");
     await page.waitForSelector("#attendee-panel:not([hidden])");
+    // 슬라이드 렌더에 필요한 녹음 중 상태로 전환 — 참석자 패널은 잠기고 닫힌다.
+    await emit({ type: "capture", capturing: true, mode: "mic" });
     await emit({
       type: "slide",
       current: { index: 1, title: "출시 일정", bullets: ["베타 금요일"], startedAt: 0, sentenceCount: 3 },
       history: [],
     });
     await page.waitForSelector(".slide__title");
-    // 슬라이드가 패널 뒤에서 계속 갱신되는지 먼저 확인한다.
+    // 녹음 시작 후에는 라이브 슬라이드가 렌더되고 참석자 패널은 잠금으로 닫힌다.
     expect(await page.evaluate(() => ({
       title: document.querySelector(".slide__title")?.textContent,
-      panelStillOpen: !(document.getElementById("attendee-panel") as HTMLElement).hidden,
-    }))).toEqual({ title: "출시 일정", panelStillOpen: true });
-    // 도크 버튼은 패널 바깥이므로 클릭 시 패널이 닫히면서 기존 액션이 그대로 나간다.
+      panelLockedClosed: (document.getElementById("attendee-panel") as HTMLElement).hidden,
+    }))).toEqual({ title: "출시 일정", panelLockedClosed: true });
+    // 도크 버튼은 패널과 무관하게 기존 액션이 그대로 나간다.
     await clearSent();
     await page.click("#btn-export-md");
     expect(await sent()).toEqual([{ action: "saveNotes" }]);
-    expect(await page.evaluate(() => (document.getElementById("attendee-panel") as HTMLElement).hidden)).toBe(true);
   });
 });
