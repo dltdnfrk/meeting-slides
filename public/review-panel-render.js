@@ -1,7 +1,7 @@
 const REVIEW_KIND_LABEL = {
-  decision: "결정",
-  action_item: "액션",
-  open_item: "미결",
+  decision: "결정 사항",
+  action_item: "할 일",
+  open_item: "미정 사항",
 };
 
 const reviewEscapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
@@ -69,7 +69,9 @@ function reviewItemHtml(input) {
   const dropped = itemState === "rejected";
   const confirmed = itemState === "confirmed";
   const disabled = dropped || !hasAttendees ? " disabled" : "";
-  const range = item.startSeq === item.endSeq ? `seq ${item.startSeq}` : `seq ${item.startSeq}–${item.endSeq}`;
+  const range = item.startSeq === item.endSeq
+    ? `${item.startSeq}번째 문장`
+    : `${item.startSeq}~${item.endSeq}번째 문장`;
   const deadline = item.kind === "action_item"
     ? `<label class="review-item__field review-item__deadline"><span class="review-item__field-label">기한</span>
          <input class="review-item__deadline-input" type="date" value="${reviewEscapeHtml(deadlineValue)}"
@@ -94,25 +96,25 @@ function reviewItemHtml(input) {
       data-start-seq="${reviewEscapeHtml(String(item.startSeq))}" data-end-seq="${reviewEscapeHtml(String(item.endSeq))}">
       <header class="review-item__head">
         <span class="review-item__kind">${reviewEscapeHtml(REVIEW_KIND_LABEL[item.kind])}</span>
-        <span class="review-item__coords" title="불변 전사 좌표">${reviewEscapeHtml(range)} · ${reviewEscapeHtml(item.transcriptVersionId)}</span>
+        <span class="review-item__coords" title="전사 원문 위치">${reviewEscapeHtml(range)}</span>
       </header>
       ${body}
       <blockquote class="review-item__quote">${reviewEscapeHtml(item.evidenceQuote)}</blockquote>
       <details class="review-item__evidence">
-        <summary class="review-item__evidence-summary">근거 구간 전문</summary>
+        <summary class="review-item__evidence-summary">근거 발언 전체</summary>
         <pre class="review-item__segment">${reviewEscapeHtml(item.segmentText)}</pre>
       </details>
       ${deadline}
       <footer class="review-item__foot">
-        <label class="review-item__field"><span class="review-item__field-label">귀속</span>
-          <select class="review-item__select review-item__attribution" aria-label="${reviewEscapeHtml(description)} 발언 귀속"${disabled}>
+        <label class="review-item__field"><span class="review-item__field-label">발언자</span>
+          <select class="review-item__select review-item__attribution" aria-label="${reviewEscapeHtml(description)} 발언자"${disabled}>
             ${reviewOptionsHtml(review, attributionId, hasAttendees)}
           </select></label>
         ${assignee}
         <span class="review-item__spacer"></span>
         ${!dropped ? `<button type="button" class="review-item__action review-item__confirm"
-          aria-label="${reviewEscapeHtml(description)} ${confirmed ? "재검토" : "항목 확정"}"
-          ${!confirmed && !complete ? " disabled" : ""}>${confirmed ? "재검토" : "항목 확정"}</button>` : ""}
+          aria-label="${reviewEscapeHtml(description)} ${confirmed ? "확인 취소" : "확인"}"
+          ${!confirmed && !complete ? " disabled" : ""}>${confirmed ? "확인 취소" : "확인"}</button>` : ""}
         ${editing
           ? `<button type="button" class="review-item__action review-item__save" aria-label="${reviewEscapeHtml(description)} 수정 저장">저장</button>
              <button type="button" class="review-item__action review-item__cancel" aria-label="${reviewEscapeHtml(description)} 수정 취소">취소</button>`
@@ -133,17 +135,17 @@ function reviewPanelRender(input) {
     return;
   }
   const hasAttendees = review.attendees.length > 0;
-  versionEl.textContent = review.transcriptVersionId;
-  versionEl.title = review.transcriptVersionId;
+  versionEl.textContent = "원문 연결됨";
+  versionEl.title = "검토 항목이 전사 원문과 연결되어 있습니다";
   listEl.innerHTML = review.items.length === 0
-    ? `<p class="review-list__empty">추출된 후보가 없습니다 — 전사에 명시적인 결정·액션·미결 표현이 없었습니다</p>`
+    ? `<p class="review-list__empty">확인할 결정 사항이나 할 일을 찾지 못했습니다</p>`
     : review.items.map((item) => reviewItemHtml({
       item, review, itemState: itemState(item), description: description(item),
       attributionId: attribution(item), assigneeId: assignee(item), deadlineValue: deadline(item),
       editing: editingId === item.id, hasAttendees, complete: complete(item),
     })).join("");
   noticeEl.textContent = hasAttendees || review.items.length === 0
-    ? "" : "참석자 명단이 비어 있어 귀속을 지정할 수 없습니다";
+    ? "" : "참석자를 먼저 추가하면 발언자와 담당자를 연결할 수 있습니다";
   noticeEl.hidden = !noticeEl.textContent;
   const kept = review.items.filter((item) => itemState(item) !== "rejected").length;
   confirmCountEl.textContent = String(kept);

@@ -327,7 +327,7 @@ describe("attendee dropdown attribution", () => {
     }))).toEqual({
       disabled: true,
       options: ["참석자 없음"],
-      notice: "참석자 명단이 비어 있어 귀속을 지정할 수 없습니다",
+      notice: "참석자를 먼저 추가하면 발언자와 담당자를 연결할 수 있습니다",
       noticeHidden: false,
     });
   });
@@ -369,7 +369,7 @@ describe("edit and drop controls", () => {
     expect(await page.evaluate(() => ({
       error: document.getElementById("review-error")?.textContent?.trim(),
       hidden: (document.getElementById("review-error") as HTMLElement).hidden,
-    }))).toEqual({ error: "설명을 비울 수 없습니다", hidden: false });
+    }))).toEqual({ error: "내용을 입력해 주세요", hidden: false });
   });
 
   test("dropping a candidate marks it rejected and sends the review_state patch", async () => {
@@ -465,13 +465,13 @@ describe("empty, error, and loading states", () => {
       confirmDisabled: (document.getElementById("btn-review-confirm") as HTMLButtonElement).disabled,
     }))).toEqual({
       rows: 0,
-      empty: "추출된 후보가 없습니다 — 전사에 명시적인 결정·액션·미결 표현이 없었습니다",
+      empty: "확인할 결정 사항이나 할 일을 찾지 못했습니다",
       confirmDisabled: false,
     });
   });
 
   test("the extraction status message drives a loading state before the payload lands", async () => {
-    await emit({ type: "status", text: "회의록 후보 추출 중…" });
+    await emit({ type: "status", text: "회의록 정리 중…" });
     await page.waitForSelector("#review-panel:not([hidden])");
     expect(await page.evaluate(() => ({
       loading: (document.getElementById("review-panel") as HTMLElement).dataset.state,
@@ -487,7 +487,7 @@ describe("empty, error, and loading states", () => {
   });
 
   test("an extraction failure status shows a retry affordance instead of stale cards", async () => {
-    await emit({ type: "status", text: "회의록 후보 추출 실패·재시도" });
+    await emit({ type: "status", text: "회의록을 정리하지 못했습니다" });
     await page.waitForSelector("#review-panel:not([hidden])");
     expect(await page.evaluate(() => ({
       state: (document.getElementById("review-panel") as HTMLElement).dataset.state,
@@ -495,7 +495,7 @@ describe("empty, error, and loading states", () => {
       retryVisible: !(document.getElementById("btn-review-retry") as HTMLElement).hidden,
     }))).toEqual({
       state: "error",
-      error: "회의록 후보 추출 실패·재시도",
+      error: "회의록을 정리하지 못했습니다",
       retryVisible: true,
     });
 

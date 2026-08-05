@@ -84,23 +84,25 @@ All spacing derives from 4px.
 
 ### Meeting cover
 
-- **Structure**: `section.meeting-cover > img.cover-visual + div.cover-copy + p.cover-meta + aside.notes`
+- **Structure**: `section.meeting-cover > svg.cover-visual + div.cover-copy + p.cover-meta + aside.notes`
 - **Variants**: default, long title
 - **Spacing**: `--space-16`, `--space-20`
 - **States**: static presentation surface
-- **Accessibility**: decorative image uses empty alt text and `aria-hidden`
+- **Accessibility**: decorative SVG uses `aria-hidden` and contains no baked-in meeting text
 - **Motion**: none
 - **Layout**: two-field asymmetric cover with a thin coral registration line
+- **Variation**: the conversation map is generated from the meeting title; no fixed raster is reused across meetings
 
 ### Meeting topic
 
-- **Structure**: `section.meeting-topic > div.topic-copy + figure.topic-visual + aside.notes`
+- **Structure**: `section.meeting-topic > div.topic-copy + svg.topic-map + aside.notes`
 - **Variants**: default, dense
 - **Spacing**: `--space-6`, `--space-12`, `--space-16`
 - **States**: static presentation surface
-- **Accessibility**: decorative image remains hidden from assistive technology; semantic title and list carry all content
+- **Accessibility**: decorative SVG remains hidden from assistive technology; semantic title and list carry all content
 - **Motion**: none
 - **Layout**: editorial two-column grid
+- **Variation**: node count and geometry derive from the topic title and bullets so separate topics never share a fixed visual
 
 ### Meeting closing
 
@@ -127,7 +129,7 @@ Strategy: tonal shift.
 
 - Depth comes from paper tones, rules, and image opacity.
 - No glow, glass card, neon shadow, or generic floating card treatment.
-- Texture belongs inside the local raster imagery, not as a noisy page overlay.
+- Texture belongs to the paper surface and generated linework, not as a noisy page overlay.
 
 ## 8. Accessibility Constraints & Accepted Debt
 

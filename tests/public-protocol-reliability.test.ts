@@ -70,14 +70,14 @@ describe("public meeting/export protocol reliability", () => {
     }));
     expect(state).toEqual({
       filmstrip: ["이전 장", "현재 장"],
-      total: "2",
+      total: "2장",
       glance: "02/02",
-      compile: "컴파일됨 · 6장",
+      compile: "만든 슬라이드 6장",
     });
 
-    const compile = waitForClientAction("compileDeck");
+    const compile = waitForClientAction("compileTranscriptSnapshot");
     await page.click("#btn-compile-deck");
-    expect(await compile).toEqual({ action: "compileDeck", meetingId: 7 });
+    expect(await compile).toEqual({ action: "compileTranscriptSnapshot", meetingId: 7 });
   });
 
   test("typed progress disables conflicts and terminal error restores controls with retry", async () => {

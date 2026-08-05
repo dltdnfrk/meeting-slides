@@ -1,9 +1,22 @@
 node_modules/
 .DS_Store
 .env
-models/*.bin
+models/**/*.bin
 meetings.db
 meetings.db-*
 exports/
-Meeting Slides.app/
+Meeting Slides.app
 vendor/ms-playwright/
+
+# 로컬 런타임 상태 / 에이전트 내부 상태
+.meeting-slides/
+.omo/senpi-task/
+.omo/aside-tests/
+.omo/boulder.json
+
+# Finder/백업 복사본 ("파일 2.ext")
+* 2.*
+
+# 에이전트 작업 로그 복사본/임시본
+.omo/start-work/ledger *.jsonl
+.omo/start-work/*.pre-final-sync

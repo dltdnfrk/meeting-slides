@@ -1,8 +1,10 @@
 import { buildDeckHtml, buildSlideFiles, renderSlideSpec, type DeckInput, type SlideFile } from "./deck.js";
+import { renderSceneSlideDocument } from "./scene-html.js";
+import { scenePublication } from "./scene-store.js";
 import type { DeckOutline, SlideSpec } from "./slide-spec.js";
 import type { MeetingStore } from "./store.js";
 
-export type ExportDeckSource = "compiled" | "legacy";
+export type ExportDeckSource = "scene" | "compiled" | "legacy";
 
 export interface ExportDeckMaterial {
   source: ExportDeckSource;
@@ -66,6 +68,31 @@ export function prepareExportDeck(store: MeetingStore, meetingId: number): Expor
   const meeting = store.meeting(meetingId);
   if (meeting === null) throw new Error(`Meeting ${meetingId} was not found`);
   const lines = store.lines(meetingId);
+  const publication = scenePublication(store.databaseHandle(), meetingId);
+  if (publication !== null) {
+    const files = publication.scene.slides.map((slide, index) => ({
+      filename: `slide-${String(index).padStart(2, "0")}.html`,
+      html: renderSceneSlideDocument(slide),
+    }));
+    return {
+      source: "scene",
+      meetingId,
+      title: publication.scene.title,
+      indexHtml: buildCompiledDeckHtml({
+        meetingId,
+        title: publication.scene.title,
+        style: "scene-graph",
+        slides: publication.narrative.slides.map((slide) => ({
+          kind: "cover",
+          title: slide.title,
+        })),
+      }, files),
+      files,
+      slideCount: files.length,
+      maxBullets: 0,
+      lineCount: lines.length,
+    };
+  }
   const compiled = store.deckOutline(meetingId);
   if (compiled !== null && compiled.publishedAt !== null) {
     const files = compiled.outline.slides.map(renderSlideSpec);

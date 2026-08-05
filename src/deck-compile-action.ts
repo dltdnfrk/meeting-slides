@@ -10,7 +10,6 @@ import {
 import { basename, join } from "node:path";
 
 import { compileDeckOutline } from "./deck-compiler.js";
-import { copyDeckAssets } from "./deck-assets.js";
 import { renderSlideSpec, type SlideFile } from "./deck.js";
 import type { DeckPlanner } from "./llm.js";
 import { parseDeckOutline, type DeckOutline } from "./slide-spec.js";
@@ -79,11 +78,6 @@ export async function compileDeckToDisk(
     mkdirSync(slidesDirectory, { recursive: true });
     copyFileSync(join(projectDirectory, "deck", "theme.css"), join(stagingDirectory, "theme.css"));
     copyFileSync(join(projectDirectory, "deck", "theme.css"), join(slidesDirectory, "theme.css"));
-    copyDeckAssets({
-      sourceDirectory: join(projectDirectory, "deck", "assets"),
-      exportDirectory: stagingDirectory,
-      slidesDirectory,
-    });
     for (const [index, file] of rendered.files.entries()) {
       writeFileSync(join(slidesDirectory, file.filename), file.html, "utf-8");
       options.onProgress?.({ stage: "render", completed: index + 1, total: rendered.files.length });

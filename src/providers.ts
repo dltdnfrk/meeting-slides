@@ -76,8 +76,8 @@ export function buildProviderEntries(
     },
     {
       id: "local",
-      label: "Local llama.cpp",
-      detail: env.LOCAL_LLM_BASE_URL ?? "Not configured",
+      label: "로컬 모델",
+      detail: env.LOCAL_LLM_BASE_URL ?? "설정 필요",
       available: Boolean(env.LOCAL_LLM_BASE_URL),
       models: [],
     },

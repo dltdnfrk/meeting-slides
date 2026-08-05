@@ -21,6 +21,11 @@ const lines = [
 ];
 const standaloneThemeCss = readFileSync(join(import.meta.dir, "..", "deck", "theme.css"), "utf-8");
 
+function visualMarkup(html: string, className: string): string[] {
+  return [...html.matchAll(new RegExp(`<svg class="${className}"[\\s\\S]*?<\\/svg>`, "g"))]
+    .map((match) => match[0]);
+}
+
 describe("linesForSlide", () => {
   test("블록 시작 시각 구간으로 라인 배정", () => {
     expect(linesForSlide(slides, lines, 0).map((l) => l.seq)).toEqual([1]);
@@ -63,23 +68,32 @@ describe("buildDeckHtml", () => {
     expect(evil).toContain("&lt;script&gt;");
   });
 
-  test("Given meeting imagery assets, When reveal deck is built, Then semantic cover and topic content reference only local decorative images", () => {
+  test("Given different meeting content, When reveal decks are built, Then decorative visuals derive from that content", () => {
     // Given
     const sections = html.match(/<section[\s\S]*?<\/section>/g) ?? [];
+    const alternate = buildDeckHtml({
+      title: "파트너십 전략",
+      startedAt: 1000,
+      slides: [{ idx: 1, title: "공동 출시", bullets: ["9월 공개"], startedAt: 1000 }],
+      lines: [],
+    });
 
     // When
     const cover = sections[0] ?? "";
     const topics = sections.slice(1, -1);
+    const coverVisual = visualMarkup(cover, "cover-visual")[0];
+    const alternateCoverVisual = visualMarkup(alternate, "cover-visual")[0];
+    const topicVisuals = visualMarkup(html, "topic-map");
 
     // Then
-    expect(cover).toContain('src="./assets/meeting-cover.png"');
-    expect(cover).toContain('alt=""');
+    expect(coverVisual).toBeDefined();
+    expect(alternateCoverVisual).toBeDefined();
+    expect(coverVisual).not.toBe(alternateCoverVisual);
     expect(topics).toHaveLength(2);
-    expect(topics.every((topic) => topic.includes('src="./assets/meeting-topic-map.png"'))).toBe(true);
-    expect(sections.at(-1)).not.toContain("meeting-cover.png");
-    expect(sections.at(-1)).not.toContain("meeting-topic-map.png");
-    expect(html).not.toMatch(/<img[^>]+src=["']https?:\/\//);
-    expect(html).not.toMatch(/<img[^>]+src=["'][^"']*(?:\/Users\/|file:)/);
+    expect(topicVisuals).toHaveLength(2);
+    expect(topicVisuals[0]).not.toBe(topicVisuals[1]);
+    expect(html).not.toContain("./assets/");
+    expect(html).not.toMatch(/<img\b/);
   });
 });
 
@@ -191,18 +205,35 @@ describe("buildSlideFiles (slides-grab 계약)", () => {
     expect(standaloneThemeCss).toContain("transform-origin: top left");
   });
 
-  test("Given topic slide pages, When standalone files are built, Then cover and topics use their matching local decorative assets while closing remains typography-only", () => {
+  test("Given topic slide pages, When standalone files are built, Then each decorative visual is generated from its slide content", () => {
     // Given
     const [cover, firstTopic, secondTopic, closing] = files;
 
     // When
     const topicPages = [firstTopic?.html ?? "", secondTopic?.html ?? ""];
+    const coverVisuals = visualMarkup(cover?.html ?? "", "cover-visual");
+    const topicVisuals = topicPages.flatMap((page) => visualMarkup(page, "topic-map"));
 
     // Then
-    expect(cover?.html).toContain('src="./assets/meeting-cover.png"');
-    expect(topicPages.every((page) => page.includes('src="./assets/meeting-topic-map.png"'))).toBe(true);
-    expect(closing?.html).not.toContain("meeting-topic-map.png");
-    expect(closing?.html).not.toContain("meeting-cover.png");
+    expect(coverVisuals).toHaveLength(1);
+    expect(topicVisuals).toHaveLength(2);
+    expect(topicVisuals[0]).not.toBe(topicVisuals[1]);
+    expect(files.every((file) => !file.html.includes("./assets/"))).toBe(true);
+    expect(closing?.html).not.toMatch(/<svg\b/);
+  });
+
+  test("Given the shared deck theme, When a slide is rendered, Then the paper design system replaces the legacy dark grid", () => {
+    // Given
+    const rootTokens = standaloneThemeCss.match(/:root\s*{[\s\S]*?}/)?.[0] ?? "";
+
+    // When
+    const usesLegacyBackdrop = standaloneThemeCss.includes(".reveal-viewport::after");
+
+    // Then
+    expect(rootTokens).toContain("--deck-paper:");
+    expect(rootTokens).toContain("--deck-ink:");
+    expect(rootTokens).not.toContain("--wg-bg:");
+    expect(usesLegacyBackdrop).toBe(false);
   });
 
   test("Given six product-limit Korean bullets, When a dense topic is built, Then both outputs use the compact presentation contract without losing text", () => {

@@ -4,7 +4,18 @@
 // 전사 청크를 누적하고, 주기적으로 LLM에 블록 감지를 요청한다.
 // 블록 전환 감지 시 WebSocket 클라이언트에 슬라이드 push.
 
-import { isLowQualityMeetingCard, type BlockDetectionResult, type BlockDetector } from "./llm.js";
+import {
+  deriveFallbackMeetingCard,
+  isLowQualityMeetingCard,
+  type BlockDetectionResult,
+  type BlockDetector,
+} from "./llm.js";
+import {
+  composeNarrativeDeck,
+  type NarrativeSlide,
+  type SceneDeck,
+  type SceneSlide,
+} from "./scene-graph.js";
 import type { LiveMeetingCard } from "./slide-spec.js";
 import type { TranscriptChunk } from "./whisper.js";
 
@@ -12,6 +23,36 @@ export interface Slide extends LiveMeetingCard {
   index: number;
   startedAt: number;
   sentenceCount: number;
+  scene?: SceneSlide;
+}
+
+function sceneForCard(card: LiveMeetingCard, index: number): SceneSlide {
+  let narrative: NarrativeSlide;
+  if (card.kind === "cover") {
+    narrative = { intent: "cover", title: card.title, ...(card.emphasis ? { subtitle: card.emphasis } : {}) };
+  } else if (card.kind === "decision") {
+    narrative = {
+      intent: "decision",
+      title: card.title,
+      decision: card.emphasis ?? card.title,
+      ...(card.bullets.length > 0 ? { rationale: card.bullets.join(" ") } : {}),
+    };
+  } else if (card.kind === "actions") {
+    narrative = {
+      intent: "actions",
+      title: card.title,
+      items: (card.bullets.length > 0 ? card.bullets : [card.emphasis ?? card.title])
+        .map((task) => ({ task })),
+    };
+  } else {
+    narrative = {
+      intent: "statement",
+      title: card.title,
+      statement: card.bullets.join(" ") || card.emphasis || card.title,
+      ...(card.emphasis && card.bullets.length > 0 ? { support: card.emphasis } : {}),
+    };
+  }
+  return composeNarrativeDeck({ meetingId: 0, title: card.title, slides: [narrative] }).slides[0]!;
 }
 
 export interface SlideUpdate {
@@ -92,6 +133,8 @@ export interface CaptureUpdate {
   phase?: CapturePhase;
   modelPath?: string;
   selectedModelId?: SttModelInfo["id"];
+  /** 서버 기준 녹음 시작 시각. 재연결 뒤에도 경과 시간을 이어서 표시한다. */
+  startedAt?: number;
 }
 
 export interface SttModelInfo {
@@ -197,7 +240,7 @@ export interface SavedUpdate {
 }
 
 export type CompileJobId = `compile-${string}`;
-export type ExportJobId = `png-${string}` | `pdf-${string}`;
+export type ExportJobId = `png-${string}` | `pdf-${string}` | `pptx-${string}`;
 export type JobStage = "planning" | "render" | "publish" | "prepare" | "validate" | "preview" | "review" | "design-gate";
 
 export interface CompileUpdate {
@@ -216,13 +259,15 @@ export interface CompileUpdate {
     usedFallback: boolean;
     plannerError: string | null;
   };
+  /** 생성 직후 앱에서 결과를 미리 볼 수 있도록 함께 보내는 장면 그래프 */
+  scene?: SceneDeck;
   error?: string;
 }
 
 export interface ExportUpdate {
   type: "export";
   status: "started" | "progress" | "success" | "error" | "timeout";
-  action: "exportPdf" | "exportPng";
+  action: "exportPdf" | "exportPng" | "exportPptx";
   jobId: ExportJobId;
   meetingId?: number;
   stage?: JobStage;
@@ -267,7 +312,8 @@ export type ServerMessage =
 export type ClientAction =
   | { action: "startCapture"; meeting_id?: number }
   | { action: "stopCapture" | "reset" | "status" | "listMeetings" | "transcript" | "recheckProviders" | "recheckSttModels" | "attendees" | "startReview" }
-  | { action: "selectMeeting" | "compileDeck" | "exportDeck" | "exportPdf" | "exportPng" | "saveNotes" | "saveTranscript" | "saveJson"; meetingId?: number }
+  | { action: "deleteMeeting"; meetingId: number }
+  | { action: "selectMeeting" | "compileDeck" | "compileTranscriptSnapshot" | "exportDeck" | "exportPptx" | "exportPdf" | "exportPng" | "saveNotes" | "saveTranscript" | "saveJson"; meetingId?: number }
   | { action: "setProvider"; id: string; model?: string; effort?: string }
   | { action: "connectProvider"; id: string }
   | { action: "setProviderKey"; id: string; key: string }
@@ -277,6 +323,10 @@ export type ClientAction =
   | { action: "installSttModel" | "cancelSttModel" | "selectSttModel"; modelId: SttModelInfo["id"] };
 
 export type ClientListener = (msg: ServerMessage) => void;
+
+export interface MeetingSessionOptions {
+  automaticDetection?: boolean;
+}
 
 export class MeetingSession {
   private sentences: string[] = [];
@@ -298,6 +348,7 @@ export class MeetingSession {
   private pendingAdvanceTitle: string | null = null;
   private static readonly MAX_SENTENCES = 200;
   private static readonly ADVANCE_THRESHOLD = 2;
+  private readonly automaticDetection: boolean;
 
   constructor(
     private llm: BlockDetector,
@@ -305,7 +356,10 @@ export class MeetingSession {
     private contextWindow: number,
     private listeners: Set<ClientListener>,
     private sink: MeetingSink | null = null,
-  ) {}
+    options: MeetingSessionOptions = {},
+  ) {
+    this.automaticDetection = options.automaticDetection ?? true;
+  }
 
   addListener(l: ClientListener) { this.listeners.add(l); }
   removeListener(l: ClientListener) { this.listeners.delete(l); }
@@ -330,6 +384,7 @@ export class MeetingSession {
 
   async flush(): Promise<void> {
     this.flushCaption();
+    if (!this.automaticDetection) return;
     // 진행 중 감지가 끝날 때까지 대기 — LLM 타임아웃(30s) 상한 보다 충분히 큰 40s로 가드.
     const deadline = Date.now() + 40_000;
     while (this.detecting && Date.now() < deadline) {
@@ -388,7 +443,7 @@ export class MeetingSession {
 
     // detectInterval 문장마다 블록 감지. 감지 중이면 maybeDetect가 반환하고,
     // flush()가 마지막 미처리 문장을 다시 감지한다.
-    if (this.sentences.length - this.lastDetectCount >= this.detectInterval) {
+    if (this.automaticDetection && this.sentences.length - this.lastDetectCount >= this.detectInterval) {
       this.maybeDetect();
     }
   }
@@ -419,7 +474,10 @@ export class MeetingSession {
     this.broadcast({ type: "detect", detecting: true });
     const epoch = this.epoch;
     try {
-      const result = await this.llm.detectBlock(context);
+      const detected = await this.llm.detectBlock(context);
+      const result = detected.title || detected.bullets.length > 0
+        ? detected
+        : deriveFallbackMeetingCard(context) ?? detected;
       // await 도중 reset()이 돌았으면 stale 결과 적용 금지.
       if (epoch !== this.epoch) return;
       this.applyDetection(result);
@@ -488,6 +546,13 @@ export class MeetingSession {
         ...(result.emphasis === undefined ? {} : { emphasis: result.emphasis }),
         startedAt: Date.now(),
         sentenceCount: this.sentences.length,
+        scene: sceneForCard({
+          title: result.title || `(블록 ${this.slideIndex})`,
+          bullets: result.bullets,
+          ...(result.kind === undefined ? {} : { kind: result.kind }),
+          ...(result.kicker === undefined ? {} : { kicker: result.kicker }),
+          ...(result.emphasis === undefined ? {} : { emphasis: result.emphasis }),
+        }, this.slideIndex),
       };
       try {
         this.sink?.onSlide(this.currentSlide);
@@ -519,6 +584,7 @@ export class MeetingSession {
         if (result.kind === undefined) delete current.kind;
         else current.kind = result.kind;
         current.sentenceCount = this.sentences.length;
+        current.scene = sceneForCard(current, current.index);
         try {
           this.sink?.onSlide(current);
         } catch (e) {
@@ -551,6 +617,6 @@ export class MeetingSession {
     this.advanceStreak = 0;
     this.pendingAdvanceTitle = null;
     this.broadcast({ type: "slide", current: null, history: [] });
-    this.broadcast({ type: "status", text: "세션 초기화" });
+    this.broadcast({ type: "status", text: "새 회의를 준비했습니다" });
   }
 }

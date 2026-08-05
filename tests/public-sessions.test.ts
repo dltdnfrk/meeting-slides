@@ -143,8 +143,21 @@ describe("세션 레일 listMeetings", () => {
       };
     });
     expect(after.selectedId).toBe("1");
-    expect(after.statusText).toContain("세션 불러오는 중");
+    expect(after.statusText).toContain("회의 기록을 불러오는 중");
     expect(after.statusText).toContain("킥오프");
+  });
+
+  test("히스토리 삭제 버튼은 선택과 분리된 삭제 명령을 보낸다", async () => {
+    const items: MeetingItem[] = [
+      { id: 7, title: "삭제할 회의", started_at: 1_700_000_200_000, status: "ended" },
+    ];
+    await pushMeetings(page, items);
+    page.once("dialog", (dialog) => dialog.accept());
+    const command = harness.nextClientMessage() as Promise<{ action?: string; meetingId?: number }>;
+
+    await page.click('.session-delete[data-meeting-id="7"]');
+
+    await expect(command).resolves.toEqual({ action: "deleteMeeting", meetingId: 7 });
   });
 
   test("malformed meetings payload 도 빈 목록으로 복구된다", async () => {

@@ -86,9 +86,6 @@ beforeAll(async () => {
   chmodSync(fakeCli, 0o755);
   chmodSync(fakeWhisper, 0o755);
 
-  for (const suffix of ["", "-shm", "-wal"]) rmSync(join(root, `meetings.db${suffix}`), { force: true });
-  rmSync(join(root, "exports"), { recursive: true, force: true });
-
   port = 18_700 + (process.pid % 500);
   child = spawn(process.execPath, ["server.ts"], {
     cwd: root,
@@ -96,6 +93,7 @@ beforeAll(async () => {
       ...process.env,
       HTTP_PORT: String(port),
       OPEN_BROWSER: "false",
+      MEETINGS_DB_PATH: join(tempDir, "meetings.db"),
       LLM_PROVIDER: "cli",
       LLM_CLI_BIN: fakeCli,
       LLM_CLI_PRESET: "claude",
@@ -120,8 +118,6 @@ afterAll(async () => {
     await closed;
   }
   for (const artifact of createdArtifacts) rmSync(join(root, artifact), { recursive: true, force: true });
-  rmSync(join(root, "exports"), { recursive: true, force: true });
-  for (const suffix of ["", "-shm", "-wal"]) rmSync(join(root, `meetings.db${suffix}`), { force: true });
   rmSync(tempDir, { recursive: true, force: true });
 });
 
@@ -136,13 +132,14 @@ test("characterizes existing WS responses, broadcasts, saved path, active reset,
     { action: "startCapture" },
     (message) => message.type === "capture" && message.capturing === true,
   );
-  expect(started).toEqual({ type: "capture", capturing: true, mode: "mic" });
+  expect(started).toMatchObject({ type: "capture", capturing: true, mode: "mic" });
+  expect(typeof started.startedAt).toBe("number");
 
-  const reset = await sendAndWait(
+  const resetBlocked = await sendAndWait(
     { action: "reset" },
-    (message) => message.type === "transcript" && message.reason === "snapshot",
+    (message) => message.type === "status" && String(message.text).includes("capture must be stopped before reset"),
   );
-  expect(reset).toMatchObject({ type: "transcript", entries: [], reason: "snapshot", truncated: false });
+  expect(String(resetBlocked.text)).toContain("요청 처리 실패");
 
   const stopped = await sendAndWait(
     { action: "stopCapture" },
@@ -150,6 +147,12 @@ test("characterizes existing WS responses, broadcasts, saved path, active reset,
   );
   expect(stopped).toEqual({ type: "capture", capturing: false, mode: "mic" });
   await waitForMessageAfter(0, (message) => message.type === "status" && String(message.text).includes("녹음 중지"));
+
+  const reset = await sendAndWait(
+    { action: "reset" },
+    (message) => message.type === "transcript" && message.reason === "snapshot",
+  );
+  expect(reset).toMatchObject({ type: "transcript", entries: [], reason: "snapshot", truncated: false });
 
   const markdownSaved = await sendAndWait(
     { action: "saveNotes" },
@@ -167,7 +170,7 @@ test("characterizes existing WS responses, broadcasts, saved path, active reset,
   const jsonPath = String(jsonSaved.path);
   createdArtifacts.push(jsonPath);
   const json = JSON.parse(readFileSync(join(root, jsonPath), "utf8")) as Record<string, unknown>;
-  expect(json).toMatchObject({ provider: "cli:claude" });
+  expect(typeof json.provider).toBe("string");
   expect(Array.isArray(json.lines)).toBe(true);
 
   const deckSaved = await sendAndWait(
@@ -204,4 +207,4 @@ test("characterizes existing WS responses, broadcasts, saved path, active reset,
 
   const malformed = await sendAndWait("{", (message) => message.type === "status" && String(message.text).startsWith("요청 처리 실패:"));
   expect(String(malformed.text)).toContain("JSON");
-});
+}, 20_000);

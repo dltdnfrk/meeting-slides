@@ -29,6 +29,7 @@ const btnSettingsEl = /** @type {HTMLButtonElement} */ ($("btn-settings"));
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
 const btnRecheckEl = $("btn-recheck");
+const btnSettingsCloseEl = $("btn-settings-close");
 const btnRecheckSttEl = $("btn-recheck-stt");
 const sttListEl = $("stt-list");
 const btnRecordEl = /** @type {HTMLButtonElement} */ ($("btn-record"));
@@ -51,6 +52,8 @@ const btnResetEl = $("btn-reset");
 const sessionListEl = $("session-list");
 const sessionEmptyEl = $("session-empty");
 const sessionCountEl = $("session-count");
+const conflictingJobControls = [btnCompileDeckEl, btnExportPdfEl, btnExportPngEl];
+let jobControlsBusy = false;
 
 // 글랜서블 상태 스트립
 const appEl = document.querySelector(".app");
@@ -77,8 +80,24 @@ let slideHistory = [];
 let ws = null;
 let meetings = [];
 let selectedMeetingId = null;
-// 히스토리 썸네일로 미리보기 중인 과거 슬라이드 (null이면 라이브 표시)
+let awaitingInitialCaptureState = true;
+// 썸네일 미리보기 상태. PowerPoint 생성 결과도 같은 무대에서 확인한다.
 let viewingHistory = null;
+let renderedSlides = [];
+let viewingCompiled = false;
+let compiledPreviewTitle = "";
+let activeMeetingTitle = "";
+
+function syncActionAvailability() {
+  const connected = Boolean(ws && ws.readyState === WebSocket.OPEN);
+  btnRecordEl.disabled = !connected;
+  btnAttendeesEl.disabled = !connected || capturing;
+  for (const control of [btnExportMdEl, btnExportJsonEl, btnExportTranscriptEl, btnExportDeckEl]) {
+    control.disabled = !connected;
+  }
+  for (const control of conflictingJobControls) control.disabled = !connected || jobControlsBusy;
+  btnResetEl.disabled = !connected || capturing;
+}
 
 function escapeHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({
@@ -96,15 +115,16 @@ function renderMeetings(items) {
   meetings = Array.isArray(items) ? items : [];
   if (selectedMeetingId !== null && !meetings.some((item) => item.id === selectedMeetingId)) {
     selectedMeetingId = null;
+    showFreshWorkspace();
   }
   sessionCountEl.textContent = String(meetings.length);
   sessionEmptyEl.hidden = meetings.length > 0;
   sessionListEl.innerHTML = meetings.map((item) => {
     const selected = item.id === selectedMeetingId;
     const started = new Date(item.started_at).toLocaleString("ko-KR", {
-      month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false,
+      month: "long", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
     });
-    return `<li>
+    return `<li class="session-item">
       <button type="button" class="session-row${selected ? " session-row--selected" : ""}" data-meeting-id="${escapeHtml(item.id)}" aria-pressed="${selected}">
         <span class="session-row__title">${escapeHtml(item.title)}</span>
         <span class="session-row__meta">
@@ -112,21 +132,69 @@ function renderMeetings(items) {
           <span class="session-row__status session-row__status--${item.status === "open" ? "open" : "ended"}">${item.status === "open" ? "진행 중" : "종료"}</span>
         </span>
       </button>
+      <button type="button" class="session-delete" data-meeting-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.title)} 삭제" title="회의 기록 삭제">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"></path>
+        </svg>
+      </button>
     </li>`;
   }).join("");
 }
 
 sessionListEl.addEventListener("click", (ev) => {
+  const deleteButton = ev.target instanceof Element ? ev.target.closest(".session-delete") : null;
+  if (deleteButton instanceof HTMLElement) {
+    const meetingId = Number(deleteButton.dataset.meetingId);
+    const meeting = meetings.find((item) => item.id === meetingId);
+    if (
+      Number.isSafeInteger(meetingId)
+      && ws?.readyState === WebSocket.OPEN
+      && window.confirm(`“${meeting?.title ?? `회의 #${meetingId}`}” 기록을 삭제할까요?\n내보낸 파일은 유지됩니다.`)
+    ) {
+      ws.send(JSON.stringify({ action: "deleteMeeting", meetingId }));
+      renderStatus("회의 기록을 삭제하는 중…");
+    }
+    return;
+  }
   const row = ev.target instanceof Element ? ev.target.closest(".session-row") : null;
   if (!(row instanceof HTMLElement)) return;
-  selectedMeetingId = Number(row.dataset.meetingId);
+  const nextMeetingId = Number(row.dataset.meetingId);
+  const meeting = meetings.find((item) => item.id === nextMeetingId);
+  if (meeting?.status === "open" && capturing) {
+    selectedMeetingId = null;
+    renderMeetings(meetings);
+    renderStatus("현재 진행 중인 회의를 보고 있습니다");
+    return;
+  }
+  selectedMeetingId = nextMeetingId;
   renderMeetings(meetings);
-  const meeting = meetings.find((item) => item.id === selectedMeetingId);
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "selectMeeting", meetingId: selectedMeetingId }));
-    renderStatus(`세션 불러오는 중… ${meeting?.title ?? `#${selectedMeetingId}`}`);
+    activeMeetingTitle = meeting?.title ?? "";
+    renderStatus(`회의 기록을 불러오는 중… ${meeting?.title ?? `#${selectedMeetingId}`}`);
   }
 });
+
+function showFreshWorkspace() {
+  currentSlide = null;
+  slideHistory = [];
+  viewingHistory = null;
+  renderedSlides = [];
+  viewingCompiled = false;
+  compiledPreviewTitle = "";
+  activeMeetingTitle = "";
+  renderTranscriptBacklog([]);
+  renderMain();
+  renderThumbnails([]);
+  compileStatusEl.hidden = true;
+  compileStatusEl.textContent = "";
+  if (lastSavedEl) {
+    lastSavedEl.hidden = true;
+    lastSavedEl.textContent = "";
+    lastSavedEl.title = "";
+  }
+  renderDocHead();
+}
 
 // 라이브 MeetingCard → 실시간 kind 추론 후 레이아웃 분기.
 // 예전에는 단일 카드만 써서 "디자인이 안 바뀌는" 느낌이 났고,
@@ -151,7 +219,28 @@ function resolveLiveKind(slide) {
   return inferLiveKind(slide);
 }
 
+function sceneSlideMarkup(scene) {
+  const elements = (scene.elements ?? []).map((element) => {
+    const frame = `left:${element.x}%;top:${element.y / 56.25 * 100}%;width:${element.w}%;height:${element.h / 56.25 * 100}%`;
+    if (element.type === "shape") {
+      if (element.shape === "line") {
+        return `<div class="live-scene__shape live-scene__line" style="${frame};border-top:${element.strokeWidth ?? 1}px solid #${element.stroke ?? "000000"}"></div>`;
+      }
+      const border = element.stroke ? `border:${element.strokeWidth ?? 1}px solid #${element.stroke}` : "";
+      const fill = element.fill ? `background:#${element.fill}` : "";
+      const radius = element.shape === "ellipse" ? "border-radius:50%" : "";
+      return `<div class="live-scene__shape" style="${frame};${border};${fill};${radius}"></div>`;
+    }
+    const weight = element.weight === "bold" ? 740 : element.weight === "semibold" ? 620 : 400;
+    return `<div class="live-scene__text live-scene__text--${element.role}" style="${frame};font-size:${element.fontSize}px;color:#${element.color};font-weight:${weight};text-align:${element.align ?? "left"}">${escapeHtml(element.text)}</div>`;
+  }).join("");
+  return `<div class="live-scene" data-scene-intent="${escapeHtml(scene.intent)}" style="background:#${scene.background}">${elements}</div>`;
+}
+
 function slideHtml(slide) {
+  if (slide.scene && Array.isArray(slide.scene.elements)) {
+    return sceneSlideMarkup(slide.scene);
+  }
   const kind = resolveLiveKind(slide);
   const kicker = typeof slide.kicker === "string" ? slide.kicker.trim() : "";
   const emphasis = typeof slide.emphasis === "string" ? slide.emphasis.trim() : "";
@@ -168,23 +257,24 @@ function slideHtml(slide) {
     ? `<p class="slide__emphasis"><span class="slide__emphasis-label">핵심</span>${escapeHtml(emphasis)}</p>`
     : "";
   const kindLabel = {
-    cover: "COVER",
-    section: "SECTION",
-    topic: "TOPIC",
-    decision: "DECISION",
-    actions: "ACTIONS",
-    summary: "SUMMARY",
-  }[kind] ?? "TOPIC";
+    cover: "표지",
+    section: "구분",
+    topic: "주요 내용",
+    decision: "결정",
+    actions: "할 일",
+    summary: "요약",
+  }[kind] ?? "주요 내용";
 
   // cover: 히어로 타이틀 중심
   if (kind === "cover") {
     return `
     <div class="slide__inner slide__inner--live slide__inner--cover" data-live-kind="cover">
+      <span class="slide__cover-number" aria-hidden="true">${idx}</span>
       <div class="slide__kindchip">${kindLabel}</div>
-      <p class="slide__cover-eyebrow">${kickerHtml || `<span class="slide__kicker">LIVE DECK</span>`}</p>
+      <p class="slide__cover-eyebrow">${kickerHtml || `<span class="slide__kicker">${selectedMeetingId !== null ? "회의 슬라이드" : "실시간 슬라이드"}</span>`}</p>
       <h2 class="slide__title slide__title--hero">${title}</h2>
       ${bulletsHtml}
-      <div class="slide__cover-foot"><span class="slide__index">${idx}</span><span>실시간 구성 중</span></div>
+      <div class="slide__cover-foot"><span class="slide__index">${idx}</span><span>${selectedMeetingId !== null || !capturing ? "회의 기록" : "내용 정리 중"}</span></div>
     </div>`;
   }
 
@@ -253,9 +343,7 @@ function slideHtml(slide) {
         ${emphasisHtml}
       </div>
       <aside class="slide__topic-visual" aria-hidden="true">
-        <div class="slide__topic-orb"></div>
-        <div class="slide__topic-grid"></div>
-        <p class="slide__topic-caption">LIVE · DESIGNING</p>
+        <span class="slide__topic-number">${idx}</span>
       </aside>
     </div>`;
 }
@@ -273,8 +361,8 @@ function renderSlide(slide) {
             </svg>
           </span>
         </div>
-        <h2 class="placeholder__title">발언을 시작하면<br>슬라이드가 만들어집니다</h2>
-        <p class="placeholder__sub">whisper.cpp가 음성을 전사하고, AI가 주제 블록을 감지해 한 장씩 정리합니다</p>
+        <h2 class="placeholder__title">대화가 충분히 쌓이면 슬라이드 초안을 만들어 보세요</h2>
+        <p class="placeholder__sub">지금까지의 대화로 편집 가능한 PowerPoint 초안을 만듭니다</p>
       </div>`;
     return;
   }
@@ -287,10 +375,11 @@ function renderMain() {
     renderSlide(currentSlide);
   } else {
     setOnAir(true);
+    const notice = viewingCompiled
+      ? `만든 PowerPoint의 ${viewingHistory.index}번째 슬라이드입니다. 누르면 실시간 화면으로 돌아갑니다.`
+      : `${viewingHistory.index}번째 슬라이드 미리보기입니다. 누르면 현재 화면으로 돌아갑니다.`;
     currentSlideEl.innerHTML = `
-      <button type="button" class="slide__notice">
-        SLIDE ${escapeHtml(String(viewingHistory.index).padStart(2, "0"))} 미리보기 · 클릭하면 라이브로 복귀 (Esc)
-      </button>
+      <button type="button" class="slide__notice">${escapeHtml(notice)}</button>
       ${slideHtml(viewingHistory)}`;
   }
   renderGlance();
@@ -299,34 +388,29 @@ function renderMain() {
 // 글랜서블 스트립: 현재 슬라이드 인덱스 + 히스토리 수 + 전사 줄 수.
 function renderGlance() {
   const cur = viewingHistory ?? currentSlide;
-  const total = slideHistory.length + (currentSlide ? 1 : 0);
+  const total = viewingCompiled ? renderedSlides.length : slideHistory.length + (currentSlide ? 1 : 0);
   const idx = cur ? String(cur.index).padStart(2, "0") : "00";
   glanceSlideEl.textContent = `${idx}/${String(total).padStart(2, "0")}`;
   glanceLinesEl.textContent = String(transcriptLineCount);
 }
 
-function allSlides() {
-  const slides = [...slideHistory];
-  if (currentSlide && !slides.some((slide) => slide.index === currentSlide.index)) slides.push(currentSlide);
-  return slides;
-}
-
-function renderThumbnails(history) {
+function renderThumbnails(history, includeCurrent = true) {
   const slides = [...history];
-  if (currentSlide && !slides.some((slide) => slide.index === currentSlide.index)) slides.push(currentSlide);
-  historyCountEl.textContent = String(slides.length);
+  if (includeCurrent && currentSlide && !slides.some((slide) => slide.index === currentSlide.index)) slides.push(currentSlide);
+  renderedSlides = slides;
+  historyCountEl.textContent = `${slides.length}장`;
 
   if (slides.length === 0) {
     thumbnailsEl.innerHTML = `
       <div class="filmstrip__empty">
         <span class="filmstrip__empty-ring"></span>
-        <span>슬라이드가 없습니다</span>
+        <span>아직 만든 슬라이드가 없습니다</span>
       </div>`;
     return;
   }
   thumbnailsEl.innerHTML = slides.map((s) => `
     <div class="thumbnail${viewingHistory && viewingHistory.index === s.index ? " thumbnail--viewing" : ""}" data-index="${escapeHtml(String(s.index))}" tabindex="0" role="button" aria-label="슬라이드 ${escapeHtml(String(s.index))} 미리보기">
-      <div class="thumbnail__index">SLIDE ${escapeHtml(String(s.index).padStart(2, "0"))}</div>
+      <div class="thumbnail__index">슬라이드 ${escapeHtml(String(s.index).padStart(2, "0"))}</div>
       <div class="thumbnail__title">${escapeHtml(s.title)}</div>
       <ul class="thumbnail__bullets">
         ${(s.bullets ?? []).slice(0, 3).map((b) => `<li>${escapeHtml(b)}</li>`).join("")}
@@ -334,12 +418,48 @@ function renderThumbnails(history) {
     </div>`).join("");
 }
 
+function compiledSceneSlides(scene) {
+  if (!scene || !Array.isArray(scene.slides)) return [];
+  return scene.slides.map((slide, index) => {
+    const textElements = Array.isArray(slide.elements)
+      ? slide.elements.filter((element) => element?.type === "text" && typeof element.text === "string")
+      : [];
+    const title = textElements.find((element) => element.role === "title")?.text ?? `슬라이드 ${index + 1}`;
+    const bullets = textElements
+      .filter((element) => ["statement", "body", "quote", "meta"].includes(element.role))
+      .map((element) => element.text);
+    return { index: index + 1, title, bullets, scene: slide };
+  });
+}
+
+function showCompiledScene(scene) {
+  const slides = compiledSceneSlides(scene);
+  if (slides.length === 0) return;
+  viewingCompiled = true;
+  compiledPreviewTitle = typeof scene.title === "string" && scene.title.trim() ? scene.title.trim() : "슬라이드 초안";
+  viewingHistory = slides[0];
+  renderThumbnails(slides, false);
+  renderMain();
+  renderDocHead();
+  renderPill();
+}
+
+function exitSlidePreview() {
+  viewingHistory = null;
+  viewingCompiled = false;
+  compiledPreviewTitle = "";
+  renderThumbnails(slideHistory);
+  renderMain();
+  renderDocHead();
+  renderPill();
+}
+
 const SPEAKER_COLORS = ["#10b981", "#60a5fa", "#f59e0b", "#f472b6"];
 
 function renderCaption(text, speaker) {
   const live = !!text;
   if (live) lastCaptionAt = Date.now();
-  captionTextEl.textContent = text || "대기 중…";
+  captionTextEl.textContent = text || "발언을 기다리는 중…";
   islandEl.classList.toggle("island--live", live);
   if (live && speaker) {
     speakerChipEl.hidden = false;
@@ -367,53 +487,88 @@ function fmtMMSS(ms) {
 function renderPill() {
   const fresh = Date.now() - lastCaptionAt < 2500;
   if (!fresh) {
-    let text = "대기 중…";
-    if (detecting) text = "✦ AI 슬라이드 만드는 중…";
-    else if (capturing) text = `● 녹음 중 ${fmtMMSS(Date.now() - captureStartedAt)}`;
+    let text = currentSlide ? "녹음이 끝났습니다" : "녹음 대기";
+    if (detecting) text = "슬라이드를 정리하는 중…";
+    else if (capturing) text = `녹음 중 ${fmtMMSS(Date.now() - captureStartedAt)}`;
     captionTextEl.textContent = text;
   }
   islandEl.classList.toggle("island--live", fresh);
   islandEl.classList.toggle("island--recording", capturing && !fresh);
   islandEl.classList.toggle("island--detecting", detecting && !fresh);
-  const total = slideHistory.length + (currentSlide ? 1 : 0);
+  const shown = viewingHistory ?? currentSlide;
+  const total = viewingCompiled ? renderedSlides.length : slideHistory.length + (currentSlide ? 1 : 0);
   pillMetaEl.textContent = [
-    currentSlide ? `SLIDE ${currentSlide.index}/${String(total).padStart(2, "0")}` : null,
-    `LINES ${transcriptLineCount}`,
+    shown ? `슬라이드 ${shown.index}/${total}` : null,
+    `${transcriptLineCount}문장`,
     providerLabelCur || null,
   ].filter(Boolean).join(" · ");
 }
 
 function renderDocHead() {
-  // 문서 제목은 회의 정체성 — 슬라이드 제목과 중복되지 않게 회의 단위로
-  docTitleEl.textContent = currentSlide ? "오늘의 회의" : (capturing ? "회의 진행 중" : "회의 준비 중");
-  const total = slideHistory.length + (currentSlide ? 1 : 0);
+  if (viewingCompiled) docTitleEl.textContent = compiledPreviewTitle;
+  else if (selectedMeetingId !== null) docTitleEl.textContent = activeMeetingTitle || "지난 회의";
+  else if (capturing) docTitleEl.textContent = "회의 진행 중";
+  else if (currentSlide) docTitleEl.textContent = "최근 회의";
+  else docTitleEl.textContent = "새 회의 준비";
+  const total = viewingCompiled ? renderedSlides.length : slideHistory.length + (currentSlide ? 1 : 0);
   const parts = [];
   if (meetingStartTs) {
     parts.push(new Date(meetingStartTs).toLocaleTimeString("ko-KR", { hour12: false, hour: "2-digit", minute: "2-digit" }));
   }
   parts.push(`${transcriptLineCount}문장`);
-  if (total > 0) parts.push(`${total}슬라이드`);
-  if (providerLabelCur) parts.push(providerLabelCur);
+  if (total > 0) parts.push(`슬라이드 ${total}장`);
   docMetaEl.textContent = parts.join(" · ");
 }
 
-function setOnAir(active) {
-  onairEl.classList.toggle("onair--idle", !active);
+function setOnAir() {
+  const label = onairEl.querySelector(".onair__label");
+  onairEl.classList.toggle("onair--idle", !capturing);
+  if (label) label.textContent = capturing ? "녹음 중" : "녹음 대기";
+}
+
+function savedArtifactLabel(path) {
+  const value = String(path ?? "").toLowerCase();
+  if (value.endsWith(".pptx")) return "PowerPoint";
+  if (value.endsWith(".pdf")) return "PDF";
+  if (value.endsWith("index.html")) return "웹 슬라이드";
+  if (value.endsWith(".json")) return "회의 데이터";
+  if (/transcript-.*\.md$/.test(value)) return "전사 원문";
+  if (value.endsWith(".md")) return "회의 메모";
+  if (value.endsWith("-png") || value.includes("-png/")) return "슬라이드 이미지";
+  return "파일";
+}
+
+function friendlyStatus(text) {
+  const cleaned = String(text ?? "").replace(/\s+/g, " ").trim();
+  const saved = cleaned.match(/^(?:(웹 슬라이드|덱|PDF|슬라이드 이미지|초안 PNG)\s+)?저장됨:\s*(.+?)(?:\s+\(미검토\))?$/);
+  if (saved) {
+    const explicit = saved[1] === "덱" ? "웹 슬라이드" : saved[1] === "초안 PNG" ? "슬라이드 이미지" : saved[1];
+    return `${explicit || savedArtifactLabel(saved[2])} 저장 완료`;
+  }
+  if (/^whisper-stream 시작:/i.test(cleaned)) return "음성 인식을 시작했습니다";
+  if (/usage limit|사용량 한도/i.test(cleaned)) return "AI 사용량 한도에 도달했습니다. 기본 형식으로 이어서 만듭니다";
+  if (/^연결됨\.\s*LLM provider=/i.test(cleaned)) return "AI 모델에 연결되었습니다";
+  if (/^LLM 변경됨:/i.test(cleaned)) return "슬라이드 생성 모델을 변경했습니다";
+  if (/^STT 모델 변경됨:/i.test(cleaned)) return "음성 인식 모델을 변경했습니다";
+  if (/연결\/로그인 명령을 실행합니다/.test(cleaned)) return "로그인 화면을 열었습니다. 로그인 후 연결 상태를 다시 확인해 주세요.";
+  if (/A conflicting .* job is already in progress/i.test(cleaned)) return "다른 파일을 만드는 중입니다. 완료 후 다시 시도해 주세요.";
+  if (/meetingId must be|No stored meeting|Meeting was not found/i.test(cleaned)) return "저장된 회의를 찾을 수 없습니다";
+  if (/capture must be stopped before reset/i.test(cleaned)) return "녹음을 중지한 뒤 새 회의를 준비해 주세요";
+  return cleaned;
 }
 
 function renderStatus(text) {
-  // 긴 whisper/metal 로그가 status bar를 잠식하지 않게 자른다.
-  const cleaned = String(text ?? "").replace(/\s+/g, " ").trim();
-  statusTextEl.textContent = cleaned.length > 160 ? `${cleaned.slice(0, 157)}...` : cleaned;
+  const cleaned = friendlyStatus(text);
+  statusTextEl.textContent = cleaned.length > 96 ? `${cleaned.slice(0, 93)}...` : cleaned;
   statusTextEl.title = cleaned;
   statusIndicatorEl.classList.remove(
     "status__indicator--ok",
     "status__indicator--warn",
     "status__indicator--error",
   );
-  if (/오류|실패|error|fail/i.test(text)) {
+  if (/오류|실패|error|fail/i.test(`${text} ${cleaned}`)) {
     statusIndicatorEl.classList.add("status__indicator--error");
-  } else if (/연결됨|ok|정상/i.test(text)) {
+  } else if (/연결|완료|저장|정상|ok/i.test(cleaned)) {
     statusIndicatorEl.classList.add("status__indicator--ok");
   } else {
     statusIndicatorEl.classList.add("status__indicator--warn");
@@ -432,14 +587,14 @@ function downloadText(filename, mime, text) {
   URL.revokeObjectURL(url);
 }
 
-// ── 전사본(원문)보내기 ──
+// ── 전사 원문 저장 ──
 function exportTranscript(entries) {
   if (!entries || entries.length === 0) {
-    renderStatus("저장할 전사 문장 없음");
+    renderStatus("저장할 발언이 없습니다");
     return;
   }
   const fmtTime = (ts) => new Date(ts).toLocaleTimeString("ko-KR", { hour12: false });
-  const lines = ["# Meeting Transcript", "", `Exported: ${new Date().toISOString()}`, ""];
+  const lines = ["# 회의 전사 원문", "", `저장 시각: ${new Date().toLocaleString("ko-KR")}`, ""];
   for (const e of entries) {
     const who = e.speaker ? `화자 ${e.speaker}` : "전사";
     lines.push(`**[${fmtTime(e.ts)}] ${who}** — ${e.text}`);
@@ -447,20 +602,41 @@ function exportTranscript(entries) {
   lines.push("");
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   downloadText(`meeting-transcript-${stamp}.md`, "text/markdown;charset=utf-8", lines.join("\n"));
-  renderStatus(`전사본 저장 완료 (${entries.length}문장)`);
+  renderStatus(`전사 원문 ${entries.length}문장을 저장했습니다`);
 }
 
-// ── 프로바이더 선택 패널 ──
+// ── 슬라이드 생성 모델 설정 ──
 let currentProvider = "";
+
+const PROVIDER_COPY = {
+  "cli:codex": { name: "ChatGPT", detail: "구독 계정" },
+  "cli:grok": { name: "Grok", detail: "xAI 계정" },
+  "cli:claude": { name: "Claude", detail: "Claude Pro 또는 Max 계정" },
+  "cli:gemini": { name: "Gemini", detail: "Google 계정" },
+  alibaba: { name: "Alibaba GLM", detail: "Alibaba Cloud API 키" },
+  openai: { name: "OpenAI", detail: "API 키로 연결" },
+  local: { name: "로컬 모델", detail: "이 Mac에서 실행" },
+};
+
+function providerCopy(provider) {
+  return PROVIDER_COPY[provider?.id] ?? { name: provider?.label ?? "AI 모델", detail: provider?.detail ?? "" };
+}
+
+function displayModelName(model) {
+  const value = String(model ?? "");
+  const gpt = value.match(/^gpt-(\d+(?:\.\d+)?)-(sol|luna|terra)$/i);
+  if (gpt) return `GPT-${gpt[1]} ${gpt[2][0].toUpperCase()}${gpt[2].slice(1).toLowerCase()}`;
+  return value;
+}
+
+const EFFORT_COPY = { low: "낮음", medium: "보통", high: "높음" };
 
 function renderProviders(msg) {
   currentProvider = msg.current ?? "";
-  // 글랜서블: 현재 선택된 프로바이더 라벨 노출
   const curRow = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === currentProvider);
-  providerLabelCur = curRow
-    ? curRow.label + (msg.currentModel ? `/${msg.currentModel}` : "") + (msg.currentEffort ? `·${msg.currentEffort}` : "")
-    : currentProvider;
-  glanceProviderEl.textContent = curRow ? curRow.label : (currentProvider || "—");
+  const currentCopy = providerCopy(curRow);
+  providerLabelCur = msg.currentModel ? displayModelName(msg.currentModel) : (curRow ? currentCopy.name : currentProvider);
+  glanceProviderEl.textContent = providerLabelCur || "—";
   renderProviderConfig(msg);
   renderDocHead();
   renderPill();
@@ -469,21 +645,22 @@ function renderProviders(msg) {
     const isCli = p.id.startsWith("cli:");
     const keyBased = p.id === "openai" || p.id === "alibaba";
     const status = providerStatus(p);
+    const copy = providerCopy(p);
     const showActions = isCli || !status.selectable;
     return `
     <div class="provider-row${p.id === currentProvider ? " provider-row--current" : ""}${status.selectable ? "" : " provider-row--disabled"}" data-id="${escapeHtml(p.id)}" data-auth="${escapeHtml(status.auth)}" data-installed="${status.installed ? "true" : "false"}">
       <button type="button" class="provider-row__select" ${status.selectable ? "" : "disabled"} aria-pressed="${p.id === currentProvider ? "true" : "false"}">
-        <span class="provider-row__name">${escapeHtml(p.label)}</span>
-        <span class="provider-row__detail">${escapeHtml(p.detail)}</span>
+        <span class="provider-row__name">${escapeHtml(copy.name)}</span>
+        <span class="provider-row__detail">${escapeHtml(copy.detail)}</span>
         <span class="provider-row__badge provider-row__badge--${status.tone}">${escapeHtml(status.badge)}</span>
       </button>
       ${showActions ? `
         <div class="provider-row__actions">
           ${isCli ? `<button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">${escapeHtml(status.connectLabel)}</button>` : ""}
           ${keyBased && !status.selectable ? `
-            <button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">연결</button>
-            <input class="provider-row__key" type="password" placeholder="API 키 붙여넣기" autocomplete="off">
-            <button type="button" class="provider-row__save" data-id="${escapeHtml(p.id)}">저장</button>` : ""}
+            <button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">키 발급</button>
+            <input class="provider-row__key" type="password" placeholder="${escapeHtml(copy.name)} API 키" aria-label="${escapeHtml(copy.name)} API 키" autocomplete="off">
+            <button type="button" class="provider-row__save" data-id="${escapeHtml(p.id)}">API 키 저장</button>` : ""}
         </div>` : ""}
     </div>`;
   }).join("");
@@ -503,21 +680,20 @@ function providerStatus(p) {
       auth, installed,
       selectable: Boolean(p.available),
       tone: p.available ? "ok" : "absent",
-      badge: p.available ? "설정됨" : "미설정",
-      connectLabel: "연결",
+      badge: p.available ? "사용 가능" : (p.id === "local" ? "설정 필요" : "API 키 필요"),
+      connectLabel: "설정",
     };
   }
   if (!installed || auth === "unavailable") {
-    return { auth, installed, selectable: false, tone: "absent", badge: "미설치", connectLabel: "연결" };
+    return { auth, installed, selectable: false, tone: "absent", badge: "설치 필요", connectLabel: "로그인" };
   }
   if (auth === "connected") {
-    return { auth, installed, selectable: true, tone: "ok", badge: "연결됨", connectLabel: "재인증" };
+    return { auth, installed, selectable: true, tone: "ok", badge: "사용 가능", connectLabel: "다시 로그인" };
   }
   if (auth === "disconnected") {
-    return { auth, installed, selectable: true, tone: "absent", badge: "로그인 필요", connectLabel: "연결" };
+    return { auth, installed, selectable: true, tone: "absent", badge: "로그인 필요", connectLabel: "로그인" };
   }
-  // unknown: 설치는 확인되지만 인증은 토킹할 수 없는 상태
-  return { auth, installed, selectable: true, tone: "unknown", badge: "인증 미확인", connectLabel: "연결" };
+  return { auth, installed, selectable: true, tone: "unknown", badge: "로그인 확인 필요", connectLabel: "로그인" };
 }
 
 // ── 현재 프로바이더의 모델/effort 선택 ──
@@ -525,14 +701,14 @@ function renderProviderConfig(msg) {
   const entry = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === msg.current);
   const models = entry?.models ?? [];
   selectModelEl.disabled = models.length === 0;
-  selectModelEl.innerHTML = `<option value="">기본값</option>` + models.map((m) =>
-    `<option value="${escapeHtml(m)}"${m === msg.currentModel ? " selected" : ""}>${escapeHtml(m)}</option>`,
+  selectModelEl.innerHTML = `<option value="">기본 모델</option>` + models.map((m) =>
+    `<option value="${escapeHtml(m)}"${m === msg.currentModel ? " selected" : ""}>${escapeHtml(displayModelName(m))}</option>`,
   ).join("");
 
   const efforts = entry?.efforts ?? [];
   effortRowEl.hidden = efforts.length === 0;
-  selectEffortEl.innerHTML = `<option value="">기본값</option>` + efforts.map((e) =>
-    `<option value="${e}"${e === msg.currentEffort ? " selected" : ""}>${e}</option>`,
+  selectEffortEl.innerHTML = `<option value="">기본 설정</option>` + efforts.map((e) =>
+    `<option value="${e}"${e === msg.currentEffort ? " selected" : ""}>${escapeHtml(EFFORT_COPY[e] ?? e)}</option>`,
   ).join("");
 }
 
@@ -559,17 +735,18 @@ function sttStatusView(model) {
 
 function sttActions(model) {
   const id = escapeHtml(model.id);
+  const label = escapeHtml(model.label ?? model.id);
   switch (model.status) {
     case "downloading":
-      return `<button type="button" class="stt-btn stt-btn--quiet stt-row__cancel" data-id="${id}">취소</button>`;
+      return `<button type="button" class="stt-btn stt-btn--quiet stt-row__cancel" data-id="${id}" aria-label="${label} 내려받기 취소">취소</button>`;
     case "installed":
-      return `<button type="button" class="stt-btn stt-row__select" data-id="${id}">선택</button>`;
+      return `<button type="button" class="stt-btn stt-row__select" data-id="${id}" aria-label="${label} 사용">사용</button>`;
     case "selected":
-      return `<button type="button" class="stt-btn stt-row__select" data-id="${id}" disabled>선택됨</button>`;
+      return `<button type="button" class="stt-btn stt-row__select" data-id="${id}" aria-label="${label} 사용 중" disabled>사용 중</button>`;
     case "failed":
-      return `<button type="button" class="stt-btn stt-row__install" data-id="${id}">다시 시도</button>`;
+      return `<button type="button" class="stt-btn stt-row__install" data-id="${id}" aria-label="${label} 다시 내려받기">다시 시도</button>`;
     default:
-      return `<button type="button" class="stt-btn stt-row__install" data-id="${id}">내려받기</button>`;
+      return `<button type="button" class="stt-btn stt-row__install" data-id="${id}" aria-label="${label} 내려받기">내려받기</button>`;
   }
 }
 
@@ -617,7 +794,7 @@ sttListEl.addEventListener("click", (ev) => {
 btnRecheckSttEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "recheckSttModels" }));
-    renderStatus("음성 인식 모델 재검사 중…");
+    renderStatus("음성 인식 모델의 설치 상태를 확인하는 중…");
   }
 };
 
@@ -647,6 +824,7 @@ btnSettingsEl.onclick = (ev) => {
   ev.stopPropagation();
   setProviderPanelOpen(providerPanelEl.hidden);
 };
+btnSettingsCloseEl.onclick = () => setProviderPanelOpen(false, true);
 
 providerListEl.addEventListener("click", (ev) => {
   if (!(ev.target instanceof Element)) return;
@@ -676,7 +854,7 @@ providerListEl.addEventListener("click", (ev) => {
 btnRecheckEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "recheckProviders" }));
-    renderStatus("프로바이더 재검사 중…");
+    renderStatus("AI 모델 연결 상태를 확인하는 중…");
   }
 };
 
@@ -743,9 +921,14 @@ function renderCaptureState() {
     startCaptureTimer();
   } else {
     appEl.classList.remove("app--capturing");
-    if (glanceCaptureLabelEl) glanceCaptureLabelEl.textContent = currentSlide ? "진행 중" : "대기";
+    if (glanceCaptureLabelEl) glanceCaptureLabelEl.textContent = currentSlide ? "녹음 완료" : "녹음 대기";
     stopCaptureTimer();
   }
+  const resetLabel = capturing ? "새 회의 준비. 녹음을 먼저 중지해 주세요" : "현재 회의를 닫고 새 회의 준비";
+  btnResetEl.title = resetLabel;
+  btnResetEl.setAttribute("aria-label", resetLabel);
+  syncActionAvailability();
+  setOnAir();
 }
 
 // ── 녹음 경과 타이머 (클라이언트 기준: capture 시작 시각 추정) ──
@@ -753,7 +936,7 @@ let captureStartedAt = 0;
 let captureTimerId = null;
 function startCaptureTimer() {
   if (captureTimerId !== null) return;
-  captureStartedAt = Date.now();
+  if (!Number.isFinite(captureStartedAt) || captureStartedAt <= 0) captureStartedAt = Date.now();
   if (glanceRecEl) glanceRecEl.hidden = false;
   const tick = () => {
     const s = Math.floor((Date.now() - captureStartedAt) / 1000);
@@ -766,6 +949,7 @@ function startCaptureTimer() {
 }
 function stopCaptureTimer() {
   if (captureTimerId !== null) { clearInterval(captureTimerId); captureTimerId = null; }
+  captureStartedAt = 0;
   if (glanceRecEl) glanceRecEl.hidden = true;
 }
 
@@ -775,7 +959,7 @@ function renderCaptureButton() {
   btnRecordEl.setAttribute("aria-pressed", String(capturing));
   btnRecordEl.setAttribute("aria-label", capturing ? "녹음 중지" : "녹음 시작");
   const label = btnRecordEl.querySelector(".record-btn__label");
-  if (label) label.textContent = capturing ? "중지" : "녹음 시작";
+  if (label) label.textContent = capturing ? "녹음 중지" : "녹음 시작";
 }
 
 btnRecordEl.onclick = () => {
@@ -834,11 +1018,15 @@ function closeAttendeePanel(restoreFocus = false) {
 /** 캡처 중에는 명단을 잠근다 (서버가 draft meeting을 활성화한 뒤이므로 편집 불가). */
 function renderAttendeeLock() {
   btnAttendeesEl.disabled = capturing;
+  const attendeeLabel = capturing ? "참석자 지정. 녹음 중에는 변경할 수 없습니다" : "참석자 지정";
+  btnAttendeesEl.title = attendeeLabel;
+  btnAttendeesEl.setAttribute("aria-label", attendeeLabel);
   attendeeNameEl.disabled = capturing;
   attendeeCrmEl.disabled = capturing;
   btnAttendeeAddEl.disabled = capturing;
   btnAttendeeSaveEl.disabled = capturing;
   if (capturing) closeAttendeePanel();
+  syncActionAvailability();
 }
 
 /** 초안 한 명 추가/수정 — 빈 이름·중복 이름은 거부하고 초안을 그대로 둔다. */
@@ -902,7 +1090,7 @@ function sendAttendees() {
     return;
   }
   if (!ws || ws.readyState !== WebSocket.OPEN) {
-    setAttendeeError("연결되지 않음 — 참석자 저장 불가");
+    setAttendeeError("앱 서버에 연결되지 않아 참석자를 저장할 수 없습니다");
     return;
   }
   ws.send(JSON.stringify({
@@ -967,26 +1155,27 @@ function applyAttendeesMessage(msg) {
     crmPersonId: a.crmPersonEntityId ?? "",
     saved: true,
   }));
+  const userWasSaving = attendeeDirty;
   attendeeDirty = false;
   setAttendeeError("");
   renderAttendeeList();
-  renderStatus(`참석자 ${attendees.length}명 저장됨`);
+  if (userWasSaving) renderStatus(`참석자 ${attendees.length}명을 저장했습니다`);
 }
 
 /** 준비된 meeting_id가 있으면 startCapture에 실어 같은 draft 회의를 활성화한다. */
 function sendCaptureToggle() {
   if (!ws || ws.readyState !== WebSocket.OPEN) {
-    renderStatus("서버 연결 중… 잠시 후 다시 눌러주세요");
+    renderStatus("앱 서버에 연결하는 중입니다. 잠시 후 다시 눌러 주세요");
     return;
   }
-  renderStatus(capturing ? "녹음 중지 요청…" : "녹음 시작 요청…");
+  renderStatus(capturing ? "녹음을 중지하는 중…" : "녹음을 시작하는 중…");
   if (capturing) {
     ws.send(JSON.stringify({ action: "stopCapture" }));
     requestMeetings();
     return;
   }
   if (attendeeDirty) {
-    setAttendeeError("저장하지 않은 참석자가 있습니다 — 저장 후 시작하세요");
+    setAttendeeError("저장하지 않은 참석자가 있습니다. 참석자를 저장한 뒤 녹음을 시작해 주세요");
   }
   // 참석자는 하드 게이트가 아니다 — 지정하지 않아도 캡처는 시작된다.
   ws.send(JSON.stringify(attendeeState.meetingId === null
@@ -1022,45 +1211,49 @@ function meetingTarget() {
 btnExportMdEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "saveNotes", ...meetingTarget() }));
-    renderStatus("Markdown 저장 중…");
+    renderStatus("회의 메모를 저장하는 중…");
   } else {
-    renderStatus("연결되지 않음 — 저장 불가");
+    renderStatus("앱 서버에 연결되지 않아 저장할 수 없습니다");
   }
 };
 btnExportJsonEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "saveJson", ...meetingTarget() }));
-    renderStatus("JSON 저장 중…");
+    renderStatus("회의 데이터를 저장하는 중…");
   } else {
-    renderStatus("연결되지 않음 — 저장 불가");
+    renderStatus("앱 서버에 연결되지 않아 저장할 수 없습니다");
   }
 };
 btnExportTranscriptEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "saveTranscript", ...meetingTarget() }));
-    renderStatus("전사본 저장 중…");
+    renderStatus("전사 원문을 저장하는 중…");
   } else {
-    renderStatus("연결되지 않음 — 저장 불가");
+    renderStatus("앱 서버에 연결되지 않아 저장할 수 없습니다");
   }
 };
 
 btnCompileDeckEl.onclick = () => {
+  if (transcriptLineCount === 0) {
+    renderStatus("슬라이드를 만들려면 먼저 회의를 녹음해 주세요");
+    return;
+  }
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "compileDeck", ...meetingTarget() }));
+    ws.send(JSON.stringify({ action: "compileTranscriptSnapshot", ...meetingTarget() }));
     setJobControlsBusy(true);
     compileStatusEl.hidden = false;
     compileStatusEl.dataset.state = "started";
-    compileStatusEl.textContent = "컴파일 중…";
-    renderStatus("발표 덱 컴파일 시작…");
+    compileStatusEl.textContent = "슬라이드 초안을 만드는 중…";
+    renderStatus("지금까지의 대화로 슬라이드 초안을 만드는 중…");
   } else {
-    renderStatus("연결되지 않음 — 컴파일 불가");
+    renderStatus("앱 서버에 연결되지 않아 슬라이드를 만들 수 없습니다");
   }
 };
 
-const conflictingJobControls = [btnCompileDeckEl, btnExportPdfEl, btnExportPngEl];
 let activeJobId = null;
 function setJobControlsBusy(busy) {
-  for (const control of conflictingJobControls) control.disabled = busy;
+  jobControlsBusy = busy;
+  syncActionAvailability();
 }
 function showRetry(action, meetingId) {
   document.querySelector(".job-retry")?.remove();
@@ -1079,8 +1272,18 @@ function showRetry(action, meetingId) {
   compileStatusEl.insertAdjacentElement("afterend", retry);
 }
 function progressText(label, msg) {
-  const count = Number.isFinite(msg.completed) && Number.isFinite(msg.total) ? ` ${msg.completed}/${msg.total}` : "";
-  return `${label} · ${msg.stage || "처리"}${count}`;
+  const count = Number.isFinite(msg.completed) && Number.isFinite(msg.total) ? ` · ${msg.completed}/${msg.total}` : "";
+  const stage = {
+    planning: "내용을 정리하는 중",
+    render: "슬라이드를 디자인하는 중",
+    publish: "파일을 저장하는 중",
+    prepare: "내보내기를 준비하는 중",
+    validate: "슬라이드를 확인하는 중",
+    preview: "미리보기를 만드는 중",
+    review: "디자인을 점검하는 중",
+    "design-gate": "최종 점검 중",
+  }[msg.stage] ?? `${label} 처리 중`;
+  return `${stage}${count}`;
 }
 function renderCompileStatus(msg) {
   compileStatusEl.hidden = false;
@@ -1088,28 +1291,42 @@ function renderCompileStatus(msg) {
   if (msg.status === "started" || msg.status === "progress") {
     activeJobId = msg.jobId ?? activeJobId;
     setJobControlsBusy(true);
-    compileStatusEl.textContent = msg.status === "progress" ? progressText("컴파일", msg) : "컴파일 중…";
+    compileStatusEl.textContent = msg.status === "progress" ? progressText("슬라이드", msg) : "슬라이드 초안을 만드는 중…";
     renderStatus(compileStatusEl.textContent);
   } else if (msg.status === "success") {
     if (activeJobId && msg.jobId && msg.jobId !== activeJobId) return;
     setJobControlsBusy(false);
     activeJobId = null;
     document.querySelector(".job-retry")?.remove();
+    if (msg.scene) showCompiledScene(msg.scene);
     const count = msg.outline?.slideCount;
-    compileStatusEl.textContent = `컴파일 완료${Number.isFinite(count) ? ` · ${count}장` : ""}`;
-    renderStatus(`컴파일 완료${msg.path ? `: ${msg.path}` : ""}`);
+    const hasCount = Number.isFinite(count);
+    const countText = hasCount ? `${count}장` : "슬라이드";
+    const fallback = Boolean(msg.outline?.usedFallback || msg.outline?.plannerError);
+    compileStatusEl.dataset.state = fallback ? "warning" : "success";
+    compileStatusEl.textContent = fallback
+      ? (hasCount ? `기본 형식으로 ${countText} 완성` : "기본 형식으로 완성")
+      : (hasCount ? `슬라이드 ${countText} 완성` : "슬라이드 완성");
+    const limitHit = /usage limit|사용량 한도/i.test(String(msg.outline?.plannerError ?? ""));
+    renderStatus(fallback
+      ? (limitHit
+        ? (hasCount ? `AI 사용량 한도로 기본 형식 ${countText}을 만들었습니다` : "AI 사용량 한도로 기본 형식 슬라이드를 만들었습니다")
+        : (hasCount ? `AI 구성이 원활하지 않아 기본 형식으로 ${countText}을 만들었습니다` : "AI 구성이 원활하지 않아 기본 형식으로 슬라이드를 만들었습니다"))
+      : (hasCount ? `슬라이드 ${countText}을 만들었습니다` : "슬라이드를 만들었습니다"));
   } else {
     if (activeJobId && msg.jobId && msg.jobId !== activeJobId) return;
     setJobControlsBusy(false);
     activeJobId = null;
-    compileStatusEl.textContent = `${msg.status === "timeout" ? "컴파일 시간 초과" : "컴파일 실패"}: ${msg.error || "알 수 없는 오류"}`;
+    compileStatusEl.textContent = msg.status === "timeout"
+      ? "슬라이드 생성 시간이 초과되었습니다"
+      : `슬라이드를 만들지 못했습니다: ${friendlyStatus(msg.error || "알 수 없는 오류")}`;
     renderStatus(compileStatusEl.textContent);
-    showRetry("compileDeck", msg.meetingId);
+    showRetry("compileTranscriptSnapshot", msg.meetingId);
   }
 }
 
 function renderExportStatus(msg) {
-  const label = msg.action === "exportPdf" ? "PDF" : "PNG";
+  const label = msg.action === "exportPdf" ? "PDF" : "슬라이드 이미지";
   if (msg.status === "started" || msg.status === "progress") {
     activeJobId = msg.jobId ?? activeJobId;
     setJobControlsBusy(true);
@@ -1121,23 +1338,22 @@ function renderExportStatus(msg) {
   activeJobId = null;
   if (msg.status === "success") {
     document.querySelector(".job-retry")?.remove();
-    renderStatus(`${label} 저장됨${msg.path ? `: ${msg.path}` : ""}`);
+    renderStatus(`${label} 저장 완료`);
   } else {
     const busy = msg.code === "job-busy" || msg.code === "compile-busy";
     renderStatus(busy
-      ? "컴파일 중에는 내보낼 수 없습니다"
-      : `${label} ${msg.status === "timeout" ? "시간 초과" : "실패"}: ${msg.error || "알 수 없는 오류"}`);
+      ? "슬라이드를 만드는 중에는 다른 파일을 저장할 수 없습니다"
+      : `${label} ${msg.status === "timeout" ? "생성 시간이 초과되었습니다" : "저장 실패"}: ${friendlyStatus(msg.error || "알 수 없는 오류")}`);
     if (!busy) showRetry(msg.action, msg.meetingId);
   }
 }
 
 btnExportDeckEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    // lecture-deck 템플릿으로 reveal.js 강의 덱 생성 → exports/deck-*/
     ws.send(JSON.stringify({ action: "exportDeck", ...meetingTarget() }));
-    renderStatus("강의 덱 생성 중…");
+    renderStatus("웹 슬라이드를 만드는 중…");
   } else {
-    renderStatus("연결되지 않음 — 덱 저장 불가");
+    renderStatus("앱 서버에 연결되지 않아 웹 슬라이드를 저장할 수 없습니다");
   }
 };
 
@@ -1145,9 +1361,9 @@ btnExportPdfEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "exportPdf", ...meetingTarget() }));
     setJobControlsBusy(true);
-    renderStatus("PDF 준비 중…");
+    renderStatus("PDF를 만드는 중…");
   } else {
-    renderStatus("연결되지 않음 — PDF 저장 불가");
+    renderStatus("앱 서버에 연결되지 않아 PDF를 만들 수 없습니다");
   }
 };
 
@@ -1155,38 +1371,51 @@ btnExportPngEl.onclick = () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "exportPng", ...meetingTarget() }));
     setJobControlsBusy(true);
-    renderStatus("PNG 준비 중…");
+    renderStatus("슬라이드 이미지를 저장하는 중…");
   } else {
-    renderStatus("연결되지 않음 — PNG 저장 불가");
+    renderStatus("앱 서버에 연결되지 않아 이미지를 저장할 수 없습니다");
   }
 };
 btnResetEl.onclick = () => {
+  if (capturing) {
+    renderStatus("녹음을 중지한 뒤 새 회의를 준비해 주세요");
+    return;
+  }
+  if (!window.confirm("현재 회의를 닫고 새 회의를 준비할까요?\n저장된 회의 기록과 내보낸 파일은 그대로 남습니다.")) return;
   currentSlide = null;
   slideHistory = [];
   viewingHistory = null;
+  viewingCompiled = false;
+  compiledPreviewTitle = "";
+  renderedSlides = [];
   renderTranscriptBacklog([]);
   transcriptTruncEl.hidden = true;
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "reset" }));
     requestMeetings();
     clearPreparedMeeting();
-    renderStatus("세션 초기화 요청됨");
+    renderStatus("새 회의를 준비했습니다");
   } else {
-    renderStatus("연결되지 않음 — 초기화 불가");
+    renderStatus("앱 서버에 연결되지 않아 새 회의를 준비할 수 없습니다");
   }
   renderMain();
-  renderGlance();
+  renderThumbnails([]);
+  renderDocHead();
 };
 
-// ── 히스토리 썸네일 클릭/키보드 → 과거 슬라이드 미리보기 ──
-// 같은 썸네일 재클릭 / 안내 바 클릭 / Esc 로 라이브 복귀.
+// ── 슬라이드 썸네일 미리보기 ──
 /** @param {HTMLElement} card */
 function toggleThumbnailPreview(card) {
   const idx = Number(card.dataset.index);
-  const slide = allSlides().find((s) => s.index === idx);
+  const slide = renderedSlides.find((candidate) => candidate.index === idx);
   if (!slide) return;
-  viewingHistory = viewingHistory && viewingHistory.index === slide.index ? null : slide;
+  if (viewingHistory && viewingHistory.index === slide.index) {
+    exitSlidePreview();
+    return;
+  }
+  viewingHistory = slide;
   renderMain();
+  renderPill();
 }
 thumbnailsEl.addEventListener("click", (ev) => {
   const card = ev.target instanceof HTMLElement ? ev.target.closest(".thumbnail") : null;
@@ -1201,10 +1430,7 @@ thumbnailsEl.addEventListener("keydown", (ev) => {
 });
 
 currentSlideEl.addEventListener("click", (ev) => {
-  if (ev.target instanceof Element && ev.target.closest(".slide__notice")) {
-    viewingHistory = null;
-    renderMain();
-  }
+  if (ev.target instanceof Element && ev.target.closest(".slide__notice")) exitSlidePreview();
 });
 
 window.addEventListener("keydown", (ev) => {
@@ -1213,8 +1439,7 @@ window.addEventListener("keydown", (ev) => {
     return;
   }
   if (ev.key === "Escape" && viewingHistory) {
-    viewingHistory = null;
-    renderMain();
+    exitSlidePreview();
     return;
   }
   // 입력 필드/패널 안에서는 단축키 무시
@@ -1234,10 +1459,15 @@ window.addEventListener("keydown", (ev) => {
 // ── WebSocket ──
 function connect() {
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
+  awaitingInitialCaptureState = true;
+  document.documentElement.dataset.connection = "connecting";
   ws = new WebSocket(`${proto}//${location.host}/ws`);
+  syncActionAvailability();
 
   ws.onopen = () => {
-    renderStatus("서버 연결됨");
+    document.documentElement.dataset.connection = "connected";
+    syncActionAvailability();
+    renderStatus("앱 서버에 연결되었습니다");
     requestMeetings();
     ws.send(JSON.stringify({ action: "attendees" }));
     reviewPanel.syncTransport();
@@ -1247,17 +1477,20 @@ function connect() {
       const msg = JSON.parse(ev.data);
       if (msg.type === "slide") {
         if (selectedMeetingId !== null) return;
+        if (awaitingInitialCaptureState) return;
         currentSlide = msg.current;
         slideHistory = Array.isArray(msg.history) ? msg.history : [];
-        // 미리보기 중인 슬라이드가 히스토리에서 사라졌으면(예: reset) 라이브로 복귀
-        if (viewingHistory && !slideHistory.some((s) => s.index === viewingHistory.index)) {
+        // 라이브 슬라이드가 갱신돼도 사용자가 보고 있는 PowerPoint 미리보기는 유지한다.
+        if (!viewingCompiled && viewingHistory && !slideHistory.some((s) => s.index === viewingHistory.index)) {
           viewingHistory = null;
         }
-        renderMain();
-        renderThumbnails(slideHistory);
+        if (!viewingCompiled) {
+          renderMain();
+          renderThumbnails(slideHistory);
+        }
         renderDocHead();
         renderPill();
-        setOnAir(capturing || !!currentSlide);
+        setOnAir();
       } else if (msg.type === "caption") {
         renderCaption(msg.text, msg.speaker);
       } else if (msg.type === "meetings") {
@@ -1267,21 +1500,25 @@ function connect() {
         currentSlide = msg.current ?? null;
         slideHistory = Array.isArray(msg.history) ? msg.history : [];
         viewingHistory = null;
+        viewingCompiled = false;
+        compiledPreviewTitle = "";
+        activeMeetingTitle = msg.title || `회의 #${msg.meetingId}`;
         renderTranscriptBacklog(msg.transcript);
         renderMain();
         renderThumbnails(slideHistory);
-        docTitleEl.textContent = msg.title || `회의 #${msg.meetingId}`;
+        renderDocHead();
         if (msg.compiled) {
           compileStatusEl.hidden = false;
           compileStatusEl.dataset.state = "success";
-          compileStatusEl.textContent = `컴파일됨 · ${msg.compiled.slideCount}장`;
+          compileStatusEl.textContent = `만든 슬라이드 ${msg.compiled.slideCount}장`;
         } else {
           compileStatusEl.hidden = true;
           compileStatusEl.textContent = "";
         }
-        renderStatus(`세션 불러옴: ${msg.title || `#${msg.meetingId}`}`);
+        renderStatus(`${activeMeetingTitle} 기록을 불러왔습니다`);
       } else if (msg.type === "transcript") {
         if (selectedMeetingId !== null && msg.reason === "snapshot") return;
+        if (awaitingInitialCaptureState && msg.reason === "snapshot") return;
         if (msg.reason === "snapshot") {
           renderTranscriptBacklog(msg.entries);
           transcriptTruncEl.hidden = !msg.truncated;
@@ -1300,14 +1537,19 @@ function connect() {
         reviewPanel.applyReview(msg);
       } else if (msg.type === "capture") {
         capturing = !!msg.capturing;
+        if (capturing) {
+          if (Number.isFinite(msg.startedAt) && msg.startedAt > 0) captureStartedAt = msg.startedAt;
+          awaitingInitialCaptureState = false;
+        } else if (awaitingInitialCaptureState && selectedMeetingId === null) {
+          showFreshWorkspace();
+        }
         inputMode = msg.mode ?? "mic";
         renderCaptureButton();
         renderCaptureState();
         renderAttendeeLock();
         renderPill();
         renderDocHead();
-        // ON AIR 표시도 캡처 상태와 연동
-        setOnAir(capturing || !!currentSlide);
+        setOnAir();
       } else if (msg.type === "detect") {
         detecting = !!msg.detecting;
         if (glanceDetectEl) glanceDetectEl.hidden = !msg.detecting;
@@ -1317,13 +1559,14 @@ function connect() {
       } else if (msg.type === "export") {
         renderExportStatus(msg);
       } else if (msg.type === "saved") {
+        if (awaitingInitialCaptureState && selectedMeetingId === null) return;
         renderStatus(`저장됨: ${msg.path}`);
         requestMeetings();
-        // 상시 표시 (관찰성: 마지막 저장물 경로를 도크에 고정)
         if (lastSavedEl) {
+          const label = savedArtifactLabel(msg.path);
           lastSavedEl.hidden = false;
-          lastSavedEl.textContent = `저장: ${msg.path}`;
-          lastSavedEl.title = msg.path;
+          lastSavedEl.textContent = `${label} 저장 완료`;
+          lastSavedEl.title = `${label} 파일을 저장했습니다`;
         }
       } else if (msg.type === "status") {
         renderStatus(msg.text);
@@ -1336,11 +1579,17 @@ function connect() {
   ws.onclose = () => {
     activeJobId = null;
     setJobControlsBusy(false);
-    renderStatus("연결 끊김. 3초 후 재시도...");
+    document.documentElement.dataset.connection = "disconnected";
+    syncActionAvailability();
+    renderStatus("앱 서버 연결이 끊겼습니다. 다시 연결하는 중…");
     reviewPanel?.syncTransport();
     setTimeout(connect, 3000);
   };
-  ws.onerror = () => renderStatus("연결 오류");
+  ws.onerror = () => {
+    document.documentElement.dataset.connection = "error";
+    syncActionAvailability();
+    renderStatus("앱 서버에 연결하지 못했습니다");
+  };
 }
 
 connect();

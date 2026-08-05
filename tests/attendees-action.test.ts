@@ -242,7 +242,8 @@ test("setAttendees replaces a prepared roster and rejects capturing or ended mee
     { action: "startCapture", meeting_id: meetingId },
     (message) => message.type === "capture" && message.capturing === true,
   );
-  expect(started).toEqual({ type: "capture", capturing: true, mode: "mic" });
+  expect(started).toMatchObject({ type: "capture", capturing: true, mode: "mic" });
+  expect(typeof started.startedAt).toBe("number");
   expect(db.query("SELECT phase FROM meeting_meta WHERE meeting_id = ?").get(meetingId)).toEqual({ phase: "capturing" });
 
   await errorFor({

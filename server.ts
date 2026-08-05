@@ -17,15 +17,14 @@ import { isSttModelId, type SttModelId } from "./src/stt-model-catalog.ts";
 import { sttModelsMessage } from "./src/stt-model-protocol.ts";
 import { SttModelSettingsStore } from "./src/stt-model-settings.ts";
 import { MeetingStore } from "./src/store.ts";
+import { deleteMeetingHistory } from "./src/meeting-deletion.ts";
 import { MinutesStore, type AttendeeInput, type ReviewState } from "./src/minutes-store.ts";
 import { CaptureFinalizer, RawAudioRecorder, TranscriptVersionWriter, claimFileAudioSource, sha256File } from "./src/transcript-versioning.ts";
 import { MinutesExtractor } from "./src/extract.ts";
 import { startReview } from "./src/start-review.ts";
 import { concludeMeeting } from "./src/conclusion.ts";
-import { buildDeckHtml, buildSlideFiles } from "./src/deck.ts";
-import { runCompileDeckAction } from "./src/deck-compile-action.ts";
+import { runSceneCompileAction } from "./src/scene-compile-action.ts";
 import { prepareExportDeck } from "./src/deck-export.ts";
-import { copyDeckAssets } from "./src/deck-assets.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
 import { createHash, randomUUID } from "node:crypto";
@@ -93,6 +92,7 @@ const session = new MeetingSession(
       broadcast(meetingsMessage());
     },
   },
+  { automaticDetection: false },
 );
 
 // ── 프로바이더 런타임 선택 (사용자가 UI에서 교체) ──
@@ -130,8 +130,8 @@ try {
 }
 // 관찰성: 마지막 저장 경로를 유지해 클라이언트에 상시 표시
 let lastSavedPath: string | null = null;
-// Compile/PDF/PNG share one artifact pipeline and must never overlap.
-type ActiveJob = { id: CompileJobId | ExportJobId; meetingId: number; action: "compileDeck" | "exportPdf" | "exportPng" };
+// Compile/PPTX/PDF/PNG share one artifact pipeline and must never overlap.
+type ActiveJob = { id: CompileJobId | ExportJobId; meetingId: number; action: "compileDeck" | "compileTranscriptSnapshot" | "exportDeck" | "exportPptx" | "exportPdf" | "exportPng" };
 let activeJob: ActiveJob | null = null;
 
 function providersMessage(): ProvidersUpdate {
@@ -227,7 +227,6 @@ async function runImageExport(action: "exportPdf" | "exportPng", meetingId: numb
     mkdirSync(slidesDir, { recursive: true });
     copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
     copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(slidesDir, "theme.css"));
-    copyDeckAssets({ sourceDirectory: join(import.meta.dir, "deck", "assets"), exportDirectory: dir, slidesDirectory: slidesDir });
     const material = prepareExportDeck(store, meetingId);
     writeFileSync(join(dir, "index.html"), material.indexHtml, "utf-8");
     for (const file of material.files) writeFileSync(join(slidesDir, file.filename), file.html, "utf-8");
@@ -293,7 +292,7 @@ function connectProvider(id: string): void {
   if (adapter) {
     const command = providerConnectCommand(id as SubscriptionProviderId);
     if (!command) return;
-    broadcast({ type: "status", text: `${adapter.label} 연결/로그인 명령을 실행합니다 — 완료 후 재검사하세요` });
+    broadcast({ type: "status", text: `${adapter.label} 로그인 화면을 열었습니다. 로그인 후 연결 상태를 다시 확인해 주세요` });
     spawn(command.executable, command.args, {
       env: command.environment,
       stdio: "inherit",
@@ -303,17 +302,17 @@ function connectProvider(id: string): void {
   }
   switch (id) {
     case "openai": {
-      broadcast({ type: "status", text: "OpenAI 키 발급 페이지를 엽니다 — 키를 카드에 붙여넣으세요" });
+      broadcast({ type: "status", text: "OpenAI API 키 발급 페이지를 열었습니다. 발급한 키를 입력해 주세요" });
       openUrl("https://platform.openai.com/api-keys");
       break;
     }
     case "alibaba": {
-      broadcast({ type: "status", text: "Alibaba 콘솔을 엽니다 — 키를 카드에 붙여넣으세요" });
+      broadcast({ type: "status", text: "Alibaba Cloud 콘솔을 열었습니다. 발급한 API 키를 입력해 주세요" });
       openUrl("https://bailian.console.aliyun.com/");
       break;
     }
     default:
-      broadcast({ type: "status", text: "로컬 llama.cpp: 서버를 띄우고 .env의 LOCAL_LLM_BASE_URL을 설정하세요" });
+      broadcast({ type: "status", text: "로컬 모델 서버 주소를 설정해 주세요" });
   }
 }
 
@@ -576,7 +575,7 @@ const handleStartReview: WsActionHandler = ({ ws }) => {
     return;
   }
 
-  broadcast({ type: "status", text: "회의록 후보 추출 중…" });
+  broadcast({ type: "status", text: "회의록 정리 중…" });
   const promise = startReview({
     meetingId,
     store: minutesStore,
@@ -592,7 +591,7 @@ const handleStartReview: WsActionHandler = ({ ws }) => {
     console.error(`[review] 추출 실패: ${message}`);
     for (const requester of run.requesters) {
       try {
-        requester.send(JSON.stringify({ type: "status" as const, text: "회의록 후보 추출 실패·재시도" }));
+        requester.send(JSON.stringify({ type: "status" as const, text: "회의록을 정리하지 못했습니다" }));
       } catch { /* requester disconnected */ }
     }
   }).finally(() => {
@@ -704,11 +703,6 @@ const handleDeckExport: WsActionHandler = ({ ws, cmd }) => {
       mkdirSync(slidesDir, { recursive: true });
       copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
       copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(slidesDir, "theme.css"));
-      copyDeckAssets({
-        sourceDirectory: join(import.meta.dir, "deck", "assets"),
-        exportDirectory: dir,
-        slidesDirectory: slidesDir,
-      });
       const input = {
         title: "Meeting Notes",
         startedAt: meta.started_at,
@@ -716,8 +710,9 @@ const handleDeckExport: WsActionHandler = ({ ws, cmd }) => {
         slides: store.slides(meta.id),
         lines: store.lines(meta.id),
       };
-      writeFileSync(join(dir, "index.html"), buildDeckHtml(input), "utf-8");
-      for (const f of buildSlideFiles(input)) {
+      const material = prepareExportDeck(store, meta.id);
+      writeFileSync(join(dir, "index.html"), material.indexHtml, "utf-8");
+      for (const f of material.files) {
         writeFileSync(join(slidesDir, f.filename), f.html, "utf-8");
       }
 
@@ -735,25 +730,25 @@ const handleDeckExport: WsActionHandler = ({ ws, cmd }) => {
       if (cmd.action === "exportDeck") {
         lastSavedPath = `exports/deck-${stamp}/index.html`;
         broadcast({ type: "saved", path: lastSavedPath });
-        broadcast({ type: "status", text: `덱 저장됨: ${lastSavedPath}` });
+        broadcast({ type: "status", text: `웹 슬라이드 저장됨: ${lastSavedPath}` });
         openUrl(`file://${join(dir, "index.html")}`);
       } else if (cmd.action === "exportPng") {
         // 초안 PNG: slides-grab png는 design-gate 대상이 아니라 validate 후 바로 렌더.
         const out = join(import.meta.dir, "exports", `deck-${stamp}-png`);
-        broadcast({ type: "status", text: "초안 PNG 준비 중… (design-gate 불필요)" });
+        broadcast({ type: "status", text: "슬라이드 이미지를 준비하는 중…" });
         runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
           if (vcode !== 0) {
-            broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
+            broadcast({ type: "status", text: `슬라이드 파일 확인 실패: ${vtail.trim().slice(0, 160)}` });
             return;
           }
-          broadcast({ type: "status", text: "초안 PNG 렌더 중… (chromium)" });
+          broadcast({ type: "status", text: "슬라이드 이미지를 만드는 중…" });
           runGrab(["png", "--slides-dir", slidesDir, "--output-dir", out], (code, tail) => {
             if (code === 0) {
               lastSavedPath = `exports/deck-${stamp}-png`;
               broadcast({ type: "saved", path: lastSavedPath });
-              broadcast({ type: "status", text: `초안 PNG 저장됨: ${lastSavedPath} (미검토)` });
+              broadcast({ type: "status", text: `슬라이드 이미지 저장됨: ${lastSavedPath}` });
             } else {
-              broadcast({ type: "status", text: `PNG 실패: ${tail.trim().slice(0, 160)}` });
+              broadcast({ type: "status", text: `슬라이드 이미지 저장 실패: ${tail.trim().slice(0, 160)}` });
             }
           });
         });
@@ -761,23 +756,23 @@ const handleDeckExport: WsActionHandler = ({ ws, cmd }) => {
         // 정식 PDF: slides-grab pdf는 design-gate proceed 영수증을 CLI 레벨에서 요구한다.
         // 체인: validate → 정직한 Pass A/B 리포트(실제 수행한 검사를 기록) → design-gate → pdf.
         const out = join(import.meta.dir, "exports", `deck-${stamp}.pdf`);
-        broadcast({ type: "status", text: "PDF 준비 중… (design-gate)" });
-        const slideFiles = buildSlideFiles(input);
+        broadcast({ type: "status", text: "PDF를 준비하는 중…" });
+        const slideFiles = material.files;
         const fingerprints = slideFiles.map((f) => ({
           file: f.filename,
           sha256: createHash("sha256").update(f.html, "utf-8").digest("hex"),
         }));
         runGrab(["validate", "--slides-dir", slidesDir], (vcode, vtail) => {
           if (vcode !== 0) {
-            broadcast({ type: "status", text: `validate 실패: ${vtail.trim().slice(0, 160)}` });
+            broadcast({ type: "status", text: `슬라이드 파일 확인 실패: ${vtail.trim().slice(0, 160)}` });
             return;
           }
           // 1) 미리보기 PNG 렌더 → 2) 독립 비전 리뷰 → 3) proceed면 게이트 기록 → 4) PDF
-          broadcast({ type: "status", text: "PDF 미리보기 렌더 중… (chromium)" });
+          broadcast({ type: "status", text: "PDF 미리보기를 만드는 중…" });
           runGrab(["png", "--slides-dir", slidesDir, "--output-dir", join(slidesDir, ".slides-grab", "gate-preview")], (_pcode, _ptail) => {
             void (async () => {
               try {
-                broadcast({ type: "status", text: "독립 시각 리뷰 중… (codex)" });
+                broadcast({ type: "status", text: "슬라이드 디자인을 점검하는 중…" });
                 const previewDir = join(slidesDir, ".slides-grab", "gate-preview");
                 const previewFiles = readdirSync(previewDir)
                   .filter((f) => f.endsWith(".png"));
@@ -809,17 +804,17 @@ const handleDeckExport: WsActionHandler = ({ ws, cmd }) => {
                 };
                 writeFileSync(join(slidesDir, ".pass-a.md"), buildPassAReport(gateInput), "utf-8");
                 writeFileSync(join(slidesDir, ".pass-b.md"), buildPassBReport(gateInput), "utf-8");
-                broadcast({ type: "status", text: `리뷰 통과 (${review.confidence}) — 게이트 기록 중…` });
+                broadcast({ type: "status", text: "디자인 점검을 마쳤습니다. PDF 저장을 준비하는 중…" });
                 runGrab(
                   ["design-gate", "--slides-dir", slidesDir, "--verdict", "proceed",
                     "--pass-a-report", join(slidesDir, ".pass-a.md"),
                     "--pass-b-report", join(slidesDir, ".pass-b.md")],
                   (gcode, gtail) => {
                     if (gcode !== 0) {
-                      broadcast({ type: "status", text: `design-gate 실패: ${gtail.trim().slice(0, 160)}` });
+                      broadcast({ type: "status", text: `최종 점검 실패: ${gtail.trim().slice(0, 160)}` });
                       return;
                     }
-                    broadcast({ type: "status", text: "PDF 렌더 중… (chromium)" });
+                    broadcast({ type: "status", text: "PDF를 만드는 중…" });
                     runGrab(["pdf", "--slides-dir", slidesDir, "--output", out], (code, tail) => {
                       if (code === 0) {
                         lastSavedPath = `exports/deck-${stamp}.pdf`;
@@ -834,7 +829,7 @@ const handleDeckExport: WsActionHandler = ({ ws, cmd }) => {
               } catch (e) {
                 const message = e instanceof Error ? e.message : String(e);
                 appendFileSync("/tmp/ms-export-flow.log", `${new Date().toISOString()} REVIEW-ERROR ${message.slice(0, 400)}\n`);
-                broadcast({ type: "status", text: `시각 리뷰 실패: ${message.slice(0, 160)}` });
+                broadcast({ type: "status", text: `디자인 점검 실패: ${message.slice(0, 160)}` });
               }
             })();
           });
@@ -994,10 +989,10 @@ const httpServer = Bun.serve({
         type: "status" as const,
         text: `연결됨. LLM provider=${config.llm.provider} model=${llmLabel}`,
       }));
-      ws.send(JSON.stringify(session.snapshot()));
       ws.send(JSON.stringify(providersMessage()));
       ws.send(JSON.stringify(sttModelsMessage(sttManager.allStates())));
       ws.send(JSON.stringify(captureMessage()));
+      ws.send(JSON.stringify(session.snapshot()));
       ws.send(JSON.stringify(session.transcript("snapshot")));
       if (lastSavedPath) {
         ws.send(JSON.stringify({ type: "saved" as const, path: lastSavedPath }));
@@ -1017,8 +1012,12 @@ const httpServer = Bun.serve({
           handlerMap.get(cmd.action ?? "")?.({ ws, cmd });
           return;
         }
-        if (cmd.action === "startCapture") void startCapture(cmd.meeting_id);
-        else if (cmd.action === "stopCapture") void stopCapture();
+        if (cmd.action === "startCapture") {
+          void startCapture(cmd.meeting_id).catch((error) => reportCaptureActionError("start", error));
+        }
+        else if (cmd.action === "stopCapture") {
+          void stopCapture().catch((error) => reportCaptureActionError("stop", error));
+        }
         else if (cmd.action === "reset") {
           handleReset({ ws, cmd });
           broadcast(meetingsMessage());
@@ -1039,10 +1038,26 @@ const httpServer = Bun.serve({
               : { type: "meeting" as const, ...detail }));
           }
         }
+        else if (cmd.action === "deleteMeeting") {
+          if (!validMeetingId(cmd.meetingId)) {
+            requestError(ws, new Error("유효한 회의 ID가 필요합니다"));
+          } else if (capturing && cmd.meetingId === currentMeetingId) {
+            requestError(ws, new Error("녹음 중인 회의는 삭제할 수 없습니다"));
+          } else if (deleteMeetingHistory(store.databaseHandle(), cmd.meetingId)) {
+            if (cmd.meetingId === currentMeetingId) {
+              session.reset();
+              currentMeetingId = null;
+            }
+            broadcast(meetingsMessage());
+            ws.send(JSON.stringify({ type: "status" as const, text: "회의 기록을 삭제했습니다" }));
+          } else {
+            requestError(ws, new Error(`회의 ${cmd.meetingId}을 찾을 수 없습니다`));
+          }
+        }
         else if (cmd.action === "transcript") {
           ws.send(JSON.stringify(session.transcript("export")));
         }
-        else if (cmd.action === "compileDeck") {
+        else if (cmd.action === "compileDeck" || cmd.action === "compileTranscriptSnapshot" || cmd.action === "exportDeck" || cmd.action === "exportPptx") {
           const jobId: CompileJobId = `compile-${randomUUID()}`;
           if (cmd.meetingId !== undefined && !validMeetingId(cmd.meetingId)) {
             broadcast({ type: "compile", status: "started", jobId });
@@ -1052,17 +1067,22 @@ const httpServer = Bun.serve({
           } else {
             const requestedMeetingId = cmd.meetingId ?? store.latestMeeting()?.id;
             if (requestedMeetingId === undefined) {
-              void runCompileDeckAction({ store, planner: llm, jobId, exportsDirectory: join(import.meta.dir, "exports"), send: broadcast });
+              void runSceneCompileAction({ store, transport: extractionTransport, jobId, exportsDirectory: join(import.meta.dir, "exports"), send: broadcast });
             } else {
-              activeJob = { id: jobId, meetingId: requestedMeetingId, action: "compileDeck" };
-              void runCompileDeckAction({
-                store, planner: llm, jobId, meetingId: requestedMeetingId, timeoutMs: 120_000,
+              activeJob = { id: jobId, meetingId: requestedMeetingId, action: cmd.action };
+              void runSceneCompileAction({
+                store, transport: extractionTransport, jobId, meetingId: requestedMeetingId,
                 exportsDirectory: join(import.meta.dir, "exports"), send: broadcast,
+              }).then((result) => {
+                if (result && cmd.action !== "compileDeck") {
+                  lastSavedPath = cmd.action === "exportDeck" ? result.relativePath : result.pptxPath;
+                  broadcast({ type: "saved", path: lastSavedPath });
+                }
               }).finally(() => { if (activeJob?.id === jobId) activeJob = null; });
             }
           }
         }
-        else if (cmd.action === "exportDeck" || cmd.action === "exportPdf" || cmd.action === "exportPng") {
+        else if (cmd.action === "exportPdf" || cmd.action === "exportPng") {
           const requestedMeetingId = validMeetingId(cmd.meetingId)
             ? cmd.meetingId
             : cmd.meetingId === undefined ? store.latestMeeting()?.id : undefined;
@@ -1092,25 +1112,6 @@ const httpServer = Bun.serve({
               });
             } else {
               broadcast({ type: "status", text: `A conflicting ${activeJob.action} job is already in progress` });
-            }
-          } else if (cmd.action === "exportDeck") {
-            try {
-              const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-              const dir = join(import.meta.dir, "exports", `deck-${stamp}`);
-              const slidesDir = join(dir, "slides");
-              mkdirSync(slidesDir, { recursive: true });
-              copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(dir, "theme.css"));
-              copyFileSync(join(import.meta.dir, "deck", "theme.css"), join(slidesDir, "theme.css"));
-              copyDeckAssets({ sourceDirectory: join(import.meta.dir, "deck", "assets"), exportDirectory: dir, slidesDirectory: slidesDir });
-              const material = prepareExportDeck(store, requestedMeetingId);
-              writeFileSync(join(dir, "index.html"), material.indexHtml, "utf-8");
-              for (const file of material.files) writeFileSync(join(slidesDir, file.filename), file.html, "utf-8");
-              lastSavedPath = `exports/deck-${stamp}/index.html`;
-              broadcast({ type: "saved", path: lastSavedPath });
-              broadcast({ type: "status", text: `덱 저장됨: ${lastSavedPath}` });
-              openUrl(`file://${join(dir, "index.html")}`);
-            } catch (error) {
-              broadcast({ type: "status", text: `저장 실패: ${error instanceof Error ? error.message : String(error)}` });
             }
           } else {
             const prefix = cmd.action === "exportPdf" ? "pdf" : "png";
@@ -1303,6 +1304,7 @@ if (config.server.openBrowser) {
 // 시작하지 않음 — 마이크 권한 요청 시점도 사용자 클릭에 맞춤). 파일 모드는
 // 데모용으로 부팅 즉시 자동 시작.
 let capturing = false;
+let captureStartedAt: number | null = null;
 let stopPromise: Promise<void> | null = null;
 let captureRun: Promise<void> | null = null;
 let stopRequested = false;
@@ -1316,12 +1318,24 @@ const selectSttModel = createSelectSttModel(sttManager, {
   rebuildCapture() {
     whisper = createWhisperCapture();
     broadcast(sttModelsMessage(sttManager.allStates()));
-    broadcast({ type: "status", text: `STT 모델 변경됨: ${sttManager.selectedPath() ?? config.whisper.modelPath}` });
+    broadcast({ type: "status", text: "음성 인식 모델을 변경했습니다" });
   },
 });
 
 function captureMessage(): CaptureUpdate {
-  return { type: "capture", capturing, mode: config.input.mode };
+  return {
+    type: "capture",
+    capturing,
+    mode: config.input.mode,
+    ...(capturing && captureStartedAt !== null ? { startedAt: captureStartedAt } : {}),
+  };
+}
+
+function reportCaptureActionError(action: "start" | "stop", error: unknown): void {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`[capture] ${action} failed: ${message}`);
+  broadcast({ type: "status", text: `녹음을 ${action === "start" ? "시작" : "중지"}하지 못했습니다: ${message}` });
+  broadcast(captureMessage());
 }
 
 const whisperHandlers = {
@@ -1332,7 +1346,7 @@ const whisperHandlers = {
   },
   onError: (e: Error) => {
     console.error(`[whisper error] ${e.message}`);
-    broadcast({ type: "status", text: `whisper 오류: ${e.message}` });
+    broadcast({ type: "status", text: `음성 인식 오류: ${e.message}` });
   },
 };
 
@@ -1403,10 +1417,11 @@ async function startCapture(requestedMeetingId?: unknown): Promise<void> {
   });
   captureFinalizer = new CaptureFinalizer(minutesStore, transcriptWriter, meetingId, rawAudioRecorder);
   capturing = true;
+  captureStartedAt = Date.now();
   stopRequested = false;
   broadcast(captureMessage());
   broadcast(meetingsMessage());
-  broadcast({ type: "status", text: "🎤 녹음 시작 — 말씀하세요" });
+  broadcast({ type: "status", text: "녹음을 시작했습니다. 말씀해 주세요" });
   const finalizer = captureFinalizer;
   captureRun = (async () => {
     let failure: unknown = null;
@@ -1419,7 +1434,7 @@ async function startCapture(requestedMeetingId?: unknown): Promise<void> {
         await session.flush();
         const finalized = await finalizer.finish();
         if (finalized.audio.status === "unavailable" && config.input.mode === "mic") {
-          broadcast({ type: "status", text: "원본 오디오를 보존하지 못했습니다 (recorder_failed)" });
+          broadcast({ type: "status", text: "원본 오디오를 저장하지 못했습니다" });
         }
       } finally {
         rawAudioRecorder = null;
@@ -1428,18 +1443,19 @@ async function startCapture(requestedMeetingId?: unknown): Promise<void> {
         if (minutesStore.meetingMeta(meetingId)?.phase === "capturing") minutesStore.endMeeting(meetingId);
         const endedNaturally = capturing && !stopRequested;
         capturing = false;
+        captureStartedAt = null;
         broadcast(captureMessage());
         if (endedNaturally && config.input.mode === "mic") {
-          broadcast({ type: "status", text: "⚠️ 마이크 캡처가 종료되었습니다 — 장치/권한 확인 후 다시 시작하세요" });
+          broadcast({ type: "status", text: "마이크 입력이 중단되었습니다. 마이크와 권한을 확인한 뒤 다시 시작해 주세요" });
         } else if (!stopRequested) {
-          broadcast({ type: "status", text: "입력 종료" });
+          broadcast({ type: "status", text: "음성 입력이 종료되었습니다" });
         }
       }
     }
     if (failure) {
       const message = failure instanceof Error ? failure.message : String(failure);
       console.error(`[capture fatal] ${message}`);
-      broadcast({ type: "status", text: `캡처 치명 오류: ${message}` });
+      broadcast({ type: "status", text: `녹음 오류: ${message}` });
     }
   })();
 }
@@ -1459,7 +1475,7 @@ async function stopCapture(): Promise<void> {
       await whisper.stop();
       await run;
       broadcast(meetingsMessage());
-      broadcast({ type: "status", text: "⏹ 녹음 중지 — 슬라이드/전사본을 저장할 수 있습니다" });
+      broadcast({ type: "status", text: "녹음 중지 완료. 슬라이드와 전사 원문을 저장할 수 있습니다" });
     } finally {
       captureRun = null;
       stopPromise = null;

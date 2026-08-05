@@ -45,6 +45,32 @@ async function addAndDetect(harness: SessionHarness, text: string): Promise<void
 }
 
 describe("MeetingSession", () => {
+  test("production-style manual mode records transcript without automatic LLM detection", async () => {
+    let calls = 0;
+    const session = new MeetingSession(
+      {
+        detectBlock: async () => {
+          calls += 1;
+          return { shouldAdvance: false, title: "자동 카드", bullets: ["생성되면 안 됨"] };
+        },
+        ping: async () => true,
+      },
+      1,
+      20,
+      new Set(),
+      undefined,
+      { automaticDetection: false },
+    );
+
+    session.onChunk({ text: "첫 번째 전사", ts: 1 });
+    session.onChunk({ text: "두 번째 전사", ts: 2 });
+    await session.flush();
+
+    expect(calls).toBe(0);
+    expect(session.transcript().entries).toHaveLength(2);
+    expect(session.snapshot().current).toBeNull();
+  });
+
   test("첫 감지에서 MeetingCard 슬라이드 생성", async () => {
     const harness = makeSession({
       detectBlock: async () => ({
@@ -251,5 +277,35 @@ describe("meta card rejection", () => {
     await addAndDetect(harness, "수고하셨습니다");
     const current = harness.session.snapshot().current;
     expect(current).toBeNull();
+  });
+
+  test("음성 인식 테스트 자체가 회의 주제이면 실제 논의 카드를 생성한다", async () => {
+    const harness = makeSession({
+      detectBlock: async () => ({
+        shouldAdvance: false,
+        title: "",
+        bullets: [],
+      }),
+    });
+
+    harness.session.onChunk({ text: "음성 인식 테스트를 진행하겠습니다.", ts: 1 });
+    harness.session.onChunk({ text: "전사는 정상적으로 들어오고 있습니다.", ts: 2 });
+    harness.session.onChunk({ text: "슬라이드 생성 기준을 확인하겠습니다.", ts: 3 });
+    await harness.session.flush();
+
+    expect(harness.session.snapshot().current).toMatchObject({
+      title: "음성 인식 테스트를 진행하겠습니다",
+      bullets: [
+        "음성 인식 테스트를 진행하겠습니다.",
+        "전사는 정상적으로 들어오고 있습니다.",
+        "슬라이드 생성 기준을 확인하겠습니다.",
+      ],
+    });
+    expect(harness.session.snapshot().current?.scene).toMatchObject({
+      intent: "statement",
+      elements: expect.arrayContaining([
+        expect.objectContaining({ type: "text", role: "statement" }),
+      ]),
+    });
   });
 });

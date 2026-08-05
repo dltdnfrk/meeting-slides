@@ -116,8 +116,8 @@ afterAll(async () => {
   harness.stop();
 });
 
-describe("프로바이더 설정 UI", () => {
-  test("설치/인증 상태를 진실하게 표시하고 인증 미확인을 연결됨으로 속이지 않는다", async () => {
+describe("AI 모델 설정 UI", () => {
+  test("설치와 로그인 상태를 사용자 언어로 구분해 표시한다", async () => {
     harness.pushMessage(providers());
     await waitForProviderAuth("cli:gemini", "unavailable");
 
@@ -133,17 +133,15 @@ describe("프로바이더 설정 UI", () => {
     // 네 개의 구독형 CLI 카드가 모두 보인다.
     expect(Object.keys(byId)).toEqual(expect.arrayContaining(["cli:codex", "cli:grok", "cli:claude", "cli:gemini"]));
 
-    // 인증이 확인된 것만 "연결됨"이다.
-    expect(byId["cli:codex"]).toMatchObject({ badge: "연결됨", disabled: false, connect: "재인증" });
+    expect(byId["cli:codex"]).toMatchObject({ badge: "사용 가능", disabled: false, connect: "다시 로그인" });
 
-    // auth=unknown은 절대 연결됨으로 표시되지 않지만, 설치되어 있으므로 선택은 가능하다.
-    expect(byId["cli:grok"].badge).toBe("인증 미확인");
-    expect(byId["cli:grok"].badge).not.toBe("연결됨");
+    // auth=unknown은 사용 가능으로 속이지 않지만 설치되어 있으므로 선택은 가능하다.
+    expect(byId["cli:grok"].badge).toBe("로그인 확인 필요");
+    expect(byId["cli:grok"].badge).not.toBe("사용 가능");
     expect(byId["cli:grok"].disabled).toBe(false);
 
-    expect(byId["cli:claude"]).toMatchObject({ badge: "로그인 필요", disabled: false, connect: "연결" });
-    // 미설치는 선택 불가.
-    expect(byId["cli:gemini"]).toMatchObject({ badge: "미설치", disabled: true });
+    expect(byId["cli:claude"]).toMatchObject({ badge: "로그인 필요", disabled: false, connect: "로그인" });
+    expect(byId["cli:gemini"]).toMatchObject({ badge: "설치 필요", disabled: true });
 
     // 저장된 현재 선택이 모델/effort 셀렉트에 반영된다.
     expect(await page.$eval("#select-model", (el) => (el as HTMLSelectElement).value)).toBe("gpt-5.6-sol");

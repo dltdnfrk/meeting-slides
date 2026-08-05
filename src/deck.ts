@@ -14,6 +14,7 @@ import type {
   SlideSpec,
   SummarySlideSpec,
 } from "./slide-spec.js";
+import { renderConversationVisual } from "./deck-visual.js";
 import type { StoredLine, StoredSlide } from "./store.js";
 
 export interface DeckInput {
@@ -58,12 +59,22 @@ export function linesForSlide(slides: StoredSlide[], lines: StoredLine[], index:
 export function buildDeckHtml(input: DeckInput): string {
   const date = new Date(input.startedAt).toLocaleString("ko-KR", { hour12: false });
   const coverClass = isLongCoverTitle(input.title) ? "title-slide is-long-cover" : "title-slide";
+  const coverVisual = renderConversationVisual({
+    title: input.title,
+    points: input.slides.map((slide) => slide.title),
+    variant: "cover",
+  });
   const sections = input.slides.map((slide, i) => {
     const notes = linesForSlide(input.slides, input.lines, i)
       .map((l) => `[${fmtTime(l.ts)}] ${l.speaker ? `화자 ${l.speaker}: ` : ""}${l.text}`)
       .join("\n");
     const bullets = slide.bullets.map((b) => `            <li>${esc(b)}</li>`).join("\n");
     const topicClass = isDenseTopic(slide) ? "topic-slide is-dense" : "topic-slide";
+    const topicVisual = renderConversationVisual({
+      title: slide.title,
+      points: slide.bullets,
+      variant: "topic",
+    });
     return `        <section class="${topicClass}">
           <div class="topic-copy">
             <h2>${String(slide.idx).padStart(2, "0")}. ${esc(slide.title)}</h2>
@@ -71,7 +82,7 @@ export function buildDeckHtml(input: DeckInput): string {
 ${bullets}
             </ul>
           </div>
-          <img class="topic-map" src="./assets/meeting-topic-map.png" alt="" aria-hidden="true" />
+          ${topicVisual}
           <aside class="notes">${esc(notes || "(이 블록의 전사 없음)")}</aside>
         </section>`;
   }).join("\n\n");
@@ -93,7 +104,7 @@ ${bullets}
       <div class="slides">
 
         <section class="${coverClass}">
-          <img class="cover-visual" src="./assets/meeting-cover.png" alt="" aria-hidden="true" />
+          ${coverVisual}
           <div class="title-block">
             <p class="eyebrow">MEETING SLIDES</p>
             <h1>${esc(input.title)}</h1>
@@ -158,8 +169,9 @@ ${inner}
 }
 
 function renderCoverTemplate(spec: CoverSlideSpec): string {
+  const visual = renderConversationVisual({ title: spec.title, points: [], variant: "cover" });
   return slidePageHtml(`
-  <img class="cover-visual" src="./assets/meeting-cover.png" alt="" aria-hidden="true" />
+  ${visual}
   <p class="eyebrow">${esc(spec.kicker ?? "MEETING SLIDES")}</p>
   <h1>${esc(spec.title)}</h1>
   <p class="meta">${esc(spec.subtitle ?? "")}</p>`, "cover", false, isLongCoverTitle(spec.title));
@@ -167,6 +179,7 @@ function renderCoverTemplate(spec: CoverSlideSpec): string {
 
 function renderSectionTemplate(spec: SectionSlideSpec): string {
   const bullets = spec.bullets.map((bullet) => `    <li>${esc(bullet)}</li>`).join("\n");
+  const visual = renderConversationVisual({ title: spec.title, points: spec.bullets, variant: "topic" });
   return slidePageHtml(`
   <div class="topic-layout">
     <div class="topic-copy">
@@ -175,7 +188,7 @@ function renderSectionTemplate(spec: SectionSlideSpec): string {
 ${bullets}
       </ul>
     </div>
-    <img class="topic-map" src="./assets/meeting-topic-map.png" alt="" aria-hidden="true" />
+    ${visual}
   </div>`, "topic", isDenseTopic(spec));
 }
 

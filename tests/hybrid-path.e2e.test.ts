@@ -252,7 +252,7 @@ describe("Hybrid live -> compile -> export hermetic path", () => {
       error: "Deck compile is in progress; export was not started",
     });
     await page.waitForFunction(
-      () => document.getElementById("status-text")?.textContent === "컴파일 중에는 내보낼 수 없습니다",
+      () => document.getElementById("status-text")?.textContent === "슬라이드를 만드는 중에는 다른 파일을 저장할 수 없습니다",
       { timeout: 5_000 },
     );
     expect(existsSync(exportsDirectory) ? readdirSync(exportsDirectory).length : 0)

@@ -431,6 +431,10 @@ describe("pre-capture attendee registration form", () => {
     });
     await page.waitForFunction(() => window.__attendeeState.meetingId === 55);
 
+    page.once("dialog", async (dialog) => {
+      expect(dialog.message()).toContain("현재 회의를 닫고 새 회의를 준비할까요?");
+      await dialog.accept();
+    });
     await page.click("#btn-reset");
     await page.waitForFunction(() => window.__attendeeState.meetingId === null);
 

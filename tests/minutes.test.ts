@@ -69,7 +69,7 @@ describe("buildMinutesHtml", () => {
     const emptyFirstPage = buildMinutesHtml(input({ decisions: [], actions: [] }))
       .match(/<section class="first-page"[\s\S]*?<\/section>/)?.[0] ?? "";
     expect(emptyFirstPage).toContain("결정 사항 없음");
-    expect(emptyFirstPage).toContain("액션 항목 없음");
+    expect(emptyFirstPage).toContain("할 일 없음");
   });
 
   test("starts appendix content after a forced page break", () => {
@@ -79,23 +79,23 @@ describe("buildMinutesHtml", () => {
     expect(html).toMatch(/<\/section>\s*<section class="appendix-page"/);
     expect(css).toMatch(/\.first-page\s*\{[^}]*break-after:\s*page/s);
     expect(css).toMatch(/\.appendix-page\s*\{[^}]*break-before:\s*page/s);
-    expect(html).toContain("논의 및 미결 사항");
-    expect(html).toContain("발언 귀속 및 정본 전사 원문");
+    expect(html).toContain("논의 및 미정 사항");
+    expect(html).toContain("발언자 및 최종 전사 원문");
     expect(html).toContain("참조 자료");
   });
 
-  test("prints immutable provenance coordinates for every sourced item", () => {
+  test("keeps immutable provenance in data attributes while showing readable sentence positions", () => {
     const html = buildMinutesHtml(input());
-    const coordinates = [...html.matchAll(/<span class="source-coordinate"[^>]*>\(([^<]+)\)<\/span>/g)]
+    const coordinates = [...html.matchAll(/<span class="source-coordinate"[^>]*>([^<]+)<\/span>/g)]
       .map((match) => match[1]);
 
     expect(coordinates).toEqual([
-      "transcript-v1,1,2",
-      "transcript-v1,2,2",
-      "transcript-v1,3,3",
-      "transcript-v1,3,4",
-      "transcript-v1,1,1",
-      "transcript-v1,2,2",
+      "1~2번째 문장",
+      "2번째 문장",
+      "3번째 문장",
+      "3~4번째 문장",
+      "1번째 문장",
+      "2번째 문장",
     ]);
     expect(html).toContain('data-source-coordinate="(transcript-v1,1,2)"');
     expect(html).toContain('data-source-coordinate="(transcript-v1,1,1)"');
@@ -108,7 +108,7 @@ describe("buildMinutesHtml", () => {
     }));
 
     expect(html).toContain('class="transcript-version"');
-    expect(html).toContain('>canonical-retranscription-v2</span>');
+    expect(html).toContain('>원문 연결됨</span>');
     expect(html).toContain('data-transcript-version-id="canonical-retranscription-v2"');
     expect(html).toContain('class="minutes-block transcript-block canonical-transcript"');
   });

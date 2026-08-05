@@ -31,14 +31,14 @@
 </head>
 <body>
   <main class="direct-file-guard">
-    <p class="direct-file-guard__eyebrow">MEETINGSLIDES / LOCAL RUNTIME</p>
-    <h1>파일을 직접 열 수 없는 화면입니다</h1>
-    <p class="direct-file-guard__copy">이 UI는 실시간 전사와 슬라이드 생성을 위해 로컬 서버 연결이 필요합니다. 터미널에서 서버를 시작한 뒤 정상 주소로 열어주세요.</p>
+    <p class="direct-file-guard__eyebrow">MEETING SLIDES · 실행 안내</p>
+    <h1>앱 주소에서 열어 주세요</h1>
+    <p class="direct-file-guard__copy">Meeting Slides는 음성 기록과 슬라이드 생성을 위해 로컬 앱 서버가 필요합니다. 아래 명령으로 서버를 시작한 뒤 앱을 열어 주세요.</p>
     <div class="direct-file-guard__command">
-      <span>실행 명령</span>
+      <span>서버 시작</span>
       <code>bun run server.ts</code>
     </div>
-    <a href="http://localhost:8787/">정상 화면 열기</a>
+    <a href="http://localhost:8787/">Meeting Slides 열기</a>
   </main>
 
   <!-- 앰비언트 배경 레이어 -->
@@ -68,8 +68,7 @@
           <span class="record-btn__label">녹음 시작</span>
         </button>
         <button id="btn-review" class="review-btn" type="button" title="회의록 검토" aria-label="회의록 검토" aria-expanded="false" aria-controls="review-panel" hidden>
-          <span class="review-btn__icon" aria-hidden="true">◈</span>
-          <span class="review-btn__label">검토</span>
+          <span class="review-btn__label">회의록 검토</span>
           <span class="review-btn__count" id="review-count" hidden>0</span>
         </button>
       </div>
@@ -77,12 +76,12 @@
       <div class="topbar__right">
         <div class="onair" id="onair">
           <span class="onair__dot"></span>
-          <span class="onair__label">대기</span>
+          <span class="onair__label">녹음 대기</span>
         </div>
         <div class="topbar__status">
           <span class="status__indicator" id="status-indicator"></span>
-          <span class="status__text" id="status-text">서버에 연결 중…</span>
-          <button id="btn-settings" class="icon-btn" type="button" title="LLM 프로바이더 설정" aria-label="LLM 프로바이더 설정">⚙</button>
+          <span class="status__text" id="status-text">앱 서버에 연결하는 중…</span>
+          <button id="btn-settings" class="icon-btn" type="button" title="설정 열기" aria-label="설정 열기">설정</button>
         </div>
       </div>
     </header>
@@ -91,28 +90,31 @@
     <div class="provider-panel" id="provider-panel" role="dialog" aria-modal="false" aria-label="설정" hidden>
       <section class="settings-section" aria-labelledby="provider-section-title">
         <div class="provider-panel__head">
-          <span id="provider-section-title">LLM 프로바이더</span>
-          <button id="btn-recheck" class="icon-btn icon-btn--sm" type="button" title="재검사" aria-label="프로바이더 재검사">↻</button>
+          <span id="provider-section-title">슬라이드 생성 모델</span>
+          <div class="settings-section__actions">
+            <button id="btn-recheck" class="icon-btn icon-btn--sm" type="button" title="연결 상태 다시 확인" aria-label="연결 상태 다시 확인">다시 확인</button>
+            <button id="btn-settings-close" class="icon-btn icon-btn--sm" type="button" title="설정 닫기" aria-label="설정 닫기">닫기</button>
+          </div>
         </div>
         <div class="provider-panel__list" id="provider-list"></div>
         <div class="provider-config" id="provider-config">
           <label class="provider-config__row">모델
             <select id="select-model" class="provider-config__select"></select>
           </label>
-          <label class="provider-config__row" id="effort-row">Effort
+          <label class="provider-config__row" id="effort-row">추론 강도
             <select id="select-effort" class="provider-config__select"></select>
           </label>
         </div>
-        <p class="provider-panel__hint">선택 즉시 다음 블록 감지부터 적용됩니다</p>
+        <p class="provider-panel__hint">변경한 설정은 다음 슬라이드부터 적용됩니다</p>
       </section>
 
       <section class="settings-section settings-section--stt" aria-labelledby="stt-section-title">
         <div class="provider-panel__head">
-          <span id="stt-section-title">음성 인식 모델</span>
-          <button id="btn-recheck-stt" class="icon-btn icon-btn--sm" type="button" title="재검사" aria-label="음성 인식 모델 재검사">↻</button>
+          <span id="stt-section-title">음성 인식</span>
+          <button id="btn-recheck-stt" class="icon-btn icon-btn--sm" type="button" title="설치 상태 다시 확인" aria-label="설치 상태 다시 확인">다시 확인</button>
         </div>
         <div class="stt-list" id="stt-list" aria-live="polite"></div>
-        <p class="provider-panel__hint" id="stt-hint">모델을 내려받아 선택하면 다음 녹음부터 적용됩니다</p>
+        <p class="provider-panel__hint" id="stt-hint">선택한 모델은 다음 녹음부터 사용됩니다</p>
       </section>
     </div>
 
@@ -135,7 +137,7 @@
         <p class="attendee-list__empty">아직 참석자가 없습니다</p>
       </div>
       <button id="btn-attendee-save" class="attendee-panel__save" type="button">참석자 저장</button>
-      <p class="attendee-panel__hint">녹음 시작 전에 지정하면 회의록 화자·담당자 후보로 쓰입니다 (선택 사항)</p>
+      <p class="attendee-panel__hint">녹음 전에 추가하면 회의록의 발언자와 담당자를 연결할 때 사용합니다. 선택 사항입니다.</p>
     </div>
 
     <!-- ── 글랜서블 상태 스트립 (진행 과정 한눈에) ── -->
@@ -146,7 +148,7 @@
       </div>
       <div class="glance__chip glance__chip--detect" id="glance-detect" hidden>
         <span class="glance__dot"></span>
-        <span class="glance__label">정리 중</span>
+        <span class="glance__label">슬라이드 정리 중</span>
       </div>
       <div class="glance__metric">
         <span class="glance__metric-label">슬라이드</span>
@@ -157,7 +159,7 @@
         <span class="glance__metric-value" id="glance-lines">0</span>
       </div>
       <div class="glance__metric glance__metric--provider">
-        <span class="glance__metric-label">모델</span>
+        <span class="glance__metric-label">AI 모델</span>
         <span class="glance__metric-value" id="glance-provider">—</span>
       </div>
       <div class="glance__metric glance__metric--rec" id="glance-rec" hidden>
@@ -170,26 +172,26 @@
     <div class="workspace" id="workspace">
 
     <!-- 좌: 세션 레일 -->
-    <aside class="session-rail" id="session-rail" aria-label="세션">
+    <aside class="session-rail" id="session-rail" aria-label="회의 기록">
       <div class="pane__head">
-        <span class="pane__title">세션</span>
+        <span class="pane__title">회의 기록</span>
         <span class="pane__count" id="session-count">0</span>
       </div>
       <div class="pane__body">
         <ul class="session-list" id="session-list"></ul>
-        <p class="pane__empty" id="session-empty">저장된 세션이 없습니다</p>
+        <p class="pane__empty" id="session-empty">저장된 회의가 없습니다</p>
       </div>
     </aside>
 
     <!-- 좌|중앙 스플리터 -->
-    <div class="splitter splitter--rail" id="splitter-rail" role="separator" aria-orientation="vertical" aria-label="세션 레일 너비 조절" tabindex="0"></div>
+    <div class="splitter splitter--rail" id="splitter-rail" role="separator" aria-orientation="vertical" aria-label="회의 기록 목록 너비 조절" tabindex="0"></div>
 
     <!-- 중앙: 시각 자료 무대 (Tiro 히어로 슬롯) -->
     <main class="stage stage-pane" id="stage-pane">
       <section class="slide-frame" id="slide-frame">
         <div class="doc-head">
-          <h1 class="doc-title" id="doc-title">회의 준비 중</h1>
-          <p class="doc-meta" id="doc-meta">녹음을 시작하면 문서가 만들어집니다</p>
+          <h1 class="doc-title" id="doc-title">새 회의 준비</h1>
+          <p class="doc-meta" id="doc-meta">녹음을 시작하면 발언이 기록됩니다</p>
         </div>
         <div class="slide" id="current-slide">
           <div class="slide__placeholder">
@@ -201,8 +203,8 @@
                 </svg>
               </span>
             </div>
-            <h2 class="placeholder__title">발언을 시작하면<br>슬라이드가 만들어집니다</h2>
-            <p class="placeholder__sub">whisper.cpp가 음성을 전사하고, AI가 주제 블록을 감지해 한 장씩 정리합니다</p>
+            <h2 class="placeholder__title">대화가 충분히 쌓이면 슬라이드 초안을 만들어 보세요</h2>
+            <p class="placeholder__sub">지금까지의 대화로 편집 가능한 PowerPoint 초안을 만듭니다</p>
           </div>
         </div>
       </section>
@@ -211,7 +213,7 @@
       <section class="island" id="island">
         <span class="island__dot"></span>
         <span class="speaker-chip" id="speaker-chip" hidden></span>
-        <span class="island__text" id="caption-text">대기 중…</span>
+        <span class="island__text" id="caption-text">발언을 기다리는 중…</span>
         <span class="island__sep"></span>
         <span class="island__meta" id="pill-meta"></span>
       </section>
@@ -221,16 +223,16 @@
     <div class="splitter splitter--transcript" id="splitter-transcript" role="separator" aria-orientation="vertical" aria-label="전사 패널 너비 조절" tabindex="0"></div>
 
     <!-- 우: 전사 패널 — 라이브 전사의 1차 거처 -->
-    <aside class="transcript-pane" id="transcript-pane" aria-label="전사">
+    <aside class="transcript-pane" id="transcript-pane" aria-label="실시간 기록">
       <section class="transcript-card" id="transcript-card">
         <div class="pane__head">
-          <span class="pane__title">전사</span>
+          <span class="pane__title">실시간 기록</span>
           <span class="pane__count" id="transcript-count">0</span>
         </div>
         <div class="pane__body" id="transcript-body">
           <div class="transcript-stream" id="transcript-stream"></div>
-          <p class="pane__empty" id="transcript-empty">녹음을 시작하면<br>전사가 여기에 흐릅니다</p>
-          <div class="transcript-trunc" id="transcript-trunc" hidden>⚠ 전사 로그 상한 도달 — 오래된 문장이 잘렸습니다</div>
+          <p class="pane__empty" id="transcript-empty">녹음을 시작하면<br>발언 내용이 여기에 기록됩니다</p>
+          <div class="transcript-trunc" id="transcript-trunc" hidden>오래된 기록 일부가 화면에서 생략되었습니다</div>
         </div>
         <!-- 남/남서 리사이즈 손잡이: 서쪽 폭은 워크스페이스 스플리터가 담당 -->
         <div class="transcript-grip transcript-grip--s" id="transcript-grip-s" role="separator" aria-orientation="horizontal" aria-label="전사 패널 높이 조절" tabindex="0"></div>
@@ -244,18 +246,18 @@
     <div class="dock">
       <div class="dock__tabs">
         <span class="dock__label" id="tab-history">
-          히스토리 <span class="dock__count" id="history-count">0</span>
+          슬라이드 <span class="dock__count" id="history-count">0장</span>
         </span>
         <div class="dock__spacer"></div>
-        <button id="btn-compile-deck" class="dock__btn dock__btn--compile" type="button" title="전체 회의를 발표 덱으로 컴파일" aria-label="발표 덱 컴파일"><span>✦</span>컴파일</button>
+        <button id="btn-compile-deck" class="dock__btn dock__btn--compile" type="button" title="지금까지의 대화로 편집 가능한 PowerPoint 초안 만들기" aria-label="슬라이드 초안 만들기">슬라이드 초안 만들기</button>
         <span id="compile-status" class="compile-status" role="status" aria-live="polite" hidden></span>
-        <button id="btn-export-md"   class="dock__btn" type="button" title="Markdown 내보내기" aria-label="Markdown 내보내기"><span>↓</span>MD</button>
-        <button id="btn-export-json" class="dock__btn" type="button" title="JSON 내보내기" aria-label="JSON 내보내기"><span>{ }</span>JSON</button>
-        <button id="btn-export-transcript" class="dock__btn" type="button" title="전사본 내보내기" aria-label="전사본 내보내기"><span>¶</span>전사</button>
-        <button id="btn-export-deck"  class="dock__btn" type="button" title="덱 저장" aria-label="덱 저장"><span>▣</span>덱</button>
-        <button id="btn-export-pdf"  class="dock__btn" type="button" title="초안 PDF 저장 (미검토)" aria-label="초안 PDF 저장"><span>↓</span>PDF</button>
-        <button id="btn-export-png"  class="dock__btn" type="button" title="초안 PNG 저장 (미검토)" aria-label="초안 PNG 저장"><span>▦</span>PNG</button>
-        <button id="btn-reset"        class="dock__btn dock__btn--danger" type="button" title="초기화" aria-label="초기화"><span>⟲</span></button>
+        <button id="btn-export-md" class="dock__btn" type="button" title="회의 메모를 Markdown으로 저장" aria-label="회의 메모 저장">회의 메모</button>
+        <button id="btn-export-json" class="dock__btn" type="button" title="회의 데이터를 JSON으로 저장" aria-label="회의 데이터 저장">데이터</button>
+        <button id="btn-export-transcript" class="dock__btn" type="button" title="전사 원문 저장" aria-label="전사 원문 저장">전사 원문</button>
+        <button id="btn-export-deck" class="dock__btn" type="button" title="브라우저에서 볼 수 있는 슬라이드 저장" aria-label="웹 슬라이드 저장">웹 슬라이드</button>
+        <button id="btn-export-pdf" class="dock__btn" type="button" title="검토용 PDF 만들기" aria-label="검토용 PDF 만들기">PDF</button>
+        <button id="btn-export-png" class="dock__btn" type="button" title="슬라이드를 PNG 이미지로 저장" aria-label="슬라이드 이미지 저장">이미지</button>
+        <button id="btn-reset" class="dock__btn dock__btn--danger" type="button" title="현재 회의를 닫고 새 회의 준비" aria-label="새 회의 준비">새 회의</button>
         <span class="last-saved" id="last-saved" hidden></span>
       </div>
 
@@ -264,7 +266,7 @@
         <div class="filmstrip" id="thumbnails">
           <div class="filmstrip__empty">
             <span class="filmstrip__empty-ring"></span>
-            <span>슬라이드가 없습니다</span>
+            <span>아직 만든 슬라이드가 없습니다</span>
           </div>
         </div>
       </div>
@@ -272,9 +274,9 @@
     </div>
   </div>
 
-  <div class="review-panel" id="review-panel" role="dialog" aria-modal="false" aria-label="회의록 후보 검토" aria-busy="false" data-state="idle" hidden>
+  <div class="review-panel" id="review-panel" role="dialog" aria-modal="false" aria-label="회의록 검토" aria-busy="false" data-state="idle" hidden>
     <div class="review-panel__head">
-      <span class="review-panel__title">회의록 후보 검토</span>
+      <span class="review-panel__title">회의록 검토</span>
       <span class="review-panel__version" id="review-version"></span>
       <button id="btn-review-close" class="icon-btn icon-btn--sm" type="button" title="검토 닫기" aria-label="검토 닫기">✕</button>
     </div>
@@ -282,14 +284,14 @@
     <p class="review-panel__error" id="review-error" role="alert" hidden></p>
     <div class="review-loading" id="review-loading" hidden>
       <span class="review-loading__ring" aria-hidden="true"></span>
-      <span class="review-loading__text">전사에서 결정·액션·미결 후보를 추출하는 중…</span>
+      <span class="review-loading__text">결정 사항과 할 일을 정리하는 중…</span>
     </div>
     <div class="review-list" id="review-list" role="list"></div>
     <div class="review-panel__foot">
-      <button id="btn-review-retry" class="review-panel__retry" type="button" hidden>↻ 추출 재시도</button>
-      <span class="review-panel__hint">확정하면 이 후보들이 회의록 정본이 됩니다</span>
+      <button id="btn-review-retry" class="review-panel__retry" type="button" hidden>다시 정리</button>
+      <span class="review-panel__hint">확인한 항목만 최종 회의록에 반영됩니다</span>
       <button id="btn-review-confirm" class="review-panel__confirm" type="button" disabled>
-        검토 확정 <span class="review-panel__confirm-count" id="review-confirm-count">0</span>
+        검토 완료 <span class="review-panel__confirm-count" id="review-confirm-count">0</span>
       </button>
     </div>
   </div>

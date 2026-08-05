@@ -49,7 +49,7 @@ function fixture(): { store: MeetingStore; meetingId: number; planner: DeckPlann
 const fixedNow = () => new Date("2026-08-02T12:34:56.000Z");
 
 describe("compiled deck disk action", () => {
-  test("fake planner output is persisted and atomically rendered as standalone registry files", async () => {
+  test("fake planner output is persisted with content-derived visuals and no copied image bundle", async () => {
     const { store, meetingId, planner } = fixture();
     const exportsDirectory = temporaryExports();
 
@@ -66,9 +66,13 @@ describe("compiled deck disk action", () => {
     expect(readFileSync(join(slidesDirectory, "slide-02.html"), "utf-8")).toContain('class="slide-page is-summary"');
     expect(readFileSync(join(slidesDirectory, "slide-03.html"), "utf-8")).toContain("금요일에 배포한다");
     expect(readFileSync(join(slidesDirectory, "slide-04.html"), "utf-8")).toContain("릴리스 노트");
-    expect(readFileSync(join(slidesDirectory, "slide-00.html"), "utf-8")).toContain('href="./theme.css"');
+    const coverHtml = readFileSync(join(slidesDirectory, "slide-00.html"), "utf-8");
+    const topicHtml = readFileSync(join(slidesDirectory, "slide-01.html"), "utf-8");
+    expect(coverHtml).toContain('href="./theme.css"');
+    expect(coverHtml).toContain('<svg class="cover-visual"');
+    expect(topicHtml).toContain('<svg class="topic-map"');
     expect(existsSync(join(slidesDirectory, "theme.css"))).toBe(true);
-    expect(existsSync(join(slidesDirectory, "assets", "meeting-cover.png"))).toBe(true);
+    expect(existsSync(join(slidesDirectory, "assets"))).toBe(false);
     expect(readdirSync(exportsDirectory).some((name) => name.startsWith("."))).toBe(false);
     store.close();
   });

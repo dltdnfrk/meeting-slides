@@ -128,6 +128,32 @@ export function isLowQualityMeetingCard(card: LiveMeetingCard): boolean {
   return false;
 }
 
+const TRANSCRIPT_FALLBACK_MIN_LINES = 3;
+const TRANSCRIPT_FALLBACK_MIN_CHARACTERS = 48;
+const TRANSCRIPT_META_LINE = /(?:회의(?:를|가)?\s*(?:종료|마치)|수고하셨|감사합니다|안녕하세요)/u;
+
+export function deriveFallbackMeetingCard(lines: readonly string[]): BlockDetectionResult | null {
+  const contentLines = lines
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter((line) => line.length >= 8 && !TRANSCRIPT_META_LINE.test(line));
+  const characterCount = contentLines.reduce((total, line) => total + line.length, 0);
+  if (
+    contentLines.length < TRANSCRIPT_FALLBACK_MIN_LINES
+    || characterCount < TRANSCRIPT_FALLBACK_MIN_CHARACTERS
+  ) {
+    return null;
+  }
+
+  const title = contentLines[0]!
+    .replace(/[.!?。]+$/u, "")
+    .slice(0, 48);
+  return {
+    shouldAdvance: false,
+    title,
+    bullets: contentLines.slice(-3),
+  };
+}
+
 
 interface ChatChoice {
   message?: {

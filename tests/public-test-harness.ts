@@ -6,12 +6,13 @@ export interface PublicTestHarness {
   clientConnected: Promise<void>;
   pushMessage(payload: unknown): void;
   nextClientMessage(): Promise<unknown>;
+  disconnectClients(): void;
   stop(): void;
 }
 
 export function createPublicTestHarness(): PublicTestHarness {
   const publicDirectory = join(import.meta.dir, "..", "public");
-  const sockets = new Set<{ send(data: string): void }>();
+  const sockets = new Set<{ send(data: string): void; close(): void }>();
   const clientMessageWaiters: Array<(message: unknown) => void> = [];
   let resolveClientConnected: (() => void) | null = null;
   const clientConnected = new Promise<void>((resolve) => { resolveClientConnected = resolve; });
@@ -58,6 +59,9 @@ export function createPublicTestHarness(): PublicTestHarness {
           resolve(message);
         });
       });
+    },
+    disconnectClients() {
+      for (const socket of sockets) socket.close();
     },
     stop() {
       server.stop(true);

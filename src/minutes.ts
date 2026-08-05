@@ -68,11 +68,31 @@ function esc(value: string | number): string {
 
 function coordinate(source: MinutesSourceSegment): string {
   const tuple = `(${source.transcript_version_id},${source.start_seq},${source.end_seq})`;
-  return `<span class="source-coordinate" data-source-coordinate="${esc(tuple)}" data-transcript-version-id="${esc(source.transcript_version_id)}" data-start-seq="${esc(source.start_seq)}" data-end-seq="${esc(source.end_seq)}">${esc(tuple)}</span>`;
+  const label = source.start_seq === source.end_seq
+    ? `${source.start_seq}번째 문장`
+    : `${source.start_seq}~${source.end_seq}번째 문장`;
+  return `<span class="source-coordinate" data-source-coordinate="${esc(tuple)}" data-transcript-version-id="${esc(source.transcript_version_id)}" data-start-seq="${esc(source.start_seq)}" data-end-seq="${esc(source.end_seq)}">${esc(label)}</span>`;
 }
 
 function transcriptVersion(transcriptVersionId: string): string {
-  return `<span class="transcript-version" data-transcript-version-id="${esc(transcriptVersionId)}">${esc(transcriptVersionId)}</span>`;
+  return `<span class="transcript-version" data-transcript-version-id="${esc(transcriptVersionId)}">원문 연결됨</span>`;
+}
+
+function displayProvider(provider: string): string {
+  const names: Record<string, string> = {
+    "cli:codex": "ChatGPT",
+    "cli:grok": "Grok",
+    "cli:claude": "Claude",
+    "cli:gemini": "Gemini",
+    alibaba: "Alibaba GLM",
+    openai: "OpenAI",
+    local: "로컬 모델",
+  };
+  return names[provider] ?? provider;
+}
+
+function displayTimeZone(timeZone: string): string {
+  return timeZone === "Asia/Seoul" ? "한국 표준시" : timeZone;
 }
 
 function attendeeName(input: MinutesInput, attendeeId: string | null | undefined): string {
@@ -91,7 +111,7 @@ function decisionsTable(input: MinutesInput): string {
   return `<div class="minutes-block decisions-block">
         <h2>결정 사항</h2>
         <table>
-          <thead><tr><th>결정</th><th>발언자</th><th>근거 좌표</th></tr></thead>
+          <thead><tr><th>결정</th><th>발언자</th><th>원문 위치</th></tr></thead>
           <tbody>
 ${rows}
           </tbody>
@@ -108,11 +128,11 @@ function actionsTable(input: MinutesInput): string {
             <td>${esc(item.deadline ?? item.deadlineText ?? "미정")}</td>
             <td>${coordinate(item.sourceSegment)}</td>
           </tr>`).join("\n")
-    : '          <tr><td class="empty" colspan="5">액션 항목 없음</td></tr>';
+    : '          <tr><td class="empty" colspan="5">할 일 없음</td></tr>';
   return `<div class="minutes-block actions-block">
-        <h2>액션 항목</h2>
+        <h2>할 일</h2>
         <table>
-          <thead><tr><th>액션</th><th>발언자</th><th>담당자</th><th>기한</th><th>근거 좌표</th></tr></thead>
+          <thead><tr><th>할 일</th><th>발언자</th><th>담당자</th><th>기한</th><th>원문 위치</th></tr></thead>
           <tbody>
 ${rows}
           </tbody>
@@ -121,7 +141,7 @@ ${rows}
 }
 
 function openItems(input: MinutesInput): string {
-  if (!input.open.length) return '<p class="empty">미결 또는 다음 안건 없음</p>';
+  if (!input.open.length) return '<p class="empty">미정 사항이나 다음 안건 없음</p>';
   return `<ol class="document-list">
 ${input.open.map((item) => `          <li><p>${esc(item.description)}</p><p class="item-meta">발언자 ${esc(attendeeName(input, item.attributedAttendeeId))} · ${coordinate(item.sourceSegment)}</p></li>`).join("\n")}
         </ol>`;
@@ -134,7 +154,8 @@ ${input.referencedMaterials.map((item) => {
     const heading = item.title ?? item.uri ?? "제목 없음";
     const detail = [item.uri, item.notes].filter((value): value is string => Boolean(value)).map(esc).join(" · ");
     const source = item.sourceSegment ? ` · ${coordinate(item.sourceSegment)}` : "";
-    return `          <li><p><span class="material-type">${esc(item.materialType)}</span> ${esc(heading)}</p>${detail ? `<p>${detail}</p>` : ""}<p class="item-meta">${source || "근거 좌표 없음"}</p></li>`;
+    const materialType = { document: "문서", figure: "그림", link: "링크", data: "데이터", other: "기타" }[item.materialType];
+    return `          <li><p><span class="material-type">${esc(materialType)}</span> ${esc(heading)}</p>${detail ? `<p>${detail}</p>` : ""}<p class="item-meta">${source || "원문 위치 없음"}</p></li>`;
   }).join("\n")}
         </ul>`;
 }
@@ -154,7 +175,7 @@ ${input.transcript.map((line) => {
 
 export function buildMinutesHtml(input: MinutesInput): string {
   const purpose = input.meta.purpose ? `<p class="purpose">${esc(input.meta.purpose)}</p>` : "";
-  const provider = input.meta.provider ? ` · ${esc(input.meta.provider)}` : "";
+  const provider = input.meta.provider ? ` · ${esc(displayProvider(input.meta.provider))}` : "";
   const attendeeList = input.attendees.length
     ? input.attendees.map((attendee) => esc(attendee.displayName)).join(", ")
     : "등록된 참석자 없음";
@@ -170,15 +191,15 @@ export function buildMinutesHtml(input: MinutesInput): string {
   </head>
   <body>
     <main class="minutes-document">
-      <section class="first-page" aria-label="결정 및 액션 요약">
+      <section class="first-page" aria-label="결정 사항 및 할 일 요약">
         <header class="minutes-header">
-          <p class="eyebrow">MEETING MINUTES</p>
+          <p class="eyebrow">회의록</p>
           <h1>${esc(input.meta.title)}</h1>
           ${purpose}
           <dl class="meeting-meta">
-            <div><dt>일시</dt><dd>${esc(input.meta.meetingDate)} · ${esc(input.meta.timeZone)}${provider}</dd></div>
+            <div><dt>일시</dt><dd>${esc(input.meta.meetingDate)} · ${esc(displayTimeZone(input.meta.timeZone))}${provider}</dd></div>
             <div><dt>참석자</dt><dd>${attendeeList}</dd></div>
-            <div><dt>전사 버전</dt><dd>${transcriptVersion(input.transcriptVersionId)}</dd></div>
+            <div><dt>전사 원문</dt><dd>${transcriptVersion(input.transcriptVersionId)}</dd></div>
           </dl>
         </header>
         ${decisionsTable(input)}
@@ -186,12 +207,12 @@ export function buildMinutesHtml(input: MinutesInput): string {
       </section>
       <section class="appendix-page" aria-label="회의록 부록">
         <header class="appendix-header">
-          <p class="eyebrow">APPENDIX</p>
+          <p class="eyebrow">부록</p>
           <h2>논의 및 근거 기록</h2>
-          <p>정본 전사 버전 ${transcriptVersion(input.transcriptVersionId)}</p>
+          <p>각 항목은 전사 원문과 연결되어 있습니다</p>
         </header>
         <div class="minutes-block">
-          <h2>논의 및 미결 사항</h2>
+          <h2>논의 및 미정 사항</h2>
           ${openItems(input)}
         </div>
         <div class="minutes-block">
@@ -199,7 +220,7 @@ export function buildMinutesHtml(input: MinutesInput): string {
           ${materials(input)}
         </div>
         <div class="minutes-block transcript-block canonical-transcript" data-transcript-version-id="${esc(input.transcriptVersionId)}">
-          <h2>발언 귀속 및 정본 전사 원문</h2>
+          <h2>발언자 및 최종 전사 원문</h2>
           ${transcript(input)}
         </div>
       </section>

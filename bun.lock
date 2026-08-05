@@ -5,6 +5,7 @@
     "": {
       "name": "meeting-slides",
       "dependencies": {
+        "pptxgenjs": "3.12.0",
         "slides-grab": "^1.5.0",
       },
       "devDependencies": {

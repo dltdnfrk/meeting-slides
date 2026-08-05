@@ -29,8 +29,8 @@ function createReviewPanel(transport) {
   const toggleEl = /** @type {HTMLButtonElement} */ (byId("btn-review"));
   const countEl = byId("review-count");
 
-  const STATUS_LOADING = "회의록 후보 추출 중…";
-  const STATUS_FAILED = "회의록 후보 추출 실패·재시도";
+  const STATUS_LOADING = new Set(["회의록 정리 중…", "회의록 후보 추출 중…"]);
+  const STATUS_FAILED = new Set(["회의록을 정리하지 못했습니다", "회의록 후보 추출 실패·재시도"]);
 
   /** 서버가 보낸 마지막 리뷰. 재연결·부분 갱신에도 이 스냅샷이 진실이다. */
   let review = null;
@@ -96,7 +96,7 @@ function createReviewPanel(transport) {
       kind: item.kind,
       patch,
     })) {
-      setError("연결되지 않음 — 검토 저장 불가");
+      setError("앱 서버에 연결되지 않아 변경 내용을 저장할 수 없습니다");
       return false;
     }
     setError("");
@@ -141,7 +141,7 @@ function createReviewPanel(transport) {
     if (ev.target.closest(".review-item__confirm")) {
       const nextState = reviewStateOf(item) === "confirmed" ? "candidate" : "confirmed";
       if (nextState === "confirmed" && !isComplete(item)) {
-        setError("귀속·담당자·기한을 모두 지정해야 합니다");
+        setError("발언자, 담당자, 기한을 모두 지정해 주세요");
         return;
       }
       if (!sendPatch(item, { reviewState: nextState })) return;
@@ -170,7 +170,7 @@ function createReviewPanel(transport) {
       const editor = listEl.querySelector(`.review-item[data-item-id="${CSS.escape(item.id)}"] .review-item__editor`);
       const next = (editor instanceof HTMLTextAreaElement ? editor.value : "").trim();
       if (!next) {
-        setError("설명을 비울 수 없습니다");
+        setError("내용을 입력해 주세요");
         if (editor instanceof HTMLTextAreaElement) editor.focus();
         return;
       }
@@ -192,11 +192,11 @@ function createReviewPanel(transport) {
   confirmEl.addEventListener("click", () => {
     if (!review) return;
     if (!canConfirmReview()) {
-      setError("모든 후보를 항목 확정 또는 제외해야 합니다");
+      setError("모든 항목을 확인하거나 제외해 주세요");
       return;
     }
     if (!transport.send({ action: "confirmReview", reviewId: review.reviewId })) {
-      setError("연결되지 않음 — 확정 불가");
+      setError("앱 서버에 연결되지 않아 검토를 완료할 수 없습니다");
       return;
     }
     setError("");
@@ -204,7 +204,7 @@ function createReviewPanel(transport) {
 
   retryEl.addEventListener("click", () => {
     if (!transport.send({ action: "startReview" })) {
-      setError("연결되지 않음 — 재시도 불가");
+      setError("앱 서버에 연결되지 않아 다시 정리할 수 없습니다");
       return;
     }
     setError("");
@@ -240,7 +240,7 @@ function createReviewPanel(transport) {
     },
     /** 서버 status 텍스트로 로딩/실패 상태를 연다 (추출은 비동기다). */
     applyStatus(text) {
-      if (text === STATUS_LOADING) {
+      if (STATUS_LOADING.has(text)) {
         setPanelState("loading");
         setError("");
         confirmEl.disabled = true;
@@ -248,9 +248,9 @@ function createReviewPanel(transport) {
         open(false);
         return;
       }
-      if (text === STATUS_FAILED) {
+      if (STATUS_FAILED.has(text)) {
         setPanelState("error");
-        setError(STATUS_FAILED);
+        setError("회의록을 정리하지 못했습니다");
         confirmEl.disabled = true;
         toggleEl.hidden = false;
         open(false);
