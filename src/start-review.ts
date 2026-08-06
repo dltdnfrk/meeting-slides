@@ -12,6 +12,7 @@ export interface StartReviewInput {
   extractor: Extractor;
   meetingDate?: string;
   timeZone?: string;
+  notes?: string;
 }
 
 function meetingDateFor(store: MinutesStore, meetingId: number): string {
@@ -87,6 +88,7 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
     transcriptVersionId: canonical.transcriptVersionId,
     attendees,
     lines,
+    ...(input.notes?.trim() ? { notes: input.notes.trim() } : {}),
   };
   const result = await input.extractor.extract(request);
   if (result.transcriptVersionId !== canonical.transcriptVersionId) {

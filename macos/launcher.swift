@@ -3,6 +3,7 @@
 
 import AVFoundation
 import AppKit
+import EventKit
 import Foundation
 
 let bundleURL = Bundle.main.bundleURL
@@ -125,6 +126,55 @@ func waitUntilWebAppReady(port: Int, timeoutSeconds: Double = 30) -> Bool {
     return false
 }
 
+/// 캘린더에서 다음 회의 시작을 감지해 서버에 자동 녹음 시작을 알린다.
+/// EventKit 권한이 없거나 캘린더 항목이 없으면 조용히 무시한다.
+func calendarAutoCapture(port: Int) {
+    let store = EKEventStore()
+    let sem = DispatchSemaphore(value: 0)
+    var granted = false
+    if #available(macOS 14.0, *) {
+        store.requestFullAccessToEvents { ok, _ in
+            granted = ok
+            sem.signal()
+        }
+    } else {
+        store.requestAccess(to: .event) { ok, _ in
+            granted = ok
+            sem.signal()
+        }
+    }
+    _ = sem.wait(timeout: .now() + 10)
+    guard granted else {
+        log("캘린더 권한 없음 — 자동 녹음 비활성 (시스템 설정 > 개인정보 보호 > 캘린더)")
+        return
+    }
+    let base = URL(string: "http://127.0.0.1:\(port)")!
+    func post(_ path: String) {
+        var req = URLRequest(url: base.appendingPathComponent(path))
+        req.httpMethod = "POST"
+        let task = URLSession.shared.dataTask(with: req)
+        task.resume()
+    }
+    var lastTriggered = Date(timeIntervalSince1970: 0)
+    let calendar = Calendar.current
+    while true {
+        let now = Date()
+        let start = calendar.startOfDay(for: now)
+        guard let end = calendar.date(byAdding: .day, value: 7, to: start) else { continue }
+        let predicate = store.predicateForEvents(withStart: start, end: end, calendars: nil)
+        let events = store.events(matching: predicate)
+        for event in events where event.isAllDay == false && event.startDate > now {
+            let delta = event.startDate.timeIntervalSince(now)
+            if delta > 0, delta <= 60, event.startDate.timeIntervalSince(lastTriggered) > 60 {
+                lastTriggered = event.startDate
+                log("캘린더 감지: \(event.title ?? "(제목 없음)") — 자동 녹음 시작")
+                post("api/auto-capture")
+            }
+        }
+        Thread.sleep(forTimeInterval: 15)
+    }
+}
+
 // ── 1. 프로젝트 / bun ──
 let projectDir = resolveProjectDir()
 log("프로젝트: \(projectDir)")
@@ -137,6 +187,14 @@ guard let bun = findBun() else {
 
 let port = readHttpPort(projectDir: projectDir)
 let appURL = URL(string: "http://localhost:\(port)/")!
+
+// ── 0. 캘린더 자동 녹음 (백그라운드 폴링) ──
+let calendarThread = Thread {
+    calendarAutoCapture(port: port)
+}
+calendarThread.name = "calendar-auto-capture"
+calendarThread.start()
+
 
 // ── 2. 마이크 권한 (번들 이름 = Meeting Slides) ──
 let micOK = requestMicAccess()

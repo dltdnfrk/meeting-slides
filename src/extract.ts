@@ -15,6 +15,7 @@ export interface MinutesExtractionInput {
   transcriptVersionId: string;
   attendees: Array<{ attendeeId: string; displayName: string }>;
   lines: Array<{ seq: number; speakerTurn: number | null; text: string }>;
+  notes?: string;
 }
 
 export type CandidateKind = "decision" | "action_item" | "open_item";
@@ -218,7 +219,10 @@ export class MinutesExtractor {
 
   async extract(request: MinutesExtractionInput): Promise<MinutesExtractionResult> {
     try {
-      const prompt = `Extract candidates from this request without changing any seq values:\n${JSON.stringify(request)}`;
+      const notesBlock = request.notes?.trim()
+        ? `\n\nMeeting notes taken by the user during the call:\n${request.notes.trim()}\n\nUse the notes as a guide: candidates that appear in the notes but lack direct transcript evidence must still be grounded in a verbatim quote; if no evidence exists, do not emit them.`
+        : "";
+      const prompt = `Extract candidates from this request without changing any seq values:\n${JSON.stringify(request)}${notesBlock}`;
       const parsed = parseMinutesExtractionJson(await this.transport.chat(prompt, {
         system: EXTRACTION_SYSTEM_PROMPT, temperature: 0, maxTokens: 4000,
       }), request);

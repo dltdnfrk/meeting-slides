@@ -413,6 +413,9 @@ export class WhisperStream extends WhisperBase {
       "-fa",
       "-kc",
     ];
+    if (!this.config.gpu) {
+      args.push("-ng");
+    }
     if (this.config.diarize) {
       args.push("-tdrz");
       opts.onStatus?.("⚠️ tinydiarize 모델은 현재 영어 전용입니다 — 한국어 회의는 전사 품질이 크게 떨어집니다");
@@ -445,6 +448,9 @@ export class WhisperCLI extends WhisperBase {
       "-nt",
       "-f", this.filePath,
     ];
+    if (!this.config.gpu) {
+      args.push("-ng");
+    }
     if (this.config.diarize) {
       args.push("-tdrz");
       opts.onStatus?.("⚠️ tinydiarize 모델은 현재 영어 전용입니다 — 한국어 회의는 전사 품질이 크게 떨어집니다");

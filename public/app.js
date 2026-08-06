@@ -43,6 +43,14 @@ const attendeeErrorEl = $("attendee-error");
 const attendeeCountEl = $("attendee-count");
 const btnAttendeeAddEl = /** @type {HTMLButtonElement} */ ($("btn-attendee-add"));
 const btnAttendeeSaveEl = /** @type {HTMLButtonElement} */ ($("btn-attendee-save"));
+const btnAskEl = /** @type {HTMLButtonElement} */ ($("btn-ask"));
+const askPanelEl = $("ask-panel");
+const askInputEl = /** @type {HTMLInputElement} */ ($("ask-input"));
+const askSendEl = /** @type {HTMLButtonElement} */ ($("btn-ask-send"));
+const askCloseEl = $("btn-ask-close");
+const askConversationEl = $("ask-conversation");
+const askEmptyEl = $("ask-empty");
+const notesInputEl = /** @type {HTMLTextAreaElement} */ ($("notes-input"));
 // 전사는 우측 도킹 패널(.transcript-pane)이 1차 거처다 — 하단 도크 복제본은 없았다.
 const transcriptStreamEl = $("transcript-stream");
 const transcriptCountEl = $("transcript-count");
@@ -89,6 +97,7 @@ let compiledPreviewTitle = "";
 let activeMeetingTitle = "";
 
 function syncActionAvailability() {
+  syncAskAvailability?.();
   const connected = Boolean(ws && ws.readyState === WebSocket.OPEN);
   btnRecordEl.disabled = !connected;
   btnAttendeesEl.disabled = !connected || capturing;
@@ -1197,11 +1206,87 @@ const reviewPanel = window.createReviewPanel ? window.createReviewPanel({
     return true;
   },
   isOpen: () => !!ws && ws.readyState === WebSocket.OPEN,
+  getNotes: () => notesInputEl?.value ?? "",
 }) : {
   syncTransport() {},
   applyReview() {},
   applyStatus() {},
 };
+
+// ── Ask 회의 질문 패널 (RAG) ──
+let askPending = false;
+
+function openAskPanel() {
+  if (selectedMeetingId === null) {
+    renderStatus("왼쪽 히스토리에서 회의를 먼저 선택하세요");
+    return;
+  }
+  askPanelEl.hidden = false;
+  askInputEl.focus();
+  syncAskAvailability();
+}
+
+function closeAskPanel() {
+  askPanelEl.hidden = true;
+}
+
+function syncAskAvailability() {
+  const hasMeeting = selectedMeetingId !== null && !askPending;
+  btnAskEl.disabled = selectedMeetingId === null;
+  askSendEl.disabled = !hasMeeting || !askInputEl.value.trim();
+  btnAskEl.title = selectedMeetingId === null
+    ? "왼쪽 히스토리에서 회의를 먼저 선택하세요"
+    : "선택한 회의의 전사에 질문하기";
+}
+
+function appendAskMessage(role, text) {
+  const row = document.createElement("div");
+  row.className = `ask-message ask-message--${role}`;
+  row.textContent = text;
+  askConversationEl.appendChild(row);
+  askConversationEl.scrollTop = askConversationEl.scrollHeight;
+  askEmptyEl.hidden = true;
+}
+
+function sendAsk() {
+  const question = askInputEl.value.trim();
+  if (!question || selectedMeetingId === null || askPending) return;
+  askPending = true;
+  syncAskAvailability();
+  appendAskMessage("user", question);
+  askInputEl.value = "";
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "ask", meetingId: selectedMeetingId, question }));
+  } else {
+    appendAskMessage("assistant", "서버 연결이 끊어져 질문을 보낼 수 없습니다");
+    askPending = false;
+    syncAskAvailability();
+  }
+}
+
+function applyAskMessage(msg) {
+  askPending = false;
+  syncAskAvailability();
+  if (msg.error) {
+    appendAskMessage("assistant", msg.error);
+    return;
+  }
+  const sourceNote = msg.matchedCount > 0
+    ? `\n\n(전사 ${msg.matchedCount}개 구간에서 답변)`
+    : "";
+  appendAskMessage("assistant", `${msg.answer}${sourceNote}`);
+}
+
+btnAskEl.onclick = () => {
+  if (askPanelEl.hidden) openAskPanel();
+  else closeAskPanel();
+};
+askCloseEl.onclick = closeAskPanel;
+askSendEl.onclick = sendAsk;
+askInputEl.addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") sendAsk();
+});
+askInputEl.addEventListener("input", syncAskAvailability);
 
 // ── 버튼 핸들러 (connect 외부에서 1회 바인딩) ──
 function meetingTarget() {
@@ -1527,6 +1612,8 @@ function connect() {
         }
       } else if (msg.type === "line") {
         if (selectedMeetingId === null) renderTranscriptLine(msg);
+      } else if (msg.type === "ask") {
+        applyAskMessage(msg);
       } else if (msg.type === "providers") {
         renderProviders(msg);
       } else if (msg.type === "sttModels") {

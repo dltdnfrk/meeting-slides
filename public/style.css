@@ -1234,3 +1234,114 @@ button:focus-visible { outline-offset: 1px; }
   .attendee-btn__label { display: none; }
   .attendee-panel { top: 52px; width: auto; left: 12px; right: 12px; transform: none; max-width: none; }
 }
+
+/* ── Ask 회의 질문 패널 ── */
+.ask-panel {
+  position: fixed;
+  bottom: 64px; right: 18px;
+  z-index: 65;
+  display: flex; flex-direction: column;
+  width: min(420px, calc(100vw - 36px));
+  max-height: min(480px, calc(100vh - 140px));
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-lg);
+  background: var(--z900);
+  box-shadow: 0 18px 56px rgba(0,0,0,0.55);
+  overflow: hidden;
+}
+.ask-panel[hidden] { display: none; }
+.ask-panel__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px 8px;
+  flex-shrink: 0;
+}
+.ask-panel__close {
+  border: none; background: none; color: var(--z500);
+  font-size: 18px; line-height: 1; cursor: pointer; padding: 4px 8px;
+}
+.ask-panel__close:hover { color: var(--ink); }
+.ask-panel__body {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+  padding: 0 14px;
+}
+.ask-panel__conversation { display: flex; flex-direction: column; gap: 8px; }
+.ask-message {
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.ask-message--user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--live) 16%, transparent);
+  color: var(--ink);
+  max-width: 85%;
+}
+.ask-message--assistant {
+  align-self: flex-start;
+  background: color-mix(in srgb, var(--z700) 60%, transparent);
+  color: var(--ink);
+  max-width: 95%;
+}
+.ask-panel__foot {
+  display: flex; gap: 8px;
+  padding: 10px 14px 14px;
+  flex-shrink: 0;
+}
+.ask-panel__input {
+  flex: 1; min-width: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--z800);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+}
+.ask-panel__input:focus { outline: 1px solid var(--live); }
+.ask-panel__send {
+  padding: 8px 14px;
+  border: 1px solid var(--live-line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--live) 10%, transparent);
+  color: var(--live);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+.ask-panel__send:disabled { opacity: 0.4; cursor: default; }
+.ask-panel .pane__empty { padding: 18px 0; text-align: center; }
+
+/* ── 회의 중 메모 (AI 정리 반영) ── */
+.notes-box {
+  flex-shrink: 0;
+  border-top: 1px solid var(--line-soft);
+  padding: 8px 12px;
+}
+.notes-box__summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  color: var(--z500);
+  letter-spacing: 0.06em;
+  user-select: none;
+}
+.notes-box__summary:hover { color: var(--ink); }
+.notes-box__input {
+  width: 100%;
+  min-height: 64px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--z800);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  resize: vertical;
+}
+.notes-box__input:focus { outline: 1px solid var(--live); }

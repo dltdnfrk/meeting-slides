@@ -7,7 +7,7 @@
 // ============================================================
 
 /**
- * @param {{ send: (payload: object) => boolean, isOpen: () => boolean }} transport
+ * @param {{ send: (payload: object) => boolean, isOpen: () => boolean, getNotes?: () => string }} transport
  */
 function createReviewPanel(transport) {
   const byId = (id) => {
@@ -203,7 +203,8 @@ function createReviewPanel(transport) {
   });
 
   retryEl.addEventListener("click", () => {
-    if (!transport.send({ action: "startReview" })) {
+    const notes = transport.getNotes?.() ?? "";
+    if (!transport.send({ action: "startReview", ...(notes.trim() ? { notes: notes.trim() } : {}) })) {
       setError("앱 서버에 연결되지 않아 다시 정리할 수 없습니다");
       return;
     }

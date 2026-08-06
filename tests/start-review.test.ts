@@ -144,6 +144,29 @@ describe("startReview", () => {
     fx.legacy.close();
   });
 
+  test("passes user notes through to the extractor request", async () => {
+    const fx = fixture([
+      { seq: 1, speakerTurn: 3, text: "We discussed the rollout." },
+    ]);
+    let request: MinutesExtractionInput | undefined;
+    const extractor = {
+      extract: async (input: MinutesExtractionInput): Promise<MinutesExtractionResult> => {
+        request = input;
+        return { ...emptyResult(input.transcriptVersionId), decisions: [], actionItems: [], openItems: [], rejections: [] };
+      },
+    };
+
+    await startReview({
+      meetingId: fx.meetingId,
+      store: fx.store,
+      extractor,
+      notes: "  마감일 금요일 확정, 앨리스가 체크리스트 공유  ",
+    });
+
+    expect(request!.notes).toBe("마감일 금요일 확정, 앨리스가 체크리스트 공유");
+    fx.legacy.close();
+  });
+
   test("creates an empty version-scoped review for an empty canonical transcript", async () => {
     const fx = fixture([]);
     let calls = 0;

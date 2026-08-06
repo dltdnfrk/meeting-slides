@@ -19,6 +19,7 @@ const existingActions = [
   "exportPng",
   "saveNotes",
   "saveJson",
+  "ask",
   "setProvider",
   "connectProvider",
   "setProviderKey",

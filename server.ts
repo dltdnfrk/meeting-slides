@@ -8,7 +8,7 @@ import { loadConfig, loadWhisperConfig } from "./src/config.ts";
 import { WhisperStream, WhisperCLI, listCaptureDevices, type TranscriptChunk } from "./src/whisper.ts";
 import { LLMClient, type ChatTransport, type MeetingLLM } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
-import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ExportUpdate, type ReviewUpdate } from "./src/session.ts";
+import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ExportUpdate, type ReviewUpdate, type AskUpdate } from "./src/session.ts";
 import { buildProviderEntriesFromStates, checkCliBin, createDetector, inspectSubscriptionProviders, KEY_BY_PROVIDER, PROVIDER_ADAPTERS, providerAdapter, providerConnectCommand, upsertEnvText, type ProviderRuntimeState, type SubscriptionProviderId } from "./src/providers.ts";
 import { AppSettingsStore } from "./src/app-settings.ts";
 import { SttModelManager } from "./src/stt-model-downloader.ts";
@@ -26,6 +26,7 @@ import { concludeMeeting } from "./src/conclusion.ts";
 import { runSceneCompileAction } from "./src/scene-compile-action.ts";
 import { prepareExportDeck } from "./src/deck-export.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
+import { askMeeting } from "./src/ask.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
 import { createHash, randomUUID } from "node:crypto";
 import type { CompileJobId, ExportJobId } from "./src/session.ts";
@@ -391,12 +392,16 @@ interface WsCommand {
   model?: string;
   effort?: string;
   meeting_id?: unknown;
+  meetingId?: unknown;
   purpose?: unknown;
   attendees?: unknown;
   reviewId?: unknown;
   itemId?: unknown;
   kind?: unknown;
   patch?: unknown;
+  question?: unknown;
+  requestId?: unknown;
+  notes?: unknown;
 }
 
 let currentMeetingId: number | null = null;
@@ -542,7 +547,7 @@ const reviewRuns = new Map<string, {
 }>();
 const completedReviews = new Map<string, ReviewUpdate>();
 
-const handleStartReview: WsActionHandler = ({ ws }) => {
+const handleStartReview: WsActionHandler = ({ ws, cmd }) => {
   if (capturing) {
     requestError(ws, new Error("capture must be stopped before starting review"));
     return;
@@ -580,6 +585,7 @@ const handleStartReview: WsActionHandler = ({ ws }) => {
     meetingId,
     store: minutesStore,
     extractor: new MinutesExtractor(extractionTransport),
+    ...(typeof cmd.notes === "string" && cmd.notes.trim() ? { notes: cmd.notes.trim() } : {}),
   });
   const run = { promise, requesters: new Set([ws]) };
   reviewRuns.set(key, run);
@@ -679,6 +685,47 @@ const handleConfirmReview: WsActionHandler = ({ ws, cmd }) => {
     });
     broadcast(conclusion);
   }).catch((error: unknown) => requestError(ws, error));
+};
+
+const askRuns = new Map<string, Set<ServerWebSocket<undefined>>>();
+
+const handleAsk: WsActionHandler = ({ ws, cmd }) => {
+  const meetingId = Number(cmd.meeting_id ?? cmd.meetingId ?? 0);
+  const question = typeof cmd.question === "string" ? cmd.question.trim() : "";
+  const requestId = typeof cmd.requestId === "string" ? cmd.requestId : randomUUID();
+  if (!Number.isSafeInteger(meetingId) || meetingId < 1) {
+    ws.send(JSON.stringify({ type: "ask" as const, requestId, answer: "", matchedCount: 0, error: "meetingId가 필요합니다" }));
+    return;
+  }
+  if (!question) {
+    ws.send(JSON.stringify({ type: "ask" as const, requestId, answer: "", matchedCount: 0, error: "질문을 입력해 주세요" }));
+    return;
+  }
+  if (!extractionTransport) {
+    ws.send(JSON.stringify({ type: "ask" as const, requestId, answer: "", matchedCount: 0, error: "사용 가능한 LLM 프로바이더가 없습니다" }));
+    return;
+  }
+  const key = `${meetingId}:${requestId}`;
+  const requesters = askRuns.get(key) ?? new Set<ServerWebSocket<undefined>>();
+  requesters.add(ws);
+  askRuns.set(key, requesters);
+  void askMeeting(minutesStore, meetingId, question, extractionTransport, { timeoutMs: 60_000 })
+    .then((result) => {
+      const update: AskUpdate = { type: "ask", requestId, answer: result.answer, matchedCount: result.matchedSegments.length };
+      for (const requester of requesters) {
+        try { requester.send(JSON.stringify(update)); } catch { /* requester disconnected */ }
+      }
+    })
+    .catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      const update: AskUpdate = { type: "ask", requestId, answer: "", matchedCount: 0, error: `질문 처리 실패: ${message}` };
+      for (const requester of requesters) {
+        try { requester.send(JSON.stringify(update)); } catch { /* requester disconnected */ }
+      }
+    })
+    .finally(() => {
+      askRuns.delete(key);
+    });
 };
 
 const handleStatus: WsActionHandler = ({ ws, cmd }) => {
@@ -968,6 +1015,7 @@ export const handlerMap = new Map<string, WsActionHandler>([
   ["exportPng", handleDeckExport],
   ["saveNotes", handleSaveNotes],
   ["saveJson", handleSaveJson],
+  ["ask", handleAsk],
   ["setProvider", handleSetProvider],
   ["connectProvider", handleConnectProvider],
   ["setProviderKey", handleSetProviderKey],
@@ -1269,6 +1317,25 @@ const httpServer = Bun.serve({
     const path = (url.pathname === "/" || url.pathname === "/app" || url.pathname === "/app/")
       ? "/index.html"
       : url.pathname;
+    // 캘린더 연동: launcher가 회의 시작 전에 알리면 자동으로 녹음을 시작한다.
+    if (url.pathname === "/api/auto-capture" && req.method === "POST") {
+      if (!capturing) {
+        void startCapture().catch((error) => {
+          console.error(`[auto-capture] 시작 실패: ${error instanceof Error ? error.message : String(error)}`);
+        });
+      }
+      return new Response(JSON.stringify({ ok: true, capturing }), {
+        headers: { "content-type": "application/json" },
+      });
+    }
+    if (url.pathname === "/api/auto-stop" && req.method === "POST") {
+      if (capturing) {
+        void stopCapture();
+      }
+      return new Response(JSON.stringify({ ok: true, capturing: false }), {
+        headers: { "content-type": "application/json" },
+      });
+    }
     const publicDir = join(import.meta.dir, "public");
     const filePath = join(publicDir, path);
     if (filePath !== publicDir && !filePath.startsWith(`${publicDir}${sep}`)) {

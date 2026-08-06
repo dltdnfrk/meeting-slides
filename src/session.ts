@@ -307,7 +307,16 @@ export type ServerMessage =
   | ReviewUpdate
   | ReviewItemUpdated
   | ReviewConfirmed
-  | MeetingConcluded;
+  | MeetingConcluded
+  | AskUpdate;
+
+export interface AskUpdate {
+  type: "ask";
+  requestId: string;
+  answer: string;
+  matchedCount: number;
+  error?: string;
+}
 
 export type ClientAction =
   | { action: "startCapture"; meeting_id?: number }
@@ -320,6 +329,7 @@ export type ClientAction =
   | { action: "setAttendees"; attendees: Array<{ name: string; crmPersonId?: string }> }
   | { action: "updateItem"; reviewId: string; itemId: string; kind: "decision" | "action_item" | "open_item"; patch: Record<string, unknown> }
   | { action: "confirmReview"; reviewId: string }
+  | { action: "ask"; meetingId: number; question: string }
   | { action: "installSttModel" | "cancelSttModel" | "selectSttModel"; modelId: SttModelInfo["id"] };
 
 export type ClientListener = (msg: ServerMessage) => void;

@@ -234,6 +234,10 @@
           <p class="pane__empty" id="transcript-empty">녹음을 시작하면<br>발언 내용이 여기에 기록됩니다</p>
           <div class="transcript-trunc" id="transcript-trunc" hidden>오래된 기록 일부가 화면에서 생략되었습니다</div>
         </div>
+        <details class="notes-box" id="notes-box">
+          <summary class="notes-box__summary">📝 회의 중 메모 (AI 정리에 반영)</summary>
+          <textarea id="notes-input" class="notes-box__input" placeholder="회의 중 떠오른 결정, 액션, 맥락을 적어두세요 — 회의록 정리 시 전사와 함께 사용됩니다"></textarea>
+        </details>
         <!-- 남/남서 리사이즈 손잡이: 서쪽 폭은 워크스페이스 스플리터가 담당 -->
         <div class="transcript-grip transcript-grip--s" id="transcript-grip-s" role="separator" aria-orientation="horizontal" aria-label="전사 패널 높이 조절" tabindex="0"></div>
         <div class="transcript-grip transcript-grip--sw" id="transcript-grip-sw" role="separator" aria-orientation="horizontal" aria-label="전사 패널 너비·높이 조절" tabindex="0"></div>
@@ -257,6 +261,7 @@
         <button id="btn-export-deck" class="dock__btn" type="button" title="브라우저에서 볼 수 있는 슬라이드 저장" aria-label="웹 슬라이드 저장">웹 슬라이드</button>
         <button id="btn-export-pdf" class="dock__btn" type="button" title="검토용 PDF 만들기" aria-label="검토용 PDF 만들기">PDF</button>
         <button id="btn-export-png" class="dock__btn" type="button" title="슬라이드를 PNG 이미지로 저장" aria-label="슬라이드 이미지 저장">이미지</button>
+        <button id="btn-ask" class="dock__btn" type="button" title="선택한 회의의 전사에 질문하기" aria-label="회의에 질문하기">Ask</button>
         <button id="btn-reset" class="dock__btn dock__btn--danger" type="button" title="현재 회의를 닫고 새 회의 준비" aria-label="새 회의 준비">새 회의</button>
         <span class="last-saved" id="last-saved" hidden></span>
       </div>
@@ -293,6 +298,23 @@
       <button id="btn-review-confirm" class="review-panel__confirm" type="button" disabled>
         검토 완료 <span class="review-panel__confirm-count" id="review-confirm-count">0</span>
       </button>
+    </div>
+  </div>
+
+  <div class="ask-panel" id="ask-panel" hidden>
+    <div class="ask-panel__head">
+      <span class="pane__title">Ask 회의 질문</span>
+      <button id="btn-ask-close" class="ask-panel__close" type="button" aria-label="Ask 패널 닫기">×</button>
+    </div>
+    <div class="ask-panel__body" id="ask-body">
+      <div class="ask-panel__conversation" id="ask-conversation"></div>
+      <p class="pane__empty" id="ask-empty">선택한 회의의 전사에
+        <br>궁금한 점을 물어보세요
+      </p>
+    </div>
+    <div class="ask-panel__foot">
+      <input id="ask-input" class="ask-panel__input" type="text" placeholder="예: 결정된 마감일이 뭐였어?" aria-label="회의 질문 입력" autocomplete="off">
+      <button id="btn-ask-send" class="ask-panel__send" type="button" disabled>질문</button>
     </div>
   </div>
 
