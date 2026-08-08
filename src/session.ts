@@ -138,10 +138,10 @@ export interface CaptureUpdate {
 }
 
 export interface SttModelInfo {
-  id: "small" | "medium" | "large-v3-turbo" | "large-v3";
+  id: import("./stt-model-catalog.js").SttModelId;
   label: string;
   sizeBytes: number;
-  license: "MIT" | "Apache-2.0";
+  license: import("./stt-model-catalog.js").SttLicense;
   status: "absent" | "downloading" | "installed" | "selected" | "failed";
   path?: string;
   receivedBytes?: number;

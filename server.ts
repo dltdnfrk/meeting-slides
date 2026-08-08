@@ -6,6 +6,7 @@
 
 import { loadConfig, loadWhisperConfig } from "./src/config.ts";
 import { WhisperStream, WhisperCLI, listCaptureDevices, type TranscriptChunk } from "./src/whisper.ts";
+import { TranscribeStream, TranscribeCLI } from "./src/transcribe.ts";
 import { LLMClient, type ChatTransport, type MeetingLLM } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
 import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ExportUpdate, type ReviewUpdate, type AskUpdate } from "./src/session.ts";
@@ -350,6 +351,23 @@ function whisperConfigForSelection() {
 }
 function createWhisperCapture() {
   const whisperConfig = whisperConfigForSelection();
+  const selected = sttManager.selectedArtifact();
+  if (selected?.backend === "transcribe") {
+    const modelPath = sttManager.selectedPath();
+    if (!modelPath) {
+      throw new Error(`transcribe 모델이 설치되지 않았습니다: ${selected.id}`);
+    }
+    const transcribeConfig = {
+      modelPath,
+      captureId: config.whisper.captureId,
+      threads: config.whisper.threads,
+      gpu: config.whisper.gpu,
+      ffmpegBin: config.whisper.audioRecorderBin || "ffmpeg",
+    };
+    return config.input.mode === "file" && config.input.filePath
+      ? new TranscribeCLI(transcribeConfig, config.input.filePath)
+      : new TranscribeStream(transcribeConfig);
+  }
   return config.input.mode === "file" && config.input.filePath
     ? new WhisperCLI(whisperConfig, config.input.filePath)
     : new WhisperStream(whisperConfig);

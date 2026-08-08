@@ -56,6 +56,7 @@ function artifact(path = "/model"): SttModelArtifact {
   return {
     id: "small",
     label: "Test Q8_0",
+    backend: "whisper",
     fileName: "ggml-test-q8_0.bin",
     url: new URL(path, server.url).href,
     sizeBytes: payload.length,
@@ -74,7 +75,7 @@ function partials(directory: string): string[] {
 }
 
 describe("STT model catalog", () => {
-  test("contains the exact four whisper.cpp-compatible Q8_0 payloads", () => {
+  test("contains the exact whisper.cpp and transcribe.cpp payloads", () => {
     expect(STT_MODEL_CATALOG.map(({ id, fileName, sizeBytes, sha256, license }) => ({ id, fileName, sizeBytes, sha256, license }))).toEqual([
       {
         id: "small",
@@ -104,7 +105,39 @@ describe("STT model catalog", () => {
         sha256: "24bc434f372355688ab9a623077a63e5361a1c41f4d8d648977e39f9b060f09e",
         license: "Apache-2.0",
       },
+      {
+        id: "nemotron-3.5",
+        fileName: "nemotron-3.5-asr-streaming-0.6b-Q8_0.gguf",
+        sizeBytes: 751_094_240,
+        sha256: "b94545b313b3223fda7b2857a52681da813935c2127643d1e9ff0c23d988089c",
+        license: "OpenMDW-1.1",
+      },
+      {
+        id: "qwen3-asr-0.6b",
+        fileName: "Qwen3-ASR-0.6B-Q8_0.gguf",
+        sizeBytes: 850_423_456,
+        sha256: "f081b2d5e23bd669d92cc331d722a8a0681943b8e6f34b48996fd5c319b5acd8",
+        license: "Apache-2.0",
+      },
+      {
+        id: "qwen3-asr-1.7b",
+        fileName: "Qwen3-ASR-1.7B-Q8_0.gguf",
+        sizeBytes: 2_185_030_624,
+        sha256: "9a0d81792dfea2d5f278b8a63deb3ea6e02139ce42c2301f32ea19c4f77526b7",
+        license: "Apache-2.0",
+      },
     ]);
+  });
+
+  test("tags whisper artifacts and transcribe artifacts with their backends", () => {
+    expect(STT_MODEL_CATALOG.filter((m) => m.backend === "whisper").map((m) => m.id))
+      .toEqual(["small", "medium", "large-v3-turbo", "large-v3"]);
+    expect(STT_MODEL_CATALOG.filter((m) => m.backend === "transcribe").map((m) => m.id))
+      .toEqual(["nemotron-3.5", "qwen3-asr-0.6b", "qwen3-asr-1.7b"]);
+    for (const model of STT_MODEL_CATALOG) {
+      const expectedExt = model.backend === "whisper" ? ".bin" : ".gguf";
+      expect(model.fileName.endsWith(expectedExt)).toBe(true);
+    }
   });
 });
 

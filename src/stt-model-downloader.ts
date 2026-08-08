@@ -180,4 +180,9 @@ export class SttModelManager {
     const model = this.catalog.find((entry) => entry.id === this.selectedModelId);
     return model && this.isInstalled(model) ? this.path(model) : null;
   }
+
+  selectedArtifact(): SttModelArtifact | null {
+    if (!this.selectedModelId) return null;
+    return this.catalog.find((entry) => entry.id === this.selectedModelId) ?? null;
+  }
 }
