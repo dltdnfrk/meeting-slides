@@ -486,7 +486,7 @@ describe("중앙 무대 잠금과 반응형", () => {
     expect(narrow.compileVisible).toBe(true);
   });
 
-  test("375px에서 도크 줄바꿈으로 문서 가로 스크롤이 생기지 않는다", async () => {
+  test("375px에서 도크 액션이 내부 스크롤되고 문서는 가로로 넘치지 않는다", async () => {
     await page.setViewport({ width: 375, height: 720 });
     await page.evaluate(() => localStorage.removeItem("workspace.layout.v1"));
     await page.reload({ waitUntil: "load" });
@@ -498,6 +498,7 @@ describe("중앙 무대 잠금과 반응형", () => {
       const style = getComputedStyle(tabs);
       return {
         flexWrap: style.flexWrap,
+        internalScroll: tabs.scrollWidth > tabs.clientWidth,
         docScrollX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         bodyScrollX: document.body.scrollWidth - document.body.clientWidth,
         compileVisible: document.querySelector(".dock #btn-compile-deck") !== null,
@@ -505,7 +506,8 @@ describe("중앙 무대 잠금과 반응형", () => {
       };
     });
 
-    expect(tiny.flexWrap).toBe("wrap");
+    expect(tiny.flexWrap).toBe("nowrap");
+    expect(tiny.internalScroll).toBe(true);
     expect(tiny.docScrollX).toBeLessThanOrEqual(1);
     expect(tiny.bodyScrollX).toBeLessThanOrEqual(1);
     expect(tiny.compileVisible).toBe(true);

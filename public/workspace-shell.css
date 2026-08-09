@@ -125,7 +125,7 @@
 }
 .session-row:hover { background: rgba(255, 255, 255, 0.035); }
 .session-row--selected {
-  border-color: rgba(16, 185, 129, 0.35);
+  border-color: var(--live-line);
   background: var(--live-soft);
 }
 .session-row__title {
@@ -284,16 +284,16 @@
   overflow-y: auto;
 }
 
-/* ── 하단 도크 행: 버튼이 넘치면 문서를 밀지 않고 접힌다 ──
-   .dock__tabs는 nowrap flex 행이라 좁은 폭에서 8개 버튼이 뷰포트를 넘겨
-   문서 전체에 가로 스크롤을 만들었다. 무대를 지키는 셸 규약과 같은 원칙으로
-   여기서도 “넘치면 접는다”. */
+/* ── 하단 도크 행: 버튼이 넘치면 행 내부에서만 스크롤한다 ──
+   작업 순서를 한 줄로 보존하고 문서 전체 가로 스크롤은 만들지 않는다. */
 .dock__tabs {
-  flex-wrap: wrap;
-  row-gap: var(--sp-1);
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
   padding-bottom: var(--sp-1);
 }
-/* 스페이서는 첫 줄에서만 밀어내는 역할을 하고, 줄바꿈의 기점이 된다 */
+/* 스페이서는 넓은 화면에서 라벨과 액션을 가르고 좁은 화면에서는 함께 스크롤된다 */
 .dock__tabs .dock__spacer { min-width: 0; }
 
 /* ── 반응형: 좁아지면 사이드부터 접어 무대를 지킨다 ── */
@@ -324,4 +324,49 @@
     border-bottom: none;
   }
   .transcript-pane--sized { background-image: none; }
+}
+
+@media (max-width: 600px) {
+  .workspace {
+    grid-template-rows: minmax(0, 21fr) minmax(0, 19fr);
+  }
+}
+
+/* ── Floating glass islands: five-column geometry stays intact ── */
+.workspace {
+  gap: 0;
+  padding: var(--island-gap) 14px 8px;
+}
+
+.session-rail,
+.stage-pane,
+.transcript-pane {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 42%),
+    var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-inset), 0 14px 36px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.stage-pane {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 44%),
+    rgba(18, 18, 22, 0.42);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.session-rail { border-right: 1px solid var(--glass-border); }
+.transcript-pane { border-left: 1px solid var(--glass-border); }
+
+@media (max-width: 900px) {
+  .workspace {
+    row-gap: 8px;
+    padding: 8px 10px 4px;
+  }
+  .transcript-pane { border-top: 1px solid var(--glass-border); }
 }
