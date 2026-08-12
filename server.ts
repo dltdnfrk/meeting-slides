@@ -9,7 +9,7 @@ import { WhisperStream, WhisperCLI, listCaptureDevices, type TranscriptChunk } f
 import { TranscribeStream, TranscribeCLI } from "./src/transcribe.ts";
 import { LLMClient, type ChatTransport, type MeetingLLM } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
-import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type ExportUpdate, type ReviewUpdate, type AskUpdate } from "./src/session.ts";
+import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type CapturePhase, type ExportUpdate, type ReviewUpdate, type AskUpdate } from "./src/session.ts";
 import { buildProviderEntriesFromStates, checkCliBin, createDetector, inspectSubscriptionProviders, KEY_BY_PROVIDER, PROVIDER_ADAPTERS, providerAdapter, providerConnectCommand, upsertEnvText, type ProviderRuntimeState, type SubscriptionProviderId } from "./src/providers.ts";
 import { AppSettingsStore } from "./src/app-settings.ts";
 import { SttModelManager } from "./src/stt-model-downloader.ts";
@@ -306,11 +306,6 @@ function connectProvider(id: string): void {
     case "openai": {
       broadcast({ type: "status", text: "OpenAI API 키 발급 페이지를 열었습니다. 발급한 키를 입력해 주세요" });
       openUrl("https://platform.openai.com/api-keys");
-      break;
-    }
-    case "alibaba": {
-      broadcast({ type: "status", text: "Alibaba Cloud 콘솔을 열었습니다. 발급한 API 키를 입력해 주세요" });
-      openUrl("https://bailian.console.aliyun.com/");
       break;
     }
     default:
@@ -1074,7 +1069,7 @@ const httpServer = Bun.serve({
           modelId?: unknown;
           meetingId?: unknown;
         };
-        if (["startReview", "setAttendees", "attendees", "updateItem", "confirmReview"].includes(cmd.action ?? "")) {
+        if (["startReview", "setAttendees", "attendees", "updateItem", "confirmReview", "ask"].includes(cmd.action ?? "")) {
           handlerMap.get(cmd.action ?? "")?.({ ws, cmd });
           return;
         }
@@ -1407,12 +1402,37 @@ const selectSttModel = createSelectSttModel(sttManager, {
   },
 });
 
+/**
+ * The authoritative capture phase.
+ *
+ * `capturing` alone cannot express the stop window: `stopCapture()` sets
+ * `capturing = false` and broadcasts BEFORE `whisper.stop()` and the session
+ * flush, so trailing `line` frames arrive while both surfaces would otherwise
+ * already be claiming idle. `stopping` names that window truthfully, and the
+ * browser and the native minibar both keep Stop and the timer through it.
+ *
+ * Additive only: `CaptureUpdate.phase` is already declared optional in
+ * `src/session.ts`, and every consumer maps a phase-less frame from `capturing`,
+ * so nothing about the existing wire shape changes for a client that ignores it.
+ */
+function capturePhase(): CapturePhase {
+  if (capturing) return "capturing";
+  // A stop that has been requested but whose capture run has not finished yet.
+  return stopRequested && captureRun !== null ? "stopping" : "idle";
+}
+
 function captureMessage(): CaptureUpdate {
+  const phase = capturePhase();
+  // The recording origin stays on the wire for the whole time the server still
+  // owns a capture, so neither surface has to invent a stopwatch to keep the
+  // timer alive across the stop window.
+  const startedAt = capturing || phase === "stopping" ? captureStartedAt : null;
   return {
     type: "capture",
     capturing,
     mode: config.input.mode,
-    ...(capturing && captureStartedAt !== null ? { startedAt: captureStartedAt } : {}),
+    phase,
+    ...(startedAt !== null ? { startedAt } : {}),
   };
 }
 
@@ -1529,10 +1549,17 @@ async function startCapture(requestedMeetingId?: unknown): Promise<void> {
         const endedNaturally = capturing && !stopRequested;
         capturing = false;
         captureStartedAt = null;
+        // This is the authoritative END of the capture, so the stop window is
+        // over before the snapshot goes out. Without clearing the request here
+        // `capturePhase()` would still read `stopping` and this frame - the one
+        // that actually ends the meeting for both surfaces - would claim the
+        // capture was merely winding down.
+        const wasRequestedStop = stopRequested;
+        stopRequested = false;
         broadcast(captureMessage());
         if (endedNaturally && config.input.mode === "mic") {
           broadcast({ type: "status", text: "마이크 입력이 중단되었습니다. 마이크와 권한을 확인한 뒤 다시 시작해 주세요" });
-        } else if (!stopRequested) {
+        } else if (!wasRequestedStop) {
           broadcast({ type: "status", text: "음성 입력이 종료되었습니다" });
         }
       }

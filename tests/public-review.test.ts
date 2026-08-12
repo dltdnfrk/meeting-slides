@@ -87,7 +87,7 @@ async function loadShell(): Promise<void> {
   await emit({ type: "capture", capturing: false, mode: "mic" });
 }
 
-const emit = (value: unknown) => page.evaluate((v) => window.__sockets.at(-1)!.emit(v), value);
+const emit = (value: unknown) => page.evaluate((v) => window.__sockets.slice(-1)[0]!.emit(v), value);
 const sent = () => page.evaluate(() => window.__sent);
 const clearSent = () => page.evaluate(() => { window.__sent.length = 0; });
 
@@ -195,6 +195,25 @@ describe("review panel shell", () => {
       recordDisabled: (document.getElementById("btn-record") as HTMLButtonElement).disabled,
       recordHidden: (document.getElementById("btn-record") as HTMLElement).hidden,
     }))).toEqual({ recordDisabled: false, recordHidden: false });
+  });
+
+  test("a selected ended meeting exposes Review and first activation requests real review output", async () => {
+    await emit({ type: "meetings", items: [
+      { id: 7, title: "완료된 회의", started_at: 1_700_000_000_000, status: "ended" },
+    ] });
+    await page.click('.session-row[data-meeting-id="7"]');
+    await clearSent();
+    await emit({
+      type: "meeting", meetingId: 7, title: "완료된 회의", transcript: [],
+      current: null, history: [], compiled: null,
+    });
+    expect(await page.$eval("#btn-review", (button) => (button as HTMLElement).hidden)).toBe(false);
+    await page.click("#btn-review");
+    expect(await sent()).toEqual([{ action: "startReview" }]);
+    expect(await page.evaluate(() => ({
+      hidden: (document.getElementById("review-panel") as HTMLElement).hidden,
+      state: (document.getElementById("review-panel") as HTMLElement).dataset.state,
+    }))).toEqual({ hidden: false, state: "loading" });
   });
 });
 
@@ -593,7 +612,7 @@ describe("reconnect and update handling", () => {
   test("a dropped socket disables confirm and reconnect restores it", async () => {
     await openReview({ items: [reviewMessage().items[0]] });
     await page.click('.review-item[data-item-id="dec-1"] .review-item__confirm');
-    await page.evaluate(() => window.__sockets.at(-1)!.close());
+    await page.evaluate(() => window.__sockets.slice(-1)[0]!.close());
     await page.waitForFunction(() => (document.getElementById("btn-review-confirm") as HTMLButtonElement).disabled);
     await clearSent();
     await page.click("#btn-review-confirm");

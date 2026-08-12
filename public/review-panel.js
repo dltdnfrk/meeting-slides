@@ -79,11 +79,14 @@ function createReviewPanel(transport) {
     toggleEl.hidden = false;
     toggleEl.setAttribute("aria-expanded", "true");
     if (focusInside) (confirmEl.disabled ? closeEl : confirmEl).focus();
+    // DESIGN 9.12: Tab/Shift+Tab stay inside the open dialog (focus-trap.js).
+    window.trapFocus?.(panelEl);
   }
 
   function close(restoreFocus = false) {
     panelEl.hidden = true;
     toggleEl.setAttribute("aria-expanded", "false");
+    window.releaseFocus?.(panelEl);
     if (restoreFocus && !toggleEl.hidden) toggleEl.focus();
   }
 
@@ -216,6 +219,16 @@ function createReviewPanel(transport) {
 
   toggleEl.addEventListener("click", (ev) => {
     ev.stopPropagation();
+    if (!review) {
+      if (!transport.send({ action: "startReview" })) {
+        setError("앱 서버에 연결되지 않아 회의록을 정리할 수 없습니다");
+        return;
+      }
+      setError("");
+      setPanelState("loading");
+      open(false);
+      return;
+    }
     if (panelEl.hidden) open();
     else close();
   });

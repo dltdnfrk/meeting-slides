@@ -148,35 +148,6 @@ async function geometry(target: Page): Promise<Geometry> {
   });
 }
 
-async function pressHeightSeparatorKey(
-  target: Page,
-  selector: string,
-  key: "ArrowUp" | "ArrowDown" | "Home" | "End",
-): Promise<number> {
-  await target.focus(selector);
-  await target.evaluate((sel) => {
-    const separator = document.querySelector(sel)!;
-    (globalThis as unknown as { __separatorValue: Promise<number> }).__separatorValue =
-      new Promise<number>((resolve, reject) => {
-        const timer = setTimeout(() => {
-          observer.disconnect();
-          reject(new Error(`separator value did not change: ${sel}`));
-        }, 2_000);
-        const observer = new MutationObserver(() => {
-          const value = Number(separator.getAttribute("aria-valuenow"));
-          clearTimeout(timer);
-          observer.disconnect();
-          resolve(value);
-        });
-        observer.observe(separator, { attributes: true, attributeFilter: ["aria-valuenow"] });
-      });
-  }, selector);
-  await target.keyboard.press(key);
-  return target.evaluate(
-    () => (globalThis as unknown as { __separatorValue: Promise<number> }).__separatorValue,
-  );
-}
-
 async function resetWorkspace(): Promise<void> {
   await page.evaluate(
     (keys: string[]) => keys.forEach((key) => localStorage.removeItem(key)),
@@ -298,180 +269,59 @@ describe("전사 도킹", () => {
   });
 });
 
-describe("전사 패널 다중 모서리 리사이즈", () => {
+describe("Caret 라이브 전사 패널 기하", () => {
   beforeEach(resetWorkspace);
 
-  test("기본 상태에서는 카드가 패널 전체 높이를 쓴다", async () => {
+  test("전사 카드는 패널의 패딩을 제외한 가용 높이를 사용한다", async () => {
     const geo = await geometry(page);
-    expect(geo.cardH).toBeCloseTo(geo.paneH, 0);
-
-    const grips = await page.evaluate(() => ({
-      south: document.querySelector(".transcript-grip--s") !== null,
-      southWest: document.querySelector(".transcript-grip--sw") !== null,
-      // 서쪽 폭은 워크스페이스 스플리터가 담당한다
-      west: document.querySelector("#splitter-transcript") !== null,
-      // SE 전용 플로팅 손잡이는 존재하지 않는다
-      southEast: document.querySelector(".transcript-grip--se") !== null,
-    }));
-    expect(grips).toEqual({ south: true, southWest: true, west: true, southEast: false });
+    expect(geo.paneH - geo.cardH).toBeGreaterThanOrEqual(0);
+    expect(geo.paneH - geo.cardH).toBeLessThanOrEqual(32);
   });
 
-  test("높이 그립이 방향과 현재·최소·최대 높이를 노출한다", async () => {
-    const aria = await page.evaluate(() =>
+  test("폐기된 카드 높이 그립은 DOM 계약만 남고 라이브 기하에서는 비노출이다", async () => {
+    const grips = await page.evaluate(() =>
       ["transcript-grip-s", "transcript-grip-sw"].map((id) => {
-        const separator = document.getElementById(id)!;
-        return {
-          orientation: separator.getAttribute("aria-orientation"),
-          min: Number(separator.getAttribute("aria-valuemin")),
-          max: Number(separator.getAttribute("aria-valuemax")),
-          now: Number(separator.getAttribute("aria-valuenow")),
-        };
+        const node = document.getElementById(id)!;
+        return { id, display: getComputedStyle(node).display, orientation: node.getAttribute("aria-orientation") };
       }),
     );
-
-    for (const value of aria) {
-      expect(value.orientation).toBe("horizontal");
-      expect(value.min).toBe(160);
-      expect(value.max).toBeGreaterThan(value.min);
-      expect(value.now).toBe(value.max);
-    }
+    expect(grips).toEqual([
+      { id: "transcript-grip-s", display: "none", orientation: "horizontal" },
+      { id: "transcript-grip-sw", display: "none", orientation: "horizontal" },
+    ]);
   });
 
-  test("키보드 Arrow/Home/End가 두 높이 그립과 ARIA 현재값을 동기화한다", async () => {
-    const southAfterArrow = await pressHeightSeparatorKey(page, "#transcript-grip-s", "ArrowUp");
-    expect(southAfterArrow).toBeCloseTo((await geometry(page)).cardH, 0);
-
-    const atMin = await pressHeightSeparatorKey(page, "#transcript-grip-s", "Home");
-    expect(atMin).toBe(160);
-    const atMax = await pressHeightSeparatorKey(page, "#transcript-grip-s", "End");
-    expect(atMax).toBeCloseTo((await geometry(page)).paneH, 0);
-
-    const southWestAfterArrow = await pressHeightSeparatorKey(
-      page,
-      "#transcript-grip-sw",
-      "ArrowUp",
-    );
-    expect(southWestAfterArrow).toBeLessThan(atMax);
-    expect(southWestAfterArrow).toBeCloseTo((await geometry(page)).cardH, 0);
-  });
-
-  test("서(W) 드래그: 스플리터가 전사 폭을 넓힌다", async () => {
+  test("전사 폭은 현재 워크스페이스 스플리터가 계속 조절한다", async () => {
     const before = await geometry(page);
     await dragFrom(page, "#splitter-transcript", -160, 0);
     const after = await geometry(page);
-
     expect(after.paneW - before.paneW).toBeGreaterThan(20);
     expect(before.stageW - after.stageW).toBeGreaterThan(20);
     expect(after.stageW).toBeGreaterThan(320);
   });
 
-  test("남(S) 드래그: 카드 높이만 줄고 폭은 그대로다", async () => {
-    const before = await geometry(page);
-    await dragFrom(page, "#transcript-grip-s", 0, -240);
-    const after = await geometry(page);
-
-    expect(before.cardH - after.cardH).toBeGreaterThan(200);
-    expect(after.cardH).toBeGreaterThanOrEqual(160);
-    expect(after.paneW).toBeCloseTo(before.paneW, 0);
-    expect(
-      await page.$eval("#transcript-grip-s", (node) => Number(node.getAttribute("aria-valuenow"))),
-    ).toBeCloseTo(after.cardH, 0);
-    // 무대는 높이 조절과 무관하다
-    expect(after.stageW).toBeCloseTo(before.stageW, 0);
-    expect(after.stageH).toBeCloseTo(before.stageH, 0);
-  });
-
-  test("남서(SW) 드래그: 높이와 폭이 함께 바뀐다", async () => {
-    await dragFrom(page, "#transcript-grip-s", 0, -260);
-    const before = await geometry(page);
-
-    await dragFrom(page, "#transcript-grip-sw", -140, 120);
-    const after = await geometry(page);
-
-    expect(after.cardH - before.cardH).toBeGreaterThan(80);
-    expect(after.paneW - before.paneW).toBeGreaterThan(100);
-    expect(after.stageW).toBeGreaterThan(320);
-  });
-
-  test("높이 하한과 상한을 넘지 않는다", async () => {
-    await dragFrom(page, "#transcript-grip-s", 0, -900);
-    const collapsed = await geometry(page);
-    expect(collapsed.cardH).toBeGreaterThanOrEqual(160);
-
-    await dragFrom(page, "#transcript-grip-s", 0, 900);
-    const expanded = await geometry(page);
-    expect(expanded.cardH).toBeLessThanOrEqual(expanded.paneH + 1);
-  });
-
-  test("높이가 workspace.transcript.v1에 남고 새로고침 후 복원된다", async () => {
-    await dragFrom(page, "#transcript-grip-s", 0, -220);
-    const dragged = await geometry(page);
-    const stored = await page.evaluate(
-      (key: string) => JSON.parse(localStorage.getItem(key) ?? "null") as { heightPx: number } | null,
-      TRANSCRIPT_KEY,
-    );
-
-    expect(stored).not.toBeNull();
-    expect(stored!.heightPx).toBeCloseTo(dragged.cardH, 0);
-
+  test("레거시 높이 저장값은 전체 라이브 전사 기하를 축소하지 않는다", async () => {
+    await page.evaluate((key: string) => localStorage.setItem(key, JSON.stringify({ heightPx: 180 })), TRANSCRIPT_KEY);
     await page.reload({ waitUntil: "load" });
     await waitForStableLayout(page);
-    const restored = await geometry(page);
-    expect(restored.cardH).toBeCloseTo(dragged.cardH, 0);
-  });
-
-  test("저장값이 손상돼도 카드가 패널을 꽉 채운 기본으로 뜬다", async () => {
-    await page.evaluate((key: string) => localStorage.setItem(key, "{not json"), TRANSCRIPT_KEY);
-    await page.reload({ waitUntil: "load" });
-    await waitForStableLayout(page);
-
     const geo = await geometry(page);
-    expect(geo.cardH).toBeCloseTo(geo.paneH, 0);
+    expect(geo.paneH - geo.cardH).toBeGreaterThanOrEqual(0);
+    expect(geo.paneH - geo.cardH).toBeLessThanOrEqual(32);
   });
 
-  test("상태가 어떻든 전사 본문은 카드 안쪽에 머무른다", async () => {
-    await dragFrom(page, "#transcript-grip-s", 0, -280);
-    await pushLines(["경계 확인 문장"]);
-
-    const clipped = await page.evaluate(() => {
-      const body = document.getElementById("transcript-body")!.getBoundingClientRect();
-      return [...document.querySelectorAll(".transcript-pane .feed-line")].some((line) => {
-        const rect = line.getBoundingClientRect();
-        // 스크롤 영역 밖으로 완전히 나간 줄은 있을 수 있지만,
-        // 스크롤 컸테이너 자체가 카드 밖을 범침하면 안 된다
-        return rect.width > body.width + 1;
-      });
-    });
-    expect(clipped).toBe(false);
-
-    const fits = await page.evaluate(() => {
-      const card = document.querySelector(".transcript-card")!.getBoundingClientRect();
-      const body = document.getElementById("transcript-body")!.getBoundingClientRect();
-      return body.bottom <= card.bottom + 1 && body.top >= card.top - 1;
-    });
-    expect(fits).toBe(true);
-  });
-
-  test("높이를 줄여도 전사 줄은 계속 쌓이고 스크롤로 읽힌다", async () => {
-    await dragFrom(page, "#transcript-grip-s", 0, -300);
+  test("확정 전사는 카드 내부의 단일 스크롤 영역에 계속 쌓인다", async () => {
     await pushLines(Array.from({ length: 30 }, (_, i) => `스크롤 확인 문장 ${i}`));
-
-    const scroll = await page.evaluate(() => {
+    const state = await page.evaluate(() => {
       const body = document.getElementById("transcript-body")!;
-      const lines = document.querySelectorAll(".transcript-pane .feed-line");
-      const last = lines[lines.length - 1]!.getBoundingClientRect();
-      const card = document.querySelector(".transcript-card")!.getBoundingClientRect();
+      const card = document.getElementById("transcript-card")!.getBoundingClientRect();
+      const bodyRect = body.getBoundingClientRect();
       return {
-        count: lines.length,
+        count: document.querySelectorAll(".transcript-pane .feed-line").length,
         scrollable: body.scrollHeight > body.clientHeight,
-        // 최신 문장이 카드 안쪽에 보이도록 자동 스크롤된다
-        latestVisible: last.bottom <= card.bottom + 1 && last.top >= card.top - 1,
+        contained: bodyRect.top >= card.top - 1 && bodyRect.bottom <= card.bottom + 1,
       };
     });
-
-    expect(scroll.count).toBe(30);
-    expect(scroll.scrollable).toBe(true);
-    expect(scroll.latestVisible).toBe(true);
+    expect(state).toEqual({ count: 30, scrollable: true, contained: true });
   });
 });
 

@@ -30,18 +30,20 @@
     return Number.isFinite(parsed) ? parsed : fallback;
   };
 
-  /**
-   * 두 폭을 최소값과 뷰포트 안으로 함께 접는다.
-   * 사이드가 남은 자리를 다 먹으면 무대(MIN_STAGE)를 먼저 지키고 사이드를 깎는다.
-   */
+  const gridAvailableWidth = () => {
+    const styles = getComputedStyle(workspace);
+    const padL = Number.parseFloat(styles.paddingLeft) || 0;
+    const padR = Number.parseFloat(styles.paddingRight) || 0;
+    return Math.max(0, workspace.clientWidth - padL - padR - splitterWidth() * 2);
+  };
+
   const clamp = (leftPx, rightPx) => {
-    const available = workspace.clientWidth - splitterWidth() * 2;
+    const available = gridAvailableWidth();
     let left = Math.max(MIN_RAIL, Math.round(leftPx));
     let right = Math.max(MIN_TRANSCRIPT, Math.round(rightPx));
 
     const overflow = left + right + MIN_STAGE - available;
     if (overflow > 0) {
-      // 넘친 만큼을 여유(최소폭 초과분)에 비례해 양쪽에서 회수한다
       const leftSlack = left - MIN_RAIL;
       const rightSlack = right - MIN_TRANSCRIPT;
       const slack = leftSlack + rightSlack;
@@ -56,7 +58,7 @@
   };
 
   const limits = () => {
-    const available = workspace.clientWidth - splitterWidth() * 2 - MIN_STAGE;
+    const available = gridAvailableWidth() - MIN_STAGE;
     return {
       maxLeft: Math.max(MIN_RAIL, Math.round(available - MIN_TRANSCRIPT)),
       maxRight: Math.max(MIN_TRANSCRIPT, Math.round(available - MIN_RAIL)),

@@ -5,7 +5,18 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");
-const timeoutMs = 10_000;
+/**
+ * Per-await deadline for this suite.
+ *
+ * It bounds REAL work: this test spawns an actual server process, starts and
+ * stops an actual capture, and waits for the actual transcript flush and file
+ * writes. Nothing here sleeps or polls - every await is settled by a socket
+ * message or a process log line - so the bound exists only to turn a genuine
+ * hang into a failure. At 10s it was already marginal before this task (the
+ * flush alone measured 4.3-10.0s across runs on this machine), so it is raised
+ * to leave headroom for the authoritative-idle frame that is now asserted too.
+ */
+const timeoutMs = 30_000;
 let child: ChildProcessWithoutNullStreams;
 let socket: WebSocket;
 let tempDir: string;
@@ -145,8 +156,41 @@ test("characterizes existing WS responses, broadcasts, saved path, active reset,
     { action: "stopCapture" },
     (message) => message.type === "capture" && message.capturing === false,
   );
-  expect(stopped).toEqual({ type: "capture", capturing: false, mode: "mic" });
-  await waitForMessageAfter(0, (message) => message.type === "status" && String(message.text).includes("녹음 중지"));
+  // The first frame after `stopCapture` is the STOP WINDOW, not idle: the server
+  // has released `capturing` but is still flushing the tail of the transcript.
+  // `phase` names that window and `startedAt` keeps the timer truthful through
+  // it; both are additive, and `capturing`/`mode` are unchanged, so a client
+  // that reads neither field behaves exactly as before.
+  expect(stopped).toMatchObject({ type: "capture", capturing: false, mode: "mic" });
+  expect(stopped.phase).toBe("stopping");
+  expect(typeof stopped.startedAt).toBe("number");
+  expect(Object.keys(stopped).sort()).toEqual(["capturing", "mode", "phase", "startedAt", "type"]);
+
+  // Everything from HERE on is the terminal flush.
+  //
+  // The scan floor matters: the connect-time hydration frame at the top of this
+  // socket is `{type:"capture",capturing:false,mode:"mic",phase:"idle"}`, which is
+  // byte-identical to the terminal idle asserted below. Scanning the whole buffer
+  // would match THAT frame and the assertion would hold even if the server never
+  // left the stopping phase. Anchoring past the stop-window frame is what makes
+  // this a real observation of the end of the capture.
+  const idleStart = messages.length;
+
+  // The authoritative idle that ends the meeting arrives after the flush,
+  // alongside the stop status. Both are consequences of the SAME flush, so they
+  // are armed together and awaited together rather than serialised into two
+  // stacked windows inside this test's per-await budget.
+  const [idle] = await Promise.all([
+    waitForMessageAfter(
+      idleStart,
+      (message) => message.type === "capture" && message.phase === "idle",
+    ),
+    waitForMessageAfter(
+      idleStart,
+      (message) => message.type === "status" && String(message.text).includes("녹음 중지"),
+    ),
+  ]);
+  expect(idle).toEqual({ type: "capture", capturing: false, mode: "mic", phase: "idle" });
 
   const reset = await sendAndWait(
     { action: "reset" },
@@ -207,4 +251,6 @@ test("characterizes existing WS responses, broadcasts, saved path, active reset,
 
   const malformed = await sendAndWait("{", (message) => message.type === "status" && String(message.text).startsWith("요청 처리 실패:"));
   expect(String(malformed.text)).toContain("JSON");
-}, 20_000);
+// The test bound sits above the per-await bound so a single slow await surfaces
+// as its own named timeout rather than as an anonymous test-level kill.
+}, 60_000);

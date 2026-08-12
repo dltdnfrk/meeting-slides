@@ -47,6 +47,8 @@ cat > "$CONTENTS/Info.plist" <<'EOF'
   <key>NSHighResolutionCapable</key><true/>
   <key>NSSupportsAutomaticGraphicsSwitching</key><true/>
   <key>NSMicrophoneUsageDescription</key><string>회의 음성을 로컬에서 전사하기 위해 마이크가 필요합니다.</string>
+  <key>NSCalendarsUsageDescription</key><string>다음 회의 시작에 맞춰 녹음을 자동으로 시작하기 위해 캘린더 일정을 읽습니다.</string>
+  <key>NSCalendarsFullAccessUsageDescription</key><string>다음 회의 시작에 맞춰 녹음을 자동으로 시작하기 위해 캘린더 일정을 읽습니다.</string>
   <key>NSAppTransportSecurity</key>
   <dict>
     <key>NSAllowsLocalNetworking</key><true/>
@@ -56,6 +58,13 @@ cat > "$CONTENTS/Info.plist" <<'EOF'
 </plist>
 EOF
 
+# The launcher resolves this marker, then reads .env for HTTP_PORT and runs
+# `bun run server.ts` there. Packaging a path without that entry point would
+# ship a launcher that cannot start the session it promises.
+if [[ ! -f "$PROJ/server.ts" || ! -f "$PROJ/package.json" ]]; then
+  echo "refusing to package: $PROJ has no server.ts/package.json"
+  exit 1
+fi
 printf '%s\n' "$PROJ" > "$RESOURCES/project-path.txt"
 
 if [[ -f "$HOME/Applications/Meeting Slides.app/Contents/Resources/AppIcon.icns" ]]; then
@@ -63,7 +72,14 @@ if [[ -f "$HOME/Applications/Meeting Slides.app/Contents/Resources/AppIcon.icns"
 fi
 
 echo "compile browser webapp launcher…"
-swiftc -O -o "$MACOS_DIR/meeting-slides" macos/launcher.swift \
+swiftc -O -o "$MACOS_DIR/meeting-slides" \
+  macos/launcher.swift \
+  macos/AppLifecycle.swift \
+  macos/NativeSurfaceContract.swift \
+  macos/TransportClient.swift \
+  macos/MinibarProjection.swift \
+  macos/MinibarWindowController.swift \
+  macos/MinibarView.swift \
   -framework AVFoundation \
   -framework AppKit \
   -framework Foundation
@@ -74,7 +90,10 @@ xattr -cr "$APP" || true
 codesign --force --deep --sign - --identifier "$BUNDLE_ID" "$APP"
 codesign --verify --deep --strict "$APP"
 
-if [[ "$PROJECT_APP_LINK" != "$APP" ]]; then
+# The repository symlink names the canonical installed app. A redirected build
+# (MEETING_SLIDES_APP_DIR, e.g. a test or a throwaway bundle) must never
+# repoint it at a temporary directory that is about to be deleted.
+if [[ "$APP_INSTALL_DIR" == "$HOME/Applications" && "$PROJECT_APP_LINK" != "$APP" ]]; then
   rm -rf "$PROJECT_APP_LINK"
   ln -sfn "$APP" "$PROJECT_APP_LINK"
 fi

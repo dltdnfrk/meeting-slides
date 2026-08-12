@@ -13,6 +13,15 @@ async function waitForClientAction(action: string): Promise<Record<string, unkno
   return message;
 }
 
+/**
+ * Todo 13 homes the save/export/compile set behind the one contextual
+ * `<details>` (DESIGN 9.11). Opening it is idempotent, so a test may call this
+ * before any dock interaction without caring about the current state.
+ */
+async function openDock(target: Page): Promise<void> {
+  await target.$eval("#dock-more", (node) => { (node as HTMLDetailsElement).open = true; });
+}
+
 beforeAll(async () => {
   browser = await puppeteer.launch({ args: ["--no-sandbox"] });
   page = await browser.newPage();
@@ -38,6 +47,10 @@ describe("public meeting/export protocol reliability", () => {
     await page.$eval('.session-row[data-meeting-id="7"]', (button) => (button as HTMLButtonElement).click());
     expect(await select).toEqual({ action: "selectMeeting", meetingId: 7 });
 
+        // Todo 13 homes the save/export/compile set inside the one contextual
+    // disclosure (DESIGN 9.11). Puppeteer requires a visible target, so the
+    // disclosure is opened first, as a user does. Assertions are unchanged.
+    await openDock(page);
     const transcript = waitForClientAction("saveTranscript");
     await page.click("#btn-export-transcript");
     expect(await transcript).toEqual({ action: "saveTranscript", meetingId: 7 });
@@ -75,6 +88,10 @@ describe("public meeting/export protocol reliability", () => {
       compile: "만든 슬라이드 6장",
     });
 
+        // Todo 13 homes the save/export/compile set inside the one contextual
+    // disclosure (DESIGN 9.11). Puppeteer requires a visible target, so the
+    // disclosure is opened first, as a user does. Assertions are unchanged.
+    await openDock(page);
     const compile = waitForClientAction("compileTranscriptSnapshot");
     await page.click("#btn-compile-deck");
     expect(await compile).toEqual({ action: "compileTranscriptSnapshot", meetingId: 7 });

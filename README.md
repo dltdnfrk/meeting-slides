@@ -43,7 +43,6 @@ WebSocket /ws ── public/app.js ── 슬라이드·자막·히스토리 렌
   ```
 - LLM 프로바이더 1개 (택일):
   - **구독 서비스 CLI** — API 키 없이 구독 인증 재사용: `claude`(Claude Pro/Max) 또는 `codex`(ChatGPT)
-  - **Alibaba Token Plan (Bailian)** — GLM-5.2
   - **OpenAI** — gpt-4o-mini 등
   - **로컬 llama.cpp 서버** — API 키 없이 완전 오프라인 가능
 
@@ -60,8 +59,8 @@ cp .env.example .env   # 열어서 LLM 키 등을 채워 넣기
 
 | 변수 | 설명 | 기본값 |
 |---|---|---|
-| `LLM_PROVIDER` | `alibaba` \| `openai` \| `local` \| `cli` | `alibaba` |
-| `ALIBABA_TOKEN_PLAN_API_KEY` | Alibaba 키 (`sk-sp-...`) | — |
+| `LLM_PROVIDER` | `openai` \| `local` \| `cli` | `cli` |
+| `OPENAI_API_KEY` | OpenAI API 키 | — |
 | `LLM_CLI_BIN` | `cli` 모드 백엔드 CLI (`claude`/`codex`, 구독 인증) | `claude` |
 | `LLM_CLI_TIMEOUT_MS` | `cli` 모드 호출 상한 (ms) | `120000` |
 | `WHISPER_MODEL_PATH` | ggml 모델 경로 | `./models/ggml-medium.bin` |
@@ -75,22 +74,25 @@ cp .env.example .env   # 열어서 LLM 키 등을 채워 넣기
 
 ## 실행
 
-### macOS 앱으로 실행 (권장 — 터미널 불필요)
+### macOS 앱으로 실행 (권장)
 
 ```bash
 bun install
-bash scripts/build-app.sh      # Meeting Slides.app 생성 (1회)
+bash scripts/build-app.sh
+bash scripts/verify-app.sh "$HOME/Applications/Meeting Slides.app"
+open -a "Meeting Slides"
 ```
 
-1. Finder에서 `Meeting Slides.app` **우클릭 → 열기** (최초 1회, Gatekeeper)
-2. 마이크 권한 프롬프트 **허용** (앱 단위로 영구 귀속 — 이후 어떤 실행 경로로든 녹음 동작)
-3. 이후 **더블클릭/Spotlight**로 실행 → 서버 기동 + 브라우저 자동 오픈
+빌드는 `$HOME/Applications/Meeting Slides.app`을 만들고 저장소 루트의
+`Meeting Slides.app` 심볼릭 링크를 같은 앱으로 연결합니다. 앱은 로컬 Bun 서버를
+기동하고 전체 작업 공간을 기본 브라우저에 열며, 메뉴 막대와 네이티브 미니바에는
+녹음 상태·타이머·최근 발언·Stop만 투영합니다. 회의 목록, Notes, Transcript, Ask,
+검토, 설정과 내보내기는 브라우저 작업 공간에서 사용합니다.
 
-```bash
-open -a "Meeting Slides.app" --args --mic-check   # 권한 프롬프트 미리 띄우기
-bash scripts/install-login-item.sh                # 로그인 시 자동 시작 (선택)
-bash scripts/install-login-item.sh --remove       # 자동 시작 해제
-```
+최초 실행 시 Gatekeeper가 막으면 Finder에서 앱을 우클릭해 **열기**를 선택하고,
+마이크 및 캘린더 권한 요청은 사용할 기능에 맞게 승인합니다. 앱 번들은 현재
+체크아웃의 `server.ts`와 정적 자산을 사용하므로 소스를 이동한 뒤에는 다시
+빌드합니다.
 
 ### 터미널에서 실행
 
@@ -105,14 +107,14 @@ bun run devices
 bun run server.ts --file ./sample.m4a
 ```
 
-브라우저에서 `http://localhost:8787` 접속 후 발언을 시작하면:
+브라우저에서 `http://localhost:8787` 접속하면:
 
-- 하단 **아일랜드**에 실시간 자막이 흐르고
-- 상단 **⚙ 버튼**에서 LLM 프로바이더를 언제든 교체 (구독 Claude / 구독 GPT / Alibaba / OpenAI / 로컬 — 사용 가능 여부 자동 감지, "사용 중" 배지)
-- 주제가 잡히면 **슬라이드**가 만들어지고, 주제가 바뀌면 새 장으로 넘어갑니다
-- 왼쪽 **히스토리** 썸네일을 클릭하면 지난 슬라이드 미리보기 (재클릭·Esc·안내 바 클릭 시 라이브 복귀)
-- **Markdown / JSON 저장**은 요약 슬라이드, **전사본**은 시각·화자 라벨이 붙은 원문 전체를 다운로드
-- **초기화**로 세션 리셋
+- Library의 회의 목록에서 Overview, Notes, Transcript 탭을 전환합니다.
+- **녹음 시작**으로 Live 작업 공간에 들어가며, 16:9 슬라이드와 확정 전사가 함께 표시됩니다.
+- Live의 **Stop**과 서버 기준 타이머는 시작·녹음·중지 처리 중 계속 보입니다.
+- 설정에서 사용 가능한 LLM 프로바이더와 음성 인식 모델을 선택합니다.
+- **만들기·저장·내보내기**에서 PowerPoint 초안과 Markdown, JSON, 전사, 웹 슬라이드, PDF, PNG를 생성합니다.
+- Ask, 참석자 지정과 회의록 검토는 선택한 회의의 실제 서버 작업을 사용합니다.
 
 > 문장 분할 품질: 한국어 STT는 구두점이 자주 빠지므로, 미완결 조각을 보류해 다음 조각과 병합하는 어셈블러가 전사 파이프라인에 내장돼 있습니다(완결 구두점·화자 전환·60자 상한·종료 시 방출).
 

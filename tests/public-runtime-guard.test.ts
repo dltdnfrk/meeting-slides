@@ -10,7 +10,7 @@ describe("operator runtime bootstrap", () => {
     expect(html).toContain("<title>Meeting Slides");
     expect(html).toContain("runtime-bootstrap");
     expect(html).toContain('href="/style.css"');
-    expect(html).toContain('href="/workspace-shell.css"');
+    expect(html).toContain('href="/caret-operator.css"');
     expect(html).toContain('src="/workspace-split.js"');
     expect(html).toContain('src="/transcript-resize.js"');
     expect(html).toContain('src="/app.js"');

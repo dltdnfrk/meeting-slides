@@ -20,7 +20,30 @@ afterAll(async () => {
   harness.stop();
 });
 
-describe("TIRO 기반 오퍼레이터 표면", () => {
+/**
+ * Drives the shell back to the library with a real authoritative `capture` frame
+ * and waits for the class the client itself toggles. No faked DOM state.
+ */
+async function returnToLibrary(target: Page): Promise<void> {
+  await target.evaluate(() => {
+    const app = document.querySelector(".app")!;
+    (globalThis as unknown as { __toLibrary: Promise<void> }).__toLibrary = new Promise<void>(
+      (resolve, reject) => {
+        if (!app.classList.contains("app--capturing")) { resolve(); return; }
+        const timer = setTimeout(() => { observer.disconnect(); reject(new Error("library did not restore")); }, 5_000);
+        const observer = new MutationObserver(() => {
+          if (app.classList.contains("app--capturing")) return;
+          clearTimeout(timer); observer.disconnect(); resolve();
+        });
+        observer.observe(app, { attributes: true, attributeFilter: ["class"] });
+      },
+    );
+  });
+  harness.pushMessage({ type: "capture", capturing: false, mode: "mic", phase: "idle" });
+  await target.evaluate(() => (globalThis as unknown as { __toLibrary: Promise<void> }).__toLibrary);
+}
+
+describe("Caret 오퍼레이터 표면", () => {
   test("중앙 슬라이드 계약과 필수 DOM ID를 한 번씩만 보존한다", async () => {
     const contract = await page.evaluate(() => {
       const ids = ["current-slide", "stage-pane", "session-list", "transcript-stream"];
@@ -128,10 +151,43 @@ describe("TIRO 기반 오퍼레이터 표면", () => {
     expect(active.waveformVisible).toBe(true);
     expect(active.label).toContain("녹음 중지");
     expect(active.pressed).toBe("true");
+
+    await page.evaluate(() => {
+      const app = document.querySelector(".app");
+      (globalThis as typeof globalThis & { __captureStopped: Promise<void> }).__captureStopped =
+        new Promise<void>((resolve, reject) => {
+          let observer: MutationObserver;
+          const timer = setTimeout(() => {
+            observer?.disconnect();
+            reject(new Error("capture stop did not render"));
+          }, 5_000);
+          observer = new MutationObserver(() => {
+            if (app?.classList.contains("app--capturing")) return;
+            clearTimeout(timer);
+            observer.disconnect();
+            resolve();
+          });
+          if (!app?.classList.contains("app--capturing")) {
+            clearTimeout(timer);
+            resolve();
+            return;
+          }
+          observer.observe(app, { attributes: true, attributeFilter: ["class"] });
+        });
+    });
+    harness.pushMessage({ type: "capture", capturing: false, mode: "mic" });
+    await page.evaluate(() =>
+      (globalThis as typeof globalThis & { __captureStopped: Promise<void> }).__captureStopped,
+    );
   });
 
   test("3-way 출력에서 전체 전사를 선택하면 패널로 이동하고 현재 상태를 갱신한다", async () => {
     await page.setViewport({ width: 768, height: 800 });
+    // MIGRATED (Todo 11): state is server-authoritative now (DESIGN §9.3), so the
+    // shell must be returned to the library with a real capture frame. Removing
+    // `.app--capturing` by hand left the reducer in the live shell and produced a
+    // combination the product itself can never reach.
+    await returnToLibrary(page);
     await page.click('.output-switcher__item[data-output-target="transcript-pane"]');
 
     const selection = await page.evaluate(() => ({
@@ -171,10 +227,16 @@ describe("TIRO 기반 오퍼레이터 표면", () => {
 
   test("비활성 사유와 모바일 전사 본문이 잘리지 않는다", async () => {
     await page.setViewport({ width: 1280, height: 800 });
+    // The reason text belongs to the transcript CARD, which is the measure-bound
+    // reading column inside the pane. Comparing it to the pane's outer edge was
+    // only equivalent while the pane was a fixed-width dock; with the document
+    // surface the pane is full width and the card carries the measure.
     const reasonClipping = await page.evaluate(() => {
       const reason = document.querySelector(".capability-reason")?.getBoundingClientRect();
+      const card = document.getElementById("transcript-card")?.getBoundingClientRect();
       const pane = document.getElementById("transcript-pane")?.getBoundingClientRect();
-      return Math.max(0, Math.round((reason?.right ?? 0) - (pane?.right ?? 0)));
+      const bound = Math.max(card?.right ?? 0, pane?.right ?? 0);
+      return Math.max(0, Math.round((reason?.right ?? 0) - bound));
     });
 
     await page.setViewport({ width: 375, height: 812 });
@@ -205,5 +267,128 @@ describe("TIRO 기반 오퍼레이터 표면", () => {
     expect(mobile.dockOverflow).toBe(0);
     expect(mobile.capabilityReasonVisible).toBe(true);
     expect(mobile.outputReason).toBe("결과 없음");
+  });
+
+  test("caret dual shell exposes detail tabs and live compact mode", async () => {
+    await page.setViewport({ width: 1280, height: 800 });
+    await page.goto(harness.origin, { waitUntil: "load" });
+    await page.waitForSelector("#meeting-chrome", { timeout: 5_000 });
+
+    const shell = await page.evaluate(() => {
+      const tabs = [...document.querySelectorAll(".detail-tabs__btn")].map((node) =>
+        node.textContent?.trim() ?? "",
+      );
+      const cssHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')].map((node) =>
+        (node as HTMLLinkElement).getAttribute("href") ?? "",
+      );
+      return {
+        activeShells: document.querySelectorAll('.app[data-shell]').length,
+        hasCss: cssHrefs.includes("/caret-operator.css"),
+        tabs,
+        detailTab: document.querySelector(".app")?.getAttribute("data-detail-tab") ?? "",
+        hasFollowup: Boolean(document.getElementById("action-followup")),
+      };
+    });
+
+    expect(shell.activeShells).toBe(1);
+    expect(shell.hasCss).toBe(true);
+    expect(shell.tabs).toEqual(["Overview", "Notes", "Transcript"]);
+    expect(shell.detailTab).toBe("overview");
+    expect(shell.hasFollowup).toBe(true);
+
+    await page.click("#detail-tab-notes");
+    await page.waitForFunction(
+      () => document.querySelector(".app")?.getAttribute("data-detail-tab") === "notes",
+      { timeout: 3_000 },
+    );
+
+    // ADDITIVE UPDATE (Todo 12). This step used to add `.app--capturing` by hand.
+    // That class is the legacy compatibility signal, not the authoritative shell:
+    // setting it alone leaves `data-shell="library"`, so the live geometry never
+    // applies and the assertions below measured the library layout while claiming
+    // to measure live. Todo 12's live rules key on the authoritative
+    // `data-shell="live"`, so the shell is now entered the way the product enters
+    // it - through a real capture frame - and the same assertions hold.
+    await page.evaluate(() => {
+      (globalThis as unknown as { __live: Promise<void> }).__live = new Promise<void>((resolve, reject) => {
+        const app = document.querySelector(".app") as HTMLElement;
+        const done = () => app.dataset.shell === "live" && app.classList.contains("app--capturing");
+        if (done()) { resolve(); return; }
+        const timer = setTimeout(() => { observer.disconnect(); reject(new Error("live shell timeout")); }, 3_000);
+        const observer = new MutationObserver(() => {
+          if (!done()) return;
+          clearTimeout(timer); observer.disconnect(); resolve();
+        });
+        observer.observe(app, { attributes: true, attributeFilter: ["class", "data-shell"] });
+      });
+    });
+    harness.pushMessage({ type: "capture", capturing: true, mode: "mic", phase: "capturing" });
+    await page.evaluate(() => (globalThis as unknown as { __live: Promise<void> }).__live);
+
+    const live = await page.evaluate(() => {
+      const topbar = document.getElementById("live-topbar");
+      const stop = document.getElementById("btn-live-stop");
+      const style = topbar ? getComputedStyle(topbar) : null;
+      const rail = document.querySelector(".session-rail") as HTMLElement | null;
+      const stage = document.querySelector(".stage-pane") as HTMLElement | null;
+      const transcript = document.querySelector(".transcript-pane") as HTMLElement | null;
+      const sr = stage?.getBoundingClientRect();
+      const tr = transcript?.getBoundingClientRect();
+      return {
+        capturing: document.querySelector(".app")?.classList.contains("app--capturing") ?? false,
+        stopPresent: Boolean(stop),
+        topbarDisplay: style?.display ?? "none",
+        railDisplay: rail ? getComputedStyle(rail).display : "missing",
+        docHeadDisplay: getComputedStyle(document.querySelector(".doc-head") as HTMLElement).display,
+        stageW: sr?.width ?? 0,
+        transcriptW: tr?.width ?? 0,
+        sideBySide: Boolean(sr && tr && Math.abs(sr.top - tr.top) < 48),
+        slideInStage: Boolean(
+          stage && document.getElementById("current-slide") && stage.contains(document.getElementById("current-slide")),
+        ),
+      };
+    });
+    expect(live.capturing).toBe(true);
+    expect(live.stopPresent).toBe(true);
+    expect(live.topbarDisplay).not.toBe("none");
+    expect(live.railDisplay).toBe("none");
+    expect(live.docHeadDisplay).toBe("none");
+    expect(live.stageW).toBeGreaterThan(200);
+    expect(live.transcriptW).toBeGreaterThan(200);
+    expect(live.sideBySide).toBe(true);
+    expect(live.slideInStage).toBe(true);
+
+    // ADDITIVE UPDATE (Todo 12): leave live the way the product leaves it too -
+    // on the authoritative idle frame - so `data-shell` returns to `library`.
+    await page.evaluate(() => {
+      (globalThis as unknown as { __idle: Promise<void> }).__idle = new Promise<void>((resolve, reject) => {
+        const app = document.querySelector(".app") as HTMLElement;
+        const done = () => app.dataset.shell === "library" && !app.classList.contains("app--capturing");
+        if (done()) { resolve(); return; }
+        const timer = setTimeout(() => { observer.disconnect(); reject(new Error("idle shell timeout")); }, 3_000);
+        const observer = new MutationObserver(() => {
+          if (!done()) return;
+          clearTimeout(timer); observer.disconnect(); resolve();
+        });
+        observer.observe(app, { attributes: true, attributeFilter: ["class", "data-shell"] });
+      });
+    });
+    harness.pushMessage({ type: "capture", capturing: false, mode: "mic", phase: "idle" });
+    await page.evaluate(() => (globalThis as unknown as { __idle: Promise<void> }).__idle);
+    await page.evaluate(() => {
+      document.querySelector(".app")?.setAttribute("data-detail-tab", "overview");
+    });
+    const restored = await page.evaluate(() => {
+      const topbar = document.getElementById("live-topbar");
+      const rail = document.getElementById("session-rail");
+      return {
+        topbarDisplay: topbar ? getComputedStyle(topbar).display : "missing",
+        railDisplay: rail ? getComputedStyle(rail).display : "missing",
+        docHeadDisplay: getComputedStyle(document.querySelector(".doc-head") as HTMLElement).display,
+      };
+    });
+    expect(restored.topbarDisplay).toBe("none");
+    expect(restored.railDisplay).not.toBe("none");
+    expect(restored.docHeadDisplay).not.toBe("none");
   });
 });

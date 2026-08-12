@@ -65,6 +65,11 @@ let jobControlsBusy = false;
 
 // 글랜서블 상태 스트립
 const appEl = document.querySelector(".app");
+// The shell module (operator-surface.js) owns the canonical UI/transcript
+// reducers and every explicit state attribute. It is an ES module and therefore
+// runs before this deferred script, so the handle is always present in the
+// browser; the optional chaining keeps this file usable in isolation.
+const caretShell = window.__caretShell ?? null;
 const glanceCaptureEl = $("glance-capture");
 const glanceCaptureLabelEl = glanceCaptureEl.querySelector(".glance__label");
 const glanceSlideEl = $("glance-slide");
@@ -96,16 +101,75 @@ let viewingCompiled = false;
 let compiledPreviewTitle = "";
 let activeMeetingTitle = "";
 
+/**
+ * DESIGN 9.11: "A capability the server gates stays visible and disabled with its
+ * exact machine reason in both `title` and `aria-label`."
+ *
+ * The static markup carries each control's PURPOSE. The moment a gate closes,
+ * that purpose is no longer the truth about the control, so the gate's reason
+ * replaces it in BOTH places and the purpose is restored when the gate opens.
+ * `title` alone is not enough: assistive technology reads the accessible name,
+ * so a reason that lives only in `title` never reaches the user who needs it.
+ */
+const GATE_REASON_DISCONNECTED = "앱 서버에 연결되어야 사용할 수 있습니다";
+const GATE_REASON_JOB_BUSY = "진행 중인 슬라이드 작업이 끝나야 사용할 수 있습니다";
+const GATE_REASON_CAPTURING = "녹음을 중지한 뒤 사용할 수 있습니다";
+
+/** Each gated control's purpose, captured from the markup before any override. */
+const controlPurpose = new WeakMap();
+
+/**
+ * Declares a control's CURRENT purpose. When no gate is closed the purpose is
+ * applied immediately; when one is, only the stored purpose is updated so the
+ * displayed reason survives until the gate opens. This is what lets the capture
+ * control flip its action label across phases without ever erasing a reason.
+ */
+function setControlPurpose(control, title, ariaLabel) {
+  if (!control) return;
+  controlPurpose.set(control, { title, ariaLabel });
+  if (control.disabled) return;
+  if (title) control.setAttribute("title", title);
+  else control.removeAttribute("title");
+  if (ariaLabel) control.setAttribute("aria-label", ariaLabel);
+  else control.removeAttribute("aria-label");
+}
+
+function applyGate(control, reason) {
+  if (!control) return;
+  if (!controlPurpose.has(control)) {
+    controlPurpose.set(control, {
+      title: control.getAttribute("title") ?? "",
+      ariaLabel: control.getAttribute("aria-label") ?? "",
+    });
+  }
+  const purpose = controlPurpose.get(control);
+  control.disabled = reason !== null;
+  // The reason and the purpose are the same string in both attributes, so the
+  // pointer tooltip and the accessible name can never disagree.
+  const title = reason ?? purpose.title;
+  const label = reason ?? purpose.ariaLabel;
+  if (title) control.setAttribute("title", title);
+  else control.removeAttribute("title");
+  if (label) control.setAttribute("aria-label", label);
+  else control.removeAttribute("aria-label");
+}
+
 function syncActionAvailability() {
   syncAskAvailability?.();
   const connected = Boolean(ws && ws.readyState === WebSocket.OPEN);
-  btnRecordEl.disabled = !connected;
-  btnAttendeesEl.disabled = !connected || capturing;
+  // The capture control states its gate reason like every other gated control.
+  // Its enabled accessible name is the ACTION ("녹음 시작" / "녹음 중지"), which
+  // `renderCaptureButton` owns and re-asserts whenever the phase flips, so the
+  // reason is applied here and withdrawn there.
+  applyGate(btnRecordEl, connected ? null : GATE_REASON_DISCONNECTED);
+  applyGate(btnAttendeesEl, !connected ? GATE_REASON_DISCONNECTED : capturing ? GATE_REASON_CAPTURING : null);
   for (const control of [btnExportMdEl, btnExportJsonEl, btnExportTranscriptEl, btnExportDeckEl]) {
-    control.disabled = !connected;
+    applyGate(control, connected ? null : GATE_REASON_DISCONNECTED);
   }
-  for (const control of conflictingJobControls) control.disabled = !connected || jobControlsBusy;
-  btnResetEl.disabled = !connected || capturing;
+  for (const control of conflictingJobControls) {
+    applyGate(control, !connected ? GATE_REASON_DISCONNECTED : jobControlsBusy ? GATE_REASON_JOB_BUSY : null);
+  }
+  applyGate(btnResetEl, !connected ? GATE_REASON_DISCONNECTED : capturing ? GATE_REASON_CAPTURING : null);
 }
 
 function escapeHtml(s) {
@@ -122,6 +186,11 @@ function requestMeetings() {
 
 function renderMeetings(items) {
   meetings = Array.isArray(items) ? items : [];
+  // While the server is capturing, the meeting it marks `open` IS the live one.
+  if (capturing) {
+    const open = meetings.find((item) => item.status === "open");
+    if (open) liveMeetingId = open.id;
+  }
   if (selectedMeetingId !== null && !meetings.some((item) => item.id === selectedMeetingId)) {
     selectedMeetingId = null;
     showFreshWorkspace();
@@ -176,6 +245,9 @@ sessionListEl.addEventListener("click", (ev) => {
     return;
   }
   selectedMeetingId = nextMeetingId;
+  // Register the selection with the reducer BEFORE the request goes out, so a
+  // response for a previous selection is already recognizable as stale.
+  caretShell?.selectMeeting(nextMeetingId);
   renderMeetings(meetings);
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "selectMeeting", meetingId: selectedMeetingId }));
@@ -380,6 +452,14 @@ function renderSlide(slide) {
   currentSlideEl.innerHTML = slideHtml(slide);
 }
 function renderMain() {
+  // Explicit stage state, derived from what is actually about to be rendered.
+  caretShell?.setStageState(
+    viewingHistory ? "history-preview"
+      : currentSlide ? "slide"
+        : detecting ? "detecting"
+          : capturing ? "waiting"
+            : "empty",
+  );
   if (!viewingHistory) {
     renderSlide(currentSlide);
   } else {
@@ -622,7 +702,6 @@ const PROVIDER_COPY = {
   "cli:grok": { name: "Grok", detail: "xAI 계정" },
   "cli:claude": { name: "Claude", detail: "Claude Pro 또는 Max 계정" },
   "cli:gemini": { name: "Gemini", detail: "Google 계정" },
-  alibaba: { name: "Alibaba GLM", detail: "Alibaba Cloud API 키" },
   openai: { name: "OpenAI", detail: "API 키로 연결" },
   local: { name: "로컬 모델", detail: "이 Mac에서 실행" },
 };
@@ -652,7 +731,7 @@ function renderProviders(msg) {
   const list = Array.isArray(msg.list) ? msg.list : [];
   providerListEl.innerHTML = list.map((p) => {
     const isCli = p.id.startsWith("cli:");
-    const keyBased = p.id === "openai" || p.id === "alibaba";
+    const keyBased = p.id === "openai";
     const status = providerStatus(p);
     const copy = providerCopy(p);
     const showActions = isCli || !status.selectable;
@@ -823,10 +902,29 @@ selectEffortEl.onchange = sendProviderSelection;
 btnSettingsEl.setAttribute("aria-controls", providerPanelEl.id);
 btnSettingsEl.setAttribute("aria-expanded", "false");
 
+/**
+ * DESIGN 9.12: opening a sheet moves focus into it. Without this the settings
+ * sheet appeared while focus stayed on the trigger behind it, so a keyboard user
+ * had to tab through the whole shell to reach the panel they had just opened.
+ */
+function focusFirstControl(panel) {
+  const target = panel.querySelector(
+    "button:not([disabled]), select:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])",
+  );
+  if (target instanceof HTMLElement) target.focus({ preventScroll: true });
+}
+
 function setProviderPanelOpen(open, restoreFocus = false) {
   providerPanelEl.hidden = !open;
   btnSettingsEl.setAttribute("aria-expanded", String(open));
-  if (restoreFocus) btnSettingsEl.focus({ preventScroll: true });
+  if (open) {
+    focusFirstControl(providerPanelEl);
+    // DESIGN 9.12: Tab/Shift+Tab stay inside the open sheet (focus-trap.js).
+    window.trapFocus?.(providerPanelEl);
+  } else {
+    window.releaseFocus?.(providerPanelEl);
+    if (restoreFocus) btnSettingsEl.focus({ preventScroll: true });
+  }
 }
 
 btnSettingsEl.onclick = (ev) => {
@@ -922,6 +1020,16 @@ function renderTranscriptBacklog(entries) {
 // ── 녹음 시작/중지 버튼 ──
 let capturing = false;
 let inputMode = "mic";
+/**
+ * The meeting the server is currently recording into, learned from the meetings
+ * list while capture is live (the server marks exactly that one `open`).
+ *
+ * It exists so that authoritative idle can restore the meeting that just ended
+ * instead of leaving the operator on a live shell whose content belongs to no
+ * selected meeting. Cleared as soon as the restoration is issued, which is what
+ * makes it happen exactly once per capture.
+ */
+let liveMeetingId = null;
 
 function renderCaptureState() {
   if (capturing) {
@@ -933,9 +1041,9 @@ function renderCaptureState() {
     if (glanceCaptureLabelEl) glanceCaptureLabelEl.textContent = currentSlide ? "녹음 완료" : "녹음 대기";
     stopCaptureTimer();
   }
-  const resetLabel = capturing ? "새 회의 준비. 녹음을 먼저 중지해 주세요" : "현재 회의를 닫고 새 회의 준비";
-  btnResetEl.title = resetLabel;
-  btnResetEl.setAttribute("aria-label", resetLabel);
+  // The reset gate's reason is owned by `syncActionAvailability`, which keeps
+  // `title` and `aria-label` identical. Writing a second, differently worded
+  // label here would leave the tooltip and the accessible name disagreeing.
   syncActionAvailability();
   setOnAir();
 }
@@ -966,9 +1074,13 @@ function renderCaptureButton() {
   btnRecordEl.hidden = inputMode === "file";
   btnRecordEl.classList.toggle("record-btn--on", capturing);
   btnRecordEl.setAttribute("aria-pressed", String(capturing));
-  btnRecordEl.setAttribute("aria-label", capturing ? "녹음 중지" : "녹음 시작");
+  const action = capturing ? "녹음 중지" : "녹음 시작";
+  // The ACTION label is the control's purpose. `applyGate` records it as the
+  // purpose to restore, and while a gate is closed the reason wins instead, so
+  // this must not overwrite a reason that is currently displayed.
+  setControlPurpose(btnRecordEl, action, action);
   const label = btnRecordEl.querySelector(".record-btn__label");
-  if (label) label.textContent = capturing ? "녹음 중지" : "녹음 시작";
+  if (label) label.textContent = action;
 }
 
 btnRecordEl.onclick = () => {
@@ -1016,11 +1128,13 @@ function openAttendeePanel() {
   attendeePanelEl.hidden = false;
   btnAttendeesEl.setAttribute("aria-expanded", "true");
   attendeeNameEl.focus();
+  window.trapFocus?.(attendeePanelEl);
 }
 
 function closeAttendeePanel(restoreFocus = false) {
   attendeePanelEl.hidden = true;
   btnAttendeesEl.setAttribute("aria-expanded", "false");
+  window.releaseFocus?.(attendeePanelEl);
   if (restoreFocus) btnAttendeesEl.focus();
 }
 
@@ -1177,8 +1291,32 @@ function sendCaptureToggle() {
     renderStatus("앱 서버에 연결하는 중입니다. 잠시 후 다시 눌러 주세요");
     return;
   }
-  renderStatus(capturing ? "녹음을 중지하는 중…" : "녹음을 시작하는 중…");
-  if (capturing) {
+  // The canonical reducer owns "is another start/stop already in flight?".
+  // `capturing` alone is a RENDER flag that only flips when the server answers,
+  // so two activations inside one task both read `capturing === true` and both
+  // sent `stopCapture` - the duplicate command the native surface has always
+  // refused (`StopCommandGuard`). The reducer's outbox is the same one-command
+  // guard for this surface; the payloads below are unchanged and still built
+  // here, because `meeting_id` is the prepared ATTENDEE draft, not the meeting
+  // the library happens to have selected.
+  const intent = caretShell?.activateCapture();
+  if (intent !== undefined && intent.length === 0) {
+    // Two distinct refusals, and the operator is told which one applies rather
+    // than watching a dead button: a command is already in flight, or the
+    // surface has not yet received the server's authoritative capture snapshot.
+    const phase = caretShell.uiState.capture;
+    if (phase === "starting" || phase === "stopping") {
+      renderStatus(phase === "stopping" ? "녹음을 중지하는 중…" : "녹음을 시작하는 중…");
+    } else {
+      renderStatus("앱 서버 상태를 확인하는 중입니다. 잠시 후 다시 눌러 주세요");
+    }
+    return;
+  }
+  const stopping = intent === undefined
+    ? capturing
+    : intent.some((command) => command.action === "stopCapture");
+  renderStatus(stopping ? "녹음을 중지하는 중…" : "녹음을 시작하는 중…");
+  if (stopping) {
     ws.send(JSON.stringify({ action: "stopCapture" }));
     requestMeetings();
     return;
@@ -1222,21 +1360,30 @@ function openAskPanel() {
     return;
   }
   askPanelEl.hidden = false;
+  askPanelEl.setAttribute("aria-expanded", "true");
   askInputEl.focus();
+  window.trapFocus?.(askPanelEl);
   syncAskAvailability();
 }
 
-function closeAskPanel() {
+/**
+ * DESIGN 9.12: a dialog returns focus to the control that opened it, so a
+ * keyboard user is never left with focus on a node that just disappeared.
+ */
+function closeAskPanel(restoreFocus = false) {
   askPanelEl.hidden = true;
+  askPanelEl.setAttribute("aria-expanded", "false");
+  window.releaseFocus?.(askPanelEl);
+  if (restoreFocus && !btnAskEl.disabled) btnAskEl.focus({ preventScroll: true });
 }
 
 function syncAskAvailability() {
   const hasMeeting = selectedMeetingId !== null && !askPending;
-  btnAskEl.disabled = selectedMeetingId === null;
   askSendEl.disabled = !hasMeeting || !askInputEl.value.trim();
-  btnAskEl.title = selectedMeetingId === null
+  // The gate reason reaches BOTH the tooltip and the accessible name (9.11).
+  applyGate(btnAskEl, selectedMeetingId === null
     ? "왼쪽 히스토리에서 회의를 먼저 선택하세요"
-    : "선택한 회의의 전사에 질문하기";
+    : null);
 }
 
 function appendAskMessage(role, text) {
@@ -1281,7 +1428,7 @@ btnAskEl.onclick = () => {
   if (askPanelEl.hidden) openAskPanel();
   else closeAskPanel();
 };
-askCloseEl.onclick = closeAskPanel;
+askCloseEl.onclick = () => closeAskPanel(true);
 askSendEl.onclick = sendAsk;
 askInputEl.addEventListener("keydown", (ev) => {
   if (ev.key === "Enter") sendAsk();
@@ -1371,6 +1518,12 @@ function progressText(label, msg) {
   return `${stage}${count}`;
 }
 function renderCompileStatus(msg) {
+  // A terminal answer for a SUPERSEDED job must not touch the current one. The
+  // guard used to sit after these two writes, so a late failure for job-1
+  // repainted the running job-2 as `error` and only then returned - the surface
+  // reported a failure that had not happened to the job it was showing.
+  const terminal = msg.status !== "started" && msg.status !== "progress";
+  if (terminal && activeJobId && msg.jobId && msg.jobId !== activeJobId) return;
   compileStatusEl.hidden = false;
   compileStatusEl.dataset.state = msg.status;
   if (msg.status === "started" || msg.status === "progress") {
@@ -1379,7 +1532,6 @@ function renderCompileStatus(msg) {
     compileStatusEl.textContent = msg.status === "progress" ? progressText("슬라이드", msg) : "슬라이드 초안을 만드는 중…";
     renderStatus(compileStatusEl.textContent);
   } else if (msg.status === "success") {
-    if (activeJobId && msg.jobId && msg.jobId !== activeJobId) return;
     setJobControlsBusy(false);
     activeJobId = null;
     document.querySelector(".job-retry")?.remove();
@@ -1399,7 +1551,6 @@ function renderCompileStatus(msg) {
         : (hasCount ? `AI 구성이 원활하지 않아 기본 형식으로 ${countText}을 만들었습니다` : "AI 구성이 원활하지 않아 기본 형식으로 슬라이드를 만들었습니다"))
       : (hasCount ? `슬라이드 ${countText}을 만들었습니다` : "슬라이드를 만들었습니다"));
   } else {
-    if (activeJobId && msg.jobId && msg.jobId !== activeJobId) return;
     setJobControlsBusy(false);
     activeJobId = null;
     compileStatusEl.textContent = msg.status === "timeout"
@@ -1467,12 +1618,15 @@ btnResetEl.onclick = () => {
     return;
   }
   if (!window.confirm("현재 회의를 닫고 새 회의를 준비할까요?\n저장된 회의 기록과 내보낸 파일은 그대로 남습니다.")) return;
+  selectedMeetingId = null;
+  renderMeetings(meetings);
   currentSlide = null;
   slideHistory = [];
   viewingHistory = null;
   viewingCompiled = false;
   compiledPreviewTitle = "";
   renderedSlides = [];
+  $("btn-review").hidden = true;
   renderTranscriptBacklog([]);
   transcriptTruncEl.hidden = true;
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1541,16 +1695,26 @@ window.addEventListener("keydown", (ev) => {
   setProviderPanelOpen(false, true);
 });
 
+// Escape priority (DESIGN 9.12): the Ask dialog closes before any shell-level
+// handler runs, and returns focus to the control that opened it.
+window.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Escape" || askPanelEl.hidden) return;
+  ev.stopPropagation();
+  closeAskPanel(true);
+});
+
 // ── WebSocket ──
 function connect() {
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
   awaitingInitialCaptureState = true;
   document.documentElement.dataset.connection = "connecting";
+  caretShell?.ingestTransport("connecting");
   ws = new WebSocket(`${proto}//${location.host}/ws`);
   syncActionAvailability();
 
   ws.onopen = () => {
     document.documentElement.dataset.connection = "connected";
+    caretShell?.ingestTransport("open");
     syncActionAvailability();
     renderStatus("앱 서버에 연결되었습니다");
     requestMeetings();
@@ -1560,10 +1724,22 @@ function connect() {
   ws.onmessage = (ev) => {
     try {
       const msg = JSON.parse(ev.data);
+      // Canonical state first: the pure reducers own connection/capture/shell and
+      // the transcript projection. Malformed frames are dropped inside the
+      // parsers and leave both projections untouched.
+      caretShell?.ingestServerFrame(msg);
       if (msg.type === "slide") {
         if (selectedMeetingId !== null) return;
         if (awaitingInitialCaptureState) return;
-        currentSlide = msg.current;
+        // A malformed `current` must not destroy the last good slide (DESIGN
+        // §9.8: live content is preserved until the server says otherwise). A
+        // slide is renderable only as an object with a title; `null` is the
+        // server's real "no slide yet" and stays meaningful.
+        const nextSlide = msg.current;
+        const renderable = nextSlide === null || nextSlide === undefined
+          || (typeof nextSlide === "object" && typeof nextSlide.title === "string");
+        if (!renderable) return;
+        currentSlide = nextSlide ?? null;
         slideHistory = Array.isArray(msg.history) ? msg.history : [];
         // 라이브 슬라이드가 갱신돼도 사용자가 보고 있는 PowerPoint 미리보기는 유지한다.
         if (!viewingCompiled && viewingHistory && !slideHistory.some((s) => s.index === viewingHistory.index)) {
@@ -1581,7 +1757,10 @@ function connect() {
       } else if (msg.type === "meetings") {
         renderMeetings(msg.items);
       } else if (msg.type === "meeting") {
+        // Rapid selection: a payload for a superseded request is dropped, so the
+        // one document surface never shows the meeting the user moved away from.
         if (msg.meetingId !== selectedMeetingId) return;
+        if (caretShell && !caretShell.isCurrentMeeting(msg.meetingId)) return;
         currentSlide = msg.current ?? null;
         slideHistory = Array.isArray(msg.history) ? msg.history : [];
         viewingHistory = null;
@@ -1600,6 +1779,11 @@ function connect() {
           compileStatusEl.hidden = true;
           compileStatusEl.textContent = "";
         }
+        // Selecting a meeting is what UNGATES the meeting-scoped capabilities.
+        // Review must be reachable before a review payload exists; its first
+        // activation requests that payload from the real server.
+        $("btn-review").hidden = false;
+        syncActionAvailability();
         renderStatus(`${activeMeetingTitle} 기록을 불러왔습니다`);
       } else if (msg.type === "transcript") {
         if (selectedMeetingId !== null && msg.reason === "snapshot") return;
@@ -1611,7 +1795,11 @@ function connect() {
           exportTranscript(msg.entries);
         }
       } else if (msg.type === "line") {
-        if (selectedMeetingId === null) renderTranscriptLine(msg);
+        // The canonical reducer is the only judge of a well-formed line, so the
+        // renderer asks it rather than trusting the frame. A malformed line is
+        // dropped by both, which keeps the DOM and the projection identical.
+        const accepted = caretShell?.acceptsTranscriptFrame(msg) ?? true;
+        if (selectedMeetingId === null && accepted) renderTranscriptLine(msg);
       } else if (msg.type === "ask") {
         applyAskMessage(msg);
       } else if (msg.type === "providers") {
@@ -1623,12 +1811,47 @@ function connect() {
       } else if (msg.type === "review") {
         reviewPanel.applyReview(msg);
       } else if (msg.type === "capture") {
-        capturing = !!msg.capturing;
+        // `phase` is the server's authoritative capture phase. It is optional on
+        // the wire, so a phase-less frame is still read exactly as before, from
+        // `capturing` alone.
+        const phase = typeof msg.phase === "string" ? msg.phase : (msg.capturing ? "capturing" : "idle");
+        // The server still owns the capture while it is stopping: it is flushing
+        // the tail of the transcript. Treating that window as "not capturing"
+        // tore down the live shell and the timer while final sentences were
+        // still arriving, so the operator watched the meeting end twice.
+        const serverOwnsCapture = !!msg.capturing || phase === "stopping";
+        const endedNow = capturing && !serverOwnsCapture;
+        capturing = serverOwnsCapture;
         if (capturing) {
           if (Number.isFinite(msg.startedAt) && msg.startedAt > 0) captureStartedAt = msg.startedAt;
           awaitingInitialCaptureState = false;
         } else if (awaitingInitialCaptureState && selectedMeetingId === null) {
           showFreshWorkspace();
+        }
+        // Authoritative idle after a real capture restores the meeting that just
+        // ended - the one this surface watched being recorded - so its slides and
+        // transcript belong to a selected meeting instead of being orphaned on a
+        // live shell nobody owns.
+        //
+        // EXACTLY ONCE per capture: `liveMeetingId` is the token, it is cleared
+        // before the selection is issued, and only a fresh capture can mint a new
+        // one (`renderMeetings` sets it solely while `capturing`). A repeated idle
+        // snapshot - a reconnect, or the server re-asserting state - therefore
+        // finds no token and cannot re-select, cannot loop, and cannot overwrite
+        // whatever the operator has chosen since.
+        if (endedNow && liveMeetingId !== null) {
+          const restoreId = liveMeetingId;
+          liveMeetingId = null;
+          // A selection left over from an EARLIER meeting is stale now; the
+          // meeting that just ended is the authoritative one to show. The token
+          // consumed above is the ONLY once-only guard, so this branch cannot be
+          // reached twice for the same capture.
+          selectedMeetingId = restoreId;
+          caretShell?.selectMeeting(restoreId);
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ action: "selectMeeting", meetingId: restoreId }));
+          }
+          renderMeetings(meetings);
         }
         inputMode = msg.mode ?? "mic";
         renderCaptureButton();
@@ -1667,6 +1890,7 @@ function connect() {
     activeJobId = null;
     setJobControlsBusy(false);
     document.documentElement.dataset.connection = "disconnected";
+    caretShell?.ingestTransport("closed");
     syncActionAvailability();
     renderStatus("앱 서버 연결이 끊겼습니다. 다시 연결하는 중…");
     reviewPanel?.syncTransport();
@@ -1674,6 +1898,7 @@ function connect() {
   };
   ws.onerror = () => {
     document.documentElement.dataset.connection = "error";
+    caretShell?.ingestTransport("error");
     syncActionAvailability();
     renderStatus("앱 서버에 연결하지 못했습니다");
   };

@@ -4,11 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meeting Slides — 실시간 회의 슬라이드</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" rel="stylesheet">
+  <!-- Deterministic bundled typography: no network font dependency. Assets, hashes
+       and OFL receipts are recorded in /fonts/font-manifest.json. -->
+  <link rel="preload" href="/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/pretendard-variable.woff2" as="font" type="font/woff2" crossorigin>
   <script id="runtime-bootstrap">
     // Meeting Slides.app health check signature + file:// guard flag.
     document.documentElement.dataset.runtime = location.protocol === "file:" ? "file" : "server";
@@ -16,21 +15,21 @@
   <style>
     .direct-file-guard { display: none; }
     html[data-runtime="file"] { min-height: 100%; background: #09090b; color-scheme: dark; }
-    html[data-runtime="file"] body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #09090b; color: #f4f4f5; font-family: "Inter", "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; }
+    html[data-runtime="file"] body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #09090b; color: #f4f4f5; font-family: "Figtree", "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; }
     html[data-runtime="file"] .ambient,
     html[data-runtime="file"] .app { display: none; }
     html[data-runtime="file"] .direct-file-guard { display: grid; width: min(640px, calc(100vw - 40px)); gap: 18px; padding-left: 28px; border-left: 2px solid #e85d4c; box-sizing: border-box; }
-    .direct-file-guard__eyebrow { margin: 0; color: #e85d4c; font: 600 12px/1.3 "JetBrains Mono", monospace; letter-spacing: .12em; }
+    .direct-file-guard__eyebrow { margin: 0; color: #e85d4c; font: 500 12px/1.3 "DM Mono", ui-monospace, monospace; letter-spacing: .12em; }
     .direct-file-guard h1 { margin: 0; max-width: 560px; font-size: clamp(30px, 7vw, 54px); line-height: 1.06; letter-spacing: -.035em; word-break: keep-all; }
     .direct-file-guard__copy { margin: 0; max-width: 560px; color: #a1a1aa; font-size: 17px; line-height: 1.65; word-break: keep-all; }
     .direct-file-guard__command { display: grid; gap: 7px; margin-top: 4px; }
     .direct-file-guard__command span { color: #7f7f89; font-size: 12px; font-weight: 600; letter-spacing: .08em; }
-    .direct-file-guard code { width: fit-content; padding: 10px 14px; border: 1px solid #27272a; border-radius: 8px; background: #131316; color: #f4f4f5; font: 600 14px/1.4 "JetBrains Mono", monospace; }
+    .direct-file-guard code { width: fit-content; padding: 10px 14px; border: 1px solid #27272a; border-radius: 8px; background: #131316; color: #f4f4f5; font: 500 14px/1.4 "DM Mono", ui-monospace, monospace; }
     .direct-file-guard a { width: fit-content; margin-top: 6px; color: #09090b; background: #e85d4c; padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; }
   </style>
+  <!-- Generated slide/review rendering and the single Caret operator shell. -->
   <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/workspace-shell.css">
-  <link rel="stylesheet" href="/operational-liquid.css">
+  <link rel="stylesheet" href="/caret-operator.css">
 </head>
 <body>
   <main class="direct-file-guard">
@@ -52,7 +51,8 @@
     <div class="ambient__noise"></div>
   </div>
 
-  <div class="app">
+  <div class="app" data-shell="library" data-detail-tab="overview"
+    data-capture-phase="idle" data-stage-state="empty" data-ui-state="startup">
     <!-- ── 상단 바 ─────────────────────────────── -->
     <header class="topbar">
       <div class="topbar__brand">
@@ -67,6 +67,11 @@
           <span class="attendee-btn__count" id="attendee-count" hidden>0</span>
         </button>
         <button id="btn-review" class="review-btn" type="button" title="회의록 검토" aria-label="회의록 검토" aria-expanded="false" aria-controls="review-panel" hidden>
+          <!-- DESIGN §9.12: below 620px .review-btn__label is hidden, so without
+               this glyph the control renders as an empty 44x44 capsule. The
+               sibling #btn-attendees already carries the same decorative icon
+               node, and public/style.css has always styled .review-btn__icon. -->
+          <span class="review-btn__icon" aria-hidden="true">✓</span>
           <span class="review-btn__label">회의록 검토</span>
           <span class="review-btn__count" id="review-count" hidden>0</span>
         </button>
@@ -78,8 +83,20 @@
           <span class="onair__label">녹음 대기</span>
         </div>
         <div class="topbar__status">
-          <span class="status__indicator" id="status-indicator"></span>
-          <span class="status__text" id="status-text">앱 서버에 연결하는 중…</span>
+          <!-- DESIGN 9.12/9.13: `renderStatus()` is the only surface that carries
+               connection loss, capture failure, export failure and save
+               completion. `#status-text` alone is therefore the shell's ONE
+               polite status region - scoped to the sentence itself rather than
+               to the whole strip, so the settings button beside it (which the
+               narrow shell rule requires to stay a sibling)
+               never becomes announceable content. `role="status"` already
+               implies polite; adding `aria-live` too would nest one region
+               inside another and announce a single event twice. -->
+          <!-- The dot repeats the status the sentence states; it is decoration
+               for that sentence, never the status itself (9.12: status is never
+               color-only). -->
+          <span class="status__indicator" id="status-indicator" aria-hidden="true"></span>
+          <span class="status__text" id="status-text" role="status" aria-atomic="true">앱 서버에 연결하는 중…</span>
           <button id="btn-settings" class="icon-btn" type="button" title="설정 열기" aria-label="설정 열기">설정</button>
         </div>
       </div>
@@ -139,8 +156,13 @@
       <p class="attendee-panel__hint">녹음 전에 추가하면 회의록의 발언자와 담당자를 연결할 때 사용합니다. 선택 사항입니다.</p>
     </div>
 
-    <!-- ── 글랜서블 상태 스트립 (진행 과정 한눈에) ── -->
-    <div class="glance" aria-live="polite">
+    <!-- ── 글랜서블 상태 스트립 (진행 과정 한눈에) ──
+         NOT a live region (DESIGN 9.12). The slide count, the sentence count and
+         the provider name change on every unrelated tick; a container-level
+         `aria-live` here re-announced all three for one transcript line, which
+         is exactly the duplicate noise the contract forbids. The state these
+         chips show is announced once by the status region above. -->
+    <div class="glance">
       <div class="glance__chip glance__chip--capturing" id="glance-capture">
         <span class="glance__dot"></span>
         <span class="glance__label">대기</span>
@@ -166,28 +188,67 @@
     <!-- ── 워크스페이스: 세션 레일 | 비주얼 스테이지 | 전사 ── -->
     <div class="workspace" id="workspace">
 
-    <!-- 좌: 세션 레일 -->
+    <!-- 좌: 회의 레일 — 라이브러리에서 유일한 내비게이션 -->
     <aside class="session-rail" id="session-rail" aria-label="회의 기록">
       <div class="pane__head">
-        <span class="pane__title">회의 기록</span>
+        <span class="pane__title caret-brand"><span class="caret-brand__mark" aria-hidden="true"></span>Meetings</span>
         <span class="pane__count" id="session-count">0</span>
       </div>
       <div class="pane__body">
         <ul class="session-list" id="session-list"></ul>
-        <p class="pane__empty" id="session-empty">저장된 회의가 없습니다</p>
+        <p class="pane__empty" id="session-empty">저장된 회의가 없습니다. 녹음을 시작하면 이곳에 회의가 쌓입니다.</p>
       </div>
     </aside>
 
     <!-- 좌|중앙 스플리터 -->
     <div class="splitter splitter--rail" id="splitter-rail" role="separator" aria-orientation="vertical" aria-label="회의 기록 목록 너비 조절" tabindex="0"></div>
 
-    <!-- 중앙: 시각 자료 무대 (Tiro 히어로 슬롯) -->
-    <main class="stage stage-pane" id="stage-pane" tabindex="-1">
-      <section class="slide-frame" id="slide-frame">
+    <!-- 중앙: 단 하나의 문서 표면. 머리말(제목/날짜/탭) 아래로
+         Overview · Notes · Transcript 패널이 서로를 교체한다. -->
+    <div class="document-surface" id="document-surface">
+      <div class="meeting-chrome" id="meeting-chrome">
+        <div class="meeting-chrome__title-row">
+          <h1 class="meeting-chrome__title" id="meeting-chrome-title">Untitled</h1>
+        </div>
+        <!-- DESIGN §9.7: #doc-title and #doc-meta live inside the meeting chrome.
+             They are the document's own title and meta line. -->
         <div class="doc-head">
           <h1 class="doc-title" id="doc-title">새 회의 준비</h1>
           <p class="doc-meta" id="doc-meta">녹음을 시작하면 발언이 기록됩니다</p>
         </div>
+        <div class="meeting-chrome__props" aria-label="회의 속성">
+          <span class="meeting-chrome__prop" id="meeting-chrome-date">Date</span>
+        </div>
+        <div class="detail-tabs" role="tablist" aria-label="회의 상세 보기">
+          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-overview"
+            data-detail-tab="overview" aria-selected="true" aria-controls="stage-pane" tabindex="0">Overview</button>
+          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-notes"
+            data-detail-tab="notes" aria-selected="false" aria-controls="notes-panel" tabindex="-1">Notes</button>
+          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-transcript"
+            data-detail-tab="transcript" aria-selected="false" aria-controls="transcript-pane" tabindex="-1">Transcript</button>
+        </div>
+      </div>
+
+    <!-- Overview 패널: 슬라이드 무대 + 요약/후속 작업 -->
+    <main class="stage stage-pane detail-panel" id="stage-pane" tabindex="-1"
+      role="tabpanel" aria-labelledby="detail-tab-overview">
+      <!-- 라이브 녹음 컨트롤은 무대가 소유한다 (task-3 계약: #live-topbar < #stage-pane). -->
+      <header class="live-topbar" id="live-topbar" aria-label="라이브 녹음 컨트롤">
+        <div class="live-topbar__nav" aria-hidden="true"></div>
+        <div class="live-topbar__capsule">
+          <button type="button" class="live-topbar__stop" id="btn-live-stop" aria-label="녹음 중지">
+            <span class="live-topbar__stop-dot" aria-hidden="true"></span>
+            Stop
+          </button>
+          <span class="live-topbar__sep" aria-hidden="true"></span>
+          <!-- DESIGN 9.12: "The timer and the provisional caption are never live
+               regions." A per-second timer inside a polite region floods the
+               announcement queue and drowns the transcript beside it. The label
+               names it so it stays readable on demand. -->
+          <span class="live-topbar__timer" id="live-topbar-timer" aria-label="녹음 경과 시간">00:00</span>
+        </div>
+      </header>
+      <section class="slide-frame" id="slide-frame">
         <div class="slide" id="current-slide">
           <div class="slide__placeholder">
             <div class="placeholder__mic">
@@ -204,6 +265,34 @@
         </div>
       </section>
 
+      <section class="meeting-overview" id="meeting-overview" aria-label="회의 개요">
+        <div class="meeting-overview__block">
+          <h2 class="meeting-overview__label">Summary</h2>
+          <p class="meeting-overview__empty" id="summary-empty">No summary yet</p>
+        </div>
+        <div class="meeting-overview__block">
+          <h2 class="meeting-overview__label">Actions</h2>
+          <article class="action-card" id="action-followup">
+            <div class="action-card__head">
+              <div>
+                <h3 class="action-card__title">Send follow-up</h3>
+                <p class="action-card__sub" id="action-followup-sub">회의가 끝나면 후속 메일 초안이 여기 쌓입니다.</p>
+              </div>
+              <div class="action-card__actions">
+                <button type="button" class="action-card__btn" id="btn-action-copy" disabled>Copy</button>
+                <button type="button" class="action-card__btn" id="btn-action-open" disabled>Open draft</button>
+              </div>
+            </div>
+            <p class="action-card__body" id="action-followup-body">Subject: Following up - …
+
+Hi,
+Thank you for your time today.
+Here's a quick recap of the meeting:
+-</p>
+          </article>
+        </div>
+      </section>
+
       <!-- 상태 필: 캡처/AI/자막/대기 + 핵심 메트릭을 한 줄로 -->
       <section class="island" id="island">
         <span class="island__dot"></span>
@@ -214,11 +303,23 @@
       </section>
     </main>
 
-    <!-- 중앙|우 스플리터 -->
+    <!-- Notes 패널: 회의 메모의 유일한 거처. 저장/히스토리 계약은 #notes-input이 그대로 소유한다. -->
+    <section class="notes-panel detail-panel" id="notes-panel" role="tabpanel"
+      aria-labelledby="detail-tab-notes" tabindex="-1" hidden>
+      <details class="notes-box" id="notes-box" open>
+        <summary class="notes-box__summary">회의 메모 · AI 정리에 반영</summary>
+        <textarea id="notes-input" class="notes-box__input" placeholder="회의 중 떠오른 결정, 액션, 맥락을 적어두세요 — 회의록 정리 시 전사와 함께 사용됩니다"></textarea>
+      </details>
+      <textarea class="live-note" id="live-note" placeholder="Leave a quick note" aria-label="라이브 노트"></textarea>
+      <p class="notes-panel__hint">메모는 회의록을 정리할 때 전사와 함께 사용됩니다.</p>
+    </section>
+
+    <!-- 중앙|우 스플리터: 라이브 셸에서만 보이고 조작 가능하다. -->
     <div class="splitter splitter--transcript" id="splitter-transcript" role="separator" aria-orientation="vertical" aria-label="전사 패널 너비 조절" tabindex="0"></div>
 
-    <!-- 우: 전사 패널 — 라이브 전사의 1차 거처 -->
-    <aside class="transcript-pane" id="transcript-pane" aria-label="실시간 기록" tabindex="-1">
+    <!-- Transcript 패널 — 라이브에서는 오른쪽 전사 열, 라이브러리에서는 문서 탭 하나. -->
+    <aside class="transcript-pane detail-panel" id="transcript-pane" aria-label="실시간 기록" tabindex="-1"
+      role="tabpanel" aria-labelledby="detail-tab-transcript" hidden>
       <section class="transcript-card" id="transcript-card">
         <div class="pane__head">
           <span>
@@ -261,19 +362,24 @@
           <span class="capability-reason">편집 좌표 연결 전</span>
         </div>
         <div class="pane__body" id="transcript-body">
-          <div class="transcript-stream" id="transcript-stream"></div>
+          <!-- DESIGN 9.12: finalized transcript lines announce ONCE through a
+               polite region. `role="log"` is the polite region shaped for an
+               append-only stream: only the added line is announced, not the
+               whole backlog, and `aria-atomic="false"` keeps it that way. The
+               provisional caption lives outside this element (#caption-text) so
+               a not-yet-final phrase is never announced. -->
+          <div class="transcript-stream" id="transcript-stream" role="log"
+            aria-label="확정된 발언 기록" aria-atomic="false"></div>
           <p class="pane__empty" id="transcript-empty">녹음을 시작하면<br>발언 내용이 여기에 기록됩니다</p>
           <div class="transcript-trunc" id="transcript-trunc" hidden>오래된 기록 일부가 화면에서 생략되었습니다</div>
         </div>
-        <details class="notes-box" id="notes-box">
-          <summary class="notes-box__summary">회의 중 메모 · AI 정리에 반영</summary>
-          <textarea id="notes-input" class="notes-box__input" placeholder="회의 중 떠오른 결정, 액션, 맥락을 적어두세요 — 회의록 정리 시 전사와 함께 사용됩니다"></textarea>
-        </details>
         <!-- 남/남서 리사이즈 손잡이: 서쪽 폭은 워크스페이스 스플리터가 담당 -->
         <div class="transcript-grip transcript-grip--s" id="transcript-grip-s" role="separator" aria-orientation="horizontal" aria-label="전사 패널 높이 조절" tabindex="0"></div>
         <div class="transcript-grip transcript-grip--sw" id="transcript-grip-sw" role="separator" aria-orientation="horizontal" aria-label="전사 패널 너비·높이 조절" tabindex="0"></div>
       </section>
     </aside>
+
+    </div>
 
     </div>
 
@@ -327,16 +433,31 @@
           슬라이드 <span class="dock__count" id="history-count">0장</span>
         </span>
         <div class="dock__spacer"></div>
-        <button id="btn-compile-deck" class="dock__btn dock__btn--compile" type="button" title="지금까지의 대화로 편집 가능한 PowerPoint 초안 만들기" aria-label="슬라이드 초안 만들기">슬라이드 초안 만들기</button>
+        <!-- DESIGN §9.11 "Library, meeting selected · Always visible: ... Ask
+             entry". Ask is the one secondary capability the contract keeps in the
+             open, so it lives in the primary row and never behind a disclosure
+             whose label advertises saving and exporting. -->
+        <button id="btn-ask" class="dock__btn dock__btn--ask" type="button" title="선택한 회의의 전사에 질문하기" aria-label="선택한 회의의 전사에 질문하기">Ask</button>
         <span id="compile-status" class="compile-status" role="status" aria-live="polite" hidden></span>
-        <button id="btn-export-md" class="dock__btn" type="button" title="회의 메모를 Markdown으로 저장" aria-label="회의 메모 저장">회의 메모</button>
-        <button id="btn-export-json" class="dock__btn" type="button" title="회의 데이터를 JSON으로 저장" aria-label="회의 데이터 저장">데이터</button>
-        <button id="btn-export-transcript" class="dock__btn" type="button" title="전사 원문 저장" aria-label="전사 원문 저장">전사 원문</button>
-        <button id="btn-export-deck" class="dock__btn" type="button" title="브라우저에서 볼 수 있는 슬라이드 저장" aria-label="웹 슬라이드 저장">웹 슬라이드</button>
-        <button id="btn-export-pdf" class="dock__btn" type="button" title="검토용 PDF 만들기" aria-label="검토용 PDF 만들기">PDF</button>
-        <button id="btn-export-png" class="dock__btn" type="button" title="슬라이드를 PNG 이미지로 저장" aria-label="슬라이드 이미지 저장">이미지</button>
-        <button id="btn-ask" class="dock__btn" type="button" title="선택한 회의의 전사에 질문하기" aria-label="회의에 질문하기">Ask</button>
-        <button id="btn-reset" class="dock__btn dock__btn--danger" type="button" title="현재 회의를 닫고 새 회의 준비" aria-label="새 회의 준비">새 회의</button>
+        <!-- Progressive disclosure (DESIGN §9.11): compile and the whole export
+             set sit behind ONE disclosure in BOTH shells - "Live · Behind the
+             More menu or a sheet: Compile, export, settings". Nothing is removed
+             and nothing is faked: every control keeps its ID, its action, its
+             accessible name and its place in the tab order, and `<details>` is
+             natively keyboard-operable and exposed to assistive technology. -->
+        <details class="dock__more" id="dock-more">
+          <summary class="dock__more-summary" aria-label="슬라이드 만들기, 저장과 내보내기 더 보기">만들기·저장·내보내기</summary>
+          <div class="dock__more-set">
+            <button id="btn-compile-deck" class="dock__btn dock__btn--compile" type="button" title="지금까지의 대화로 편집 가능한 PowerPoint 초안 만들기" aria-label="슬라이드 초안 만들기">슬라이드 초안 만들기</button>
+            <button id="btn-export-md" class="dock__btn" type="button" title="회의 메모를 Markdown으로 저장" aria-label="회의 메모 저장">회의 메모</button>
+            <button id="btn-export-json" class="dock__btn" type="button" title="회의 데이터를 JSON으로 저장" aria-label="회의 데이터 저장">데이터</button>
+            <button id="btn-export-transcript" class="dock__btn" type="button" title="전사 원문 저장" aria-label="전사 원문 저장">전사 원문</button>
+            <button id="btn-export-deck" class="dock__btn" type="button" title="브라우저에서 볼 수 있는 슬라이드 저장" aria-label="웹 슬라이드 저장">웹 슬라이드</button>
+            <button id="btn-export-pdf" class="dock__btn" type="button" title="검토용 PDF 만들기" aria-label="검토용 PDF 만들기">PDF</button>
+            <button id="btn-export-png" class="dock__btn" type="button" title="슬라이드를 PNG 이미지로 저장" aria-label="슬라이드 이미지 저장">이미지</button>
+            <button id="btn-reset" class="dock__btn dock__btn--danger" type="button" title="현재 회의를 닫고 새 회의 준비" aria-label="새 회의 준비">새 회의</button>
+          </div>
+        </details>
         <span class="last-saved" id="last-saved" hidden></span>
       </div>
 
@@ -375,7 +496,9 @@
     </div>
   </div>
 
-  <div class="ask-panel" id="ask-panel" hidden>
+  <!-- DESIGN §9.12: a re-homed panel is a real dialog - named, Escape-closable,
+       and it returns focus to the control that opened it. -->
+  <div class="ask-panel" id="ask-panel" role="dialog" aria-modal="false" aria-label="Ask 회의 질문" hidden>
     <div class="ask-panel__head">
       <span class="pane__title">Ask 회의 질문</span>
       <button id="btn-ask-close" class="ask-panel__close" type="button" aria-label="Ask 패널 닫기">×</button>
@@ -392,11 +515,17 @@
     </div>
   </div>
 
+  <!-- DESIGN 9.12: the sheet/modal focus trap. Loaded before every surface that
+       opens a dialog so `window.trapFocus` exists at first open. -->
+  <script src="/focus-trap.js"></script>
   <script src="/workspace-split.js"></script>
   <script src="/transcript-resize.js"></script>
-  <script src="/operator-surface.js"></script>
+  <!-- The shell is an ES module: it imports the canonical reducers from the
+       generated browser artifacts (scripts/build-public-modules.ts). Modules are
+       deferred by definition, so it runs before app.js, which is also deferred. -->
+  <script type="module" src="/operator-surface.js"></script>
   <script src="/review-panel-render.js"></script>
   <script src="/review-panel.js"></script>
-  <script src="/app.js"></script>
+  <script defer src="/app.js"></script>
 </body>
 </html>

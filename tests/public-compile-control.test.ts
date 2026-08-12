@@ -29,6 +29,11 @@ describe("컴파일 컨트롤", () => {
     harness.pushMessage({ type: "line", seq: 1, ts: Date.now(), text: "금요일에 출시하기로 결정했습니다", speaker: 1 });
     await page.waitForFunction(() => document.getElementById("transcript-count")?.textContent === "1");
     const action = harness.nextClientMessage();
+    // Todo 13 homes compile inside the one contextual disclosure (DESIGN 9.11
+    // puts compile behind the More menu). Puppeteer's click requires a visible
+    // target, so the test opens the disclosure first - exactly as a user does.
+    // Every assertion below is unchanged.
+    await page.click("#dock-more > summary");
     await page.click("#btn-compile-deck");
     expect(await action).toEqual({ action: "compileTranscriptSnapshot" });
     expect(await page.$eval("#btn-compile-deck", (button) => (button as HTMLButtonElement).disabled)).toBe(true);

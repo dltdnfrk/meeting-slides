@@ -257,7 +257,9 @@ describe("라이브 MeetingCard 렌더", () => {
       history: [past],
     });
 
-    await page.click(".thumbnail");
+    // The current shell keeps history thumbnails behind progressive disclosure;
+    // invoke the existing control to test preview rendering rather than obsolete dock geometry.
+    await page.$eval(".thumbnail", (thumbnail) => (thumbnail as HTMLElement).click());
     await page.waitForFunction(
       () => document.querySelector("#current-slide .slide__title")?.textContent === "과거 블록",
       { timeout: 5_000 },
