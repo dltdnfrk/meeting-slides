@@ -162,6 +162,7 @@ func runPresentation(_ input: [String: Any]) throws -> Any {
         switch raw {
         case "present": event = .present
         case "toggle": event = .toggle
+        case "dismiss": event = .dismiss
         default: throw DriverError.badInput("unknown presentation event \(raw)")
         }
         effects.append(state.handle(event).rawValue)

@@ -60,6 +60,7 @@ const btnResetEl = $("btn-reset");
 const sessionListEl = $("session-list");
 const sessionEmptyEl = $("session-empty");
 const sessionCountEl = $("session-count");
+const documentSurfaceEl = $("document-surface");
 const conflictingJobControls = [btnCompileDeckEl, btnExportPdfEl, btnExportPngEl];
 let jobControlsBusy = false;
 
@@ -78,6 +79,11 @@ const glanceProviderEl = $("glance-provider");
 const glanceDetectEl = $("glance-detect");
 const glanceRecEl = $("glance-rec");
 const captureTimerEl = $("capture-timer");
+const contextRecentListEl = $("context-recent-list");
+const contextRecentEmptyEl = $("context-recent-empty");
+const contextServerStatusEl = $("context-server-status");
+const contextAiStatusEl = $("context-ai-status");
+const contextSttStatusEl = $("context-stt-status");
 const lastSavedEl = $("last-saved");
 const docTitleEl = $("doc-title");
 const docMetaEl = $("doc-meta");
@@ -93,6 +99,51 @@ let slideHistory = [];
 let ws = null;
 let meetings = [];
 let selectedMeetingId = null;
+
+function formatContextMeetingDate(startedAt) {
+  return new Date(startedAt).toLocaleDateString("ko-KR", {
+    month: "short",
+    day: "numeric",
+    weekday: "short",
+  });
+}
+
+function renderContextMeetings(items) {
+  if (!contextRecentListEl || !contextRecentEmptyEl) return;
+  const recent = (Array.isArray(items) ? items : []).slice(0, 3);
+  contextRecentEmptyEl.hidden = recent.length > 0;
+  contextRecentListEl.innerHTML = recent.map((item) => `
+    <button type="button" class="context-recent__item" data-meeting-id="${escapeHtml(item.id)}">
+      <span class="context-recent__marker" aria-hidden="true"></span>
+      <span class="context-recent__copy">
+        <span class="context-recent__title">${escapeHtml(item.title)}</span>
+        <span class="context-recent__meta">${escapeHtml(formatContextMeetingDate(item.started_at))}</span>
+      </span>
+      <span class="context-recent__arrow" aria-hidden="true">›</span>
+    </button>
+  `).join("");
+}
+
+function selectMeeting(meetingId) {
+  const meeting = meetings.find((item) => item.id === meetingId);
+  if (meeting?.status === "open" && capturing) {
+    selectedMeetingId = null;
+    renderMeetings(meetings);
+    renderStatus("현재 진행 중인 회의를 보고 있습니다");
+    return;
+  }
+  selectedMeetingId = meetingId;
+  documentSurfaceEl.setAttribute("aria-busy", "true");
+  documentSurfaceEl.dataset.loading = "true";
+  reviewPanel?.selectMeeting(meetingId);
+  caretShell?.selectMeeting(meetingId);
+  renderMeetings(meetings);
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "selectMeeting", meetingId: selectedMeetingId }));
+    activeMeetingTitle = meeting?.title ?? "";
+    renderStatus(`회의 기록을 불러오는 중… ${meeting?.title ?? `#${selectedMeetingId}`}`);
+  }
+}
 let awaitingInitialCaptureState = true;
 // 썸네일 미리보기 상태. PowerPoint 생성 결과도 같은 무대에서 확인한다.
 let viewingHistory = null;
@@ -186,6 +237,7 @@ function requestMeetings() {
 
 function renderMeetings(items) {
   meetings = Array.isArray(items) ? items : [];
+  renderContextMeetings(meetings);
   // While the server is capturing, the meeting it marks `open` IS the live one.
   if (capturing) {
     const open = meetings.find((item) => item.status === "open");
@@ -237,26 +289,19 @@ sessionListEl.addEventListener("click", (ev) => {
   const row = ev.target instanceof Element ? ev.target.closest(".session-row") : null;
   if (!(row instanceof HTMLElement)) return;
   const nextMeetingId = Number(row.dataset.meetingId);
-  const meeting = meetings.find((item) => item.id === nextMeetingId);
-  if (meeting?.status === "open" && capturing) {
-    selectedMeetingId = null;
-    renderMeetings(meetings);
-    renderStatus("현재 진행 중인 회의를 보고 있습니다");
-    return;
-  }
-  selectedMeetingId = nextMeetingId;
-  // Register the selection with the reducer BEFORE the request goes out, so a
-  // response for a previous selection is already recognizable as stale.
-  caretShell?.selectMeeting(nextMeetingId);
-  renderMeetings(meetings);
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "selectMeeting", meetingId: selectedMeetingId }));
-    activeMeetingTitle = meeting?.title ?? "";
-    renderStatus(`회의 기록을 불러오는 중… ${meeting?.title ?? `#${selectedMeetingId}`}`);
-  }
+  selectMeeting(nextMeetingId);
+});
+
+contextRecentListEl?.addEventListener("click", (ev) => {
+  const row = ev.target instanceof Element ? ev.target.closest("[data-meeting-id]") : null;
+  if (!(row instanceof HTMLElement)) return;
+  const meetingId = Number(row.dataset.meetingId);
+  if (Number.isSafeInteger(meetingId)) selectMeeting(meetingId);
 });
 
 function showFreshWorkspace() {
+  documentSurfaceEl.removeAttribute("aria-busy");
+  documentSurfaceEl.dataset.loading = "false";
   currentSlide = null;
   slideHistory = [];
   viewingHistory = null;
@@ -498,7 +543,7 @@ function renderThumbnails(history, includeCurrent = true) {
     return;
   }
   thumbnailsEl.innerHTML = slides.map((s) => `
-    <div class="thumbnail${viewingHistory && viewingHistory.index === s.index ? " thumbnail--viewing" : ""}" data-index="${escapeHtml(String(s.index))}" tabindex="0" role="button" aria-label="슬라이드 ${escapeHtml(String(s.index))} 미리보기">
+    <div class="thumbnail${viewingHistory && viewingHistory.index === s.index ? " thumbnail--viewing" : ""}" data-index="${escapeHtml(String(s.index))}" tabindex="0" role="button" aria-current="${viewingHistory && viewingHistory.index === s.index ? "true" : "false"}" aria-label="슬라이드 ${escapeHtml(String(s.index))} 미리보기">
       <div class="thumbnail__index">슬라이드 ${escapeHtml(String(s.index).padStart(2, "0"))}</div>
       <div class="thumbnail__title">${escapeHtml(s.title)}</div>
       <ul class="thumbnail__bullets">
@@ -525,6 +570,7 @@ function showCompiledScene(scene) {
   const slides = compiledSceneSlides(scene);
   if (slides.length === 0) return;
   viewingCompiled = true;
+  appEl?.classList.add("app--compiled-preview");
   compiledPreviewTitle = typeof scene.title === "string" && scene.title.trim() ? scene.title.trim() : "슬라이드 초안";
   viewingHistory = slides[0];
   renderThumbnails(slides, false);
@@ -536,6 +582,7 @@ function showCompiledScene(scene) {
 function exitSlidePreview() {
   viewingHistory = null;
   viewingCompiled = false;
+  appEl?.classList.remove("app--compiled-preview");
   compiledPreviewTitle = "";
   renderThumbnails(slideHistory);
   renderMain();
@@ -643,13 +690,23 @@ function friendlyStatus(text) {
   if (/A conflicting .* job is already in progress/i.test(cleaned)) return "다른 파일을 만드는 중입니다. 완료 후 다시 시도해 주세요.";
   if (/meetingId must be|No stored meeting|Meeting was not found/i.test(cleaned)) return "저장된 회의를 찾을 수 없습니다";
   if (/capture must be stopped before reset/i.test(cleaned)) return "녹음을 중지한 뒤 새 회의를 준비해 주세요";
+  if (/validate failed:|NO_COLOR|FORCE_COLOR|node --trace-warnings|\(node:\d+\)/i.test(cleaned)) {
+    return "파일 생성 도구를 실행하지 못했습니다. 다시 시도해 주세요";
+  }
   return cleaned;
 }
 
+let statusMotionKey = 0;
 function renderStatus(text) {
   const cleaned = friendlyStatus(text);
   statusTextEl.textContent = cleaned.length > 96 ? `${cleaned.slice(0, 93)}...` : cleaned;
   statusTextEl.title = cleaned;
+  // Re-key the subtle compositor-only entrance even when two consecutive
+  // updates reuse the same copy. CSS disables this under reduced motion.
+  statusTextEl.dataset.motionKey = String(statusMotionKey += 1);
+  statusTextEl.style.animation = "none";
+  void statusTextEl.offsetWidth;
+  statusTextEl.style.animation = "";
   statusIndicatorEl.classList.remove(
     "status__indicator--ok",
     "status__indicator--warn",
@@ -724,6 +781,12 @@ function renderProviders(msg) {
   const curRow = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === currentProvider);
   const currentCopy = providerCopy(curRow);
   providerLabelCur = msg.currentModel ? displayModelName(msg.currentModel) : (curRow ? currentCopy.name : currentProvider);
+  if (contextAiStatusEl) {
+    contextAiStatusEl.textContent = curRow?.available
+      ? (providerLabelCur || currentCopy.name)
+      : "연결 필요";
+    contextAiStatusEl.dataset.tone = curRow?.available ? "positive" : "warning";
+  }
   glanceProviderEl.textContent = providerLabelCur || "—";
   renderProviderConfig(msg);
   renderDocHead();
@@ -841,6 +904,11 @@ function sttActions(model) {
 function renderSttModels(msg) {
   const models = Array.isArray(msg.models) ? msg.models : [];
   sttSelectedModelId = msg.selectedModelId ?? null;
+  if (contextSttStatusEl) {
+    const selected = models.find((model) => model.id === sttSelectedModelId && model.status === "selected");
+    contextSttStatusEl.textContent = selected?.label ?? "모델 필요";
+    contextSttStatusEl.dataset.tone = selected ? "positive" : "warning";
+  }
   sttListEl.innerHTML = models.map((model) => {
     const view = sttStatusView(model);
     const downloading = model.status === "downloading";
@@ -915,21 +983,26 @@ function focusFirstControl(panel) {
 }
 
 function setProviderPanelOpen(open, restoreFocus = false) {
-  providerPanelEl.hidden = !open;
   btnSettingsEl.setAttribute("aria-expanded", String(open));
   if (open) {
+    if (window.openDialog) window.openDialog(providerPanelEl); else providerPanelEl.hidden = false;
     focusFirstControl(providerPanelEl);
     // DESIGN 9.12: Tab/Shift+Tab stay inside the open sheet (focus-trap.js).
     window.trapFocus?.(providerPanelEl);
   } else {
-    window.releaseFocus?.(providerPanelEl);
-    if (restoreFocus) btnSettingsEl.focus({ preventScroll: true });
+    if (window.closeDialog) window.closeDialog(providerPanelEl, () => {
+      if (restoreFocus) btnSettingsEl.focus({ preventScroll: true });
+    }); else {
+      providerPanelEl.hidden = true;
+      window.releaseFocus?.(providerPanelEl);
+      if (restoreFocus) btnSettingsEl.focus({ preventScroll: true });
+    }
   }
 }
 
 btnSettingsEl.onclick = (ev) => {
   ev.stopPropagation();
-  setProviderPanelOpen(providerPanelEl.hidden);
+  setProviderPanelOpen(providerPanelEl.hidden || providerPanelEl.dataset.motionState === "closing");
 };
 btnSettingsCloseEl.onclick = () => setProviderPanelOpen(false, true);
 
@@ -974,13 +1047,16 @@ document.addEventListener("click", (ev) => {
 
 // ── 실시간 전사: 우측 도킹 패널 ──
 let transcriptLineCount = 0;
+const MAX_TRANSCRIPT_DOM_LINES = 1000;
 
 // 도킹 패널은 pane__body가 스크롤 컨테이너다 — 목록이 아니라 몸체를 밀어야 최신 문장이 보인다.
 function scrollTranscriptToLatest() {
   transcriptBodyEl.scrollTop = transcriptBodyEl.scrollHeight;
 }
 
-function renderTranscriptLine(entry) {
+function renderTranscriptLine(entry, incrementCount = true, refresh = true) {
+  const distanceFromBottom = transcriptBodyEl.scrollHeight - transcriptBodyEl.scrollTop - transcriptBodyEl.clientHeight;
+  const shouldFollowLatest = distanceFromBottom <= 48;
   transcriptEmptyEl.hidden = true;
   const row = document.createElement("div");
   row.className = "feed-line";
@@ -992,13 +1068,17 @@ function renderTranscriptLine(entry) {
     <span class="feed-line__meta"><span class="feed-line__time">${escapeHtml(time)}</span>${chip}</span>
     <span class="feed-line__text">${escapeHtml(entry.text)}</span>`;
   transcriptStreamEl.appendChild(row);
-  transcriptLineCount += 1;
+  while (transcriptStreamEl.childElementCount > MAX_TRANSCRIPT_DOM_LINES) transcriptStreamEl.firstElementChild?.remove();
+  if (incrementCount) transcriptLineCount += 1;
   transcriptCountEl.textContent = String(transcriptLineCount);
+  transcriptTruncEl.hidden = transcriptLineCount <= MAX_TRANSCRIPT_DOM_LINES;
   if (!meetingStartTs) meetingStartTs = entry.ts;
-  renderGlance();
-  renderDocHead();
-  renderPill();
-  scrollTranscriptToLatest();
+  if (refresh) {
+    renderGlance();
+    renderDocHead();
+    renderPill();
+    if (shouldFollowLatest) scrollTranscriptToLatest();
+  }
 }
 function renderTranscriptBacklog(entries) {
   transcriptStreamEl.replaceChildren();
@@ -1010,10 +1090,15 @@ function renderTranscriptBacklog(entries) {
     transcriptEmptyEl.hidden = false;
     return;
   }
-  // 각 line은 renderTranscriptLine이 transcriptLineCount를 증가시키고 renderGlance를 갱신한다.
-  // backlog 시작점에서 카운트/스크롤을 리셋하고, 한 번만 끝단에서 정리.
-  for (const e of entries) renderTranscriptLine(e);
+  // 전체 개수는 유지하되, 장시간 회의에서도 브라우저 DOM은 최근 1,000줄로 제한한다.
+  transcriptLineCount = entries.length;
+  transcriptCountEl.textContent = String(transcriptLineCount);
+  meetingStartTs = entries[0]?.ts ?? 0;
+  transcriptTruncEl.hidden = entries.length <= MAX_TRANSCRIPT_DOM_LINES;
+  for (const e of entries.slice(-MAX_TRANSCRIPT_DOM_LINES)) renderTranscriptLine(e, false, false);
   renderGlance();
+  renderDocHead();
+  renderPill();
   scrollTranscriptToLatest();
 }
 
@@ -1125,17 +1210,21 @@ function renderAttendeeList() {
 
 function openAttendeePanel() {
   if (btnAttendeesEl.disabled) return;
-  attendeePanelEl.hidden = false;
+  if (window.openDialog) window.openDialog(attendeePanelEl); else attendeePanelEl.hidden = false;
   btnAttendeesEl.setAttribute("aria-expanded", "true");
   attendeeNameEl.focus();
   window.trapFocus?.(attendeePanelEl);
 }
 
 function closeAttendeePanel(restoreFocus = false) {
-  attendeePanelEl.hidden = true;
   btnAttendeesEl.setAttribute("aria-expanded", "false");
-  window.releaseFocus?.(attendeePanelEl);
-  if (restoreFocus) btnAttendeesEl.focus();
+  if (window.closeDialog) window.closeDialog(attendeePanelEl, () => {
+    if (restoreFocus) btnAttendeesEl.focus({ preventScroll: true });
+  }); else {
+    attendeePanelEl.hidden = true;
+    window.releaseFocus?.(attendeePanelEl);
+    if (restoreFocus) btnAttendeesEl.focus({ preventScroll: true });
+  }
 }
 
 /** 캡처 중에는 명단을 잠근다 (서버가 draft meeting을 활성화한 뒤이므로 편집 불가). */
@@ -1230,7 +1319,7 @@ btnAttendeeSaveEl.onclick = sendAttendees;
 
 btnAttendeesEl.onclick = (ev) => {
   ev.stopPropagation();
-  if (attendeePanelEl.hidden) openAttendeePanel();
+  if (attendeePanelEl.hidden || attendeePanelEl.dataset.motionState === "closing") openAttendeePanel();
   else closeAttendeePanel();
 };
 
@@ -1344,22 +1433,26 @@ const reviewPanel = window.createReviewPanel ? window.createReviewPanel({
     return true;
   },
   isOpen: () => !!ws && ws.readyState === WebSocket.OPEN,
+  getMeetingId: () => selectedMeetingId,
   getNotes: () => notesInputEl?.value ?? "",
 }) : {
   syncTransport() {},
-  applyReview() {},
+  applyReview() { return false; },
   applyStatus() {},
+  selectMeeting() {},
+  restoreMeeting() { return false; },
 };
 
 // ── Ask 회의 질문 패널 (RAG) ──
 let askPending = false;
+let askPendingRequest = null;
 
 function openAskPanel() {
   if (selectedMeetingId === null) {
     renderStatus("왼쪽 히스토리에서 회의를 먼저 선택하세요");
     return;
   }
-  askPanelEl.hidden = false;
+  if (window.openDialog) window.openDialog(askPanelEl); else askPanelEl.hidden = false;
   askPanelEl.setAttribute("aria-expanded", "true");
   askInputEl.focus();
   window.trapFocus?.(askPanelEl);
@@ -1371,10 +1464,14 @@ function openAskPanel() {
  * keyboard user is never left with focus on a node that just disappeared.
  */
 function closeAskPanel(restoreFocus = false) {
-  askPanelEl.hidden = true;
   askPanelEl.setAttribute("aria-expanded", "false");
-  window.releaseFocus?.(askPanelEl);
-  if (restoreFocus && !btnAskEl.disabled) btnAskEl.focus({ preventScroll: true });
+  if (window.closeDialog) window.closeDialog(askPanelEl, () => {
+    if (restoreFocus && !btnAskEl.disabled) btnAskEl.focus({ preventScroll: true });
+  }); else {
+    askPanelEl.hidden = true;
+    window.releaseFocus?.(askPanelEl);
+    if (restoreFocus && !btnAskEl.disabled) btnAskEl.focus({ preventScroll: true });
+  }
 }
 
 function syncAskAvailability() {
@@ -1399,20 +1496,29 @@ function sendAsk() {
   const question = askInputEl.value.trim();
   if (!question || selectedMeetingId === null || askPending) return;
   askPending = true;
+  askPendingRequest = {
+    requestId: globalThis.crypto?.randomUUID?.() ?? `ask-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    meetingId: selectedMeetingId,
+    question,
+  };
   syncAskAvailability();
   appendAskMessage("user", question);
   askInputEl.value = "";
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "ask", meetingId: selectedMeetingId, question }));
+    ws.send(JSON.stringify({
+      action: "ask", meetingId: askPendingRequest.meetingId,
+      question: askPendingRequest.question, requestId: askPendingRequest.requestId,
+    }));
   } else {
-    appendAskMessage("assistant", "서버 연결이 끊어져 질문을 보낼 수 없습니다");
-    askPending = false;
+    appendAskMessage("assistant", "서버 연결이 끊어졌습니다. 다시 연결되면 질문을 이어서 처리합니다");
     syncAskAvailability();
   }
 }
 
 function applyAskMessage(msg) {
+  if (askPendingRequest && msg.requestId !== askPendingRequest.requestId) return;
   askPending = false;
+  askPendingRequest = null;
   syncAskAvailability();
   if (msg.error) {
     appendAskMessage("assistant", msg.error);
@@ -1425,7 +1531,7 @@ function applyAskMessage(msg) {
 }
 
 btnAskEl.onclick = () => {
-  if (askPanelEl.hidden) openAskPanel();
+  if (askPanelEl.hidden || askPanelEl.dataset.motionState === "closing") openAskPanel();
   else closeAskPanel();
 };
 askCloseEl.onclick = () => closeAskPanel(true);
@@ -1467,7 +1573,11 @@ btnExportTranscriptEl.onclick = () => {
 
 btnCompileDeckEl.onclick = () => {
   if (transcriptLineCount === 0) {
-    renderStatus("슬라이드를 만들려면 먼저 회의를 녹음해 주세요");
+    renderStatus(capturing
+      ? "슬라이드를 만들 대화 내용이 아직 없습니다"
+      : selectedMeetingId !== null
+        ? "슬라이드를 만들 전사 내용이 없습니다"
+        : "슬라이드를 만들려면 먼저 회의를 녹음해 주세요");
     return;
   }
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1487,8 +1597,12 @@ function setJobControlsBusy(busy) {
   jobControlsBusy = busy;
   syncActionAvailability();
 }
-function showRetry(action, meetingId) {
+function clearJobRetry() {
   document.querySelector(".job-retry")?.remove();
+}
+
+function showRetry(action, meetingId) {
+  clearJobRetry();
   const retry = document.createElement("button");
   retry.type = "button";
   retry.className = "job-retry dock__btn";
@@ -1653,6 +1767,7 @@ function toggleThumbnailPreview(card) {
     return;
   }
   viewingHistory = slide;
+  renderThumbnails(renderedSlides, false);
   renderMain();
   renderPill();
 }
@@ -1717,9 +1832,22 @@ function connect() {
     caretShell?.ingestTransport("open");
     syncActionAvailability();
     renderStatus("앱 서버에 연결되었습니다");
+    if (contextServerStatusEl) {
+      contextServerStatusEl.textContent = "연결됨";
+      contextServerStatusEl.dataset.tone = "positive";
+    }
     requestMeetings();
     ws.send(JSON.stringify({ action: "attendees" }));
+    if (selectedMeetingId !== null) {
+      ws.send(JSON.stringify({ action: "selectMeeting", meetingId: selectedMeetingId }));
+    }
     reviewPanel.syncTransport();
+    if (askPendingRequest && askPendingRequest.meetingId === selectedMeetingId) {
+      ws.send(JSON.stringify({
+      action: "ask", meetingId: askPendingRequest.meetingId,
+      question: askPendingRequest.question, requestId: askPendingRequest.requestId,
+    }));
+    }
   };
   ws.onmessage = (ev) => {
     try {
@@ -1761,16 +1889,27 @@ function connect() {
         // one document surface never shows the meeting the user moved away from.
         if (msg.meetingId !== selectedMeetingId) return;
         if (caretShell && !caretShell.isCurrentMeeting(msg.meetingId)) return;
+        documentSurfaceEl.removeAttribute("aria-busy");
+        documentSurfaceEl.dataset.loading = "false";
+        documentSurfaceEl.dataset.contentKey = String(msg.meetingId);
+        documentSurfaceEl.style.animation = "none";
+        void documentSurfaceEl.offsetWidth;
+        documentSurfaceEl.style.animation = "";
         currentSlide = msg.current ?? null;
         slideHistory = Array.isArray(msg.history) ? msg.history : [];
         viewingHistory = null;
         viewingCompiled = false;
+        appEl?.classList.remove("app--compiled-preview");
         compiledPreviewTitle = "";
         activeMeetingTitle = msg.title || `회의 #${msg.meetingId}`;
         renderTranscriptBacklog(msg.transcript);
-        renderMain();
-        renderThumbnails(slideHistory);
-        renderDocHead();
+        if (msg.scene) {
+          showCompiledScene(msg.scene);
+        } else {
+          renderMain();
+          renderThumbnails(slideHistory);
+          renderDocHead();
+        }
         if (msg.compiled) {
           compileStatusEl.hidden = false;
           compileStatusEl.dataset.state = "success";
@@ -1783,6 +1922,7 @@ function connect() {
         // Review must be reachable before a review payload exists; its first
         // activation requests that payload from the real server.
         $("btn-review").hidden = false;
+        reviewPanel.restoreMeeting(msg.meetingId, msg.review ?? null);
         syncActionAvailability();
         renderStatus(`${activeMeetingTitle} 기록을 불러왔습니다`);
       } else if (msg.type === "transcript") {
@@ -1790,7 +1930,7 @@ function connect() {
         if (awaitingInitialCaptureState && msg.reason === "snapshot") return;
         if (msg.reason === "snapshot") {
           renderTranscriptBacklog(msg.entries);
-          transcriptTruncEl.hidden = !msg.truncated;
+          transcriptTruncEl.hidden = !(msg.truncated || msg.entries.length > MAX_TRANSCRIPT_DOM_LINES);
         } else {
           exportTranscript(msg.entries);
         }
@@ -1809,7 +1949,18 @@ function connect() {
       } else if (msg.type === "attendees") {
         applyAttendeesMessage(msg);
       } else if (msg.type === "review") {
-        reviewPanel.applyReview(msg);
+        if (selectedMeetingId !== null && msg.meetingId !== selectedMeetingId) return;
+        if (reviewPanel.applyReview(msg)) {
+          renderStatus(Array.isArray(msg.items) && msg.items.length === 0
+            ? "검토할 결정 사항이나 할 일이 없습니다"
+            : "회의록 정리가 완료되었습니다");
+        }
+      } else if (msg.type === "reviewItemUpdated" || msg.type === "reviewConfirmed") {
+        // ACKs carry authoritative meeting identity; stale tabs cannot apply them.
+        if (msg.meetingId !== selectedMeetingId) return;
+      } else if (msg.type === "meetingConcluded") {
+        if (msg.meetingId !== selectedMeetingId) return;
+        renderStatus("검토와 회의록 묶음 저장이 완료되었습니다");
       } else if (msg.type === "capture") {
         // `phase` is the server's authoritative capture phase. It is optional on
         // the wire, so a phase-less frame is still read exactly as before, from
@@ -1870,6 +2021,7 @@ function connect() {
         renderExportStatus(msg);
       } else if (msg.type === "saved") {
         if (awaitingInitialCaptureState && selectedMeetingId === null) return;
+        clearJobRetry();
         renderStatus(`저장됨: ${msg.path}`);
         requestMeetings();
         if (lastSavedEl) {
@@ -1879,8 +2031,13 @@ function connect() {
           lastSavedEl.title = `${label} 파일을 저장했습니다`;
         }
       } else if (msg.type === "status") {
+        if (msg.mutationAction && msg.meetingId !== selectedMeetingId) return;
         renderStatus(msg.text);
         reviewPanel.applyStatus(msg.text);
+        if (msg.mutationAction && selectedMeetingId !== null && ws?.readyState === WebSocket.OPEN) {
+          // Roll back any optimistic edit from the durable meeting snapshot.
+          ws.send(JSON.stringify({ action: "selectMeeting", meetingId: selectedMeetingId }));
+        }
       }
     } catch (e) {
       console.error("parse error", e);
@@ -1893,6 +2050,10 @@ function connect() {
     caretShell?.ingestTransport("closed");
     syncActionAvailability();
     renderStatus("앱 서버 연결이 끊겼습니다. 다시 연결하는 중…");
+    if (contextServerStatusEl) {
+      contextServerStatusEl.textContent = "재연결 중";
+      contextServerStatusEl.dataset.tone = "warning";
+    }
     reviewPanel?.syncTransport();
     setTimeout(connect, 3000);
   };
@@ -1901,6 +2062,10 @@ function connect() {
     caretShell?.ingestTransport("error");
     syncActionAvailability();
     renderStatus("앱 서버에 연결하지 못했습니다");
+    if (contextServerStatusEl) {
+      contextServerStatusEl.textContent = "연결 오류";
+      contextServerStatusEl.dataset.tone = "warning";
+    }
   };
 }
 

@@ -183,6 +183,11 @@ const SCENARIOS = {
       input: { mode: "expanded", events: ["present", "toggle", "toggle"] },
     },
     {
+      name: "close-and-reopen-from-menu-bar",
+      kind: "presentation",
+      input: { mode: "collapsed", events: ["present", "dismiss", "toggle"] },
+    },
+    {
       name: "stop-once",
       kind: "stopGuard",
       input: { phase: "capturing", activations: 1 },
@@ -408,6 +413,14 @@ describe("native surface seam: menu-bar presentation", () => {
       });
     });
   }
+
+  test("the visible Close control hides the minibar and the menu bar restores it", () => {
+    expect(value("close-and-reopen-from-menu-bar")).toEqual({
+      effects: ["show", "hide", "show"],
+      states: ["visible", "hidden", "visible"],
+      mode: "collapsed",
+    });
+  });
 
   test("the shipping controller owns presentation state instead of querying NSWindow visibility", () => {
     const controller = readFileSync(join(ROOT, "macos", "MinibarWindowController.swift"), "utf8")

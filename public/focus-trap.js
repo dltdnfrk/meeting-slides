@@ -46,6 +46,17 @@
 
   /** 활성 트랩 스택. 마지막 항목이 키를 받는다. */
   const stack = [];
+  const scrim = document.getElementById("dialog-scrim");
+  const reduceMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  const CLOSE_MS = 200;
+  const closeTimers = new WeakMap();
+
+  const syncScrim = () => {
+    if (!(scrim instanceof HTMLElement)) return;
+    const open = stack.some((root) => root.isConnected && !root.hidden);
+    scrim.dataset.open = String(open);
+    scrim.setAttribute("aria-hidden", String(!open));
+  };
 
   const activeRoot = () => {
     // 이미 닫힌(hidden) 패널은 스택에 남아 있어도 무시한다: 패널이 자기
@@ -98,6 +109,7 @@
     const at = stack.indexOf(root);
     if (at !== -1) stack.splice(at, 1);
     stack.push(root);
+    syncScrim();
   }
 
   /**
@@ -108,8 +120,50 @@
   function releaseFocus(root) {
     const at = stack.indexOf(root);
     if (at !== -1) stack.splice(at, 1);
+    syncScrim();
+  }
+
+  scrim?.addEventListener("click", () => {
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  });
+
+  /**
+   * Shared symmetric dialog transition. Accessibility state changes immediately;
+   * only visual removal waits for the short opacity/transform outro.
+   */
+  function openDialog(root) {
+    if (!(root instanceof HTMLElement)) return;
+    const timer = closeTimers.get(root);
+    if (timer) clearTimeout(timer);
+    closeTimers.delete(root);
+    root.hidden = false;
+    root.inert = false;
+    root.dataset.motionState = "opening";
+    requestAnimationFrame(() => {
+      if (!root.hidden && root.dataset.motionState === "opening") root.dataset.motionState = "open";
+    });
+  }
+
+  function closeDialog(root, onClosed) {
+    if (!(root instanceof HTMLElement)) { onClosed?.(); return; }
+    const timer = closeTimers.get(root);
+    if (timer) clearTimeout(timer);
+    releaseFocus(root);
+    root.inert = true;
+    root.dataset.motionState = "closing";
+    const finish = () => {
+      closeTimers.delete(root);
+      root.hidden = true;
+      root.inert = false;
+      root.dataset.motionState = "closed";
+      onClosed?.();
+    };
+    if (reduceMotion() || root.hidden) finish();
+    else closeTimers.set(root, setTimeout(finish, CLOSE_MS));
   }
 
   window.trapFocus = trapFocus;
   window.releaseFocus = releaseFocus;
+  window.openDialog = openDialog;
+  window.closeDialog = closeDialog;
 })();

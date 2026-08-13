@@ -24,6 +24,7 @@ final class MinibarView: NSVisualEffectView {
     private let stopButton = NSButton()
     private let disclosureButton = NSButton()
     private let openWorkspaceButton = NSButton()
+    private let closeButton = NSButton()
     private let transcriptStack = NSStackView()
     private let collapsedLine = NSTextField(labelWithString: "")
     private let statusPanel = NSView()
@@ -73,6 +74,7 @@ final class MinibarView: NSVisualEffectView {
         configure(stopButton, control: .stop)
         configure(disclosureButton, control: .disclosure)
         configure(openWorkspaceButton, control: .openWorkspace)
+        configure(closeButton, control: .close)
 
         transcriptStack.orientation = .vertical
         transcriptStack.alignment = .leading
@@ -147,7 +149,7 @@ final class MinibarView: NSVisualEffectView {
         NSLayoutConstraint.deactivate(activeLayoutConstraints)
         activeLayoutConstraints = []
         for view in [statusGlyph, statusTitle, timerLabel, collapsedLine,
-                     stopButton, disclosureButton, openWorkspaceButton] {
+                     stopButton, disclosureButton, openWorkspaceButton, closeButton] {
             detach(view)
         }
 
@@ -157,7 +159,7 @@ final class MinibarView: NSVisualEffectView {
             statusPanel.isHidden = true
             transcriptStack.isHidden = true
             for view in [statusGlyph, statusTitle, collapsedLine, timerLabel,
-                         stopButton, disclosureButton] {
+                         stopButton, disclosureButton, closeButton] {
                 addSubview(view)
             }
             statusTitle.font = .systemFont(ofSize: 13, weight: .semibold)
@@ -167,7 +169,9 @@ final class MinibarView: NSVisualEffectView {
                 statusGlyph.centerYAnchor.constraint(equalTo: centerYAnchor),
                 statusTitle.leadingAnchor.constraint(equalTo: statusGlyph.trailingAnchor, constant: 8),
                 statusTitle.centerYAnchor.constraint(equalTo: centerYAnchor),
-                disclosureButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+                closeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+                closeButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+                disclosureButton.trailingAnchor.constraint(equalTo: closeButton.leadingAnchor, constant: -8),
                 disclosureButton.centerYAnchor.constraint(equalTo: centerYAnchor),
                 stopButton.trailingAnchor.constraint(equalTo: disclosureButton.leadingAnchor, constant: -8),
                 stopButton.centerYAnchor.constraint(equalTo: centerYAnchor),
@@ -187,6 +191,7 @@ final class MinibarView: NSVisualEffectView {
             }
             addSubview(disclosureButton)
             addSubview(openWorkspaceButton)
+            addSubview(closeButton)
             statusTitle.font = .systemFont(ofSize: 15, weight: .semibold)
             timerLabel.font = .monospacedDigitSystemFont(ofSize: 28, weight: .medium)
 
@@ -213,7 +218,9 @@ final class MinibarView: NSVisualEffectView {
                     equalTo: topAnchor,
                     constant: layout.actions.y + layout.actions.height / 2
                 ),
-                openWorkspaceButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+                closeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+                closeButton.centerYAnchor.constraint(equalTo: disclosureButton.centerYAnchor),
+                openWorkspaceButton.trailingAnchor.constraint(equalTo: closeButton.leadingAnchor, constant: -8),
                 openWorkspaceButton.centerYAnchor.constraint(equalTo: disclosureButton.centerYAnchor),
                 disclosureButton.trailingAnchor.constraint(equalTo: openWorkspaceButton.leadingAnchor, constant: -8),
                 disclosureButton.widthAnchor.constraint(equalTo: openWorkspaceButton.widthAnchor),
@@ -229,6 +236,7 @@ final class MinibarView: NSVisualEffectView {
         case .stop: return 1
         case .disclosure: return 2
         case .openWorkspace: return 3
+        case .close: return 4
         }
     }
 
@@ -237,6 +245,7 @@ final class MinibarView: NSVisualEffectView {
         case 1: return .stop
         case 2: return .disclosure
         case 3: return .openWorkspace
+        case 4: return .close
         default: return nil
         }
     }
@@ -273,7 +282,7 @@ final class MinibarView: NSVisualEffectView {
             )
         }
 
-        for button in [stopButton, disclosureButton, openWorkspaceButton] {
+        for button in [stopButton, disclosureButton, openWorkspaceButton, closeButton] {
             button.isHidden = true
         }
         for control in model.controls {
@@ -302,6 +311,7 @@ final class MinibarView: NSVisualEffectView {
         case .stop: return stopButton
         case .disclosure: return disclosureButton
         case .openWorkspace: return openWorkspaceButton
+        case .close: return closeButton
         }
     }
 

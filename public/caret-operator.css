@@ -1081,6 +1081,7 @@ body .live-topbar__timer {
   :root {
     --cf-motion-quick: 0ms;
     --cf-motion-state: 0ms;
+    --cf-motion-enter: 0ms;
   }
 
   .cf-motion-quick,
@@ -1121,7 +1122,11 @@ body:has(.app[data-shell="library"]) .ambient {
 .app[data-shell="library"] .workspace {
   display: grid;
 
-  grid-template-columns: var(--rail-w, var(--lib-rail-w)) var(--splitter-w, 5px) minmax(0, 1fr);
+  grid-template-columns:
+    var(--rail-w, var(--lib-rail-w))
+    var(--splitter-w, 5px)
+    minmax(560px, 1fr)
+    minmax(292px, 320px);
   align-items: stretch;
   gap: 0;
   margin: 0;
@@ -1134,6 +1139,198 @@ body:has(.app[data-shell="library"]) .ambient {
   background: transparent;
   box-shadow: none;
   overflow: hidden;
+}
+
+.context-rail {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 28px 24px 24px;
+  border-left: var(--cf-rule-width) solid var(--cf-rule);
+  background: linear-gradient(180deg, var(--cf-surface), var(--cf-canvas));
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.context-rail[hidden],
+.app[data-shell="live"] .context-rail {
+  display: none;
+}
+
+.context-section {
+  display: grid;
+  gap: 14px;
+}
+
+.context-section__head {
+  display: grid;
+  gap: 4px;
+}
+
+.context-section__eyebrow {
+  color: var(--cf-text-faint);
+  font-size: var(--cf-text-xs);
+  font-weight: var(--cf-weight-semibold);
+  letter-spacing: var(--cf-tracking-mono);
+}
+
+.context-section__title {
+  margin: 0;
+  color: var(--cf-text);
+  font-size: var(--cf-text-sm);
+  font-weight: var(--cf-weight-semibold);
+  letter-spacing: var(--cf-tracking-tight);
+}
+
+.context-recent {
+  display: grid;
+  gap: 3px;
+}
+
+.context-recent__item {
+  width: 100%;
+  min-height: 54px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: var(--cf-radius-md);
+  background: transparent;
+  color: inherit;
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) 14px;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  transition:
+    background-color var(--cf-motion-quick) var(--cf-motion-ease),
+    transform var(--cf-motion-quick) var(--cf-motion-ease);
+}
+
+.context-recent__item:hover {
+  background: var(--cf-accent-soft);
+  transform: translateX(2px);
+}
+
+.context-recent__item:active {
+  transform: translateX(2px) scale(0.99);
+}
+
+.context-recent__item:focus-visible {
+  outline: var(--cf-focus-width) solid var(--cf-focus);
+  outline-offset: var(--cf-focus-offset);
+}
+
+.context-recent__marker {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--cf-radius-pill);
+  background: var(--cf-accent);
+  box-shadow: 0 0 0 4px var(--cf-accent-soft);
+}
+
+.context-recent__copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.context-recent__title {
+  overflow: hidden;
+  color: var(--cf-text);
+  font-size: var(--cf-text-sm);
+  font-weight: var(--cf-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.context-recent__meta,
+.context-recent__arrow {
+  color: var(--cf-text-faint);
+  font-size: var(--cf-text-xs);
+}
+
+.context-recent__arrow {
+  font-size: var(--cf-text-lg);
+  transition: transform var(--cf-motion-quick) var(--cf-motion-ease);
+}
+
+.context-recent__item:hover .context-recent__arrow {
+  transform: translateX(2px);
+}
+
+.context-section__empty,
+.context-rail__hint {
+  margin: 0;
+  color: var(--cf-text-muted);
+  font-size: var(--cf-text-xs);
+  line-height: var(--cf-leading-normal);
+}
+
+.context-status-list {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.context-status {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: var(--cf-rule-width) solid var(--cf-rule);
+}
+
+.context-status:last-child {
+  border-bottom: 0;
+}
+
+.context-status dt {
+  color: var(--cf-text-muted);
+  font-size: var(--cf-text-xs);
+}
+
+.context-status dd {
+  margin: 0;
+  color: var(--cf-text);
+  font-size: var(--cf-text-xs);
+  font-weight: var(--cf-weight-medium);
+  text-align: right;
+}
+
+.context-status dd::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 7px;
+  border-radius: var(--cf-radius-pill);
+  background: var(--cf-text-faint);
+  vertical-align: 1px;
+}
+
+.context-status dd[data-tone="positive"]::before {
+  background: var(--cf-accent);
+}
+
+.context-status dd[data-tone="warning"]::before {
+  background: var(--cf-record);
+}
+
+.context-rail__hint {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: var(--cf-rule-width) solid var(--cf-rule);
+}
+
+@media (max-width: 1240px) {
+  .app[data-shell="library"] .workspace {
+    grid-template-columns: var(--rail-w, var(--lib-rail-w)) var(--splitter-w, 5px) minmax(0, 1fr);
+  }
+
+  .context-rail {
+    display: none;
+  }
 }
 
 
@@ -1492,6 +1689,18 @@ body:has(.app[data-shell="library"]) .ambient {
   flex-direction: column;
   align-items: stretch;
   gap: var(--cf-space-6);
+  animation: library-stage-enter var(--cf-motion-state) var(--cf-motion-ease) both;
+}
+
+@keyframes library-stage-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--cf-space-1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
@@ -1567,7 +1776,7 @@ body:has(.app[data-shell="library"]) .ambient {
   aspect-ratio: 16 / 9;
   height: auto;
   min-height: 0;
-  margin: 0;
+  margin-inline: auto;
   padding: 0;
   border: 0;
   background: transparent;
@@ -1699,7 +1908,8 @@ body:has(.app[data-shell="library"]) .ambient {
   display: grid;
   gap: var(--cf-space-6);
   max-width: var(--lib-measure);
-  margin: 0;
+  width: 100%;
+  margin-inline: auto;
   padding: 0;
   border: 0;
   background: transparent;
@@ -1812,8 +2022,9 @@ body:has(.app[data-shell="library"]) .ambient {
 
 .app[data-shell="library"] #notes-box {
   display: block;
+  width: 100%;
   max-width: var(--lib-measure);
-  margin: 0;
+  margin-inline: auto;
   padding: 0;
   border: 0;
   background: transparent;
@@ -1858,7 +2069,8 @@ body:has(.app[data-shell="library"]) .ambient {
 
 .app[data-shell="library"] .notes-panel__hint {
   max-width: var(--lib-measure);
-  margin: 0;
+  width: 100%;
+  margin-inline: auto;
   color: var(--cf-text-faint);
   font-size: var(--cf-text-xs);
   word-break: keep-all;
@@ -1879,9 +2091,10 @@ body:has(.app[data-shell="library"]) .ambient {
   flex-direction: column;
   align-items: stretch;
   gap: var(--cf-space-3);
+  width: 100%;
   max-width: var(--lib-measure);
   min-block-size: 0;
-  margin: 0;
+  margin-inline: auto;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -2051,6 +2264,15 @@ body:has(.app[data-shell="library"]) .ambient {
   display: none;
 }
 
+/* A persisted/generated deck is navigable in the library shell. The filmstrip
+   stays hidden for an empty meeting, then occupies one bounded dock row only
+   while the operator is previewing compiled slides. */
+.app[data-shell="library"].app--compiled-preview .dock__panel--active {
+  display: flex;
+  flex: none;
+  min-height: 104px;
+}
+
 
 .app[data-shell="library"] .output-switcher {
   display: flex;
@@ -2134,9 +2356,22 @@ body:has(.app[data-shell="library"]) .ambient {
   font-size: var(--cf-text-md);
   font-weight: var(--cf-weight-semibold);
   cursor: pointer;
-  transition-property: background-color, border-color, color;
+  transition-property: background-color, border-color, color, box-shadow, transform;
   transition-duration: var(--cf-motion-quick);
-  transition-timing-function: var(--cf-motion-ease);
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app[data-shell="library"] #btn-record:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--cf-record) 22%, transparent);
+  border-color: color-mix(in srgb, var(--cf-record) 70%, var(--cf-text));
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--cf-record) 16%, transparent);
+  transform: translateY(-1px);
+}
+
+.app[data-shell="library"] #btn-record:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--cf-record) 28%, transparent);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--cf-record) 12%, transparent);
+  transform: translateY(0) scale(0.985);
 }
 
 .app[data-shell="library"] #btn-record:focus-visible {
@@ -2149,6 +2384,47 @@ body:has(.app[data-shell="library"]) .ambient {
   border-color: var(--cf-rule);
   background-color: transparent;
   cursor: not-allowed;
+}
+
+/* Shared dialog motion contract. */
+.dialog-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background-color: rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dialog-scrim[data-open="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.provider-panel,
+.attendee-panel,
+#review-panel,
+.ask-panel {
+  z-index: 100;
+  isolation: isolate;
+  animation: cf-dialog-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition:
+    opacity 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cf-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 
@@ -3330,5 +3606,248 @@ body:has(.app[data-shell="library"]) .ambient {
     justify-self: stretch;
     justify-content: flex-end;
     inline-size: 100%;
+  }
+}
+
+
+/* ── Interaction polish: calm, tactile, state-led motion ──────────────────
+   Motion communicates hierarchy and continuity; transform/opacity keep it
+   compositor-friendly, and the global reduced-motion contract above disables it. */
+:root {
+  --cf-motion-quick: 160ms;
+  --cf-motion-state: 200ms;
+  --cf-motion-enter: 200ms;
+  --cf-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cf-motion-press: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.app[data-shell="library"] .session-row {
+  transition-property: background-color, border-color, color, transform, box-shadow;
+  transition-duration: var(--cf-motion-state);
+  transition-timing-function: var(--cf-motion-ease);
+}
+
+.app[data-shell="library"] .session-row:hover {
+  transform: translateX(3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.app[data-shell="library"] .session-row:active {
+  transform: translateX(2px) scale(0.992);
+  transition-duration: var(--cf-motion-quick);
+}
+
+.app[data-shell="library"] .session-row--selected::before {
+  transform-origin: center;
+  animation: cf-selection-marker var(--cf-motion-state) var(--cf-motion-ease) both;
+}
+
+.app .detail-tabs__btn {
+  transition:
+    color var(--cf-motion-state) var(--cf-motion-ease),
+    background-color var(--cf-motion-state) var(--cf-motion-ease),
+    transform var(--cf-motion-quick) var(--cf-motion-press);
+}
+
+.app .detail-tabs__btn:hover:not([aria-selected="true"]) {
+  transform: translateY(-1px);
+}
+
+.app .detail-tabs__btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.app[data-shell="library"] .detail-tabs__btn[aria-selected="true"]::after {
+  transform-origin: center;
+  animation: cf-tab-indicator var(--cf-motion-state) var(--cf-motion-ease) both;
+}
+
+.app[data-shell="library"] .detail-panel:not([hidden]) {
+  animation: cf-panel-enter var(--cf-motion-state) var(--cf-motion-ease) both;
+}
+
+.app #current-slide > .slide__inner,
+.app #current-slide > .slide__placeholder,
+.app #current-slide > .slide__notice + .slide__inner {
+  animation: cf-stage-content-enter var(--cf-motion-enter) var(--cf-motion-ease) both;
+}
+
+.app .thumbnail {
+  transition:
+    border-color var(--cf-motion-state) var(--cf-motion-ease),
+    background-color var(--cf-motion-state) var(--cf-motion-ease),
+    box-shadow var(--cf-motion-state) var(--cf-motion-ease),
+    transform var(--cf-motion-state) var(--cf-motion-ease);
+}
+
+.app .thumbnail:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.app .thumbnail:active {
+  transform: translateY(-1px) scale(0.985);
+  transition-duration: var(--cf-motion-quick);
+}
+
+.app .thumbnail--viewing {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--cf-accent) 12%, transparent);
+}
+
+.app[data-shell="library"] .dock__more-summary::after,
+.app[data-shell="live"] .dock__more-summary::after {
+  transition: transform var(--cf-motion-quick) var(--cf-motion-ease);
+}
+
+.app[data-shell="library"] .dock__more[open] .dock__more-set,
+.app[data-shell="live"] .dock__more[open] .dock__more-set {
+  animation: cf-dock-content-enter var(--cf-motion-quick) var(--cf-motion-ease) both;
+}
+
+.app[data-shell="library"] .dock__btn,
+.app[data-shell="live"] .dock__btn {
+  transition-property: background-color, border-color, color, box-shadow, transform;
+  transition-duration: var(--cf-motion-quick);
+  transition-timing-function: var(--cf-motion-ease);
+}
+
+.app[data-shell="library"] .dock__btn:hover:not(:disabled),
+.app[data-shell="live"] .dock__btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
+}
+
+.app[data-shell="library"] .dock__btn:active:not(:disabled),
+.app[data-shell="live"] .dock__btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.975);
+  box-shadow: none;
+  transition-timing-function: var(--cf-motion-press);
+}
+
+.app .feed-line {
+  animation: cf-feed-enter var(--cf-motion-state) var(--cf-motion-ease) both;
+}
+
+.app #status-text[data-motion-key] {
+  animation: cf-status-update var(--cf-motion-state) var(--cf-motion-ease) both;
+}
+
+.app[data-shell="live"] .live-topbar__capsule {
+  transition:
+    border-color var(--cf-motion-state) var(--cf-motion-ease),
+    box-shadow var(--cf-motion-state) var(--cf-motion-ease),
+    transform var(--cf-motion-state) var(--cf-motion-ease);
+}
+
+.app[data-shell="live"] .live-topbar__stop {
+  transition:
+    background-color var(--cf-motion-quick) var(--cf-motion-ease),
+    box-shadow var(--cf-motion-quick) var(--cf-motion-ease),
+    transform var(--cf-motion-quick) var(--cf-motion-press);
+}
+
+.app[data-shell="live"] .live-topbar__stop:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--cf-record) 22%, transparent);
+}
+
+.app[data-shell="live"] .live-topbar__stop:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+.app .dialog-scrim {
+  transition:
+    opacity var(--cf-motion-state) var(--cf-motion-ease),
+    backdrop-filter var(--cf-motion-state) var(--cf-motion-ease);
+}
+
+.app .provider-panel[data-motion-state="closing"],
+.app .attendee-panel[data-motion-state="closing"],
+.app #review-panel[data-motion-state="closing"],
+.app .ask-panel[data-motion-state="closing"] {
+  opacity: 0;
+  transform: translateY(6px) scale(0.99);
+  pointer-events: none;
+}
+
+.app .provider-panel[data-motion-state="open"],
+.app .attendee-panel[data-motion-state="open"],
+.app #review-panel[data-motion-state="open"],
+.app .ask-panel[data-motion-state="open"] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.app .provider-panel,
+.app .attendee-panel,
+.app #review-panel,
+.app .ask-panel {
+  animation-duration: var(--cf-motion-state);
+  animation-timing-function: var(--cf-motion-ease);
+  transition-duration: var(--cf-motion-state);
+  transition-timing-function: var(--cf-motion-ease);
+}
+
+
+.app #document-surface[data-loading="true"] {
+  opacity: 0.68;
+  transform: translateY(2px);
+  pointer-events: none;
+  transition:
+    opacity var(--cf-motion-state) var(--cf-motion-ease),
+    transform var(--cf-motion-state) var(--cf-motion-ease);
+}
+
+.app #document-surface[data-loading="false"][data-content-key] {
+  animation: cf-document-content-enter var(--cf-motion-state) var(--cf-motion-ease) both;
+}
+
+@keyframes cf-document-content-enter {
+  from { transform: translateY(4px); }
+  to { transform: translateY(0); }
+}
+
+@keyframes cf-dock-content-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cf-selection-marker {
+  from { opacity: 0; transform: scaleY(0.35); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+@keyframes cf-tab-indicator {
+  from { opacity: 0; transform: scaleX(0.25); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes cf-panel-enter {
+  from { transform: translateY(4px); }
+  to { transform: translateY(0); }
+}
+
+@keyframes cf-stage-content-enter {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+
+@keyframes cf-feed-enter {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes cf-status-update {
+  from { opacity: 0.25; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cf-motion-quick: 0ms;
+    --cf-motion-state: 0ms;
+    --cf-motion-enter: 0ms;
   }
 }

@@ -1418,6 +1418,7 @@ async function openReviewPanel(session: Session): Promise<void> {
     'document.querySelectorAll("#review-list .review-item").length === 2',
     () => harness.pushMessage({
       type: "review",
+      meetingId: MEETING.id,
       reviewId: "rev-a11y-1",
       transcriptVersionId: "ver-a11y-1",
       attendees: [
@@ -1902,6 +1903,122 @@ describe("Todo 15 · user-started capture focuses the visible Stop control", () 
       const inDialog = await session.page.evaluate(readFocusInside, "provider-panel");
       expect(inDialog).toBe(true);
       expect((await session.page.evaluate(readStopFocus)).stopFocused).toBe(false);
+    } finally {
+      await session.close();
+    }
+  }, 30_000);
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 7. Interaction feedback
+// ════════════════════════════════════════════════════════════════════════════
+
+describe("commercial interaction feedback", () => {
+  test("primary Start and dialogs expose tactile, reduced-motion-safe feedback", async () => {
+    const session = await openSession(1244, 836);
+    try {
+      await hydrateIdle(session);
+      const startBefore = await session.page.evaluate(() => {
+        const button = document.querySelector("#btn-record");
+        if (!(button instanceof HTMLElement)) throw new Error("missing #btn-record");
+        const base = getComputedStyle(button);
+        return {
+          background: base.backgroundColor,
+          border: base.borderColor,
+          duration: base.transitionDuration,
+        };
+      });
+      await session.page.hover("#btn-record");
+      const startHover = await session.page.evaluate(() => {
+        const button = document.querySelector("#btn-record");
+        if (!(button instanceof HTMLElement)) throw new Error("missing #btn-record");
+        const hover = getComputedStyle(button);
+        return {
+          background: hover.backgroundColor,
+          border: hover.borderColor,
+          duration: hover.transitionDuration,
+        };
+      });
+
+      expect(startHover.duration).not.toBe("0s");
+      expect(startHover.background).not.toBe(startBefore.background);
+      expect(startHover.border).not.toBe(startBefore.border);
+
+      const dialogReceipts = await session.page.evaluate(() => {
+        return ["provider-panel", "attendee-panel", "review-panel", "ask-panel"].map((id) => {
+          const dialog = document.getElementById(id);
+          const scrim = document.getElementById("dialog-scrim");
+          if (!(dialog instanceof HTMLElement)) throw new Error(`missing #${id}`);
+          if (!(scrim instanceof HTMLElement)) throw new Error("missing #dialog-scrim");
+          dialog.hidden = false;
+          (window as Window & { trapFocus?: (root: HTMLElement) => void }).trapFocus?.(dialog);
+          const style = getComputedStyle(dialog);
+          const scrimStyle = getComputedStyle(scrim);
+          const receipt = {
+            id,
+            modal: dialog.getAttribute("aria-modal"),
+            duration: style.transitionDuration,
+            properties: style.transitionProperty,
+            scrimBackground: scrimStyle.backgroundColor,
+            scrimPointerEvents: scrimStyle.pointerEvents,
+            scrimBounds: scrim.getBoundingClientRect().toJSON(),
+          };
+          (window as Window & { releaseFocus?: (root: HTMLElement) => void }).releaseFocus?.(dialog);
+          dialog.hidden = true;
+          return receipt;
+        });
+      });
+
+      expect(dialogReceipts).toHaveLength(4);
+      for (const receipt of dialogReceipts) {
+        expect(receipt.modal).toBe("true");
+        expect(receipt.duration).not.toBe("0s");
+        expect(receipt.properties).toContain("opacity");
+        expect(receipt.properties).toContain("transform");
+        expect(receipt.scrimBackground).not.toBe("rgba(0, 0, 0, 0)");
+        expect(receipt.scrimPointerEvents).toBe("auto");
+        expect(receipt.scrimBounds).toMatchObject({ x: 0, y: 0, width: 1244, height: 836 });
+      }
+
+      await selectMeeting(session);
+      const outbound = harness.nextClientMessage();
+      await session.act(
+        'document.getElementById("review-panel")?.hidden === false',
+        () => session.page.evaluate(() => {
+          const trigger = document.getElementById("btn-review");
+          if (!(trigger instanceof HTMLButtonElement)) throw new Error("missing #btn-review");
+          trigger.hidden = false;
+          trigger.click();
+        }),
+      );
+      expect((await outbound as { action?: string }).action).toBe("startReview");
+      const reviewFocus = await session.page.evaluate(() => {
+        const panel = document.getElementById("review-panel");
+        return {
+          id: document.activeElement?.id ?? "",
+          inside: panel?.contains(document.activeElement) ?? false,
+        };
+      });
+      expect(reviewFocus.inside).toBe(true);
+      expect(["btn-review-close", "btn-review-confirm"]).toContain(reviewFocus.id);
+      await session.page.keyboard.press("Escape");
+
+      await session.page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+      const reducedMotion = await session.page.evaluate(() => {
+        const start = document.querySelector("#btn-record");
+        const dialog = document.querySelector("#provider-panel");
+        if (!(start instanceof HTMLElement) || !(dialog instanceof HTMLElement)) {
+          throw new Error("missing interaction controls");
+        }
+        dialog.hidden = false;
+        const receipt = {
+          start: getComputedStyle(start).transitionDuration,
+          dialog: getComputedStyle(dialog).transitionDuration,
+        };
+        dialog.hidden = true;
+        return receipt;
+      });
+      expect(reducedMotion).toEqual({ start: "0s", dialog: "0s" });
     } finally {
       await session.close();
     }

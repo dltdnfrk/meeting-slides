@@ -980,6 +980,7 @@ describe("native minibar seam: truthful controls", () => {
       controls: [
         { id: "stop", enabled: true, label: "녹음 중지", role: "button" },
         { id: "disclosure", enabled: true, label: "미니바 펼치기", role: "button" },
+        { id: "close", enabled: true, label: "닫기", role: "button" },
       ],
     });
   });
@@ -989,6 +990,7 @@ describe("native minibar seam: truthful controls", () => {
       controls: [
         { id: "stop", enabled: false, label: "녹음 중지", role: "button" },
         { id: "disclosure", enabled: true, label: "미니바 펼치기", role: "button" },
+        { id: "close", enabled: true, label: "닫기", role: "button" },
       ],
     });
   });
@@ -999,6 +1001,7 @@ describe("native minibar seam: truthful controls", () => {
         { id: "stop", enabled: true, label: "녹음 중지", role: "button" },
         { id: "disclosure", enabled: true, label: "미니바 접기", role: "button" },
         { id: "openWorkspace", enabled: true, label: "작업 공간 열기", role: "button" },
+        { id: "close", enabled: true, label: "닫기", role: "button" },
       ],
     });
   });
@@ -1012,7 +1015,7 @@ describe("native minibar seam: truthful controls", () => {
 
   test("the control vocabulary is closed: no Pause, no share, no second engine", () => {
     expect(value("controls-vocabulary-is-closed")).toEqual({
-      controls: ["stop", "disclosure", "openWorkspace"],
+      controls: ["stop", "disclosure", "openWorkspace", "close"],
       outboundActions: ["stopCapture"],
     });
   });
@@ -1130,7 +1133,7 @@ describe("native minibar seam: accessibility", () => {
     expect(ax.timerIsLiveRegion).toBe(false);
     expect(ax.transcriptIsLiveRegion).toBe(false);
     expect(ax.minimumTargetSize).toEqual({ width: 44, height: 44 });
-    expect(ax.focusOrder).toEqual(["stop", "disclosure"]);
+    expect(ax.focusOrder).toEqual(["stop", "disclosure", "close"]);
   });
 
   test("reduced motion removes the transition entirely rather than shortening it", () => {

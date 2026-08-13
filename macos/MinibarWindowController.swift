@@ -337,6 +337,8 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
             setMode(MinibarMode.next(from: projection.mode, event: .toggleDisclosure))
         case .openWorkspace:
             NSWorkspace.shared.open(workspaceURL)
+        case .close:
+            applyPresentation(presentation.handle(.dismiss), origin: .user)
         }
     }
 

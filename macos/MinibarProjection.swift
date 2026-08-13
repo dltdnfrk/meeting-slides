@@ -194,9 +194,11 @@ public enum MinibarControl: String, Equatable, CaseIterable {
     case stop
     case disclosure
     case openWorkspace
+    case close
 
     /// The complete, closed control vocabulary. There is no Pause, no share,
-    /// no meeting management: those live in the browser workspace.
+    /// no meeting management: those live in the browser workspace. Close hides
+    /// this ambient surface without stopping capture or quitting the app.
     public static var vocabulary: [String] { allCases.map(\.rawValue) }
 }
 
@@ -601,6 +603,14 @@ public struct MinibarProjection {
                 )
             )
         }
+        controls.append(
+            MinibarControlState(
+                id: .close,
+                enabled: true,
+                label: "닫기",
+                help: "미니바를 숨깁니다. 메뉴 막대에서 다시 열 수 있습니다"
+            )
+        )
         return controls
     }
 }

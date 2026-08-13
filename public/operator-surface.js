@@ -121,6 +121,8 @@ function projectState() {
   app.dataset.uiState = uiState.name;
   app.dataset.capturePhase = uiState.capture;
   app.dataset.shell = uiState.shell;
+  const contextRail = document.getElementById("context-rail");
+  if (contextRail) contextRail.hidden = uiState.shell !== "library";
   // `data-connection` on the document element belongs to app.js and keeps its
   // frozen vocabulary (`connecting|connected|disconnected|error`), which the
   // task-3 manifest pins and other surfaces read. The richer canonical state is

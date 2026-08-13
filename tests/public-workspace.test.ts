@@ -50,7 +50,7 @@ describe("워크스페이스 셸 구조", () => {
         // The stage and the transcript are the document surface's own panels.
         stageInSurface: surface?.contains(document.getElementById("stage-pane")) ?? false,
         transcriptInSurface: surface?.contains(document.getElementById("transcript-pane")) ?? false,
-        // Rail first, then the one document surface.
+        // Meeting rail, one document surface, then the library-only context rail.
         order: [...workspace.children]
           .map((child) => child.id || child.className.split(" ")[0])
           .filter((name) => !name.startsWith("splitter")),
@@ -67,7 +67,7 @@ describe("워크스페이스 셸 구조", () => {
     expect(panes!.documentSurface).toBe(true);
     expect(panes!.stageInSurface).toBe(true);
     expect(panes!.transcriptInSurface).toBe(true);
-    expect(panes!.order).toEqual(["session-rail", "document-surface"]);
+    expect(panes!.order).toEqual(["session-rail", "document-surface", "context-rail"]);
     expect(panes!.transcriptIsPanel).toBe(true);
     expect(panes!.transcriptTabControls).toBe("transcript-pane");
   });
@@ -363,7 +363,12 @@ describe("워크스페이스 스플리터", () => {
       };
     });
 
-    expect(structure.workspaceOrder).toEqual(["session-rail", "splitter-rail", "document-surface"]);
+    expect(structure.workspaceOrder).toEqual([
+      "session-rail",
+      "splitter-rail",
+      "document-surface",
+      "context-rail",
+    ]);
     expect(structure.surfaceOrder).toEqual(["stage-pane", "splitter-transcript", "transcript-pane"]);
     expect(structure.railRole).toBe("separator");
     expect(structure.transcriptRole).toBe("separator");

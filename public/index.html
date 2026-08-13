@@ -53,6 +53,7 @@
 
   <div class="app" data-shell="library" data-detail-tab="overview"
     data-capture-phase="idle" data-stage-state="empty" data-ui-state="startup">
+    <div class="dialog-scrim" id="dialog-scrim" aria-hidden="true"></div>
     <!-- ── 상단 바 ─────────────────────────────── -->
     <header class="topbar">
       <div class="topbar__brand">
@@ -103,7 +104,7 @@
     </header>
 
     <!-- ── 설정 패널: LLM 프로바이더 + 음성 인식 모델 ────────────── -->
-    <div class="provider-panel" id="provider-panel" role="dialog" aria-modal="false" aria-label="설정" hidden>
+    <div class="provider-panel" id="provider-panel" role="dialog" aria-modal="true" aria-label="설정" hidden>
       <section class="settings-section" aria-labelledby="provider-section-title">
         <div class="provider-panel__head">
           <span id="provider-section-title">슬라이드 생성 모델</span>
@@ -135,7 +136,7 @@
     </div>
 
     <!-- ── 참석자 지정 패널 (캡처 전 준비) ───────── -->
-    <div class="attendee-panel" id="attendee-panel" role="dialog" aria-label="참석자 지정" hidden>
+    <div class="attendee-panel" id="attendee-panel" role="dialog" aria-modal="true" aria-label="참석자 지정" hidden>
       <div class="attendee-panel__head">참석자 명단</div>
       <form class="attendee-form" id="attendee-form" autocomplete="off">
         <label class="attendee-form__row">
@@ -381,6 +382,42 @@ Here's a quick recap of the meeting:
 
     </div>
 
+    <!-- 라이브러리 전용 컨텍스트 레일.
+         서버가 제공하지 않는 일정은 꾸며내지 않고 실제 회의 기록과 준비 상태만 보여준다. -->
+    <aside class="context-rail" id="context-rail" aria-label="회의 컨텍스트">
+      <section class="context-section context-section--recent" aria-labelledby="context-recent-title">
+        <div class="context-section__head">
+          <span class="context-section__eyebrow">RECENT</span>
+          <h2 class="context-section__title" id="context-recent-title">최근 회의</h2>
+        </div>
+        <div class="context-recent" id="context-recent-list"></div>
+        <p class="context-section__empty" id="context-recent-empty">첫 회의를 시작하면 최근 기록이 여기에 정리됩니다.</p>
+      </section>
+
+      <section class="context-section context-section--readiness" aria-labelledby="context-readiness-title">
+        <div class="context-section__head">
+          <span class="context-section__eyebrow">READINESS</span>
+          <h2 class="context-section__title" id="context-readiness-title">준비 상태</h2>
+        </div>
+        <dl class="context-status-list">
+          <div class="context-status">
+            <dt>앱 서버</dt>
+            <dd id="context-server-status" data-tone="positive">연결됨</dd>
+          </div>
+          <div class="context-status">
+            <dt>AI</dt>
+            <dd id="context-ai-status">확인 중</dd>
+          </div>
+          <div class="context-status">
+            <dt>음성 인식</dt>
+            <dd id="context-stt-status">확인 중</dd>
+          </div>
+        </dl>
+      </section>
+
+      <p class="context-rail__hint">회의를 시작하면 이 영역은 실시간 전사로 전환됩니다.</p>
+    </aside>
+
     </div>
 
     <!-- ── 하단 도크: 슬라이드 히스토리 + export (전사는 우측 패널로 이전) ─ -->
@@ -472,9 +509,10 @@ Here's a quick recap of the meeting:
       </div>
 
     </div>
+
   </div>
 
-  <div class="review-panel" id="review-panel" role="dialog" aria-modal="false" aria-label="회의록 검토" aria-busy="false" data-state="idle" hidden>
+  <div class="review-panel" id="review-panel" role="dialog" aria-modal="true" aria-label="회의록 검토" aria-busy="false" data-state="idle" hidden>
     <div class="review-panel__head">
       <span class="review-panel__title">회의록 검토</span>
       <span class="review-panel__version" id="review-version"></span>
@@ -498,7 +536,7 @@ Here's a quick recap of the meeting:
 
   <!-- DESIGN §9.12: a re-homed panel is a real dialog - named, Escape-closable,
        and it returns focus to the control that opened it. -->
-  <div class="ask-panel" id="ask-panel" role="dialog" aria-modal="false" aria-label="Ask 회의 질문" hidden>
+  <div class="ask-panel" id="ask-panel" role="dialog" aria-modal="true" aria-label="Ask 회의 질문" hidden>
     <div class="ask-panel__head">
       <span class="pane__title">Ask 회의 질문</span>
       <button id="btn-ask-close" class="ask-panel__close" type="button" aria-label="Ask 패널 닫기">×</button>

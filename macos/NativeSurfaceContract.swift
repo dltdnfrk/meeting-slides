@@ -214,6 +214,7 @@ public enum MinibarVisibility: String, Equatable {
 public enum MinibarPresentationEvent: Equatable {
     case present
     case toggle
+    case dismiss
 }
 
 public enum MinibarPresentationEffect: String, Equatable {
@@ -239,6 +240,9 @@ public struct MinibarPresentationState {
             }
             visibility = .visible
             return .show
+        case .dismiss:
+            visibility = .hidden
+            return .hide
         }
     }
 }

@@ -7,7 +7,7 @@
 // ============================================================
 
 /**
- * @param {{ send: (payload: object) => boolean, isOpen: () => boolean, getNotes?: () => string }} transport
+ * @param {{ send: (payload: object) => boolean, isOpen: () => boolean, getMeetingId: () => number | null, getNotes?: () => string }} transport
  */
 function createReviewPanel(transport) {
   const byId = (id) => {
@@ -41,7 +41,7 @@ function createReviewPanel(transport) {
 
   const stateOf = (item) => localState.get(item.id) ?? {};
   const descriptionOf = (item) => stateOf(item).description ?? item.description;
-  const reviewStateOf = (item) => stateOf(item).reviewState ?? "candidate";
+  const reviewStateOf = (item) => stateOf(item).reviewState ?? item.reviewState ?? "candidate";
   const attributionOf = (item) => stateOf(item).attributedAttendeeId ?? item.attributedAttendeeId;
   const assigneeOf = (item) => stateOf(item).assigneeAttendeeId ?? item.assigneeAttendeeId;
   const deadlineOf = (item) => stateOf(item).deadline ?? item.deadline;
@@ -49,7 +49,8 @@ function createReviewPanel(transport) {
 
   const isComplete = (item) => Boolean(attributionOf(item)) && (item.kind !== "action_item" ||
     (Boolean(assigneeOf(item)) && Boolean(deadlineOf(item))));
-  const canConfirmReview = () => (review?.items ?? []).every((item) => reviewStateOf(item) !== "candidate");
+  const canConfirmReview = () => review?.status !== "confirmed"
+    && (review?.items ?? []).every((item) => reviewStateOf(item) !== "candidate");
 
   function setError(text) {
     errorEl.textContent = text ?? "";
@@ -75,25 +76,32 @@ function createReviewPanel(transport) {
   }
 
   function open(focusInside = true) {
-    panelEl.hidden = false;
+    if (window.openDialog) window.openDialog(panelEl); else panelEl.hidden = false;
     toggleEl.hidden = false;
     toggleEl.setAttribute("aria-expanded", "true");
-    if (focusInside) (confirmEl.disabled ? closeEl : confirmEl).focus();
+    if (focusInside || panelEl.dataset.state !== "ready") {
+      (confirmEl.disabled ? closeEl : confirmEl).focus();
+    }
     // DESIGN 9.12: Tab/Shift+Tab stay inside the open dialog (focus-trap.js).
     window.trapFocus?.(panelEl);
   }
 
   function close(restoreFocus = false) {
-    panelEl.hidden = true;
     toggleEl.setAttribute("aria-expanded", "false");
-    window.releaseFocus?.(panelEl);
-    if (restoreFocus && !toggleEl.hidden) toggleEl.focus();
+    if (window.closeDialog) window.closeDialog(panelEl, () => {
+      if (restoreFocus && !toggleEl.hidden) toggleEl.focus({ preventScroll: true });
+    }); else {
+      panelEl.hidden = true;
+      window.releaseFocus?.(panelEl);
+      if (restoreFocus && !toggleEl.hidden) toggleEl.focus({ preventScroll: true });
+    }
   }
 
   function sendPatch(item, patch) {
-    if (!review) return false;
+    if (!review || review.status === "confirmed") return false;
     if (!transport.send({
       action: "updateItem",
+      meetingId: review.meetingId,
       reviewId: review.reviewId,
       itemId: item.id,
       kind: item.kind,
@@ -198,7 +206,7 @@ function createReviewPanel(transport) {
       setError("모든 항목을 확인하거나 제외해 주세요");
       return;
     }
-    if (!transport.send({ action: "confirmReview", reviewId: review.reviewId })) {
+    if (!transport.send({ action: "confirmReview", meetingId: review.meetingId, reviewId: review.reviewId })) {
       setError("앱 서버에 연결되지 않아 검토를 완료할 수 없습니다");
       return;
     }
@@ -207,7 +215,13 @@ function createReviewPanel(transport) {
 
   retryEl.addEventListener("click", () => {
     const notes = transport.getNotes?.() ?? "";
-    if (!transport.send({ action: "startReview", ...(notes.trim() ? { notes: notes.trim() } : {}) })) {
+    const meetingId = transport.getMeetingId() ?? review?.meetingId ?? null;
+    if (meetingId === null) {
+      setPanelState("error");
+      setError("검토할 회의를 먼저 선택해 주세요");
+      return;
+    }
+    if (!transport.send({ action: "startReview", meetingId, ...(notes.trim() ? { notes: notes.trim() } : {}) })) {
       setError("앱 서버에 연결되지 않아 다시 정리할 수 없습니다");
       return;
     }
@@ -220,7 +234,14 @@ function createReviewPanel(transport) {
   toggleEl.addEventListener("click", (ev) => {
     ev.stopPropagation();
     if (!review) {
-      if (!transport.send({ action: "startReview" })) {
+      const meetingId = transport.getMeetingId();
+      if (meetingId === null) {
+        setPanelState("error");
+        setError("검토할 회의를 먼저 선택해 주세요");
+        open(false);
+        return;
+      }
+      if (!transport.send({ action: "startReview", meetingId })) {
         setError("앱 서버에 연결되지 않아 회의록을 정리할 수 없습니다");
         return;
       }
@@ -241,16 +262,40 @@ function createReviewPanel(transport) {
 
   return {
     /** review 메시지 → 후보 카드. 두 번째 메시지는 이전 후보를 대체한다. */
-    applyReview(msg) {
+    applyReview(msg, options = {}) {
       const next = reviewPanelNormalizeReview(msg);
-      if (!next) return;
+      if (!next) return false;
       review = next;
       localState.clear();
       editingId = null;
       setError("");
       setPanelState("ready");
       render();
-      open();
+      if (options.openPanel !== false) open();
+      return true;
+    },
+    /** A meeting selection is authoritative, including the absence of a review. */
+    restoreMeeting(meetingId, snapshot) {
+      if (snapshot && snapshot.meetingId === meetingId) {
+        return this.applyReview(snapshot, { openPanel: false });
+      }
+      review = null;
+      localState.clear();
+      editingId = null;
+      setError("");
+      setPanelState("ready");
+      render();
+      close();
+      return false;
+    },
+    /** Hide stale candidates while a different meeting response is in flight. */
+    selectMeeting(meetingId) {
+      if (review?.meetingId === meetingId) return;
+      review = null;
+      localState.clear();
+      editingId = null;
+      render();
+      close();
     },
     /** 서버 status 텍스트로 로딩/실패 상태를 연다 (추출은 비동기다). */
     applyStatus(text) {
@@ -272,7 +317,7 @@ function createReviewPanel(transport) {
     },
     /** 소켓 개폐에 따라 확정 버튼 가용성을 되맞춘다. */
     syncTransport() {
-      confirmEl.disabled = !canConfirmReview() || !transport.isOpen();
+      confirmEl.disabled = review?.status === "confirmed" || !canConfirmReview() || !transport.isOpen();
     },
   };
 }
