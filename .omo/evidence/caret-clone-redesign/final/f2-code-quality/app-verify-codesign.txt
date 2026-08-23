@@ -1,0 +1,5 @@
+$ scripts/verify-app.sh
+OK bundle verified: /Users/hyunjun/Applications/Meeting Slides.app
+VERIFY_EXIT_STATUS=0
+$ codesign --verify --deep --strict "$HOME/Applications/Meeting Slides.app"
+CODESIGN_EXIT_STATUS=0

@@ -1,0 +1,4 @@
+$ # MUTATION 2: removed the "meetings" arm from the exhaustive server-message switch
+$ bunx tsc -p tsconfig.task7.json
+public/ui-state-machine.ts(531,17): error TS2322: Type '{ readonly kind: "server"; readonly message: "meetings"; readonly count: number; }' is not assignable to type 'never'.
+exit=2

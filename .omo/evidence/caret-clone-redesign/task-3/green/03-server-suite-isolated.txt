@@ -1,0 +1,39 @@
+=== isolated reruns of the two server suites (my files not loaded) ===
+--- tests/server-handler-map.test.ts alone ---
+48 |       LLM_CLI_PRESET: "claude",
+49 |       WHISPER_INPUT_MODE: "mic",
+50 |     },
+51 |   });
+52 | 
+53 |   expect(result.status, result.stderr).toBe(0);
+                                            ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/server-handler-map.test.ts:53:40)
+(fail) the real WS registry contains executable handlers for every existing action [5003.62ms]
+  ^ this test timed out after 5000ms.
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [5.03s]
+
+--- direct server boot probe ---
+/bin/bash: timeout: command not found
+--- direct server boot probe (10s budget) ---
+import error: utils.inherits is not a function. (In 'utils.inherits(Utf8DecodeWorker, GenericWorker)', 'utils.inherits' is undefined)
+probe exit: 0
+
+--- root cause: server.ts import fails on a transitive dependency ---
+error: utils.inherits is not a function (jszip Utf8DecodeWorker / GenericWorker)
+412: * side effects. Inspired by nodejs' `utils.inherits`
+416:exports.inherits = function (ctor, superCtor) {
+jszip 3.10.1
+
+--- is server.ts import failure caused by this task? NO ---
+server.ts is dirty from unrelated pre-existing work (5 deletions, see 02-preexisting-failures.txt).
+This task added no dependency, no import, and did not touch server.ts (hash verified in cleanup/01-source-restoration.txt).
+server-ws-dispatch and server-handler-map both spawn/import server.ts and therefore time out for this reason.

@@ -1,0 +1,6 @@
+$ bun run scripts/build-public-modules.ts --check
+ok      public/generated/ui-state-machine.js
+ok      public/generated/transcript-state.js
+
+All generated artifacts match their sources.
+EXIT_STATUS=0

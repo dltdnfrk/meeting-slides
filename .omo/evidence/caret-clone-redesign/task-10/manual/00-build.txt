@@ -1,0 +1,2 @@
+build dir: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/tmp.e0JEAevy81
+compile exit=0

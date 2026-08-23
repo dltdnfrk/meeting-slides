@@ -1,0 +1,18 @@
+stopCapture frames: 2
+state: {
+ "connection": "connected",
+ "connectionState": "online",
+ "capturePhase": "capturing",
+ "uiState": "capture-live",
+ "shell": "live",
+ "capturing": true,
+ "captureTimerText": "02:05",
+ "liveTimerText": "02:05",
+ "recordPressed": "true",
+ "transcriptTexts": [],
+ "transcriptLineCount": 0,
+ "captionText": "녹음 중 02:05",
+ "selectedMeetingTitle": null,
+ "selectedMeetingIds": [],
+ "meetingTitles": [
+  

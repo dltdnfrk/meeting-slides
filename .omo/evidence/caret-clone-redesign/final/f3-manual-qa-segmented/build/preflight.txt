@@ -1,0 +1,11 @@
+timestamp=2026-08-12T05:15:18Z
+canonical_root=/Users/hyunjun/Documents/MUNI/meeting-slides
+marker_before=/Users/hyunjun/Documents/MUNI/meeting-slides
+defaults_before={     height = 56;     width = 360;     x = 3477;     y = 72; } 
+user_db_hashes_before:
+99de34b89ef3ff0be5d87e8e8c5a92ed08b8839047d23a5069dc907ebc6256f5  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings 2.db
+f477e5116410c1682336f2315d3f2c85a9462f6fa86511de921c8730ff84c5a5  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings 2.db-shm
+3ecb66dc8f04a105f8991754cec2238770f41b7f87eae5fbe6d4d1453bdc4ae2  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings 2.db-wal
+24744ca540901c875784e3e8a3808343e2ea6e84a66301eac14779fc13260806  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings.db
+2f28a9abc88037a66fd89375e8bc250ad7ef787195a2e1242646a9a460a52d9e  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings.db-shm
+1bb6f41e4f260aacffe6a06745b1a28c384c0f7757eba496d930b2549d2bc0dc  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings.db-wal

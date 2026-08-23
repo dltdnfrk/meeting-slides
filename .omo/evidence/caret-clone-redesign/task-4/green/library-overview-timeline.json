@@ -1,0 +1,45 @@
+{
+  "timeline": [
+    {
+      "awaitState": "capture:idle",
+      "triggerKind": "message",
+      "subscribedAtSeq": 1,
+      "triggeredAtSeq": 2,
+      "harnessSentBefore": 140,
+      "harnessSentAfter": 141,
+      "pageTriggeredOrdinal": null
+    },
+    {
+      "awaitState": "meetings:listed",
+      "triggerKind": "message",
+      "subscribedAtSeq": 3,
+      "triggeredAtSeq": 4,
+      "harnessSentBefore": 141,
+      "harnessSentAfter": 142,
+      "pageTriggeredOrdinal": null
+    },
+    {
+      "awaitState": "meeting:selected",
+      "triggerKind": "click",
+      "subscribedAtSeq": 5,
+      "triggeredAtSeq": 6,
+      "harnessSentBefore": 142,
+      "harnessSentAfter": 142,
+      "pageArmedOrdinal": 3,
+      "pageTriggeredOrdinal": 4
+    },
+    {
+      "awaitState": "meeting:loaded",
+      "triggerKind": "message",
+      "subscribedAtSeq": 7,
+      "triggeredAtSeq": 8,
+      "harnessSentBefore": 142,
+      "harnessSentAfter": 143,
+      "pageArmedOrdinal": 5,
+      "pageTriggeredOrdinal": null
+    }
+  ],
+  "clientActions": [
+    "selectMeeting"
+  ]
+}

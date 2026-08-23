@@ -1,0 +1,348 @@
+{
+  "generatedBy": ".omo/evidence/caret-clone-redesign/task-16/manual/qa-driver.ts",
+  "clockEpochMs": 1710376860000,
+  "serverStartedAt": 1710376735000,
+  "viewport": {
+    "width": 1244,
+    "height": 836,
+    "deviceScaleFactor": 1
+  },
+  "swiftDriverCompileExit": 0,
+  "steps": [
+    {
+      "step": "01-idle-hydrated",
+      "browser": {
+        "capturePhase": "idle",
+        "shell": "library",
+        "capturing": false,
+        "timer": "00:00",
+        "transcriptLines": 0,
+        "selectedMeetingIds": [],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "idle",
+        "capturePhase": "idle",
+        "timer": null,
+        "glyph": "○",
+        "title": "대기 중",
+        "lines": [],
+        "stopEnabled": false,
+        "connection": "online"
+      },
+      "capturePhaseOwnsTimer": false,
+      "timersAgree": false
+    },
+    {
+      "step": "02-capturing",
+      "browser": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "capturing": true,
+        "timer": "02:05",
+        "transcriptLines": 0,
+        "selectedMeetingIds": [],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "live",
+        "capturePhase": "capturing",
+        "timer": "02:05",
+        "glyph": "●",
+        "title": "녹음 중",
+        "lines": [],
+        "stopEnabled": true,
+        "connection": "online"
+      },
+      "capturePhaseOwnsTimer": true,
+      "timersAgree": true
+    },
+    {
+      "step": "03-live-transcript",
+      "browser": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "capturing": true,
+        "timer": "02:05",
+        "transcriptLines": 3,
+        "selectedMeetingIds": [],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "live",
+        "capturePhase": "capturing",
+        "timer": "02:05",
+        "glyph": "●",
+        "title": "녹음 중",
+        "lines": [
+          {
+            "text": "첫 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "두 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "세 번째 문장입니다",
+            "provisional": false
+          }
+        ],
+        "stopEnabled": true,
+        "connection": "online"
+      },
+      "capturePhaseOwnsTimer": true,
+      "timersAgree": true
+    },
+    {
+      "step": "04-native-disconnected",
+      "browser": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "capturing": true,
+        "timer": "02:05",
+        "transcriptLines": 3,
+        "selectedMeetingIds": [],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "reconnecting",
+        "capturePhase": "capturing",
+        "timer": "02:05",
+        "glyph": "↻",
+        "title": "연결 끊김 — 재연결 중",
+        "lines": [
+          {
+            "text": "첫 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "두 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "세 번째 문장입니다",
+            "provisional": false
+          }
+        ],
+        "stopEnabled": false,
+        "connection": "reconnecting"
+      },
+      "capturePhaseOwnsTimer": true,
+      "timersAgree": true
+    },
+    {
+      "step": "05-native-reconnected",
+      "browser": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "capturing": true,
+        "timer": "02:05",
+        "transcriptLines": 3,
+        "selectedMeetingIds": [],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "live",
+        "capturePhase": "capturing",
+        "timer": "02:05",
+        "glyph": "●",
+        "title": "녹음 중",
+        "lines": [
+          {
+            "text": "첫 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "두 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "세 번째 문장입니다",
+            "provisional": false
+          }
+        ],
+        "stopEnabled": true,
+        "connection": "online"
+      },
+      "capturePhaseOwnsTimer": true,
+      "timersAgree": true
+    },
+    {
+      "step": "06-browser-reloaded",
+      "browser": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "capturing": true,
+        "timer": "02:05",
+        "transcriptLines": 3,
+        "selectedMeetingIds": [],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "live",
+        "capturePhase": "capturing",
+        "timer": "02:05",
+        "glyph": "●",
+        "title": "녹음 중",
+        "lines": [
+          {
+            "text": "첫 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "두 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "세 번째 문장입니다",
+            "provisional": false
+          }
+        ],
+        "stopEnabled": true,
+        "connection": "online"
+      },
+      "capturePhaseOwnsTimer": true,
+      "timersAgree": true
+    },
+    {
+      "step": "07-stopping",
+      "browser": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "capturing": true,
+        "timer": "02:05",
+        "transcriptLines": 3,
+        "selectedMeetingIds": [],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "stopping",
+        "capturePhase": "stopping",
+        "timer": "02:05",
+        "glyph": "◼",
+        "title": "녹음 종료 중",
+        "lines": [
+          {
+            "text": "첫 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "두 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "세 번째 문장입니다",
+            "provisional": false
+          }
+        ],
+        "stopEnabled": false,
+        "connection": "online"
+      },
+      "capturePhaseOwnsTimer": true,
+      "timersAgree": true
+    },
+    {
+      "step": "08-trailing-line",
+      "browser": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "capturing": true,
+        "timer": "02:05",
+        "transcriptLines": 4,
+        "selectedMeetingIds": [],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "stopping",
+        "capturePhase": "stopping",
+        "timer": "02:05",
+        "glyph": "◼",
+        "title": "녹음 종료 중",
+        "lines": [
+          {
+            "text": "두 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "세 번째 문장입니다",
+            "provisional": false
+          },
+          {
+            "text": "마지막 정리 문장입니다",
+            "provisional": false
+          }
+        ],
+        "stopEnabled": false,
+        "connection": "online"
+      },
+      "capturePhaseOwnsTimer": true,
+      "timersAgree": true
+    },
+    {
+      "step": "09-idle-restored",
+      "browser": {
+        "capturePhase": "idle",
+        "shell": "library",
+        "capturing": false,
+        "timer": "02:05",
+        "transcriptLines": 4,
+        "selectedMeetingIds": [
+          "7"
+        ],
+        "connection": "connected"
+      },
+      "native": {
+        "status": "idle",
+        "capturePhase": "idle",
+        "timer": null,
+        "glyph": "○",
+        "title": "대기 중",
+        "lines": [],
+        "stopEnabled": false,
+        "connection": "online"
+      },
+      "capturePhaseOwnsTimer": false,
+      "timersAgree": false
+    }
+  ],
+  "commands": [
+    {
+      "label": "browser",
+      "raw": "{\"action\":\"listMeetings\"}"
+    },
+    {
+      "label": "browser",
+      "raw": "{\"action\":\"attendees\"}"
+    },
+    {
+      "label": "browser",
+      "raw": "{\"action\":\"startCapture\"}"
+    },
+    {
+      "label": "browser",
+      "raw": "{\"action\":\"listMeetings\"}"
+    },
+    {
+      "label": "browser",
+      "raw": "{\"action\":\"listMeetings\"}"
+    },
+    {
+      "label": "browser",
+      "raw": "{\"action\":\"attendees\"}"
+    },
+    {
+      "label": "browser",
+      "raw": "{\"action\":\"selectMeeting\",\"meetingId\":7}"
+    }
+  ],
+  "timersAgreeWhileCaptureOwned": true,
+  "idleStepsWhereSurfacesDifferByDesign": [
+    "01-idle-hydrated",
+    "09-idle-restored"
+  ],
+  "stopCaptureCommands": 0,
+  "selectMeetingCommands": [
+    "{\"action\":\"selectMeeting\",\"meetingId\":7}"
+  ]
+}

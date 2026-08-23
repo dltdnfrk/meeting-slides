@@ -1,0 +1,81 @@
+== UNRELATED PRE-EXISTING FULL-SUITE FAILURES ==
+Recorded, NOT fixed. Out of scope for Todo 5 (native test seam).
+Source: green/03-full-bun-test.txt (bun test -> 370 pass / 36 fail / 6 errors, 406 tests, 61 files, 624s)
+
+-- attribution --
+Task 5 created 3 new files and modified ZERO existing tracked files.
+The seam suite is 31/31 pass inside that same full run.
+tests/public-shell.test.ts fails identically with the seam test file removed (see 05-failure-attribution.txt).
+Failing suites are Puppeteer/browser and native-render suites owned by concurrently running Wave-1 sibling tasks.
+
+-- failing test names (verbatim from the full run) --
+97:(fail) 라이브 MeetingCard 렌더 > 히스토리 미리보기에서도 같은 카드 레이아웃을 쓴다
+118:(fail) semantic scene compile action > publishes HTML, Scene JSON, and native PPTX from one narrative plan
+131:(fail) semantic scene compile action > success message includes the generated scene so the app can preview every slide
+151:(fail) semantic scene compile action > invalid planner output falls back to prose scenes instead of bullet slides
+171:(fail) semantic scene compile action > compile uses the exact transcript snapshot captured before planning starts
+191:(fail) fallback narrative drops trailing chatter and caps slide count
+295:(fail) 전사 패널 다중 모서리 리사이즈 > 기본 상태에서는 카드가 패널 전체 높이를 쓴다
+305:(fail) 전사 패널 다중 모서리 리사이즈 > 키보드 Arrow/Home/End가 두 높이 그립과 ARIA 현재값을 동기화한다
+319:(fail) 전사 패널 다중 모서리 리사이즈 > 서(W) 드래그: 스플리터가 전사 폭을 넓힌다
+333:(fail) 전사 패널 다중 모서리 리사이즈 > 남(S) 드래그: 카드 높이만 줄고 폭은 그대로다
+347:(fail) 전사 패널 다중 모서리 리사이즈 > 남서(SW) 드래그: 높이와 폭이 함께 바뀐다
+361:(fail) 전사 패널 다중 모서리 리사이즈 > 높이가 workspace.transcript.v1에 남고 새로고침 후 복원된다
+379:(fail) 전사 패널 다중 모서리 리사이즈 > 저장값이 손상돼도 카드가 패널을 꽉 채운 기본으로 뜬다
+402:(fail) event-before-trigger synchronization > a slide emitted before the subscribed capture state fails with a named bounded timeout
+483:(fail) (unnamed)
+523:(fail) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved
+546:(fail) pre-capture attendee registration form > capture is never hard-gated on attendees
+569:(fail) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture
+597:(fail) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id
+627:(fail) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches
+660:(fail) the real WS registry contains executable handlers for every existing action
+689:(fail) recorder startup failure leaves capture stopped and never launches whisper
+713:(fail) (unnamed)
+844:(fail) native PPTX scene renderer > writes editable OOXML text and shapes from the shared scene
+918:(fail) (unnamed)
+955:(fail) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content
+970:(fail) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout
+984:(fail) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection
+1013:(fail) generic chat transport > HTTP sends user-only message with defaults and no response_format
+1032:(fail) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection
+1046:(fail) generic chat transport > CLI chat honors options.timeoutMs override
+1049:(fail) (unnamed)
+1123:(fail) 라이브 MeetingCard 렌더 > 히스토리 미리보기에서도 같은 카드 레이아웃을 쓴다
+1124:(fail) semantic scene compile action > publishes HTML, Scene JSON, and native PPTX from one narrative plan
+1125:(fail) semantic scene compile action > success message includes the generated scene so the app can preview every slide
+1126:(fail) semantic scene compile action > invalid planner output falls back to prose scenes instead of bullet slides
+1127:(fail) semantic scene compile action > compile uses the exact transcript snapshot captured before planning starts
+1128:(fail) fallback narrative drops trailing chatter and caps slide count
+1129:(fail) 전사 패널 다중 모서리 리사이즈 > 기본 상태에서는 카드가 패널 전체 높이를 쓴다
+1130:(fail) 전사 패널 다중 모서리 리사이즈 > 키보드 Arrow/Home/End가 두 높이 그립과 ARIA 현재값을 동기화한다
+1131:(fail) 전사 패널 다중 모서리 리사이즈 > 서(W) 드래그: 스플리터가 전사 폭을 넓힌다
+1132:(fail) 전사 패널 다중 모서리 리사이즈 > 남(S) 드래그: 카드 높이만 줄고 폭은 그대로다
+1133:(fail) 전사 패널 다중 모서리 리사이즈 > 남서(SW) 드래그: 높이와 폭이 함께 바뀐다
+1134:(fail) 전사 패널 다중 모서리 리사이즈 > 높이가 workspace.transcript.v1에 남고 새로고침 후 복원된다
+1135:(fail) 전사 패널 다중 모서리 리사이즈 > 저장값이 손상돼도 카드가 패널을 꽉 채운 기본으로 뜬다
+1136:(fail) event-before-trigger synchronization > a slide emitted before the subscribed capture state fails with a named bounded timeout
+1138:(fail) (unnamed)
+1140:(fail) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved
+1141:(fail) pre-capture attendee registration form > capture is never hard-gated on attendees
+1142:(fail) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture
+1143:(fail) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id
+1144:(fail) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches
+1145:(fail) the real WS registry contains executable handlers for every existing action
+1146:(fail) recorder startup failure leaves capture stopped and never launches whisper
+1147:(fail) (unnamed)
+1149:(fail) native PPTX scene renderer > writes editable OOXML text and shapes from the shared scene
+1150:(fail) (unnamed)
+1152:(fail) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content
+1153:(fail) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout
+1154:(fail) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection
+1155:(fail) generic chat transport > HTTP sends user-only message with defaults and no response_format
+1156:(fail) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection
+1157:(fail) generic chat transport > CLI chat honors options.timeoutMs override
+1158:(fail) (unnamed)
+
+-- hook-timeout / error entries --
+hook_timeouts=8
+
+-- seam suite result inside the same full run --
+pass=31  fail=0

@@ -1,0 +1,10 @@
+{
+  "viewports": 6,
+  "allFontsReady": true,
+  "totalExternalRequests": 0,
+  "maxRootOverflow": 0,
+  "reducedMotion": {
+    "transitionDuration": "0s",
+    "animationDuration": "0s"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "CGPreflightScreenCaptureAccess" : true,
+  "note" : "Without a Screen Recording grant, SCK returns redacted content: windows are enumerated but titles and pixels of other processes are withheld.",
+  "sckApplicationCount" : 5,
+  "sckError" : null,
+  "sckWindowCount" : 15,
+  "sckWindowsWithTitle" : 10
+}

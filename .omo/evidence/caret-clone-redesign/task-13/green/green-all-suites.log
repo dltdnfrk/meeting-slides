@@ -1,0 +1,560 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-library.test.ts:
+(pass) browser-valid reducer artifacts > every reducer source has a committed, non-drifting generated artifact [7.55ms]
+(pass) browser-valid reducer artifacts > rebuilding into a clean directory reproduces byte-identical artifacts [1.70ms]
+(pass) browser-valid reducer artifacts > a mutated source is detected as drift rather than silently shipped [2.57ms]
+(pass) browser-valid reducer artifacts > generated artifacts are served as executable JavaScript, never octet-stream [2.41ms]
+(pass) browser-valid reducer artifacts > the shipped page really evaluates the reducers - no dead TypeScript seam [88.49ms]
+(pass) document-centric library frame > 1244x836 shows one meetings rail and exactly one document surface [152.65ms]
+(pass) document-centric library frame > Overview and Transcript never coexist: exactly one panel is perceivable [161.28ms]
+(pass) document-centric library frame > no redundant centre detail panel duplicates the document surface [146.72ms]
+(pass) detail tabs are a real tablist > tablist, tab and tabpanel roles are complete and cross-linked [140.06ms]
+(pass) detail tabs are a real tablist > ArrowRight, ArrowLeft, Home and End move selection and focus [167.31ms]
+(pass) detail tabs are a real tablist > document body text meets the WCAG AA contrast floor on its real surface [160.63ms]
+(pass) detail tabs are a real tablist > every tab is keyboard reachable and paints a visible focus ring [145.01ms]
+(pass) meeting selection refreshes the single document surface > selecting another meeting replaces the document content [194.83ms]
+(pass) meeting selection refreshes the single document surface > a stale meeting payload arriving after a newer selection is ignored [200.15ms]
+(pass) meeting selection refreshes the single document surface > initial hydration shows no stale slide or transcript content [90.72ms]
+(pass) real note and transcript data survive the rebuild > typing a note reaches #notes-input and is sent with its contracted action [172.74ms]
+(pass) real note and transcript data survive the rebuild > transcript history renders finalized lines with speaker and time metadata [150.27ms]
+(pass) library empty, loading, error and reconnect states > an empty library explains itself and keeps the record action [86.41ms]
+(pass) library empty, loading, error and reconnect states > connection state is explicit and survives a reconnect without losing content [148.95ms]
+(pass) library empty, loading, error and reconnect states > a malformed server frame is dropped without disturbing the shell [146.14ms]
+(pass) explicit state attributes and preserved binding contracts > the shell exposes every contracted state attribute [138.46ms]
+(pass) explicit state attributes and preserved binding contracts > .app--capturing still tracks the authoritative capture phase [146.45ms]
+(pass) explicit state attributes and preserved binding contracts > Stop and the timer stay visible and enabled through all three live phases [151.14ms]
+(pass) explicit state attributes and preserved binding contracts > no fake event, folder or share controls exist in the library shell [171.44ms]
+(pass) library shell across the canonical viewport matrix > no root overflow and one document surface at every matrix width [1038.50ms]
+(pass) library shell across the canonical viewport matrix > the document surface and slide frame stay usable at every matrix width [1006.46ms]
+(pass) library shell across the canonical viewport matrix > Notes stays visible, sized and focusable at every matrix width [1033.55ms]
+(pass) library shell across the canonical viewport matrix > no visible label is clipped or truncated at any matrix width [958.44ms]
+(pass) library shell across the canonical viewport matrix > no dock control is clipped or truncated at any matrix width [1043.29ms]
+(pass) library shell across the canonical viewport matrix > the meetings rail stays reachable at 320x667 without clipping controls [142.20ms]
+(pass) determinism guards > the library shell issues no off-origin request [91.32ms]
+(pass) determinism guards > this suite contains no sleep or polling wait [1.04ms]
+
+tests/public-caret-context.test.ts:
+(pass) Todo 13 · every binding ID keeps exactly one home > library: each of the 35 binding IDs resolves to exactly one element [122.01ms]
+(pass) Todo 13 · every binding ID keeps exactly one home > live: each of the 35 binding IDs resolves to exactly one element [110.83ms]
+(pass) Todo 13 · DESIGN 9.11 capability placement > library with a meeting selected: the Ask entry is open, not buried in a disclosure [106.78ms]
+(pass) Todo 13 · DESIGN 9.11 capability placement > library: the export set is behind ONE disclosure, not a permanent wall [91.31ms]
+(pass) Todo 13 · DESIGN 9.11 capability placement > live: compile and export are behind a disclosure; Stop and the timer are not [97.12ms]
+(pass) Todo 13 · DESIGN 9.11 capability placement > every capability is reachable once its own disclosure is opened, in both shells [222.20ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 1440x900: library action surface stays under two fifths of the viewport [108.20ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 1244x836: library action surface stays under two fifths of the viewport [96.31ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 1100x800: library action surface stays under two fifths of the viewport [96.89ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 960x760: library action surface stays under two fifths of the viewport [85.63ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 900x760: library action surface stays under two fifths of the viewport [94.86ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 899x760: library action surface stays under two fifths of the viewport [100.67ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 820x900: library action surface stays under two fifths of the viewport [92.81ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 375x812: library action surface stays under two fifths of the viewport [91.58ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 320x667: library action surface stays under two fifths of the viewport [90.54ms]
+(pass) Todo 13 · the disclosure state belongs to the user > a set opened during `starting` is still open after `capturing` arrives [92.24ms]
+(pass) Todo 13 · the disclosure state belongs to the user > a set closed in the library stays closed across repeated meeting selections [93.42ms]
+(pass) Todo 13 · the disclosure state belongs to the user > crossing the shell boundary applies the shell's own default exactly once [114.86ms]
+(pass) Todo 13 · panels are real dialogs > #provider-panel: dialog role + accessible name, Escape closes, focus returns to #btn-settings [130.98ms]
+(pass) Todo 13 · panels are real dialogs > #attendee-panel: dialog role + accessible name, Escape closes, focus returns to #btn-attendees [116.63ms]
+(pass) Todo 13 · panels are real dialogs > #ask-panel: dialog role + accessible name, Escape closes, focus returns to #btn-ask [105.40ms]
+(pass) Todo 13 · disabled controls carry their exact machine reason > a disconnected client disables the gated set and states why in title AND aria-label [83.86ms]
+(pass) Todo 13 · disabled controls carry their exact machine reason > Ask states its gate reason in title AND aria-label while no meeting is selected [94.49ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > compile, export, save and reset emit their existing action names [109.28ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > reset emits `reset` from the library, where it is truthfully enabled [150.84ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > Ask sends `ask` with the frozen `meetingId` payload key [158.25ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > repeated compile activation while a job is in flight emits exactly one action [114.70ms]
+(pass) Todo 13 · narrow widths keep real target sizes > 375x812: every painted action meets the 44px target [85.74ms]
+(pass) Todo 13 · narrow widths keep real target sizes > 320x667: every painted action meets the 44px target [86.99ms]
+(pass) Todo 13 · narrow widths keep real target sizes > 375x812 library: every painted shell control passes a real 44px edge-band hit test [83.63ms]
+(pass) Todo 13 · narrow widths keep real target sizes > 375x812 live: every painted shell control passes a real 44px edge-band hit test [88.60ms]
+(pass) Todo 13 · narrow widths keep real target sizes > 320x667 library: every painted shell control passes a real 44px edge-band hit test [72.62ms]
+(pass) Todo 13 · narrow widths keep real target sizes > 320x667 live: every painted shell control passes a real 44px edge-band hit test [94.86ms]
+(pass) Todo 13 · exactly one Stop and one timer > 1244 starting: one perceivable Stop and one perceivable timer [87.79ms]
+(pass) Todo 13 · exactly one Stop and one timer > 1244 capturing: one perceivable Stop and one perceivable timer [96.34ms]
+(pass) Todo 13 · exactly one Stop and one timer > 1244 stopping: one perceivable Stop and one perceivable timer [95.50ms]
+(pass) Todo 13 · exactly one Stop and one timer > 375 starting: one perceivable Stop and one perceivable timer [89.56ms]
+(pass) Todo 13 · exactly one Stop and one timer > 375 capturing: one perceivable Stop and one perceivable timer [83.99ms]
+(pass) Todo 13 · exactly one Stop and one timer > 375 stopping: one perceivable Stop and one perceivable timer [95.62ms]
+(pass) Todo 13 · exactly one Stop and one timer > 320 starting: one perceivable Stop and one perceivable timer [86.54ms]
+(pass) Todo 13 · exactly one Stop and one timer > 320 capturing: one perceivable Stop and one perceivable timer [83.92ms]
+(pass) Todo 13 · exactly one Stop and one timer > 320 stopping: one perceivable Stop and one perceivable timer [81.85ms]
+(pass) Todo 13 · exactly one Stop and one timer > reconnect during capture still shows exactly one Stop and one timer [83.76ms]
+(pass) Todo 13 · exactly one Stop and one timer > a compile job in flight never adds a second Stop or timer [99.33ms]
+(pass) Todo 13 · exactly one Stop and one timer > the library restores #btn-record as its capture control, with no live Stop [89.01ms]
+(pass) Todo 13 · the capture control states its own gate reason > #btn-record carries the exact reason in title AND aria-label when disconnected [83.24ms]
+(pass) Todo 13 · the output switcher reveals, never duplicates > each switcher item targets a distinct existing surface and creates no second slide [96.41ms]
+
+tests/ui-state-machine.test.ts:
+(pass) current public/app.js visible state seams > capture visibility is a bare mutable boolean, not a named state [0.14ms]
+(pass) current public/app.js visible state seams > hydration, selection, preview and job seams are separate mutable flags [0.10ms]
+(pass) current public/app.js visible state seams > connection is projected onto a data attribute with four literal values [0.10ms]
+(pass) current public/app.js visible state seams > stale job and stale meeting responses are dropped inline, per call site [0.06ms]
+(pass) current public/app.js visible state seams > malformed frames are swallowed by a catch that only logs [0.03ms]
+(pass) reducer purity > uses no DOM, clock, network, storage or global ambient value [0.11ms]
+(pass) reducer purity > declares no `any` and no unsafe cast [0.24ms]
+(pass) reducer purity > does not mutate the state it is given [0.29ms]
+(pass) reducer purity > initial state is startup and is a fresh value each call [0.02ms]
+(pass) parse boundary > accepts every server message type the protocol declares [0.42ms]
+(pass) parse boundary > rejects null as a typed failure [0.03ms]
+(pass) parse boundary > rejects undefined as a typed failure
+(pass) parse boundary > rejects string as a typed failure
+(pass) parse boundary > rejects number as a typed failure
+(pass) parse boundary > rejects array as a typed failure
+(pass) parse boundary > rejects missing type as a typed failure [0.01ms]
+(pass) parse boundary > rejects numeric type as a typed failure
+(pass) parse boundary > rejects unknown type as a typed failure
+(pass) parse boundary > rejects capture without capturing as a typed failure
+(pass) parse boundary > rejects capture with non-boolean capturing as a typed failure
+(pass) parse boundary > rejects capture with unknown phase as a typed failure
+(pass) parse boundary > rejects meeting without meetingId as a typed failure
+(pass) parse boundary > rejects meetings without items as a typed failure
+(pass) parse boundary > rejects compile without status as a typed failure
+(pass) parse boundary > rejects compile with unknown status as a typed failure
+(pass) parse boundary > a rejected frame never reaches the reducer and never changes state [0.05ms]
+(pass) canonical states > every state in the contract is reachable from startup [0.27ms]
+(pass) canonical states > state name is always consistent with the capture and shell projection [0.08ms]
+(pass) canonical states > reduce is exhaustive: every event kind is handled from every state [0.32ms]
+(pass) capture lifecycle > happy path: activate → starting → live → stop → stopping → idle [0.05ms]
+(pass) capture lifecycle > start emits exactly one startCapture no matter how often it is activated [0.05ms]
+(pass) capture lifecycle > stop emits exactly one stopCapture from every server-confirmed capture substate [0.08ms]
+(pass) capture lifecycle > a start the server has not confirmed can neither restart nor stop [0.03ms]
+(pass) capture lifecycle > startCapture carries the wire spelling meeting_id and nothing else [0.01ms]
+(pass) capture lifecycle > startCapture omits meeting_id when no meeting is prepared [0.01ms]
+(pass) capture lifecycle > stopCapture carries no payload [0.01ms]
+(pass) capture lifecycle > Stop stays truthful: a stop request alone never claims capture ended [0.02ms]
+(pass) capture lifecycle > start failure moves to capture-error and clears the pending request [0.02ms]
+(pass) capture lifecycle > a stale capture error is cleared by the next authoritative capture snapshot [0.02ms]
+(pass) capture lifecycle > capture-error is also clearable by an explicit dismissal [0.01ms]
+(pass) capture lifecycle > activating capture from capture-error retries once and clears the error [0.01ms]
+(pass) capture lifecycle > phase-less capture messages map compatibly [0.02ms]
+(pass) capture lifecycle > capture timer origin comes only from the server startedAt payload [0.01ms]
+(pass) capture lifecycle > switching-model is a capture phase, not a hidden idle [0.01ms]
+(pass) connection and restore > startup hydrates only after the first authoritative capture snapshot [0.02ms]
+(pass) connection and restore > pre-hydration slide and transcript frames are ignored
+(pass) connection and restore > transport loss during capture enters reconnect and preserves capture [0.02ms]
+(pass) connection and restore > reconnect restores the exact capture substate the server reports [0.02ms]
+(pass) connection and restore > reconnect that returns an idle server is honoured, not overridden by the old capture [0.02ms]
+(pass) connection and restore > reconnect during a pending stop keeps the stop pending and re-sends it once [0.02ms]
+(pass) connection and restore > reconnect from every capture substate is deterministic [0.05ms]
+(pass) connection and restore > capture activation is refused while the transport is not online [0.04ms]
+(pass) connection and restore > transport error surfaces a typed error without inventing an idle capture [0.01ms]
+(pass) connection and restore > no state below `online` is ever named as a settled surface [0.04ms]
+(pass) connection and restore > an authoritative snapshot after a transport error restores the online surface [0.02ms]
+(pass) connection and restore > a transport error is cleared once the socket is online again [0.02ms]
+(pass) meeting selection and preview > selecting a meeting enters meeting-switching and emits selectMeeting [0.01ms]
+(pass) meeting selection and preview > the matching detail resolves the switch, an out-of-order one does not [0.02ms]
+(pass) meeting selection and preview > rapid selection keeps only the newest request and one action per selection [0.05ms]
+(pass) meeting selection and preview > re-selecting the meeting already in flight does not re-emit [0.01ms]
+(pass) meeting selection and preview > returning to the library clears the selection [0.01ms]
+(pass) meeting selection and preview > history preview suspends live follow and exits back to the live state [0.02ms]
+(pass) meeting selection and preview > preview survives live slide traffic and ends on authoritative idle [0.02ms]
+(pass) meeting selection and preview > idle-live is the just-ended meeting shell, distinct from the library [0.01ms]
+(pass) compile jobs > started → progress → success walks compile-running to compile-complete [0.04ms]
+(pass) compile jobs > a compile answer for a superseded job is ignored [0.02ms]
+(pass) compile jobs > compile failure records a typed error and releases the job [0.02ms]
+(pass) compile jobs > compile never blocks Stop [0.02ms]
+(pass) compile jobs > a compile job started before a reconnect is dropped, not left spinning [0.01ms]
+(pass) determinism > the same sequence yields byte-identical state five times [0.08ms]
+(pass) determinism > the visited state names are stable [0.03ms]
+(pass) determinism > reduceAll equals a manual fold [0.03ms]
+
+tests/public-caret-foundation.test.ts:
+(pass) bundled font assets are local, deterministic and license-audited > every declared asset exists with the exact recorded size and SHA-256 [2.63ms]
+(pass) bundled font assets are local, deterministic and license-audited > every shipped font file is covered by the manifest - no stray asset [0.78ms]
+(pass) bundled font assets are local, deterministic and license-audited > every asset carries an OFL receipt whose license file is present and hashed [6.32ms]
+(pass) bundled font assets are local, deterministic and license-audited > the foundation stylesheet declares only same-origin font sources [0.89ms]
+(pass) bundled font assets are local, deterministic and license-audited > the shipped document never links a remote font stylesheet [0.90ms]
+(pass) the token layer resolves deterministically in a real browser > document.fonts.ready settles with every bundled family resolved from disk [0.11ms]
+(pass) the token layer resolves deterministically in a real browser > zero external requests reach the network [0.05ms]
+(pass) the token layer resolves deterministically in a real browser > computed families come from the bundled stacks with system fallbacks retained [0.07ms]
+(pass) the token layer resolves deterministically in a real browser > every required semantic token is declared with a resolved value [0.06ms]
+(pass) the token layer resolves deterministically in a real browser > the spacing scale is a strict 4px grid and the type scale is monotonic [0.05ms]
+(pass) the token layer resolves deterministically in a real browser > the canvas is an opaque matte near-black, never a translucent glass pane [0.13ms]
+(pass) the token layer resolves deterministically in a real browser > main surfaces carry no backdrop blur; blur is reserved for overlays [0.03ms]
+(pass) the token layer resolves deterministically in a real browser > the accent is a restrained emerald and recording state is a distinct coral [0.04ms]
+(pass) declared roles satisfy WCAG contrast > body and muted text clear AA on the canvas and on the document surface [0.05ms]
+(pass) declared roles satisfy WCAG contrast > faint text is only used at large sizes and still clears the 3:1 large-text floor
+(pass) declared roles satisfy WCAG contrast > accent and record text roles clear AA where they carry meaning [0.03ms]
+(pass) declared roles satisfy WCAG contrast > strong rules and the focus ring clear the 3:1 non-text boundary floor [0.15ms]
+(pass) declared roles satisfy WCAG contrast > a focused control paints a visible ring rather than removing the outline [0.01ms]
+(pass) motion is bounded and reduced motion is complete > the motion budget stays within the reference envelope [0.07ms]
+(pass) motion is bounded and reduced motion is complete > under prefers-reduced-motion every token-driven duration collapses to zero [104.38ms]
+(pass) the foundation holds at every canonical viewport > reference 1440x900: fonts ready, tokens stable, no root overflow [114.41ms]
+(pass) the foundation holds at every canonical viewport > library 1244x836: fonts ready, tokens stable, no root overflow [0.05ms]
+(pass) the foundation holds at every canonical viewport > live 960x760: fonts ready, tokens stable, no root overflow [105.39ms]
+(pass) the foundation holds at every canonical viewport > stacked 820x900: fonts ready, tokens stable, no root overflow [100.39ms]
+(pass) the foundation holds at every canonical viewport > narrow 375x812: fonts ready, tokens stable, no root overflow [96.62ms]
+(pass) the foundation holds at every canonical viewport > compact 320x667: fonts ready, tokens stable, no root overflow [104.25ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > index.html still declares every unique binding id exactly once [2.44ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > the foundation stylesheet declares tokens and never rewrites shell structure [0.24ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > generated-slide renderer colors are not touched by the foundation [0.09ms]
+
+tests/public-operator-surface.test.ts:
+(pass) TIRO 기반 오퍼레이터 표면 > 중앙 슬라이드 계약과 필수 DOM ID를 한 번씩만 보존한다 [3.40ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 플로팅 도크가 녹음·파형·타이머와 3-way 출력을 품는다 [1.75ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 번역과 전사 편집은 서버 계약 사유를 노출한 채 비활성화된다 [0.83ms]
+(pass) TIRO 기반 오퍼레이터 표면 > capture 메시지가 녹음 버튼을 파형 상태로 전환한다 [6.62ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 3-way 출력에서 전체 전사를 선택하면 패널로 이동하고 현재 상태를 갱신한다 [56.67ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 1280·768·375에서 셸이 가로로 넘치지 않는다 [7.75ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 비활성 사유와 모바일 전사 본문이 잘리지 않는다 [5.45ms]
+(pass) TIRO 기반 오퍼레이터 표면 > caret dual shell exposes detail tabs and live compact mode [71.50ms]
+
+tests/public-review.test.ts:
+(pass) review panel shell > the panel mounts hidden and leaves the slide shell intact [51.86ms]
+(pass) review panel shell > capture is not hard-gated by the review panel [48.16ms]
+(pass) candidate cards > a review message renders one card per candidate with quote and version-scoped coordinates [26.25ms]
+(pass) candidate cards > every candidate carries the immutable transcript version id, not just a seq [26.51ms]
+(pass) candidate cards > a multi-line segment shows the joined evidence text of the whole range [34.04ms]
+(pass) candidate cards > action items surface deadline text alongside the normalized deadline [25.31ms]
+(pass) candidate cards > decisions and open items have no assignee control — only action items do [25.54ms]
+(pass) attendee dropdown attribution > attribution options come only from the review attendees, never free text [24.47ms]
+(pass) attendee dropdown attribution > the suggested attribution is preselected and a change sends updateItem [31.68ms]
+(pass) attendee dropdown attribution > assigning an action item sends updateItem with the assignee patch [28.78ms]
+(pass) attendee dropdown attribution > with no attendees the dropdowns are disabled and explain why [26.38ms]
+(pass) edit and drop controls > editing a description sends updateItem with the trimmed text [56.79ms]
+(pass) edit and drop controls > an empty edit is rejected without sending anything [55.83ms]
+(pass) edit and drop controls > dropping a candidate marks it rejected and sends the review_state patch [44.56ms]
+(pass) edit and drop controls > a dropped candidate can be restored to candidate state [48.33ms]
+(pass) confirm action > the actual browser flow confirms complete candidates, corrects an action deadline, then confirms the review [90.21ms]
+(pass) confirm action > the confirm button reports how many candidates will be kept [42.26ms]
+(pass) confirm action > a review with every candidate rejected remains confirmable [49.57ms]
+(pass) empty, error, and loading states > an empty candidate list shows the no-candidates notice and no cards [23.57ms]
+(pass) empty, error, and loading states > the extraction status message drives a loading state before the payload lands [28.77ms]
+(pass) empty, error, and loading states > an extraction failure status shows a retry affordance instead of stale cards [30.33ms]
+(pass) keyboard accessibility > Escape closes the panel and the toggle reopens it without refetching [34.64ms]
+(pass) keyboard accessibility > opening the panel moves focus into it and the toggle reflects expansion [25.38ms]
+(pass) keyboard accessibility > every control is reachable and labelled for assistive tech [31.33ms]
+(pass) keyboard accessibility > Enter on the drop control toggles it, so the panel is operable keyboard-only [29.47ms]
+(pass) reconnect and update handling > a second review message replaces the previous candidates rather than appending [53.24ms]
+(pass) reconnect and update handling > a dropped socket disables confirm and reconnect restores it [3073.41ms]
+(pass) reconnect and update handling > local edits survive a re-render triggered by an unrelated message [27.27ms]
+(pass) hostile payloads > markup in descriptions, quotes, and attendee names is escaped as text [24.93ms]
+(pass) hostile payloads > a malformed review payload is ignored without tearing down the shell [23.37ms]
+(pass) hostile payloads > a kind outside the updateItem wire contract is refused, not rendered as an actionable card [48.23ms]
+(pass) hostile payloads > items missing required evidence or source coordinates are refused rather than rendered uncited [20.18ms]
+
+tests/public-protocol-reliability.test.ts:
+(pass) public meeting/export protocol reliability > transcript uses its dedicated action and selected meeting target [69.96ms]
+(pass) public meeting/export protocol reliability > historical payload hydrates transcript, current/history slides and compiled selection [41.95ms]
+(pass) public meeting/export protocol reliability > typed progress disables conflicts and terminal error restores controls with retry [40.40ms]
+
+tests/public-caret-harness.test.ts:
+(pass) canonical fixture catalogue > covers every state named in the plan with unique ids [0.13ms]
+(pass) canonical fixture catalogue > every canonical viewport in the plan matrix is exercised by a real fixture [0.04ms]
+(pass) canonical fixture catalogue > every fixture step is a real trigger: a server message or a user interaction [0.11ms]
+(pass) canonical fixture catalogue > every fixture pins a canonical viewport, locale, timezone and fixed clock [0.04ms]
+(pass) canonical fixture catalogue > canonical viewports include the plan's browser matrix at deviceScaleFactor 1 [0.02ms]
+(pass) canonical fixture catalogue > fixture events are frozen server messages, never mutable current time [0.35ms]
+(pass) deterministic browser state capture > 1244x836 library fixture yields byte-identical machine JSON twice [235.56ms]
+(pass) deterministic browser state capture > 960x760 live fixture yields byte-identical machine JSON twice with a fixed timer [215.66ms]
+(pass) deterministic browser state capture > 1440x900 reference fixture yields byte-identical machine JSON and geometry twice [202.31ms]
+(pass) deterministic browser state capture > 820x900 stacked fixture yields byte-identical machine JSON and the stacked-state contract [209.32ms]
+(pass) deterministic browser state capture > locale, timezone, fonts and clock are pinned inside the page [109.53ms]
+(pass) deterministic browser state capture > no fixture reaches the network beyond the local harness origin [113.95ms]
+(pass) deterministic browser state capture > geometry is the deterministic artifact; screenshots are visual artifacts only [332.20ms]
+(pass) deterministic browser state capture > transcript, meetings, slides and job fixtures land deterministically [219.35ms]
+(pass) event-before-trigger synchronization > the driver subscribes before every message trigger [99.60ms]
+(pass) event-before-trigger synchronization > click-driven steps prove ordering with an in-page observable counter [116.56ms]
+(pass) event-before-trigger synchronization > a slide emitted before the subscribed capture state fails with a named bounded timeout [1592.68ms]
+(pass) event-before-trigger synchronization > the default state deadline stays below Bun's default test timeout [0.06ms]
+(pass) static determinism guards > harness, fixtures and driver never use sleep or polling wait APIs [1.06ms]
+(pass) static determinism guards > no QA driver under tests/helpers reintroduces a polling delay [0.49ms]
+
+tests/public-workspace.test.ts:
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 레일과 단일 문서 표면을 담고 전사는 탭으로 도달된다 [0.68ms]
+(pass) 워크스페이스 셸 구조 > 중앙 패널이 기존 시각 자료 무대를 그대로 품는다 [1.26ms]
+(pass) 워크스페이스 셸 구조 > 레일과 문서 표면이 가로로 나란히 놓이고 하단 도크가 보존된다 [41.90ms]
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 가로 오버플로 없이 뷰포트에 맞는다 [0.48ms]
+(pass) 워크스페이스 스플리터 > 스플리터가 자신이 나누는 패널 사이 DOM 순서에 놓인다 [108.16ms]
+(pass) 워크스페이스 스플리터 > 포커스 가능한 스플리터가 방향과 현재·최소·최대 폭을 노출한다 [107.16ms]
+(pass) 워크스페이스 스플리터 > 키보드 Arrow/Home/End가 레일 스플리터 폭과 ARIA 현재값을 동기화한다 [125.13ms]
+(pass) 워크스페이스 스플리터 > 라이브 셸에서 키보드가 전사 스플리터 폭과 ARIA 현재값을 동기화한다 [160.31ms]
+(pass) 워크스페이스 스플리터 > 좌 스플리터를 끌면 레일이 넓어지고 무대가 그만큼 줄어든다 [180.05ms]
+(pass) 워크스페이스 스플리터 > 라이브 셸에서 우 스플리터를 왼쪽으로 끌면 전사 패널이 넓어진다 [188.79ms]
+(pass) 워크스페이스 스플리터 > 라이브 셸에서 전사는 최소 폭 밑으로 접히지 않는다 [240.70ms]
+(pass) 워크스페이스 스플리터 > 라이브러리에서 레일은 최소 폭 밑으로 접히지 않는다 [208.52ms]
+(pass) 워크스페이스 스플리터 > 드래그 결과가 workspace.layout.v1에 JSON으로 남는다 [158.28ms]
+(pass) 워크스페이스 스플리터 > 새로고침 후 저장된 폭이 복원된다 [324.58ms]
+(pass) 워크스페이스 스플리터 > 저장값이 손상돼도 기본 레이아웃으로 뜬다 [216.93ms]
+(pass) 중앙 무대 잠금과 반응형 > MeetingCard가 .stage-pane 안에만 렌더되고 무대 중앙 hit가 stage다 [94.58ms]
+(pass) 중앙 무대 잠금과 반응형 > 820px에서 레일은 접히고 무대/전사는 살아 있으며 문서 가로 스크롤이 없다 [80.54ms]
+(pass) 중앙 무대 잠금과 반응형 > 375px에서 도크 액션이 줄바꿈으로 모두 도달되고 문서는 가로로 넘치지 않는다 [120.16ms]
+(pass) 헤르메틱 워크스페이스 E2E > 세 패널·스플리터·전사 줄·MeetingCard·레이아웃 복원을 한 흐름으로 통과한다 [346.20ms]
+
+tests/public-attendees.test.ts:
+(pass) pre-capture attendee registration form > the pre-capture shell exposes a keyboard-reachable attendee panel [71.63ms]
+(pass) pre-capture attendee registration form > Enter on the toggle opens the panel and focuses the name field [39.29ms]
+(pass) pre-capture attendee registration form > Escape closes the panel and returns focus to the toggle [54.57ms]
+(pass) pre-capture attendee registration form > a click outside the panel closes it, matching the provider-panel pattern [69.77ms]
+(pass) pre-capture attendee registration form > Enter in the form adds drafts with name and optional crm id, including CJK [101.54ms]
+(pass) pre-capture attendee registration form > an empty or whitespace-only name is rejected without sending anything [62.70ms]
+(pass) pre-capture attendee registration form > a duplicate name is rejected and the existing draft is left untouched [68.22ms]
+(pass) pre-capture attendee registration form > edit loads a draft back into the form and replaces it in place [97.41ms]
+(pass) pre-capture attendee registration form > edit and remove keep the panel open even though they re-render the list [75.43ms]
+(pass) pre-capture attendee registration form > remove drops exactly one draft [92.79ms]
+(pass) pre-capture attendee registration form > submit serializes the exact setAttendees wire payload [98.78ms]
+(pass) pre-capture attendee registration form > submitting an empty roster is blocked and sends nothing [58.42ms]
+(pass) pre-capture attendee registration form > an attendees ack stores meeting_id plus the dropdown source and marks rows saved [127.87ms]
+315 |       attendees: [{ attendee_id: "a-1", display_name: "김현준", crm_person_entity_id: null }],
+316 |     });
+317 |     await page.waitForFunction(() => window.__attendeeState.meetingId === 77);
+318 |     await clearSent();
+319 |     await page.click("#btn-record");
+320 |     expect(await sent()).toEqual([{ action: "startCapture", meeting_id: 77 }]);
+                               ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "action": "startCapture",
+      "meeting_id": 77,
+    },
++   {
++     "action": "listMeetings",
++   },
+  ]
+
+- Expected  - 0
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:320:26)
+(fail) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved [94.33ms]
+321 |   });
+322 | 
+323 |   test("capture is never hard-gated on attendees", async () => {
+324 |     await clearSent();
+325 |     await page.click("#btn-record");
+326 |     expect(await sent()).toEqual([{ action: "startCapture" }]);
+                               ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "action": "startCapture",
+    },
++   {
++     "action": "listMeetings",
++   },
+  ]
+
+- Expected  - 0
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:326:26)
+(fail) pre-capture attendee registration form > capture is never hard-gated on attendees [44.49ms]
+329 |   test("an unsaved roster surfaces an error but still starts capture", async () => {
+330 |     await page.click("#btn-attendees");
+331 |     await addAttendee("김현준");
+332 |     await clearSent();
+333 |     await page.click("#btn-record");
+334 |     expect(await sent()).toEqual([{ action: "startCapture" }]);
+                               ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "action": "startCapture",
+    },
++   {
++     "action": "listMeetings",
++   },
+  ]
+
+- Expected  - 0
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:334:26)
+(fail) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture [66.51ms]
+(pass) pre-capture attendee registration form > capture locks and hides the attendee surface, and release restores it [57.92ms]
+(pass) pre-capture attendee registration form > a submit racing a capture transition sends at most one setAttendees [59.59ms]
+(pass) pre-capture attendee registration form > a reconnect asks the server to restore the draft roster [3047.31ms]
+(pass) pre-capture attendee registration form > malformed attendees payloads leave the panel usable and state coherent [43.60ms]
+(pass) pre-capture attendee registration form > untrusted attendee text is rendered as text, never as markup [33.07ms]
+687 |          * Returns the middle point within an element unless a specific offset is provided.
+688 |          */
+689 |         async clickablePoint(offset) {
+690 |             const box = await this.#clickableBox();
+691 |             if (!box) {
+692 |                 throw new Error('Node is either not clickable or not an Element');
+                                ^
+error: Node is either not clickable or not an Element
+      at clickablePoint (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:692:27)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:118:33)
+      at async click (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:722:41)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:129:37)
+      at async click (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:749:30)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:438:16)
+(fail) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id [74.78ms]
+473 |         WHISPER_INPUT_MODE: "mic",
+474 |       },
+475 |     });
+476 |     expect(result.status, result.stderr).toBe(0);
+477 |     const unroutable = JSON.parse(result.stdout.trim().split("\n").at(-1)!) as string[];
+478 |     expect(unroutable).toEqual([]);
+                             ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "listMeetings",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:478:24)
+(fail) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches [5273.85ms]
+(pass) pre-capture attendee registration form > existing slide rendering and dock controls survive the new panel [73.56ms]
+
+tests/public-caret-live.test.ts:
+(pass) Todo 12 · generated reducer integration > the live shell runs the CANONICAL reducers from the generated artifacts, never raw TS [164.41ms]
+(pass) Todo 12 · the 900px live seam > 1440x900: live is side by side [158.13ms]
+(pass) Todo 12 · the 900px live seam > 1244x836: live is side by side [163.01ms]
+(pass) Todo 12 · the 900px live seam > 1100x800: live is side by side [157.69ms]
+(pass) Todo 12 · the 900px live seam > 960x760: live is side by side [147.70ms]
+(pass) Todo 12 · the 900px live seam > 900x760: live is side by side [175.79ms]
+(pass) Todo 12 · the 900px live seam > 899x760: live is stacked, stage first [143.88ms]
+(pass) Todo 12 · the 900px live seam > 820x900: live is stacked, stage first [145.71ms]
+(pass) Todo 12 · the 900px live seam > 375x812: live is stacked, stage first [142.60ms]
+(pass) Todo 12 · the 900px live seam > 320x667: live is stacked, stage first [147.35ms]
+(pass) Todo 12 · the complete generated PPT stage > 1440x900: the whole 16:9 slide is contained and legible [167.32ms]
+(pass) Todo 12 · the complete generated PPT stage > 1244x836: the whole 16:9 slide is contained and legible [166.23ms]
+(pass) Todo 12 · the complete generated PPT stage > 1100x800: the whole 16:9 slide is contained and legible [151.04ms]
+(pass) Todo 12 · the complete generated PPT stage > 960x760: the whole 16:9 slide is contained and legible [142.50ms]
+(pass) Todo 12 · the complete generated PPT stage > 900x760: the whole 16:9 slide is contained and legible [140.79ms]
+(pass) Todo 12 · the complete generated PPT stage > 899x760: the whole 16:9 slide is contained and legible [146.77ms]
+(pass) Todo 12 · the complete generated PPT stage > 820x900: the whole 16:9 slide is contained and legible [154.06ms]
+(pass) Todo 12 · the complete generated PPT stage > 375x812: the whole 16:9 slide is contained and legible [151.06ms]
+(pass) Todo 12 · the complete generated PPT stage > 320x667: the whole 16:9 slide is contained and legible [142.80ms]
+(pass) Todo 12 · the complete live transcript > 1440x900: transcript is legible, scrollable and Korean-multiline [136.59ms]
+(pass) Todo 12 · the complete live transcript > 1244x836: transcript is legible, scrollable and Korean-multiline [144.17ms]
+(pass) Todo 12 · the complete live transcript > 1100x800: transcript is legible, scrollable and Korean-multiline [162.05ms]
+(pass) Todo 12 · the complete live transcript > 960x760: transcript is legible, scrollable and Korean-multiline [164.87ms]
+(pass) Todo 12 · the complete live transcript > 900x760: transcript is legible, scrollable and Korean-multiline [141.75ms]
+(pass) Todo 12 · the complete live transcript > 899x760: transcript is legible, scrollable and Korean-multiline [143.13ms]
+(pass) Todo 12 · the complete live transcript > 820x900: transcript is legible, scrollable and Korean-multiline [136.32ms]
+(pass) Todo 12 · the complete live transcript > 375x812: transcript is legible, scrollable and Korean-multiline [131.51ms]
+(pass) Todo 12 · the complete live transcript > 320x667: transcript is legible, scrollable and Korean-multiline [133.30ms]
+(pass) Todo 12 · transcript projection comes from the canonical reducer > provisional becomes final, duplicates dedupe, reordered snapshots keep order [118.30ms]
+(pass) Todo 12 · Stop and timer are persistent and truthful > Stop + timer stay visible and enabled through starting, capturing and stopping [109.20ms]
+(pass) Todo 12 · Stop and timer are persistent and truthful > a trailing line during stopping still renders, and idle returns to library once [125.47ms]
+(pass) Todo 12 · Stop and timer are persistent and truthful > a dropped socket keeps live content and the Stop control [128.95ms]
+(pass) Todo 12 · the save/export disclosure is reachable in BOTH shells > 1440x900: all 9 library dock capabilities are mouse/keyboard reachable [116.65ms]
+(pass) Todo 12 · the save/export disclosure is reachable in BOTH shells > 1244x836: all 9 library dock capabilities are mouse/keyboard reachable [116.68ms]
+(pass) Todo 12 · the save/export disclosure is reachable in BOTH shells > 1100x800: all 9 library dock capabilities are mouse/keyboard reachable [121.63ms]
+(pass) Todo 12 · the live dock clips nothing (Todo-11 handoff defect) > 375px starting: zero controls clipped or horizontally offscreen [121.13ms]
+(pass) Todo 12 · the live dock clips nothing (Todo-11 handoff defect) > 375px capturing: zero controls clipped or horizontally offscreen [133.83ms]
+(pass) Todo 12 · the live dock clips nothing (Todo-11 handoff defect) > 375px stopping: zero controls clipped or horizontally offscreen [145.85ms]
+(pass) Todo 12 · the live dock clips nothing (Todo-11 handoff defect) > 320px starting: zero controls clipped or horizontally offscreen [115.93ms]
+(pass) Todo 12 · the live dock clips nothing (Todo-11 handoff defect) > 320px capturing: zero controls clipped or horizontally offscreen [140.27ms]
+(pass) Todo 12 · the live dock clips nothing (Todo-11 handoff defect) > 320px stopping: zero controls clipped or horizontally offscreen [142.26ms]
+(pass) Todo 12 · the live dock clips nothing (Todo-11 handoff defect) > compile and export stay real and reachable in live, and never disable Stop [132.68ms]
+(pass) Todo 12 · adversarial live input > a malformed frame is dropped and leaves the live projection intact [136.69ms]
+(pass) Todo 12 · adversarial live input > the live Stop control emits the existing stopCapture action [158.20ms]
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.11ms]
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.08ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.09ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.13ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.04ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.03ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.15ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.30ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.11ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.07ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.14ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.05ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.12ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.05ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.66ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.29ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.18ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.41ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.11ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.18ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.08ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.05ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.08ms]
+
+tests/public-settings-panel.test.ts:
+(pass) AI 모델 설정 UI > 설치와 로그인 상태를 사용자 언어로 구분해 표시한다 [31.09ms]
+(pass) AI 모델 설정 UI > 연결·재검사·프로바이더/모델 선택 액션을 프로토콜대로 보낸다 [101.18ms]
+(pass) STT 모델 설정 UI > 카탈로그 네 모델을 크기·라이선스와 함께 렌더한다 [8.61ms]
+(pass) STT 모델 설정 UI > absent→downloading→installed→selected 상태와 진행률을 반영한다 [7.62ms]
+(pass) STT 모델 설정 UI > 실패 상태는 오류와 재시도를 노출한다 [3.63ms]
+(pass) STT 모델 설정 UI > install/cancel/select/recheck 액션을 modelId와 함께 보낸다 [112.69ms]
+(pass) 설정 패널 접근성 > 좁은 폭에서도 잘리지 않고 키보드로 열고 닫을 수 있다 [27.66ms]
+
+tests/public-compile-control.test.ts:
+(pass) 컴파일 컨트롤 > PowerPoint 생성은 하나의 명확한 주 버튼으로 제공한다 [12.14ms]
+(pass) 컴파일 컨트롤 > 요청을 보내고 진행·완료·실패 상태와 생성 결과를 사용자에게 표시한다 [93.01ms]
+
+tests/transcript-state.test.ts:
+(pass) transcript projection — finalized lines > Korean multiline finals keep arrival order and speaker metadata [0.43ms]
+(pass) transcript projection — finalized lines > multiline text collapses interior whitespace without losing content [0.03ms]
+(pass) transcript projection — finalized lines > blank finalized text is ignored instead of creating an empty row [0.04ms]
+(pass) transcript projection — finalized lines > a speaker-less final carries a null speaker, not a fabricated one [0.02ms]
+(pass) transcript projection — duplicate suppression > the same finalized line delivered twice appears once [0.03ms]
+(pass) transcript projection — duplicate suppression > duplicate detection normalizes whitespace but respects ts and speaker [0.06ms]
+(pass) transcript projection — duplicate suppression > a duplicate arriving after later lines does not reorder the projection [0.04ms]
+(pass) transcript projection — provisional captions > a caption is provisional only and never enters the finalized list [0.05ms]
+(pass) transcript projection — provisional captions > each caption replaces the previous provisional row [0.04ms]
+(pass) transcript projection — provisional captions > an empty caption clears the provisional row [0.02ms]
+(pass) transcript projection — provisional captions > the matching final replaces its provisional caption [0.05ms]
+(pass) transcript projection — provisional captions > a corrected final replaces the provisional caption it supersedes [0.03ms]
+(pass) transcript projection — provisional captions > a final for a different speaker leaves another speaker's caption standing [0.03ms]
+(pass) transcript projection — out-of-order delivery > an interim caption arriving after its final does not resurrect it [0.04ms]
+(pass) transcript projection — out-of-order delivery > a late final older than the newest line is inserted, not appended [0.04ms]
+(pass) transcript projection — out-of-order delivery > equal timestamps keep arrival order (stable ordering) [0.02ms]
+(pass) transcript projection — snapshots > a snapshot replaces the projection instead of appending [0.19ms]
+(pass) transcript projection — snapshots > a repeated snapshot is idempotent [0.04ms]
+(pass) transcript projection — snapshots > a snapshot clears the provisional caption and carries truncation [0.02ms]
+(pass) transcript projection — snapshots > a snapshot sorts out-of-order entries and drops in-snapshot duplicates [0.03ms]
+(pass) transcript projection — snapshots > an export-reason transcript never touches the projection [0.02ms]
+(pass) transcript projection — snapshots > an empty snapshot clears the projection [0.02ms]
+(pass) transcript projection — meeting boundaries > live lines are rejected while a history meeting is active [0.03ms]
+(pass) transcript projection — meeting boundaries > a live snapshot is rejected while a history meeting is active [0.02ms]
+(pass) transcript projection — meeting boundaries > meeting detail for the active meeting replaces the projection [0.04ms]
+(pass) transcript projection — meeting boundaries > stale meeting detail for a superseded selection is rejected [0.02ms]
+(pass) transcript projection — meeting boundaries > switching meetings isolates projections and clears the provisional row [0.03ms]
+(pass) transcript projection — meeting boundaries > returning to live clears history content [0.02ms]
+(pass) transcript projection — meeting boundaries > re-activating the same meeting is a no-op on content [0.02ms]
+(pass) transcript projection — reset and empty > reset clears finalized, provisional, truncation and counters [0.03ms]
+(pass) transcript projection — reset and empty > the initial state is empty and live [0.01ms]
+(pass) transcript projection — reset and empty > reducing an empty event sequence returns the same projection
+(pass) transcript projection — purity > the reducer never mutates the state it was given [0.04ms]
+(pass) transcript projection — purity > the returned projection is frozen [0.03ms]
+(pass) transcript projection — purity > the same event sequence produces an identical projection twice [0.14ms]
+(pass) transcript projection — minibar > the minibar shows at most three finals plus one provisional [0.18ms]
+(pass) transcript projection — minibar > the minibar derives from the same store, with no duplicate rows [0.05ms]
+(pass) transcript projection — minibar > an empty projection yields no minibar rows [0.01ms]
+(pass) transcript parse boundary > a well-formed line frame parses into a typed event [0.12ms]
+(pass) transcript parse boundary > an absent speaker parses to null rather than undefined [0.02ms]
+(pass) transcript parse boundary > a transcript frame keeps its declared reason and truncation flag [0.04ms]
+(pass) transcript parse boundary > a reason-less transcript frame defaults to the export reason [0.02ms]
+(pass) transcript parse boundary > meeting detail parses meetingId and its transcript entries [0.02ms]
+(pass) transcript parse boundary > a non-object frame is a typed failure, not an exception [0.02ms]
+(pass) transcript parse boundary > a frame with no type is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a non-string text is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a non-numeric ts is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a NaN ts is a typed failure, not an exception
+(pass) transcript parse boundary > a caption with a non-numeric speaker is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with non-array entries is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with an undeclared reason is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with a malformed entry is a typed failure, not an exception
+(pass) transcript parse boundary > a meeting with a non-numeric meetingId is a typed failure, not an exception
+(pass) transcript parse boundary > an unrelated declared message parses to an ignorable event [0.01ms]
+(pass) transcript parse boundary > an ignorable event leaves the projection untouched [0.03ms]
+(pass) transcript parse boundary > a rejected frame is recorded without disturbing content [0.03ms]
+
+5 tests failed:
+(fail) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved [94.33ms]
+(fail) pre-capture attendee registration form > capture is never hard-gated on attendees [44.49ms]
+(fail) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture [66.51ms]
+(fail) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id [74.78ms]
+(fail) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches [5273.85ms]
+
+ 413 pass
+ 5 fail
+ 2911 expect() calls
+Ran 418 tests across 15 files. [49.11s]

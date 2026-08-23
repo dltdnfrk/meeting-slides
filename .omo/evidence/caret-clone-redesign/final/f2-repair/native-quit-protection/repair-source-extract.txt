@@ -1,0 +1,95 @@
+Production predicate:
+macos/MinibarWindowController.swift-214-    /// The last authoritative capture truth from the server. Used only to decide
+macos/MinibarWindowController.swift-215-    /// whether quitting needs confirmation; never to infer product state.
+macos/MinibarWindowController.swift-216-    var isCapturing: Bool {
+macos/MinibarWindowController.swift:217:        transport.projection.capture.phase.requiresQuitProtection
+macos/MinibarWindowController.swift-218-    }
+macos/MinibarWindowController.swift-219-
+macos/MinibarWindowController.swift-220-    func stopConnection() {
+macos/MinibarWindowController.swift-221-        renderTimer?.invalidate()
+macos/MinibarWindowController.swift-222-        renderTimer = nil
+macos/MinibarWindowController.swift-223-        reconnectTimer?.invalidate()
+macos/MinibarWindowController.swift-224-        reconnectTimer = nil
+macos/MinibarWindowController.swift-225-        socket?.cancel(with: .goingAway, reason: nil)
+--
+macos/NativeSurfaceContract.swift-212-
+macos/NativeSurfaceContract.swift-213-    /// Whether quitting must be confirmed before the launcher may terminate its
+macos/NativeSurfaceContract.swift-214-    /// owned server. The server owns capture work until authoritative idle.
+macos/NativeSurfaceContract.swift:215:    public var requiresQuitProtection: Bool {
+macos/NativeSurfaceContract.swift-216-        self != .idle
+macos/NativeSurfaceContract.swift-217-    }
+macos/NativeSurfaceContract.swift-218-}
+macos/NativeSurfaceContract.swift-219-
+macos/NativeSurfaceContract.swift-220-/// The only server messages the native surface observes.
+macos/NativeSurfaceContract.swift-221-public enum NativeSurfaceEvent: Equatable {
+macos/NativeSurfaceContract.swift-222-    case capture(CaptureProjection)
+macos/NativeSurfaceContract.swift-223-    case status(text: String)
+
+Phase-table tests:
+73-    // ── geometry the AppKit shell must obey ──
+74-    { name: "collapsed-size", kind: "surfaceSize", input: { mode: "collapsed" } },
+75-    { name: "expanded-size", kind: "surfaceSize", input: { mode: "expanded" } },
+76-
+77:    // ── launcher quit protection: authoritative capture phase only ──
+78-    ...(["idle", "starting", "capturing", "stopping", "switching-model"] as const).map((phase) => ({
+79-      name: `quit-protection-${phase}`,
+80-      kind: "quitProtection",
+81-      input: { phase },
+82-    })),
+83-
+84-    // ── status projection: explicit, never inferred from text ──
+85-    {
+86-      name: "status-idle",
+87-      kind: "view",
+88-      input: { mode: "collapsed", events: [{ kind: "open" }, { kind: "message", payload: IDLE }], now: 1723370000000 },
+89-    },
+90-    {
+91-      name: "status-starting",
+92-      kind: "view",
+93-      input: {
+94-        mode: "collapsed",
+95-        events: [{ kind: "open" }, { kind: "message", payload: STARTING }],
+96-        now: 1723370002000,
+97-      },
+98-    },
+99-    {
+100-      name: "status-live",
+101-      kind: "view",
+102-      input: {
+103-        mode: "collapsed",
+104-        events: [{ kind: "open" }, { kind: "message", payload: CAPTURING }],
+105-        now: 1723370065000,
+--
+765-    });
+766-  });
+767-});
+768-
+769:describe("native minibar seam: launcher quit protection", () => {
+770-  const expected = [
+771-    ["idle", false],
+772-    ["starting", true],
+773-    ["capturing", true],
+774-    ["stopping", true],
+775-    ["switching-model", true],
+776-  ] as const;
+777-
+778-  for (const [phase, protectedFromQuit] of expected) {
+779-    test(`${phase} quit protection is ${protectedFromQuit}`, () => {
+780-      expect(value(`quit-protection-${phase}`)).toEqual({
+781-        phase,
+782-        protected: protectedFromQuit,
+783-      });
+784-    });
+785-  }
+786-
+787-  test("the AppKit controller delegates quit protection to the pure phase seam", () => {
+788-    const controller = sourceOf(CONTROLLER_SWIFT);
+789-    expect(controller).toMatch(/transport\.projection\.capture\.phase\.requiresQuitProtection/);
+790-  });
+791-});
+792-
+793-describe("native minibar seam: explicit status projection", () => {
+794-  test("idle, starting, live, stopping and switching-model are distinct explicit states", () => {
+795-    expect(value("status-idle").status).toBe("idle");
+796-    expect(value("status-starting").status).toBe("starting");
+797-    expect(value("status-live").status).toBe("live");

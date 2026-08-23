@@ -1,0 +1,5 @@
+$ git diff --check
+EXIT=0
+$ product hashes
+a410a85a695e2cc25ca8a8e00d602542485f82d0e635fad917e4511f5b78b4b7  public/style.css
+20dab12a9dbcb22b724ba2da3607d48e2d211a59c580771397536ee5ce322918  public/caret-operator.css

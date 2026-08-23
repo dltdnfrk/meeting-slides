@@ -1,0 +1,2 @@
+$ swiftc -typecheck macos/*.swift
+EXIT=0

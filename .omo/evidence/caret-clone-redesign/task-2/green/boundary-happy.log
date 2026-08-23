@@ -1,0 +1,18 @@
+### HAPPY — bounded boundary verification from canonical root
+$ pwd -P
+/Users/hyunjun/Documents/MUNI/meeting-slides
+$ git rev-parse --show-toplevel
+/Users/hyunjun/Documents/MUNI/meeting-slides
+$ git remote get-url origin
+https://github.com/dltdnfrk/meeting-slides.git
+$ git rev-parse --abbrev-ref HEAD
+main
+$ git rev-parse HEAD
+a1ed25f95980980cd958044b90e739ac45e8280d
+$ git status --porcelain=v1 -uall | wc -l
+     216
+
+$ .omo/.../boundary-validator.sh --emit $D/green/boundary-receipt.json
+BOUNDARY-OK cwd=/Users/hyunjun/Documents/MUNI/meeting-slides git_root=/Users/hyunjun/Documents/MUNI/meeting-slides origin=https://github.com/dltdnfrk/meeting-slides.git branch=main head=a1ed25f95980980cd958044b90e739ac45e8280d dirty_entries=216
+receipt: .omo/evidence/caret-clone-redesign/task-2/green/boundary-receipt.json
+exit=0

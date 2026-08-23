@@ -1,0 +1,16 @@
+687 |          * Returns the middle point within an element unless a specific offset is provided.
+688 |          */
+689 |         async clickablePoint(offset) {
+690 |             const box = await this.#clickableBox();
+691 |             if (!box) {
+692 |                 throw new Error('Node is either not clickable or not an Element');
+                                ^
+error: Node is either not clickable or not an Element
+      at clickablePoint (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:692:27)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:94:120
+      at click (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:1250:20)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:114:37
+      at click (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:749:30)
+      at processTicksAndRejections (unknown:7:39)
+
+Bun v1.3.14 (macOS arm64)

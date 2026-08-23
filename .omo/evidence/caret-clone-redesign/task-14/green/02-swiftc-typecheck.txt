@@ -1,0 +1,5 @@
+== swiftc -typecheck: full native surface (shell + pure modules + entry point) ==
+exit=0
+
+== swiftc -typecheck: pure seam only (no AppKit) ==
+exit=0

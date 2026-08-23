@@ -1,0 +1,15 @@
+{
+  "continueButtonFound" : true,
+  "done" : true,
+  "frontmostSetStatus" : 0,
+  "notification" : "AXWindowCreated",
+  "observerAddStatus" : 0,
+  "observerCreateStatus" : 0,
+  "observerSubscribedBeforeTrigger" : true,
+  "pid" : 70962,
+  "pressStatus" : 0,
+  "terminateRequestedAfterSubscription" : true,
+  "timedOut" : false,
+  "windowRole" : "AXWindow",
+  "windowTitle" : ""
+}

@@ -1,0 +1,49 @@
+{
+  "task": "Close F1 rejection gap #1",
+  "taskId": "st_019ff3d4",
+  "status": "CLOSED_WITH_PREEXISTING_UNRELATED_EXCEPTIONS",
+  "done": true,
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "head": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "fullSuite": {
+    "attemptsThisTask": 1,
+    "command": "bun test",
+    "result": "972 pass, 9 fail, 4864 expectations, 981 tests across 74 files",
+    "exitStatus": 1,
+    "output": ".omo/evidence/caret-clone-redesign/final/f1-repair/full-suite/bun-test.txt"
+  },
+  "failureAttribution": {
+    "total": 9,
+    "planRelated": 1,
+    "planRelatedRepaired": 1,
+    "preExistingUnrelated": 8,
+    "protectedProviderFailures": 6,
+    "unrelatedMinutesTimeouts": 2
+  },
+  "repair": {
+    "product": "public/focus-trap.js",
+    "regression": "tests/public-caret-accessibility.test.ts",
+    "focusedResult": "14 pass, 0 fail",
+    "errorDiagnostics": "clean"
+  },
+  "aggregate": {
+    "commandKind": "bounded aggregate with exact inclusion/exclusion manifests",
+    "result": "966 pass, 0 fail, 4852 expectations across 71 files",
+    "exitStatus": 0,
+    "allPlanRelatedGreenTogether": true,
+    "excludedOnly": [
+      "tests/llm-transport.test.ts",
+      "tests/start-review-action.test.ts",
+      "tests/attendees-action.test.ts"
+    ]
+  },
+  "protectedProviderHashesMatchTodo2": true,
+  "gitDiffCheck": "PASS",
+  "commitCreated": false,
+  "planLedgerOrCheckboxEdited": false,
+  "f2ToF4Entered": false,
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f1-repair/REPORT.md",
+    "sha256": "1d31a1d7c7f9273f3797c17a50b93c6612a948e2ad842c11622e5d7d2e97e19e"
+  }
+}

@@ -1,0 +1,8 @@
+== mutation A: displayGutter 16 -> 12 ==
+(fail) native surface seam: minibar geometry > with no saved frame the default sits inside the 16px active-display gutter [0.17ms]
+(fail) native surface seam: minibar geometry > a mostly-visible saved frame is clamped into the 16px gutters, not discarded [0.06ms]
+(fail) native surface seam: minibar geometry > with no saved frame the default sits inside the 16px active-display gutter [0.17ms]
+(fail) native surface seam: minibar geometry > a mostly-visible saved frame is clamped into the 16px gutters, not discarded [0.06ms]
+ 29 pass
+ 2 fail
+ 64 expect() calls

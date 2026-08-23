@@ -1,0 +1,106 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/native-minibar.test.ts:
+(pass) native minibar seam: sources and compilation > the projection module, AppKit shell and fixture driver exist [0.10ms]
+(pass) native minibar seam: sources and compilation > swiftc compiles the pure modules with the fixture driver [0.05ms]
+(pass) native minibar seam: sources and compilation > swiftc typechecks the AppKit shell against the pure modules
+(pass) native minibar seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.02ms]
+(pass) native minibar seam: sources and compilation > the projection module stays pure: no AppKit, window, socket or clock [0.39ms]
+(pass) native minibar seam: sources and compilation > the AppKit shell imports no WebKit and hosts no second engine [0.26ms]
+(pass) native minibar seam: sources and compilation > the panel frame is authoritative so content cannot grow past the contract size [0.17ms]
+(pass) native minibar seam: sources and compilation > the AppKit shell stays thin: geometry and status come from the pure modules [0.09ms]
+(pass) native minibar seam: sources and compilation > no native source advertises Pause, share or screen-share exclusion [0.27ms]
+(pass) native minibar seam: sources and compilation > the bundle build compiles the minibar sources into the app executable [0.07ms]
+(pass) native minibar seam: geometry > collapsed is exactly 360x56 and expanded exactly 560x220 [0.05ms]
+(pass) native minibar seam: geometry > the deterministic default frame honours the 16px gutter on the active display [0.01ms]
+(pass) native minibar seam: geometry > a saved frame that no longer intersects a display falls back deterministically
+(pass) native minibar seam: geometry > expanding a restored frame keeps the anchor and clamps into the gutter
+(pass) native minibar seam: launcher quit protection > idle quit protection is false
+(pass) native minibar seam: launcher quit protection > starting quit protection is true
+(pass) native minibar seam: launcher quit protection > capturing quit protection is true
+775 |     ["switching-model", true],
+776 |   ] as const;
+777 | 
+778 |   for (const [phase, protectedFromQuit] of expected) {
+779 |     test(`${phase} quit protection is ${protectedFromQuit}`, () => {
+780 |       expect(value(`quit-protection-${phase}`)).toEqual({
+                                                      ^
+error: expect(received).toEqual(expected)
+
+  {
+    "phase": "stopping",
+-   "protected": true,
++   "protected": false,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:780:49)
+(fail) native minibar seam: launcher quit protection > stopping quit protection is true [0.26ms]
+775 |     ["switching-model", true],
+776 |   ] as const;
+777 | 
+778 |   for (const [phase, protectedFromQuit] of expected) {
+779 |     test(`${phase} quit protection is ${protectedFromQuit}`, () => {
+780 |       expect(value(`quit-protection-${phase}`)).toEqual({
+                                                      ^
+error: expect(received).toEqual(expected)
+
+  {
+    "phase": "switching-model",
+-   "protected": true,
++   "protected": false,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:780:49)
+(fail) native minibar seam: launcher quit protection > switching-model quit protection is true [0.04ms]
+(pass) native minibar seam: launcher quit protection > the AppKit controller delegates quit protection to the pure phase seam [0.08ms]
+(pass) native minibar seam: explicit status projection > idle, starting, live, stopping and switching-model are distinct explicit states [0.01ms]
+(pass) native minibar seam: explicit status projection > before any snapshot the surface says connecting rather than idle
+(pass) native minibar seam: explicit status projection > a lost socket becomes reconnecting while the known capture truth is retained [0.01ms]
+(pass) native minibar seam: explicit status projection > a malformed payload surfaces error without discarding the known capture phase
+(pass) native minibar seam: explicit status projection > every status carries a non-color glyph and a distinct title [0.05ms]
+(pass) native minibar seam: timer derives from server startedAt > elapsed time is computed from the server timestamp and the injected clock
+(pass) native minibar seam: timer derives from server startedAt > a clock skew never renders a negative timer
+(pass) native minibar seam: timer derives from server startedAt > a capture without startedAt shows no invented timer
+(pass) native minibar seam: timer derives from server startedAt > reconnecting keeps the last known timer basis rather than resetting it
+(pass) native minibar seam: bounded transcript projection > collapsed shows exactly one line: the latest finalized sentence
+(pass) native minibar seam: bounded transcript projection > collapsed prefers the provisional caption when one is live
+(pass) native minibar seam: bounded transcript projection > expanded shows at most three finalized lines plus one provisional row [0.01ms]
+(pass) native minibar seam: bounded transcript projection > a finalized line replaces its provisional caption instead of duplicating it
+(pass) native minibar seam: bounded transcript projection > an authoritative idle snapshot clears the surface instead of keeping meeting content
+(pass) native minibar seam: bounded transcript projection > a malformed transcript payload retains the last known lines [0.01ms]
+(pass) native minibar seam: bounded transcript projection > a reconnect snapshot replaces the projected lines without duplicating them
+(pass) native minibar seam: truthful controls > collapsed exposes a persistent Stop plus a disclosure and nothing else [0.02ms]
+(pass) native minibar seam: truthful controls > Stop stays visible and truthfully disabled when there is nothing to stop
+(pass) native minibar seam: truthful controls > expanded adds Open Workspace and keeps the same Stop control
+(pass) native minibar seam: truthful controls > Stop stays reachable while reconnecting but refuses to lie about being sent [0.04ms]
+(pass) native minibar seam: truthful controls > the control vocabulary is closed: no Pause, no share, no second engine
+(pass) native minibar seam: Stop emits exactly one existing command > five rapid Stop activations emit exactly one stopCapture
+(pass) native minibar seam: Stop emits exactly one existing command > Stop spam across a reconnect still emits exactly one stopCapture
+(pass) native minibar seam: Stop emits exactly one existing command > Stop while idle emits nothing at all
+(pass) native minibar seam: activation policy > user-started capture shows the surface and focuses the visible Stop
+(pass) native minibar seam: activation policy > automatic calendar capture shows the surface without stealing OS focus
+(pass) native minibar seam: activation policy > a later user interaction on an automatic capture may take focus
+(pass) native minibar seam: mode and Escape > Escape collapses an expanded panel and never stops a recording
+(pass) native minibar seam: mode and Escape > Escape on a collapsed panel is a no-op
+(pass) native minibar seam: mode and Escape > the disclosure toggles between the two contract sizes
+(pass) native minibar seam: window policy > the panel is a borderless floating non-activating ambient surface [0.01ms]
+(pass) native minibar seam: accessibility > the surface publishes a labelled group, status text and target sizes [0.01ms]
+(pass) native minibar seam: accessibility > reduced motion removes the transition entirely rather than shortening it
+(pass) native minibar seam: announcement discipline (Todo 15) > a status announces once and never repeats on a timer tick [0.04ms]
+(pass) native minibar seam: announcement discipline (Todo 15) > an error announces its machine reason once, and recovery announces once [0.02ms]
+(pass) native minibar seam: announcement discipline (Todo 15) > every painted control carries a name, a value and a truthful help string [0.03ms]
+
+2 tests failed:
+(fail) native minibar seam: launcher quit protection > stopping quit protection is true [0.26ms]
+(fail) native minibar seam: launcher quit protection > switching-model quit protection is true [0.04ms]
+
+ 54 pass
+ 2 fail
+ 187 expect() calls
+Ran 56 tests across 1 file. [5.33s]

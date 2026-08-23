@@ -1,0 +1,5 @@
+root=/Users/hyunjun/Documents/MUNI/meeting-slides
+head=a1ed25f95980980cd958044b90e739ac45e8280d
+started_utc=2026-08-12T04:22:29Z
+completed_utc=2026-08-12T04:28:22Z
+verdict=REJECT

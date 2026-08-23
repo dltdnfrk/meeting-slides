@@ -1,0 +1,92 @@
+{
+  "announcements" : [
+
+  ],
+  "applicationRole" : "AXApplication",
+  "axProcessTrusted" : true,
+  "capturedAtUnixSeconds" : 1786503325.342519,
+  "captureWindowSeconds" : 6,
+  "focusedUIElement" : {
+    "AXDescription" : "axpost probe window",
+    "AXHelp" : null,
+    "AXRole" : "AXWindow",
+    "AXTitle" : ""
+  },
+  "observerState" : "observing kAXAnnouncementRequestedNotification",
+  "pid" : 58415,
+  "tool" : "ax-capture.swift",
+  "windowCount" : 1,
+  "windows" : [
+    {
+      "AXDescription" : "axpost probe window",
+      "AXEnabled" : null,
+      "AXFocused" : true,
+      "AXHelp" : null,
+      "AXPosition" : {
+        "x" : 0,
+        "y" : 834
+      },
+      "AXRole" : "AXWindow",
+      "AXRoleDescription" : "standard window",
+      "AXSize" : {
+        "height" : 92,
+        "width" : 200
+      },
+      "AXSubrole" : "AXStandardWindow",
+      "AXTitle" : "",
+      "AXValue" : null,
+      "children" : [
+        {
+          "AXDescription" : null,
+          "AXEnabled" : true,
+          "AXFocused" : false,
+          "AXHelp" : null,
+          "AXPosition" : {
+            "x" : 1,
+            "y" : 909
+          },
+          "AXRole" : "AXStaticText",
+          "AXRoleDescription" : "text",
+          "AXSize" : {
+            "height" : 18,
+            "width" : 37.5
+          },
+          "AXSubrole" : null,
+          "AXTitle" : null,
+          "AXValue" : "probe",
+          "children" : [
+
+          ],
+          "depth" : 1,
+          "path" : "window[0]\/0"
+        },
+        {
+          "AXDescription" : null,
+          "AXEnabled" : true,
+          "AXFocused" : false,
+          "AXHelp" : null,
+          "AXPosition" : {
+            "x" : 18,
+            "y" : 842
+          },
+          "AXRole" : "AXStaticText",
+          "AXRoleDescription" : "text",
+          "AXSize" : {
+            "height" : 16,
+            "width" : 10
+          },
+          "AXSubrole" : null,
+          "AXTitle" : null,
+          "AXValue" : "",
+          "children" : [
+
+          ],
+          "depth" : 1,
+          "path" : "window[0]\/1"
+        }
+      ],
+      "depth" : 0,
+      "path" : "window[0]"
+    }
+  ]
+}

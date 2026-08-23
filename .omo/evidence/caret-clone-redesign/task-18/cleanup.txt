@@ -1,0 +1,21 @@
+# cleanup
+2026-08-11T19:21:54Z
+## launcher process
+OK no meeting-slides process
+## relevant ports
+OK port 8787 free
+OK port 8789 free
+## active public files
+public/app.js
+public/caret-operator.css
+public/index.html
+public/operator-surface.js
+public/review-panel-render.js
+public/review-panel.js
+public/style.css
+public/transcript-resize.js
+public/transcript-state.ts
+public/ui-state-machine.ts
+public/workspace-split.js
+## db row truth
+[{"count":60,"maxId":60}]

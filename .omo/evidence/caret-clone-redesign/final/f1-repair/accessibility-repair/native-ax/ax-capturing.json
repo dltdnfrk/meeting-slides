@@ -1,0 +1,211 @@
+{
+  "announcements" : [
+
+  ],
+  "applicationRole" : "AXApplication",
+  "axProcessTrusted" : true,
+  "capturedAtUnixSeconds" : 1786503276.1417489,
+  "captureWindowSeconds" : 2,
+  "focusedUIElement" : {
+    "AXDescription" : "Meeting Slides 미니바",
+    "AXHelp" : null,
+    "AXRole" : "AXWindow",
+    "AXTitle" : ""
+  },
+  "observerState" : "observing kAXAnnouncementRequestedNotification",
+  "pid" : 48025,
+  "tool" : "ax-capture.swift",
+  "windowCount" : 1,
+  "windows" : [
+    {
+      "AXDescription" : "Meeting Slides 미니바",
+      "AXEnabled" : null,
+      "AXFocused" : true,
+      "AXHelp" : null,
+      "AXPosition" : {
+        "x" : 3448,
+        "y" : 182
+      },
+      "AXRole" : "AXWindow",
+      "AXRoleDescription" : "시스템 대화상자",
+      "AXSize" : {
+        "height" : 56,
+        "width" : 360
+      },
+      "AXSubrole" : "AXSystemDialog",
+      "AXTitle" : "",
+      "AXValue" : null,
+      "children" : [
+        {
+          "AXDescription" : "Meeting Slides 미니바",
+          "AXEnabled" : null,
+          "AXFocused" : false,
+          "AXHelp" : null,
+          "AXPosition" : {
+            "x" : 3448,
+            "y" : 182
+          },
+          "AXRole" : "AXGroup",
+          "AXRoleDescription" : "그룹",
+          "AXSize" : {
+            "height" : 56,
+            "width" : 360
+          },
+          "AXSubrole" : null,
+          "AXTitle" : null,
+          "AXValue" : null,
+          "children" : [
+            {
+              "AXDescription" : null,
+              "AXEnabled" : true,
+              "AXFocused" : false,
+              "AXHelp" : null,
+              "AXPosition" : {
+                "x" : 3459,
+                "y" : 201
+              },
+              "AXRole" : "AXStaticText",
+              "AXRoleDescription" : "텍스트",
+              "AXSize" : {
+                "height" : 18,
+                "width" : 10.5
+              },
+              "AXSubrole" : null,
+              "AXTitle" : null,
+              "AXValue" : "●",
+              "children" : [
+
+              ],
+              "depth" : 2,
+              "path" : "window[0]\/0\/0"
+            },
+            {
+              "AXDescription" : "녹음 중",
+              "AXEnabled" : true,
+              "AXFocused" : false,
+              "AXHelp" : null,
+              "AXPosition" : {
+                "x" : 3475.5,
+                "y" : 201
+              },
+              "AXRole" : "AXStaticText",
+              "AXRoleDescription" : "텍스트",
+              "AXSize" : {
+                "height" : 18,
+                "width" : 39.5
+              },
+              "AXSubrole" : null,
+              "AXTitle" : null,
+              "AXValue" : "녹음 중",
+              "children" : [
+
+              ],
+              "depth" : 2,
+              "path" : "window[0]\/0\/1"
+            },
+            {
+              "AXDescription" : null,
+              "AXEnabled" : true,
+              "AXFocused" : false,
+              "AXHelp" : null,
+              "AXPosition" : {
+                "x" : 3521,
+                "y" : 201.5
+              },
+              "AXRole" : "AXStaticText",
+              "AXRoleDescription" : "텍스트",
+              "AXSize" : {
+                "height" : 17,
+                "width" : 2
+              },
+              "AXSubrole" : null,
+              "AXTitle" : null,
+              "AXValue" : "",
+              "children" : [
+
+              ],
+              "depth" : 2,
+              "path" : "window[0]\/0\/2"
+            },
+            {
+              "AXDescription" : null,
+              "AXEnabled" : true,
+              "AXFocused" : false,
+              "AXHelp" : null,
+              "AXPosition" : {
+                "x" : 3529,
+                "y" : 201
+              },
+              "AXRole" : "AXStaticText",
+              "AXRoleDescription" : "텍스트",
+              "AXSize" : {
+                "height" : 18,
+                "width" : 38.5
+              },
+              "AXSubrole" : null,
+              "AXTitle" : null,
+              "AXValue" : "00:01",
+              "children" : [
+
+              ],
+              "depth" : 2,
+              "path" : "window[0]\/0\/3"
+            },
+            {
+              "AXDescription" : "녹음 중지",
+              "AXEnabled" : true,
+              "AXFocused" : false,
+              "AXHelp" : "진행 중인 녹음을 중지합니다",
+              "AXPosition" : {
+                "x" : 3573.5,
+                "y" : 187
+              },
+              "AXRole" : "AXButton",
+              "AXRoleDescription" : "버튼",
+              "AXSize" : {
+                "height" : 46,
+                "width" : 75
+              },
+              "AXSubrole" : null,
+              "AXTitle" : "녹음 중지",
+              "AXValue" : null,
+              "children" : [
+
+              ],
+              "depth" : 2,
+              "path" : "window[0]\/0\/4"
+            },
+            {
+              "AXDescription" : "미니바 펼치기",
+              "AXEnabled" : true,
+              "AXFocused" : false,
+              "AXHelp" : "최근 발언과 작업 공간 열기를 함께 봅니다",
+              "AXPosition" : {
+                "x" : 3654.5,
+                "y" : 187
+              },
+              "AXRole" : "AXButton",
+              "AXRoleDescription" : "버튼",
+              "AXSize" : {
+                "height" : 46,
+                "width" : 97.5
+              },
+              "AXSubrole" : null,
+              "AXTitle" : "미니바 펼치기",
+              "AXValue" : null,
+              "children" : [
+
+              ],
+              "depth" : 2,
+              "path" : "window[0]\/0\/5"
+            }
+          ],
+          "depth" : 1,
+          "path" : "window[0]\/0"
+        }
+      ],
+      "depth" : 0,
+      "path" : "window[0]"
+    }
+  ]
+}

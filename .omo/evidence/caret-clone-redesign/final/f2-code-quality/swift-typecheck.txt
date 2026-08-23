@@ -1,0 +1,2 @@
+$ swiftc -typecheck -swift-version 5 macos/*.swift
+EXIT_STATUS=0

@@ -1,0 +1,15 @@
+canonical_root=/Users/hyunjun/Documents/MUNI/meeting-slides
+date_utc=2026-08-12T05:11:22Z
+user_db_candidates:
+24744ca540901c875784e3e8a3808343e2ea6e84a66301eac14779fc13260806  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings.db
+marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+port_54732=
+processes=
+defaults_begin
+{
+    height = 56;
+    width = 360;
+    x = 3477;
+    y = 72;
+}
+defaults_end

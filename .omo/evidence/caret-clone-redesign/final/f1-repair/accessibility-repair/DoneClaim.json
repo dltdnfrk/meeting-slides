@@ -1,0 +1,62 @@
+{
+  "task": "F1 accessibility repair (independent review remediation)",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "status": "PARTIAL",
+  "terminalPass": false,
+  "reviewBlockers": {
+    "1_focus_containment": {
+      "status": "CLOSED",
+      "method": "TDD, real Chromium keyboard events at the shipped surface",
+      "red": "6 pass / 8 fail (4 dialogs x 2 wrap directions)",
+      "green": "14 pass / 0 fail",
+      "redGreenAgainstFinalTestBytes": true
+    },
+    "2_canonical_viewports": {
+      "status": "CLOSED",
+      "viewports": ["1440x900", "1244x836", "960x760", "820x900", "375x812", "320x667"],
+      "source": "installed app (~/Applications/Meeting Slides.app) port 8789",
+      "rootHorizontalOverflowPx": 0,
+      "clippedControls": 0,
+      "caveat": "every row resolved to the library shell; live-shell layout at 960/820/375 is NOT claimed from these captures"
+    },
+    "3_native_ax_runtime": {
+      "status": "PARTIAL",
+      "observedAndPassing": ["AXRole", "AXLabel/AXDescription", "AXHelp", "AXEnabled", "AXSize"],
+      "notObserved": ["announcement notifications and de-duplication", "Stop AXFocused on user-origin present"],
+      "axProcessTrusted": true,
+      "announcementControlExperiment": "known-good AppKit announcement post was equally invisible to an external AXObserver; delivery requires an active assistive client"
+    },
+    "4_native_contrast": {
+      "status": "NOT_CLOSED",
+      "note": "not attempted; no native rendered-contrast measurement exists"
+    }
+  },
+  "verification": {
+    "totalFocusedTests": "546 pass / 0 fail",
+    "suites": [
+      {"name": "public-caret-accessibility + public-caret-foundation", "result": "126 pass / 0 fail"},
+      {"name": "public-caret-library + public-caret-live", "result": "76 pass / 0 fail"},
+      {"name": "dialog owners (review, attendees, active-shell, runtime-guard, settings-panel)", "result": "79 pass / 0 fail"},
+      {"name": "9 remaining public suites", "result": "140 pass / 0 fail"},
+      {"name": "6 further public suites", "result": "44 pass / 0 fail"},
+      {"name": "native-minibar + native-surface-contract", "result": "81 pass / 0 fail"}
+    ],
+    "realChromiumKeyboardQA": "installed app, all six canonical viewports, trap loaded and focus contained in the real settings sheet"
+  },
+  "filesChanged": [
+    "public/focus-trap.js (new)",
+    "public/index.html",
+    "public/app.js",
+    "public/review-panel.js",
+    "tests/public-caret-accessibility.test.ts",
+    "tests/public-active-shell.test.ts"
+  ],
+  "constraints": {
+    "commitsCreated": 0,
+    "planLedgerF1CheckboxEdited": false,
+    "enteredF2ToF4": false,
+    "unrelatedDirtyWorkPreserved": true,
+    "prosePinnedByTests": false
+  },
+  "remainingBlocker": "Native AX runtime proof incomplete: announcement notifications/de-duplication and Stop focus-on-present are unobserved at the installed AppKit surface (announcements undeliverable to an external observer without an active assistive client, proven by control experiment; Stop AXFocused did not reproduce despite the trigger firing and the attribute being provably settable). No native WCAG contrast measurement exists."
+}

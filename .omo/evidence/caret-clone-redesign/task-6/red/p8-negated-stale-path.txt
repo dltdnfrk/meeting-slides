@@ -1,0 +1,15 @@
+# RED probe: p8-negated-stale-path
+{
+  "design": "/tmp/p8-negated-stale-path.md",
+  "designSha256": "cd4c55e806eac25e88c5ba1894e9121c8d213e1a5602be0de61be5707d739353",
+  "checks": 115,
+  "passed": 114,
+  "failed": 1,
+  "failures": [
+    {
+      "id": "forbidden/no-stale-font-path",
+      "detail": "\"public/assets/fonts\" in: Fonts are never loaded from anywhere but public/assets/fonts/ and no other path is allowed"
+    }
+  ]
+}
+exit=1

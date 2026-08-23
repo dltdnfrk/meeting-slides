@@ -1,0 +1,16 @@
+프로젝트: /tmp/f3-b-direct.pUUFHf/project
+모드: 웹앱(브라우저)
+HTTP_PORT=54743 (기본값 8787)
+마이크 권한 확인됨
+서버 시작 pid=27078 port=54743
+캘린더 권한 없음 — 자동 녹음 비활성 (시스템 설정 > 개인정보 보호 > 캘린더)
+HTTP: http://localhost:54743
+입력 모드: mic
+meeting-slides 서버 시작. 브라우저에서 http://localhost:54743 접속
+웹앱 ready → 브라우저 오픈 http://localhost:54743/
+미니바 준비됨 port=54743
+LLM 연결 OK: cli / cli:claude(/tmp/f3-b-direct.pUUFHf/provider)
+시그널 받음 sig=15
+런처 종료 code=0
+
+종료 중...

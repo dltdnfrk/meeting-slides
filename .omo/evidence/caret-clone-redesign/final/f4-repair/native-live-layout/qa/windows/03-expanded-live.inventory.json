@@ -1,0 +1,18 @@
+{
+  "observer" : "CGWindowListCopyWindowInfo(.optionOnScreenOnly)",
+  "pid" : 84067,
+  "targetWindowCount" : 1,
+  "targetWindows" : [
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 220,
+        "Width" : 560,
+        "X" : 936,
+        "Y" : 690
+      },
+      "onScreen" : true,
+      "windowNumber" : 104893
+    }
+  ]
+}

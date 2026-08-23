@@ -1,0 +1,20 @@
+=== PROBE: flaky_tests — single deterministic run ===
+Intent: the suite is pure static parsing (no clock, network, sleep, socket, browser),
+so a single run is authoritative. Determinism is shown by hashing the result set.
+
+--- forbidden async/timing constructs in the new test ---
+setTimeout         0 occurrence(s)
+sleep              0 occurrence(s)
+waitForTimeout     0 occurrence(s)
+Date\.now          0 occurrence(s)
+Math\.random       0 occurrence(s)
+fetch\(            0 occurrence(s)
+puppeteer          0 occurrence(s)
+new WebSocket      0 occurrence(s)
+process\.env       0 occurrence(s)
+
+--- three consecutive runs must produce an identical pass/fail ledger ---
+run 1 ledger sha: 82cf473ec6b85ea1204423664d0c2207
+run 2 ledger sha: 82cf473ec6b85ea1204423664d0c2207
+run 3 ledger sha: 82cf473ec6b85ea1204423664d0c2207
+(identical hashes => deterministic; the recorded GREEN is a single run)

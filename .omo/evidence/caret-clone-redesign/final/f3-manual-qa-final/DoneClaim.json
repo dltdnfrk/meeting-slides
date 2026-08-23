@@ -1,0 +1,43 @@
+{
+  "task": "F3 final manual QA recovery",
+  "verdict": "REJECT",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "classification": "qa-harness-native-hidden-window-observation",
+  "productDefectObserved": false,
+  "decisiveExit": 1,
+  "failure": {
+    "completedAction": "AXPress on installed app menu-bar item",
+    "failedObservation": "AXVisible of window 1 after the menu-bar item hid the minibar",
+    "macOSError": -1728,
+    "reason": "The successful user action removed window 1 from the System Events query path; the harness treated that expected owner disappearance as a fatal error."
+  },
+  "preflight": {
+    "verdict": "PASS",
+    "manifestedActions": 28,
+    "forbiddenTargetsAbsent": ["#thumbnails .thumbnail", "#btn-return-live"],
+    "correctedOwners": ["#dock-more > summary", "#current-slide .slide__notice"]
+  },
+  "build": {
+    "buildAppExit": 0,
+    "verifyAppExit": 0,
+    "codesignExit": 0
+  },
+  "coverageComplete": false,
+  "screenshotsProduced": 0,
+  "cleanup": {
+    "markerRestored": true,
+    "temporaryRuntimeRemoved": true,
+    "portFree": true,
+    "appAlive": false,
+    "defaultsRestored": true
+  },
+  "scope": {
+    "productEdits": false,
+    "planLedgerTodoF4Edits": false,
+    "microphoneInput": false,
+    "externalApis": false,
+    "userDatabase": false,
+    "commit": false
+  },
+  "report": ".omo/evidence/caret-clone-redesign/final/f3-manual-qa-final/REPORT.md"
+}

@@ -1,0 +1,2 @@
+== tsc --strict --noEmit on the new test file ==
+exit=0

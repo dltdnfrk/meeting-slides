@@ -1,0 +1,2 @@
+/Users/hyunjun/Applications/Meeting Slides.app: valid on disk
+/Users/hyunjun/Applications/Meeting Slides.app: satisfies its Designated Requirement

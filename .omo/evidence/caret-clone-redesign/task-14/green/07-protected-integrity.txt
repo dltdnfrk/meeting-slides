@@ -1,0 +1,68 @@
+== protected integrity: pre-existing dirty paths NOT owned by this task ==
+b1449a31bf94f07a8357743507b4574a12f937c25660712386930fa80d84c445  .env.example
+7894baee3778bd209026324c117c260076a774074c514c149fbd5cb1483b3484  DESIGN.md
+e1c3844f5cb4bb74d052b5deea9ee615940431ffa75bc49a73670e1ea912e64b  README.md
+c92b11cf7cba13e4d9711f8714f75e2d25a289971033e2c235fcf45dc4f0ca5d  public/app.js
+6834bc537b9e3c18e47bbdf4a97032aa3468570741969a50d4f70e341e21f036  public/index.html
+9cc9216c660d71582055ab52c58ce9aa5c032f4d9e7df3cf2f47f8f961b40732  public/operator-surface.js
+ce5b33e747269f43ab611eb574b17fbcf83d01e0b9737f3444b2ab6f8a584599  public/workspace-split.js
+80084305117b26160b063c5c59b80ecc07fc92a2ac01ca40a64310281520a923  server.ts
+ee456f49538f5eec09789b6afe582aafff6b9180dba19e86e67cccb52dacf444  src/app-settings.ts
+0cdc3197595e30d3fc725249e26e7c667cd040b7c651e04d93eb8c19b49f90a8  src/config.ts
+12eaba3b65342171d6d53ad8cecddc8c6d291bc91a38fe403c61f618c0d43a15  src/llm.ts
+b9b8c4436264860f5b03a829f90ca8d256cb999b8758cd26812f8579631cea0e  src/minutes.ts
+17b4fa02f0c4f443ab49584f6f80f9787be432e52a23ae15d9413d382236bdb9  src/provider-adapters.ts
+624995935cf4bcaf2647942b949146d3d546f1b4ec91edbd0cee5dde83b07f5b  src/providers.ts
+2e8ec7b84774a973e9263932c83390b8fec00f8389b6a19fad9c6787b211b5a7  tests/app-settings.test.ts
+73d9c3d62bdaab1bcb2acec8ce0aa845e893b0567ebed82995570e70fb4402c5  tests/providers.test.ts
+a4ee68f1497be5a0efabe73779925e3785dd594bb0b1ae959a1e8a7a00002bc2  tests/public-operator-surface.test.ts
+4790ed7e97dfb6fc349419bc44215fc22103b24776b6b3390dab1e1f144f45bf  tests/public-test-harness.ts
+90e3d3e89b3e3cd9628371ef5def2226d3b2e463389b4d8f81a582c236bd1bab  tests/public-workspace.test.ts
+d750cd83253b2e6b46dc6a8172769f2b5f3d5c6c0c298da83965f2228df76721  macos/NativeSurfaceContract.swift
+172fde90302b6d4fe9cac8674f79515b0b21beeebe4593dab1d04892773ee37c  macos/AppLifecycle.swift
+110f12cf8fcc2ae913f49f386df1253319aa77f6fc0f88f2ec6b8604bdb60b6f  macos/TransportClient.swift
+a940c77f517f0bb755a4eb67b4e3275fe44c3fd6c11c1acfa7ec80cfdda7c695  public/transcript-state.ts
+8e524df24d13d5187ad81aa3263fc02042526af0159c811ebe9d1de5cee356f1  public/ui-state-machine.ts
+
+== VERDICT: baseline vs now, per protected path ==
+UNCHANGED  .env.example
+UNCHANGED  DESIGN.md
+UNCHANGED  README.md
+CHANGED    public/app.js  (baseline=6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad now=c92b11cf7cba13e4d9711f8714f75e2d25a289971033e2c235fcf45dc4f0ca5d)
+CHANGED    public/index.html  (baseline=52e8d5214f6dd7de6c7de7d8a3a9f737697cc400285151a4cae9adfb124382c5 now=6834bc537b9e3c18e47bbdf4a97032aa3468570741969a50d4f70e341e21f036)
+CHANGED    public/operator-surface.js  (baseline=e589a1fecb564ede96733cca2be08ea1802bc267584f02d8d3a1dcf86c11a56f now=9cc9216c660d71582055ab52c58ce9aa5c032f4d9e7df3cf2f47f8f961b40732)
+UNCHANGED  public/workspace-split.js
+UNCHANGED  server.ts
+UNCHANGED  src/app-settings.ts
+UNCHANGED  src/config.ts
+UNCHANGED  src/llm.ts
+UNCHANGED  src/minutes.ts
+UNCHANGED  src/provider-adapters.ts
+UNCHANGED  src/providers.ts
+UNCHANGED  tests/app-settings.test.ts
+UNCHANGED  tests/providers.test.ts
+UNCHANGED  tests/public-operator-surface.test.ts
+UNCHANGED  tests/public-test-harness.ts
+UNCHANGED  tests/public-workspace.test.ts
+UNCHANGED  macos/NativeSurfaceContract.swift
+UNCHANGED  macos/AppLifecycle.swift
+UNCHANGED  macos/TransportClient.swift
+UNCHANGED  public/transcript-state.ts
+UNCHANGED  public/ui-state-machine.ts
+UNCHANGED  HANDOFF.md
+
+unchanged=22 changed=3
+
+== attribution of the 3 changed browser files (NOT this task) ==
+--- public/app.js  mtime: Aug 11 17:59:04 2026
+--- public/index.html  mtime: Aug 11 17:58:12 2026
+--- public/operator-surface.js  mtime: Aug 11 18:04:04 2026
+  minibar refs: 4
+
+This task wrote only: macos/MinibarProjection.swift, macos/MinibarWindowController.swift,
+macos/MinibarView.swift, macos/launcher.swift, scripts/build-app.sh,
+tests/fixtures/native-minibar-driver.swift, tests/native-minibar.test.ts,
+tests/native-surface-contract.test.ts, tests/native-launcher-boundary.test.ts,
+and .omo/evidence/caret-clone-redesign/task-14/**.
+The three public/ files were modified by concurrent sibling work (Todos 11-13),
+were never opened for writing here, and are left exactly as found.

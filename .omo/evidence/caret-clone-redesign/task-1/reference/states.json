@@ -1,0 +1,229 @@
+{
+  "packet": "official-caret-reference",
+  "startedAt": "2026-08-11T06:34:23.586Z",
+  "finishedAt": "2026-08-11T06:34:43.085Z",
+  "chromium": "puppeteer-bundled",
+  "sources": [
+    "https://caret.so/en",
+    "https://caret.so/en/changelog"
+  ],
+  "states": [
+    {
+      "stateId": "home-hero",
+      "kind": "official-reference",
+      "sourceUrl": "https://caret.so/en",
+      "finalUrl": "https://caret.so/en",
+      "httpStatus": 200,
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:34:27.096Z",
+      "anchorSelector": "h1.font-display",
+      "screenshot": {
+        "path": "reference/screens/home-hero.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 923516,
+        "sha256": "7b82494375bbb535a91482a55ddb0b9feadeaeadca73b4c46ef9051f2bc5bd8d"
+      },
+      "computed": {
+        "path": "reference/computed/home-hero.json",
+        "sha256": "d271145a0e625fab47fd8b6b54431d61cd3f6f3f0c0cf8c79a329e11e4f84107",
+        "bytes": 11647,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "home-live-suggestion",
+      "kind": "official-reference",
+      "sourceUrl": "https://caret.so/en",
+      "finalUrl": "https://caret.so/en",
+      "httpStatus": 200,
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:34:30.128Z",
+      "anchorSelector": "[data-omo-state-anchor='1']",
+      "screenshot": {
+        "path": "reference/screens/home-live-suggestion.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 221891,
+        "sha256": "a53aa37eb3f772f1caa87095046a9cfd079d50e08b6cfc4e3537816aa2addd7c"
+      },
+      "computed": {
+        "path": "reference/computed/home-live-suggestion.json",
+        "sha256": "f6038a0a3433a985ccfcab36a1b31383e1ca5e3610076c2249b5024621c4b302",
+        "bytes": 3951,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "home-before-the-call",
+      "kind": "official-reference",
+      "sourceUrl": "https://caret.so/en",
+      "finalUrl": "https://caret.so/en",
+      "httpStatus": 200,
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:34:32.597Z",
+      "anchorSelector": "[data-omo-state-anchor='1']",
+      "screenshot": {
+        "path": "reference/screens/home-before-the-call.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 503433,
+        "sha256": "88a10749acf5a1a2139100493300fdea404c6b8612ec65b555c5d73df13676ed"
+      },
+      "computed": {
+        "path": "reference/computed/home-before-the-call.json",
+        "sha256": "be27f34569b5dea9c1695f53357e32b1de3b9e6e6dfba7be0481588867c0ca50",
+        "bytes": 3897,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "home-after-the-call",
+      "kind": "official-reference",
+      "sourceUrl": "https://caret.so/en",
+      "finalUrl": "https://caret.so/en",
+      "httpStatus": 200,
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:34:34.813Z",
+      "anchorSelector": "[data-omo-state-anchor='1']",
+      "screenshot": {
+        "path": "reference/screens/home-after-the-call.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 370116,
+        "sha256": "617c31f850336238936ffd8e2361f9d425de44a3888b43424a00c1b6a2a205e5"
+      },
+      "computed": {
+        "path": "reference/computed/home-after-the-call.json",
+        "sha256": "1d6445d936729c9619b595a83ce8ee3cffcfbf60096b454385097a4706a1dbbd",
+        "bytes": 3906,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "home-narrow",
+      "kind": "official-reference",
+      "sourceUrl": "https://caret.so/en",
+      "finalUrl": "https://caret.so/en",
+      "httpStatus": 200,
+      "viewport": {
+        "name": "375x812",
+        "width": 375,
+        "height": 812
+      },
+      "capturedAt": "2026-08-11T06:34:36.401Z",
+      "anchorSelector": "h1.font-display",
+      "screenshot": {
+        "path": "reference/screens/home-narrow.png",
+        "width": 375,
+        "height": 812,
+        "bytes": 218593,
+        "sha256": "a7237c9935a81fcbb1618e3864f876dcd701bdc81174720d3fc9ca4f6fd91656"
+      },
+      "computed": {
+        "path": "reference/computed/home-narrow.json",
+        "sha256": "78ed7daafb35e2bb581191209285aa41ef526efbbfa377473842a82a1de9166d",
+        "bytes": 6354,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "changelog-index",
+      "kind": "official-reference",
+      "sourceUrl": "https://caret.so/en/changelog",
+      "finalUrl": "https://caret.so/en/changelog",
+      "httpStatus": 200,
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:34:39.050Z",
+      "anchorSelector": "h1.font-display",
+      "screenshot": {
+        "path": "reference/screens/changelog-index.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 176187,
+        "sha256": "9d8eb7f0e438df2a2b7a4b9048c83f8ef25b8b8066803e18efc57a6589854696"
+      },
+      "computed": {
+        "path": "reference/computed/changelog-index.json",
+        "sha256": "689d66c129e770c2debd102af57f397ed82c10a7160064a076492c1142586cc8",
+        "bytes": 9408,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "changelog-mini-recording-popup",
+      "kind": "official-reference",
+      "sourceUrl": "https://caret.so/en/changelog",
+      "finalUrl": "https://caret.so/en/changelog",
+      "httpStatus": 200,
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:34:40.802Z",
+      "anchorSelector": "h3#mini-recording-popup-invisible-during-screen-sharing",
+      "screenshot": {
+        "path": "reference/screens/changelog-mini-recording-popup.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 177023,
+        "sha256": "cae60507ce5230d87a2e3fd71a1290f7383f61a135464b7bc1b891bcc335a441"
+      },
+      "computed": {
+        "path": "reference/computed/changelog-mini-recording-popup.json",
+        "sha256": "d1f98973cf167444d9952a0ff4d1b64f95ba1f4795bd140bf61ba9ad187f1bd8",
+        "bytes": 6702,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "changelog-new-ui",
+      "kind": "official-reference",
+      "sourceUrl": "https://caret.so/en/changelog",
+      "finalUrl": "https://caret.so/en/changelog",
+      "httpStatus": 200,
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:34:42.939Z",
+      "anchorSelector": "h2#new-ui",
+      "screenshot": {
+        "path": "reference/screens/changelog-new-ui.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 165156,
+        "sha256": "5322f905bf2900a9ed2c53e5108f98dec0579b5c2bda6bd474b38598be0d307a"
+      },
+      "computed": {
+        "path": "reference/computed/changelog-new-ui.json",
+        "sha256": "dd68fe89f0256c049a683d424840bd8bf8e408a3eb63aadc002ec43f5ab57224",
+        "bytes": 5034,
+        "missingSelectors": []
+      }
+    }
+  ],
+  "errors": []
+}

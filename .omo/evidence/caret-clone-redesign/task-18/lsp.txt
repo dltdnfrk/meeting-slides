@@ -1,0 +1,13 @@
+# LSP diagnostics
+
+- TypeScript LSP: no diagnostics for every changed TS test/helper (`public-active-shell`,
+  `public-attendees`, `public-transcript-dock`, `public-shell`, `public-caret-foundation`,
+  `caret-foundation-probe`).
+- CSS/HTML LSP could not run because the configured `biome` executable is not installed.
+- Shell LSP could not run because `bash-language-server` is not installed.
+- Markdown has no configured server.
+
+No dependency was installed. Equivalent executable validation passed: Chromium parsed and
+painted both active stylesheets in 45 fresh captures, `bash -n scripts/verify-app.sh` passed,
+the verifier passed against the installed bundle, project and strict TypeScript passed, and
+`git diff --check` passed.

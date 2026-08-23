@@ -1,0 +1,9 @@
+compile browser webapp launcher…
+/Users/hyunjun/Applications/Meeting Slides.app: replacing existing signature
+
+OK webapp launcher: /Users/hyunjun/Applications/Meeting Slides.app
+mode: default browser -> http://localhost (not WKWebView/Tauri)
+project: /Users/hyunjun/Documents/MUNI/meeting-slides
+run: open "/Users/hyunjun/Applications/Meeting Slides.app"
+log: ~/Library/Logs/Meeting Slides/launcher.log
+BUILD_EXIT=0

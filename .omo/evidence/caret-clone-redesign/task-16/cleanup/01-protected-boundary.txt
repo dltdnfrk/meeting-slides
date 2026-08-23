@@ -1,0 +1,21 @@
+=== HEAD / index unchanged ===
+HEAD: a1ed25f95980980cd958044b90e739ac45e8280d
+baseline HEAD was: a1ed25f95980980cd958044b90e739ac45e8280d
+staged files (must be none):
+  [none]
+
+=== protected unrelated dirty work still dirty and untouched by task 16 ===
+  .env.example                  M .env.example
+  src/providers.ts              M src/providers.ts
+  src/provider-adapters.ts      M src/provider-adapters.ts
+  src/llm.ts                    M src/llm.ts
+  src/minutes.ts                M src/minutes.ts
+  src/config.ts                 M src/config.ts
+  src/app-settings.ts           M src/app-settings.ts
+  HANDOFF.md                   ?? HANDOFF.md
+
+=== models/ and app bundles untouched ===
+models
+  models/ present, not modified by this task
+  lrwx------  1 hyunjun  staff  46 Aug  3 21:03 Meeting Slides 2.app -> /Users/hyunjun/Applications/Meeting Slides.app
+  lrwxr-xr-x@ 1 hyunjun  staff  46 Aug 11 18:19 Meeting Slides.app -> /Users/hyunjun/Applications/Meeting Slides.app

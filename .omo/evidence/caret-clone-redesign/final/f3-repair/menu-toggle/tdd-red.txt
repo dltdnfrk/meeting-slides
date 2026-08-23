@@ -1,0 +1,351 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/native-surface-contract.test.ts:
+(pass) native surface seam: sources and compilation > the pure module and fixture driver exist [0.11ms]
+277 |     expect(existsSync(MODULE_SWIFT)).toBe(true);
+278 |     expect(existsSync(DRIVER_SWIFT)).toBe(true);
+279 |   });
+280 | 
+281 |   test("swiftc compiles the pure module with the fixture driver", () => {
+282 |     expect(compileLog).not.toMatch(/error:/);
+                                 ^
+error: expect(received).not.toMatch(expected)
+
+Expected substring or pattern: not /error:/
+Received: "/Users/hyunjun/Documents/MUNI/meeting-slides/tests/fixtures/native-surface-driver.swift:157:17: error: cannot find 'MinibarPresentationState' in scope\n155 |     }\n156 | \n157 |     var state = MinibarPresentationState()\n    |                 `- error: cannot find 'MinibarPresentationState' in scope\n158 |     var effects: [String] = []\n159 |     var states: [String] = []\n\n/Users/hyunjun/Documents/MUNI/meeting-slides/tests/fixtures/native-surface-driver.swift:161:20: error: cannot find type 'MinibarPresentationEvent' in scope\n159 |     var states: [String] = []\n160 |     for raw in rawEvents {\n161 |         let event: MinibarPresentationEvent\n    |                    `- error: cannot find type 'MinibarPresentationEvent' in scope\n162 |         switch raw {\n163 |         case \"present\": event = .present\n"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:282:28)
+(fail) native surface seam: sources and compilation > swiftc compiles the pure module with the fixture driver [0.19ms]
+(pass) native surface seam: sources and compilation > the pure module imports no AppKit and creates no window [0.12ms]
+289 |     expect(source).not.toMatch(/NSPanel|NSWindow|NSStatusItem|NSApplication/);
+290 |   });
+291 | 
+292 |   test("the driver runs once, exits 0 and emits machine-readable JSON", () => {
+293 |     expect(driverStderr).toBe("");
+294 |     expect(driverExit).toBe(0);
+                             ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: -1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:294:24)
+(fail) native surface seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.25ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "collapsed-bounds"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:302:12)
+(fail) native surface seam: minibar geometry > collapsed bounds are exactly 360x56 [0.06ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "expanded-bounds"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:306:12)
+(fail) native surface seam: minibar geometry > expanded bounds are exactly 560x220 [0.03ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "default-frame-main-display"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:310:19)
+(fail) native surface seam: minibar geometry > with no saved frame the default sits inside the 16px active-display gutter [0.03ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "saved-frame-valid"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:327:12)
+(fail) native surface seam: minibar geometry > a fully on-display saved frame is restored verbatim [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "saved-frame-off-display"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:338:12)
+(fail) native surface seam: minibar geometry > a saved frame entirely off-display falls back to the deterministic default [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "saved-frame-half-off-display"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:342:18)
+(fail) native surface seam: minibar geometry > a saved frame with less than 50% display intersection returns the default frame [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "saved-frame-clamped-into-gutter"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:348:19)
+(fail) native surface seam: minibar geometry > a mostly-visible saved frame is clamped into the 16px gutters, not discarded [0.03ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "saved-frame-second-display"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:363:19)
+(fail) native surface seam: minibar geometry > a saved frame on a secondary display stays on that display [0.03ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "expand-preserves-anchor"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:376:19)
+(fail) native surface seam: minibar geometry > expanding keeps the surface on the saved display with expanded bounds [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "impossible-display-bounds"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:389:24)
+(fail) native surface seam: minibar geometry > impossible display bounds yield a typed failure instead of a crash [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "no-displays"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:395:18)
+(fail) native surface seam: minibar geometry > an empty display list yields a typed failure instead of a crash [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "menu-toggle-visible-collapsed"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:404:14)
+(fail) native surface seam: menu-bar presentation > first toggle hides and second toggle restores without changing collapsed mode [0.03ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "menu-toggle-visible-expanded"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:404:14)
+(fail) native surface seam: menu-bar presentation > first toggle hides and second toggle restores without changing expanded mode [0.02ms]
+412 |   test("the shipping controller owns presentation state instead of querying NSWindow visibility", () => {
+413 |     const controller = readFileSync(join(ROOT, "macos", "MinibarWindowController.swift"), "utf8")
+414 |       .split("\n")
+415 |       .filter((line) => !line.trim().startsWith("//"))
+416 |       .join("\n");
+417 |     expect(controller).toMatch(/MinibarPresentationState/);
+                             ^
+error: expect(received).toMatch(expected)
+
+Expected substring or pattern: /MinibarPresentationState/
+Received: "\nimport AppKit\nimport Foundation\n\n\nenum MinibarFrameStore {\n    private static let key = \"minibar.frame.v1\"\n\n    static func save(_ rect: SurfaceRect, defaults: UserDefaults = .standard) {\n        defaults.set(\n            [\"x\": rect.x, \"y\": rect.y, \"width\": rect.width, \"height\": rect.height],\n            forKey: key\n        )\n    }\n\n    static func load(defaults: UserDefaults = .standard) -> SurfaceRect? {\n        guard let raw = defaults.dictionary(forKey: key) as? [String: Double],\n              let x = raw[\"x\"], let y = raw[\"y\"],\n              let width = raw[\"width\"], let height = raw[\"height\"]\n        else { return nil }\n        return SurfaceRect(x: x, y: y, width: width, height: height)\n    }\n}\n\n\nenum MinibarScreens {\n    static func displays() -> [DisplayInfo] {\n        let screens = NSScreen.screens\n        guard let primary = screens.first else { return [] }\n        let primaryTop = primary.frame.maxY\n        let active = NSScreen.main\n        return screens.enumerated().map { index, screen in\n            let visible = screen.visibleFrame\n            return DisplayInfo(\n                id: index,\n                frame: SurfaceRect(\n                    x: Double(visible.minX),\n                    y: Double(primaryTop - visible.maxY),\n                    width: Double(visible.width),\n                    height: Double(visible.height)\n                ),\n                isActive: screen == active\n            )\n        }\n    }\n\n    static func appKitRect(_ rect: SurfaceRect) -> NSRect {\n        guard let primary = NSScreen.screens.first else {\n            return NSRect(x: rect.x, y: rect.y, width: rect.width, height: rect.height)\n        }\n        let primaryTop = primary.frame.maxY\n        return NSRect(\n            x: rect.x,\n            y: primaryTop - rect.y - rect.height,\n            width: rect.width,\n            height: rect.height\n        )\n    }\n\n    static func contractRect(_ rect: NSRect) -> SurfaceRect {\n        guard let primary = NSScreen.screens.first else {\n            return SurfaceRect(\n                x: Double(rect.minX), y: Double(rect.minY),\n                width: Double(rect.width), height: Double(rect.height)\n            )\n        }\n        let primaryTop = primary.frame.maxY\n        return SurfaceRect(\n            x: Double(rect.minX),\n            y: Double(primaryTop - rect.maxY),\n            width: Double(rect.width),\n            height: Double(rect.height)\n        )\n    }\n}\n\n\nfinal class MinibarPanel: NSPanel {\n    var onEscape: (() -> Void)?\n\n    override var canBecomeKey: Bool { true }\n    override var canBecomeMain: Bool { false }\n\n    override func cancelOperation(_ sender: Any?) {\n        onEscape?()\n    }\n}\n\n\nfinal class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDelegate {\n    private let workspaceURL: URL\n    private let policy = MinibarWindowPolicy()\n\n    private var transport = TransportClient()\n    private var projection = MinibarProjection()\n    private var socket: URLSessionWebSocketTask?\n    private var session: URLSession?\n    private let endpoint: URL\n    private var reconnectTimer: Timer?\n    private var renderTimer: Timer?\n    private var statusItem: NSStatusItem?\n\n    private let panel: MinibarPanel\n    private let contentView: MinibarView\n\n    init(port: Int) {\n        endpoint = URL(string: TransportEndpoint.webSocketURL(port: port))!\n        workspaceURL = URL(string: \"http://localhost:\\(port)/\")!\n\n        let size = SurfaceMode.collapsed.size\n        contentView = MinibarView(\n            frame: NSRect(x: 0, y: 0, width: size.width, height: size.height)\n        )\n        panel = MinibarPanel(\n            contentRect: NSRect(x: 0, y: 0, width: size.width, height: size.height),\n            styleMask: [.borderless, .nonactivatingPanel],\n            backing: .buffered,\n            defer: false\n        )\n        super.init()\n\n        panel.contentView = contentView\n        panel.isFloatingPanel = policy.floating\n        panel.level = .floating\n        panel.hidesOnDeactivate = policy.hidesOnDeactivate\n        panel.isMovableByWindowBackground = true\n        panel.isOpaque = false\n        panel.backgroundColor = .clear\n        panel.hasShadow = true\n        panel.collectionBehavior = policy.joinsAllSpaces\n            ? [.canJoinAllSpaces, .fullScreenAuxiliary]\n            : [.fullScreenAuxiliary]\n        panel.delegate = self\n        panel.setAccessibilityLabel(\"Meeting Slides 미니바\")\n        panel.onEscape = { [weak self] in self?.handleEscape() }\n        contentView.delegate = self\n\n        applyFrame(for: projection.mode)\n    }\n\n\n    func present(origin: CaptureOrigin) {\n        let plan = MinibarActivation.plan(origin: origin)\n        guard plan.showsSurface else { return }\n        if plan.activatesApp {\n            panel.makeKeyAndOrderFront(nil)\n            NSApp.activate(ignoringOtherApps: true)\n            if plan.focusesStop { panel.makeFirstResponder(contentView.stopControl) }\n        } else {\n            panel.orderFrontRegardless()\n        }\n        render()\n    }\n\n    func installStatusItem() {\n        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)\n        item.button?.title = MinibarStatus.connecting.glyph\n        item.button?.setAccessibilityLabel(\"Meeting Slides\")\n        item.button?.target = self\n        item.button?.action = #selector(statusItemActivated)\n        statusItem = item\n    }\n\n    @objc private func statusItemActivated() {\n        present(origin: .user)\n    }\n\n    func connect() {\n        let session = URLSession(configuration: .default)\n        self.session = session\n        let task = session.webSocketTask(with: endpoint)\n        socket = task\n        task.resume()\n        receiveNext()\n        apply(transport.handle(.opened))\n        startRenderTimer()\n    }\n\n    var isCapturing: Bool {\n        transport.projection.capture.phase.requiresQuitProtection\n    }\n\n    func stopConnection() {\n        renderTimer?.invalidate()\n        renderTimer = nil\n        reconnectTimer?.invalidate()\n        reconnectTimer = nil\n        socket?.cancel(with: .goingAway, reason: nil)\n        socket = nil\n        session?.invalidateAndCancel()\n        session = nil\n    }\n\n\n    private func receiveNext() {\n        socket?.receive { [weak self] result in\n            guard let self else { return }\n            DispatchQueue.main.async {\n                switch result {\n                case let .success(message):\n                    if case let .string(payload) = message { self.ingest(payload) }\n                    if case let .data(data) = message,\n                       let payload = String(data: data, encoding: .utf8) {\n                        self.ingest(payload)\n                    }\n                    self.receiveNext()\n                case .failure:\n                    self.apply(self.transport.handle(.closed))\n                }\n            }\n        }\n    }\n\n    private func ingest(_ payload: String) {\n        let before = transport.projection.decodeFailures\n        apply(transport.handle(.received(payload)))\n        let failed = transport.projection.decodeFailures > before\n        projection.ingest(payload, transportDecodeFailed: failed)\n        if !failed, let event = try? NativeSurfaceDecoder.decode(payload),\n           case .capture = event {\n            projection.applyCapture(transport.projection.capture)\n        }\n        render()\n    }\n\n    private func apply(_ effects: [TransportEffect]) {\n        for effect in effects {\n            switch effect {\n            case let .send(frame):\n                socket?.send(.string(frame)) { _ in }\n            case let .scheduleReconnect(afterSeconds):\n                scheduleReconnect(afterSeconds)\n            }\n        }\n        render()\n    }\n\n    private func scheduleReconnect(_ seconds: Double) {\n        reconnectTimer?.invalidate()\n        reconnectTimer = Timer.scheduledTimer(withTimeInterval: seconds, repeats: false) {\n            [weak self] _ in\n            guard let self else { return }\n            self.socket?.cancel()\n            let task = self.session?.webSocketTask(with: self.endpoint)\n            self.socket = task\n            task?.resume()\n            self.receiveNext()\n            self.apply(self.transport.handle(.opened))\n        }\n    }\n\n\n    private func startRenderTimer() {\n        renderTimer?.invalidate()\n        renderTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in\n            self?.render()\n        }\n    }\n\n    private func render() {\n        let model = projection.render(\n            connection: transport.projection.connection,\n            capture: transport.projection.capture,\n            now: Date().timeIntervalSince1970 * 1000\n        )\n        contentView.render(model)\n        statusItem?.button?.title = model.glyph\n        statusItem?.button?.setAccessibilityLabel(\"Meeting Slides — \\(model.title)\")\n    }\n\n\n    func minibarViewDidActivate(_ control: MinibarControl) {\n        switch control {\n        case .stop:\n            apply(transport.handle(.stopActivated))\n        case .disclosure:\n            setMode(MinibarMode.next(from: projection.mode, event: .toggleDisclosure))\n        case .openWorkspace:\n            NSWorkspace.shared.open(workspaceURL)\n        }\n    }\n\n    private func handleEscape() {\n        setMode(MinibarMode.next(from: projection.mode, event: .escape))\n    }\n\n    private func setMode(_ mode: SurfaceMode) {\n        guard mode != projection.mode else { return }\n        projection.setMode(mode)\n        applyFrame(for: mode)\n        render()\n    }\n\n\n    private func applyFrame(for mode: SurfaceMode) {\n        let displays = MinibarScreens.displays()\n        let saved = MinibarFrameStore.load()\n        guard\n            let resolved = try? NativeSurfaceGeometry.resolveFrame(\n                mode: mode, savedFrame: saved, displays: displays\n            )\n        else {\n            return\n        }\n\n        let plan = MinibarMotion.plan(\n            reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion\n        )\n        let target = MinibarScreens.appKitRect(resolved.rect)\n        if plan.animates {\n            NSAnimationContext.runAnimationGroup { context in\n                context.duration = plan.durationSeconds\n                panel.animator().setFrame(target, display: true)\n            }\n        } else {\n            panel.setFrame(target, display: true)\n        }\n\n        panel.styleMask = policy.resizable(in: mode)\n            ? [.borderless, .nonactivatingPanel, .resizable]\n            : [.borderless, .nonactivatingPanel]\n        panel.contentMinSize = target.size\n        panel.contentMaxSize = policy.resizable(in: mode)\n            ? NSSize(\n                width: CGFloat.greatestFiniteMagnitude,\n                height: CGFloat.greatestFiniteMagnitude\n            )\n            : target.size\n        MinibarFrameStore.save(resolved.rect)\n    }\n\n\n    func windowDidMove(_ notification: Notification) {\n        MinibarFrameStore.save(MinibarScreens.contractRect(panel.frame))\n    }\n\n    func windowDidResize(_ notification: Notification) {\n        MinibarFrameStore.save(MinibarScreens.contractRect(panel.frame))\n    }\n}\n"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:417:24)
+(fail) native surface seam: menu-bar presentation > the shipping controller owns presentation state instead of querying NSWindow visibility [0.32ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "decode-capture-capturing"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:426:12)
+(fail) native surface seam: server payload decode subset > a capture update decodes phase, mode and startedAt [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "decode-capture-phaseless"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:436:21)
+(fail) native surface seam: server payload decode subset > a phase-less capturing update maps compatibly to capturing [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "decode-capture-phaseless-idle"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:442:13)
+(fail) native surface seam: server payload decode subset > a phase-less idle update maps compatibly to idle [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "decode-status"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:446:12)
+(fail) native surface seam: server payload decode subset > a status update decodes as transport status [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "decode-unknown-type"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:450:12)
+(fail) native surface seam: server payload decode subset > a message outside the observed subset is ignored, not an error [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "decode-malformed-json"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:454:17)
+(fail) native surface seam: server payload decode subset > malformed JSON yields a typed failure without crashing [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "decode-wrong-field-type"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:460:17)
+(fail) native surface seam: server payload decode subset > a wrongly typed field yields a typed failure without crashing [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "decode-unknown-phase"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:466:17)
+(fail) native surface seam: server payload decode subset > an unknown capture phase yields a typed failure without crashing [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "stop-once"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:474:12)
+(fail) native surface seam: one-command guards > a single Stop activation while capturing emits one stopCapture [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "stop-duplicate-suppressed"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:478:12)
+(fail) native surface seam: one-command guards > rapid duplicate Stop activations emit exactly one stopCapture [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "stop-while-idle"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:482:12)
+(fail) native surface seam: one-command guards > Stop while idle emits nothing [0.02ms]
+260 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+261 | });
+262 | 
+263 | function result(name: string): DriverResult {
+264 |   const found = byName.get(name);
+265 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "stop-resets-after-authoritative-idle"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:265:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:270:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-surface-contract.test.ts:486:12)
+(fail) native surface seam: one-command guards > the guard rearms only after an authoritative idle snapshot [0.02ms]
+(pass) native surface seam: launcher and build invariants > the launcher keeps the browser workspace and never imports WebKit [0.09ms]
+(pass) native surface seam: launcher and build invariants > the launcher keeps its port, readiness and auto-capture contract [0.06ms]
+(pass) native surface seam: launcher and build invariants > the build script compiles the launcher and rejects WebKit linkage [0.07ms]
+(pass) native surface seam: launcher and build invariants > the pure module is packaged through the minibar, never through a second engine [0.09ms]
+
+ 6 pass
+ 28 fail
+ 24 expect() calls
+Ran 34 tests across 1 file. [568.00ms]

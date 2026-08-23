@@ -1,0 +1,172 @@
+{
+  "stateId": "changelog-new-ui",
+  "url": "https://caret.so/en/changelog",
+  "finalUrl": "https://caret.so/en/changelog",
+  "viewport": {
+    "name": "1440x900",
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-08-11T06:34:42.939Z",
+  "deterministic": {
+    "locale": "ko-KR",
+    "timezone": "Asia/Seoul",
+    "deviceScaleFactor": 1,
+    "colorScheme": "dark",
+    "reducedMotion": "reduce"
+  },
+  "httpStatus": 200,
+  "anchorSelector": "h2#new-ui",
+  "stageMarker": null,
+  "failedRequests": [
+    {
+      "url": "https://caret.so/en/pricing?_rsc=DUe-vQD98UKqOL-7",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://caret.so/en?_rsc=DUe-vQD98UKqOL-7",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://caret.so/en/changelog",
+      "failure": "net::ERR_ABORTED"
+    }
+  ],
+  "record": {
+    "root": {
+      "selector": ":root",
+      "typography": {
+        "fontFamily": "ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(0, 0, 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(2.75381 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": -5719,
+        "width": 1440,
+        "height": 35983.31
+      }
+    },
+    "newUiHeading": {
+      "selector": "h2#new-ui",
+      "typography": {
+        "fontFamily": "\"Google Sans Flex\", \"Pretendard Variable JP\", \"Pretendard Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "lineHeight": "31.9999px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(255, 255, 255)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(98.26 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 494.78,
+        "y": 80.03,
+        "width": 618.45,
+        "height": 31.98
+      }
+    },
+    "stateAnchor": {
+      "selector": "h2#new-ui",
+      "typography": {
+        "fontFamily": "\"Google Sans Flex\", \"Pretendard Variable JP\", \"Pretendard Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "24px",
+        "fontWeight": "600",
+        "lineHeight": "31.9999px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(255, 255, 255)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(98.26 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 494.78,
+        "y": 80.03,
+        "width": 618.45,
+        "height": 31.98
+      }
+    }
+  },
+  "missing": [],
+  "documentScrollWidth": 1440,
+  "documentClientWidth": 1440
+}

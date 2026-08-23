@@ -1,0 +1,4767 @@
+{
+  "fixedClock": 1710376860000,
+  "viewports": {
+    "reference": {
+      "viewport": {
+        "name": "reference",
+        "width": 1440,
+        "height": 900
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 14,
+          "y": 319,
+          "w": 1087,
+          "h": 219,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 1106,
+          "y": 319,
+          "w": 320,
+          "h": 219,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 59,
+          "y": 396,
+          "w": 997,
+          "h": 130,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 59,
+          "y": 396,
+          "w": 997,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 690,
+          "w": 1440,
+          "h": 210,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 15,
+          "y": 775,
+          "w": 1410,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 59,
+          "y": 330,
+          "w": 997,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 498,
+          "y": 342,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 95,
+          "clientH": 34,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 7.669,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 498,
+            "y": 342,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 33,
+            "y": 709,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 92,
+            "y": 709,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 153,
+            "y": 709,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 680,
+            "y": 703,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 718,
+            "y": 782,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 858,
+            "y": 782,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 940,
+            "y": 782,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 1003,
+            "y": 782,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 1084,
+            "y": 782,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 1175,
+            "y": 782,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 1230,
+            "y": 782,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 1293,
+            "y": 782,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 1347,
+            "y": 782,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1440,
+          "vh": 900
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 143,
+          "y": 127,
+          "w": 829,
+          "h": 682,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 977,
+          "y": 127,
+          "w": 320,
+          "h": 682,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 154,
+          "y": 215,
+          "w": 807,
+          "h": 588,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 154,
+          "y": 210,
+          "w": 807,
+          "h": 588,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 564,
+          "y": 828,
+          "w": 313,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 154,
+          "y": 136,
+          "w": 807,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 498,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 1011,
+          "y": -506,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 605,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 1.372,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 498,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 620,
+            "y": 841,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1440,
+          "vh": 900
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 143,
+          "y": 127,
+          "w": 829,
+          "h": 682,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 977,
+          "y": 127,
+          "w": 320,
+          "h": 682,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 154,
+          "y": 214,
+          "w": 807,
+          "h": 588,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 154,
+          "y": 210,
+          "w": 807,
+          "h": 588,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 564,
+          "y": 828,
+          "w": 313,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 154,
+          "y": 136,
+          "w": 807,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 498,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 1011,
+          "y": -506,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 605,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 1.372,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 498,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 620,
+            "y": 841,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1440,
+          "vh": 900
+        }
+      }
+    },
+    "library": {
+      "viewport": {
+        "name": "library",
+        "width": 1244,
+        "height": 836
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 14,
+          "y": 314,
+          "w": 891,
+          "h": 160,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 910,
+          "y": 314,
+          "w": 320,
+          "h": 160,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 59,
+          "y": 391,
+          "w": 801,
+          "h": 114,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 59,
+          "y": 391,
+          "w": 801,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 626,
+          "w": 1244,
+          "h": 210,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 15,
+          "y": 711,
+          "w": 1214,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 59,
+          "y": 325,
+          "w": 801,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 400,
+          "y": 337,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 95,
+          "clientH": 24,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 7.026,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 400,
+            "y": 337,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 33,
+            "y": 645,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 92,
+            "y": 645,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 153,
+            "y": 645,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 582,
+            "y": 639,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 522,
+            "y": 718,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 662,
+            "y": 718,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 744,
+            "y": 718,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 807,
+            "y": 718,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 888,
+            "y": 718,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 979,
+            "y": 718,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 1034,
+            "y": 718,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 1097,
+            "y": 718,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 1151,
+            "y": 718,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1244,
+          "vh": 836
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 45,
+          "y": 127,
+          "w": 829,
+          "h": 618,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 879,
+          "y": 127,
+          "w": 320,
+          "h": 618,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 56,
+          "y": 215,
+          "w": 807,
+          "h": 524,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 56,
+          "y": 210,
+          "w": 807,
+          "h": 524,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 466,
+          "y": 764,
+          "w": 313,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 56,
+          "y": 136,
+          "w": 807,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 400,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 913,
+          "y": -570,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 541,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 1.54,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 400,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 522,
+            "y": 777,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1244,
+          "vh": 836
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 45,
+          "y": 127,
+          "w": 829,
+          "h": 618,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 879,
+          "y": 127,
+          "w": 320,
+          "h": 618,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 56,
+          "y": 215,
+          "w": 807,
+          "h": 524,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 56,
+          "y": 210,
+          "w": 807,
+          "h": 524,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 466,
+          "y": 764,
+          "w": 313,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 56,
+          "y": 136,
+          "w": 807,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 400,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 913,
+          "y": -570,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 541,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 1.54,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 400,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 522,
+            "y": 777,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1244,
+          "vh": 836
+        }
+      }
+    },
+    "seam1100": {
+      "viewport": {
+        "name": "seam1100",
+        "width": 1100,
+        "height": 800
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 14,
+          "y": 310,
+          "w": 747,
+          "h": 272,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 766,
+          "y": 310,
+          "w": 320,
+          "h": 272,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 47,
+          "y": 387,
+          "w": 681,
+          "h": 101,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 47,
+          "y": 387,
+          "w": 681,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 590,
+          "w": 1100,
+          "h": 210,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 15,
+          "y": 675,
+          "w": 1070,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 47,
+          "y": 321,
+          "w": 681,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 328,
+          "y": 333,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 95,
+          "clientH": 87,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 6.743,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 328,
+            "y": 333,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 31,
+            "y": 609,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 90,
+            "y": 609,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 151,
+            "y": 609,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 510,
+            "y": 603,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 378,
+            "y": 682,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 518,
+            "y": 682,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 600,
+            "y": 682,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 663,
+            "y": 682,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 744,
+            "y": 682,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 835,
+            "y": 682,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 890,
+            "y": 682,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 953,
+            "y": 682,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 1007,
+            "y": 682,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1100,
+          "vh": 800
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 25,
+          "y": 127,
+          "w": 725,
+          "h": 582,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 755,
+          "y": 127,
+          "w": 320,
+          "h": 582,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 36,
+          "y": 217,
+          "w": 703,
+          "h": 488,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 36,
+          "y": 210,
+          "w": 703,
+          "h": 488,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 396,
+          "y": 728,
+          "w": 309,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 36,
+          "y": 136,
+          "w": 703,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 328,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 789,
+          "y": -606,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 505,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 1.441,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 328,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 450,
+            "y": 741,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1100,
+          "vh": 800
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 25,
+          "y": 127,
+          "w": 725,
+          "h": 582,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 755,
+          "y": 127,
+          "w": 320,
+          "h": 582,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 36,
+          "y": 217,
+          "w": 703,
+          "h": 488,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 36,
+          "y": 210,
+          "w": 703,
+          "h": 488,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 396,
+          "y": 728,
+          "w": 309,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 36,
+          "y": 136,
+          "w": 703,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 328,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 789,
+          "y": -606,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 505,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 1.441,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 328,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 450,
+            "y": 741,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 1100,
+          "vh": 800
+        }
+      }
+    },
+    "live": {
+      "viewport": {
+        "name": "live",
+        "width": 960,
+        "height": 760
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 14,
+          "y": 306,
+          "w": 607,
+          "h": 236,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 626,
+          "y": 306,
+          "w": 320,
+          "h": 236,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 47,
+          "y": 383,
+          "w": 541,
+          "h": 88,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 47,
+          "y": 383,
+          "w": 541,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 550,
+          "w": 960,
+          "h": 210,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 15,
+          "y": 635,
+          "w": 930,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 47,
+          "y": 317,
+          "w": 541,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 258,
+          "y": 329,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 95,
+          "clientH": 51,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 6.148,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 258,
+            "y": 329,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 31,
+            "y": 569,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 90,
+            "y": 569,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 151,
+            "y": 569,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 440,
+            "y": 563,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 238,
+            "y": 642,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 378,
+            "y": 642,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 460,
+            "y": 642,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 523,
+            "y": 642,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 604,
+            "y": 642,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 695,
+            "y": 642,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 750,
+            "y": 642,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 813,
+            "y": 642,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 867,
+            "y": 642,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 960,
+          "vh": 760
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 25,
+          "y": 127,
+          "w": 585,
+          "h": 542,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 615,
+          "y": 127,
+          "w": 320,
+          "h": 542,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 36,
+          "y": 217,
+          "w": 563,
+          "h": 448,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 36,
+          "y": 210,
+          "w": 563,
+          "h": 448,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 326,
+          "y": 688,
+          "w": 309,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 36,
+          "y": 136,
+          "w": 563,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 258,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 649,
+          "y": -646,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 465,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 1.257,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 258,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 380,
+            "y": 701,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 960,
+          "vh": 760
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 25,
+          "y": 127,
+          "w": 585,
+          "h": 542,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 615,
+          "y": 127,
+          "w": 320,
+          "h": 542,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 36,
+          "y": 217,
+          "w": 563,
+          "h": 448,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 36,
+          "y": 210,
+          "w": 563,
+          "h": 448,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 326,
+          "y": 688,
+          "w": 309,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 36,
+          "y": 136,
+          "w": 563,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 258,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 649,
+          "y": -646,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 465,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 1.257,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 258,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 380,
+            "y": 701,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 960,
+          "vh": 760
+        }
+      }
+    },
+    "seam900": {
+      "viewport": {
+        "name": "seam900",
+        "width": 900,
+        "height": 760
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 10,
+          "y": 307,
+          "w": 555,
+          "h": 43,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 570,
+          "y": 307,
+          "w": 320,
+          "h": 43,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 37,
+          "y": 382,
+          "w": 501,
+          "h": 46,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 37,
+          "y": 382,
+          "w": 501,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 536,
+          "w": 900,
+          "h": 224,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 15,
+          "y": 621,
+          "w": 870,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 32,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 37,
+          "y": 316,
+          "w": 501,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 228,
+          "y": 328,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 95,
+          "clientH": 24,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 10.891,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 228,
+            "y": 328,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 29,
+            "y": 555,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 88,
+            "y": 555,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 149,
+            "y": 555,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 753,
+            "y": 549,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 150,
+            "y": 628,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 293,
+            "y": 628,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 376,
+            "y": 628,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 441,
+            "y": 628,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 524,
+            "y": 628,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 618,
+            "y": 628,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 674,
+            "y": 628,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 783,
+            "y": 628,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 840,
+            "y": 628,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 900,
+          "vh": 760
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 127,
+          "w": 537,
+          "h": 314,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 561,
+          "y": 127,
+          "w": 320,
+          "h": 314,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 218,
+          "w": 515,
+          "h": 220,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 210,
+          "w": 515,
+          "h": 220,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 298,
+          "y": 688,
+          "w": 305,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 136,
+          "w": 515,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 228,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 595,
+          "y": -874,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 237,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 2.341,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 228,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 350,
+            "y": 701,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 900,
+          "vh": 760
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 127,
+          "w": 537,
+          "h": 314,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 561,
+          "y": 127,
+          "w": 320,
+          "h": 314,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 218,
+          "w": 515,
+          "h": 220,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 210,
+          "w": 515,
+          "h": 220,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 298,
+          "y": 688,
+          "w": 305,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 136,
+          "w": 515,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 228,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 595,
+          "y": -874,
+          "w": 252,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 237,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 2.341,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 228,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 350,
+            "y": 701,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 900,
+          "vh": 760
+        }
+      }
+    },
+    "seam899": {
+      "viewport": {
+        "name": "seam899",
+        "width": 899,
+        "height": 760
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 10,
+          "y": 307,
+          "w": 879,
+          "h": 30,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 10,
+          "y": 328,
+          "w": 879,
+          "h": 21,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 37,
+          "y": 382,
+          "w": 825,
+          "h": 46,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 37,
+          "y": 382,
+          "w": 825,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 536,
+          "w": 899,
+          "h": 224,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 15,
+          "y": 621,
+          "w": 869,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 33,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 37,
+          "y": 316,
+          "w": 825,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 390,
+          "y": 328,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 95,
+          "clientH": 24,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": false,
+        "slideAspect": 17.935,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 390,
+            "y": 328,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 29,
+            "y": 555,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 88,
+            "y": 555,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 149,
+            "y": 555,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 752,
+            "y": 549,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 150,
+            "y": 628,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 293,
+            "y": 628,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 376,
+            "y": 628,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 441,
+            "y": 628,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 524,
+            "y": 628,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 618,
+            "y": 628,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 674,
+            "y": 628,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 783,
+            "y": 628,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 840,
+            "y": 628,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 1,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 899,
+          "vh": 760
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 127,
+          "w": 861,
+          "h": 157,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 19,
+          "y": 284,
+          "w": 861,
+          "h": 157,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 218,
+          "w": 839,
+          "h": 63,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 210,
+          "w": 839,
+          "h": 63,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 297,
+          "y": 688,
+          "w": 305,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 136,
+          "w": 839,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 390,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 53,
+          "y": -316,
+          "w": 793,
+          "h": 731,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 765,
+          "clientH": 80,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 13.317,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 390,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 350,
+            "y": 701,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 899,
+          "vh": 760
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 127,
+          "w": 861,
+          "h": 157,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 19,
+          "y": 284,
+          "w": 861,
+          "h": 157,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 218,
+          "w": 839,
+          "h": 63,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 210,
+          "w": 839,
+          "h": 63,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 297,
+          "y": 688,
+          "w": 305,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 136,
+          "w": 839,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 390,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 53,
+          "y": -316,
+          "w": 793,
+          "h": 731,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 765,
+          "clientH": 80,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 13.317,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 390,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 350,
+            "y": 701,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 899,
+          "vh": 760
+        }
+      }
+    },
+    "stacked": {
+      "viewport": {
+        "name": "stacked",
+        "width": 820,
+        "height": 900
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 10,
+          "y": 307,
+          "w": 800,
+          "h": 65,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 10,
+          "y": 371,
+          "w": 800,
+          "h": 65,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 37,
+          "y": 382,
+          "w": 746,
+          "h": 46,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 37,
+          "y": 382,
+          "w": 746,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 676,
+          "w": 820,
+          "h": 224,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 15,
+          "y": 761,
+          "w": 790,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 112,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 37,
+          "y": 316,
+          "w": 746,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 350,
+          "y": 328,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 95,
+          "clientH": 24,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 16.217,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 350,
+            "y": 328,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 29,
+            "y": 695,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 88,
+            "y": 695,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 149,
+            "y": 695,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 673,
+            "y": 689,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 150,
+            "y": 768,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 293,
+            "y": 768,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 376,
+            "y": 768,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 441,
+            "y": 768,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 524,
+            "y": 768,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 618,
+            "y": 768,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 674,
+            "y": 768,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 783,
+            "y": 768,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 840,
+            "y": 768,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 2,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 820,
+          "vh": 900
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 127,
+          "w": 782,
+          "h": 227,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 19,
+          "y": 354,
+          "w": 782,
+          "h": 227,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 217,
+          "w": 760,
+          "h": 133,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 210,
+          "w": 760,
+          "h": 133,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 258,
+          "y": 828,
+          "w": 305,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 136,
+          "w": 760,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 350,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 53,
+          "y": -176,
+          "w": 714,
+          "h": 731,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 765,
+          "clientH": 150,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 5.714,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 350,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 310,
+            "y": 841,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 820,
+          "vh": 900
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 127,
+          "w": 782,
+          "h": 227,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 19,
+          "y": 354,
+          "w": 782,
+          "h": 227,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 217,
+          "w": 760,
+          "h": 133,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 210,
+          "w": 760,
+          "h": 133,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 258,
+          "y": 828,
+          "w": 305,
+          "h": 72,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 136,
+          "w": 760,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 350,
+          "y": 148,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 53,
+          "y": -176,
+          "w": 714,
+          "h": 731,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 765,
+          "clientH": 150,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 5.714,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 350,
+            "y": 148,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 310,
+            "y": 841,
+            "w": 118,
+            "h": 42,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 820,
+          "vh": 900
+        }
+      }
+    },
+    "narrow": {
+      "viewport": {
+        "name": "narrow",
+        "width": 375,
+        "height": 812
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 10,
+          "y": 292,
+          "w": 355,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 10,
+          "y": 314,
+          "w": 355,
+          "h": 21,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 31,
+          "y": 367,
+          "w": 313,
+          "h": 18,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 31,
+          "y": 367,
+          "w": 313,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 592,
+          "w": 375,
+          "h": 220,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 11,
+          "y": 721,
+          "w": 353,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 647,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 31,
+          "y": 301,
+          "w": 313,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 128,
+          "y": 313,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 54,
+          "clientH": 24,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": false,
+        "slideAspect": 17.389,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 128,
+            "y": 313,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 77,
+            "y": 661,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 136,
+            "y": 661,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 197,
+            "y": 661,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 129,
+            "y": 607,
+            "w": 118,
+            "h": 40,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 128,
+            "y": 728,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 367,
+            "y": 728,
+            "w": 98,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 477,
+            "y": 728,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 534,
+            "y": 728,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 609,
+            "y": 728,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 695,
+            "y": 728,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 743,
+            "y": 728,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 844,
+            "y": 728,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 893,
+            "y": 728,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 8,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 375,
+          "vh": 812
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 123,
+          "w": 337,
+          "h": 183,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 19,
+          "y": 306,
+          "w": 337,
+          "h": 183,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 213,
+          "w": 315,
+          "h": 89,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 206,
+          "w": 315,
+          "h": 89,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 54,
+          "y": 736,
+          "w": 267,
+          "h": 70,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 132,
+          "w": 315,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 128,
+          "y": 144,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 53,
+          "y": -826,
+          "w": 269,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 106,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 3.539,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 128,
+            "y": 144,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 69,
+            "y": 751,
+            "w": 118,
+            "h": 40,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 375,
+          "vh": 812
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 123,
+          "w": 337,
+          "h": 183,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 19,
+          "y": 306,
+          "w": 337,
+          "h": 183,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 213,
+          "w": 315,
+          "h": 89,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 206,
+          "w": 315,
+          "h": 89,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 54,
+          "y": 736,
+          "w": 267,
+          "h": 70,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 132,
+          "w": 315,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 128,
+          "y": 144,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 53,
+          "y": -826,
+          "w": 269,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 106,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 3.539,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 128,
+            "y": 144,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 69,
+            "y": 751,
+            "w": 118,
+            "h": 40,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 375,
+          "vh": 812
+        }
+      }
+    },
+    "compact": {
+      "viewport": {
+        "name": "compact",
+        "width": 320,
+        "height": 667
+      },
+      "starting": {
+        "capturePhase": "starting",
+        "shell": "live",
+        "appCapturing": false,
+        "stage": {
+          "x": 10,
+          "y": 292,
+          "w": 300,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 10,
+          "y": 292,
+          "w": 300,
+          "h": 2,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 31,
+          "y": 367,
+          "w": 258,
+          "h": 18,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 31,
+          "y": 367,
+          "w": 258,
+          "h": 0,
+          "display": "flex",
+          "visible": false
+        },
+        "dock": {
+          "x": 0,
+          "y": 447,
+          "w": 320,
+          "h": 220,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 11,
+          "y": 576,
+          "w": 298,
+          "h": 44,
+          "display": "flex",
+          "visible": true
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 702,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 31,
+          "y": 301,
+          "w": 258,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 100,
+          "y": 313,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "00:00",
+        "transcriptStream": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "transcriptLines": 0,
+        "transcriptBodyScrollH": {
+          "scrollH": 54,
+          "clientH": 24,
+          "overflowY": "auto"
+        },
+        "sameRow": true,
+        "stacked": false,
+        "slideAspect": 14.333,
+        "slideClipped": true,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 100,
+            "y": 313,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 50,
+            "y": 516,
+            "w": 59,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 108,
+            "y": 516,
+            "w": 61,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "output-switcher__item",
+            "x": 169,
+            "y": 516,
+            "w": 101,
+            "h": 34,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 101,
+            "y": 462,
+            "w": 118,
+            "h": 40,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-compile-deck",
+            "x": 128,
+            "y": 583,
+            "w": 131,
+            "h": 30,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-md",
+            "x": 367,
+            "y": 583,
+            "w": 98,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-json",
+            "x": 477,
+            "y": 583,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-transcript",
+            "x": 534,
+            "y": 583,
+            "w": 71,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-deck",
+            "x": 609,
+            "y": 583,
+            "w": 81,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-pdf",
+            "x": 695,
+            "y": 583,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-export-png",
+            "x": 743,
+            "y": 583,
+            "w": 53,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-ask",
+            "x": 844,
+            "y": 583,
+            "w": 44,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-reset",
+            "x": 893,
+            "y": 583,
+            "w": 61,
+            "h": 30,
+            "offscreenRight": true,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 8,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 320,
+          "vh": 667
+        }
+      },
+      "capturing": {
+        "capturePhase": "capturing",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 123,
+          "w": 282,
+          "h": 128,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 19,
+          "y": 251,
+          "w": 282,
+          "h": 128,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 213,
+          "w": 260,
+          "h": 34,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 206,
+          "w": 260,
+          "h": 34,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 26,
+          "y": 591,
+          "w": 267,
+          "h": 70,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 132,
+          "w": 260,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 100,
+          "y": 144,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 53,
+          "y": -936,
+          "w": 214,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 51,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 7.647,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 100,
+            "y": 144,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 41,
+            "y": 606,
+            "w": 118,
+            "h": 40,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 320,
+          "vh": 667
+        }
+      },
+      "stopping": {
+        "capturePhase": "stopping",
+        "shell": "live",
+        "appCapturing": true,
+        "stage": {
+          "x": 19,
+          "y": 123,
+          "w": 282,
+          "h": 128,
+          "display": "flex",
+          "visible": true
+        },
+        "transcript": {
+          "x": 19,
+          "y": 251,
+          "w": 282,
+          "h": 128,
+          "display": "flex",
+          "visible": true
+        },
+        "slide": {
+          "x": 30,
+          "y": 213,
+          "w": 260,
+          "h": 34,
+          "display": "flex",
+          "visible": true
+        },
+        "frame": {
+          "x": 30,
+          "y": 206,
+          "w": 260,
+          "h": 34,
+          "display": "flex",
+          "visible": true
+        },
+        "dock": {
+          "x": 26,
+          "y": 591,
+          "w": 267,
+          "h": 70,
+          "display": "flex",
+          "visible": true
+        },
+        "dockTabs": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0,
+          "display": "none",
+          "visible": false
+        },
+        "dockScrollX": 0,
+        "dockTabsScrollX": 0,
+        "dockTabsOverflowX": "auto",
+        "dockTabsFlexWrap": "nowrap",
+        "liveTopbar": {
+          "x": 30,
+          "y": 132,
+          "w": 260,
+          "h": 52,
+          "display": "flex",
+          "visible": true
+        },
+        "stopBtn": {
+          "x": 100,
+          "y": 144,
+          "w": 66,
+          "h": 28,
+          "display": "flex",
+          "visible": true
+        },
+        "timerText": "02:05",
+        "transcriptStream": {
+          "x": 53,
+          "y": -936,
+          "w": 214,
+          "h": 1289,
+          "display": "flex",
+          "visible": true
+        },
+        "transcriptLines": 15,
+        "transcriptBodyScrollH": {
+          "scrollH": 1323,
+          "clientH": 51,
+          "overflowY": "auto"
+        },
+        "sameRow": false,
+        "stacked": true,
+        "slideAspect": 7.647,
+        "slideClipped": false,
+        "rootOverflowX": 0,
+        "bodyOverflowX": 0,
+        "controls": [
+          {
+            "id": "btn-live-stop",
+            "x": 100,
+            "y": 144,
+            "w": 66,
+            "h": 28,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          },
+          {
+            "id": "btn-record",
+            "x": 41,
+            "y": 606,
+            "w": 118,
+            "h": 40,
+            "offscreenRight": false,
+            "offscreenLeft": false,
+            "offscreenBottom": false,
+            "truncated": false,
+            "hidden": false
+          }
+        ],
+        "controlsOffscreen": 0,
+        "controlsTruncated": 0,
+        "viewport": {
+          "vw": 320,
+          "vh": 667
+        }
+      }
+    }
+  },
+  "blockedRequests": []
+}

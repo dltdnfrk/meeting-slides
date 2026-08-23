@@ -1,0 +1,2 @@
+TypeScript LSP diagnostics for tests/public-active-shell.test.ts: no diagnostics found.
+Product and documentation files were byte-identical and were not re-diagnosed in Repair 2.

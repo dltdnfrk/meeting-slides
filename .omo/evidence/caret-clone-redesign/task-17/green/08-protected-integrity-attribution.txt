@@ -1,0 +1,10 @@
+
+-- category B: content-changed files MUST predate my window (sibling todos 6/11-16) --
+Aug 11 17:34:44 2026 DESIGN.md
+Aug 11 22:18:22 2026 public/operator-surface.js
+Aug 12 00:07:17 2026 public/caret-shell.css
+Aug 12 00:12:38 2026 public/index.html
+Aug 12 00:12:38 2026 public/style.css
+Aug 12 01:20:37 2026 public/app.js
+Aug 12 01:26:03 2026 server.ts
+Aug 12 01:32:05 2026 .omo/plans/caret-clone-redesign.md

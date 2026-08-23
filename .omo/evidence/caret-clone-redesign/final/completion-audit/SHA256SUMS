@@ -1,0 +1,16 @@
+9f1b9d343951c6e0dd3e619c243c39b3f46f4cc15d585cbbf59a8665b9258529  ./checksum-validation.txt
+b480b6a493910007345f8746c4a033714a907e191c57ac06b6bbb4e0ac75f1eb  ./cleanup-receipt.txt
+a9994147c0444c118356a7cef394443339a756df82e7e2d93490f16cf5703e68  ./current-state.txt
+b8c771d320280f13ab1cddaa119704f6b412a7f6f239da382c5261aef116454f  ./DoneClaim.json
+bb1696e8ffccea92b6062c425f79ba5a4a39c293a0860d4edb085f53b5fa70c7  ./governance-receipt.txt
+2f8cfa785e213f07963ae4026e9182d95a27bdc122580ed73e0ec00bb6c41516  ./logs/aggregate-attempt.log
+68b5adb12ff83565ee34c2001737d891bb4aab0d8783f7c854522c680f6746dc  ./logs/broad-attempt.log
+d13a4f934415726f047110b1b40b4be8ed79dd84bf5f144ea7e46eff8f3b8978  ./logs/build-app.log
+df46f5d448c2a3706895bf7e8f593e4010718f412a5d2170583f050c987b2d8c  ./logs/codesign.log
+d7437cf5524d690f72a783eab4cc83a51f82fb14656c5ee3212e4bbf1d7aeaa0  ./logs/diff-and-protected-hashes.log
+1e877b9c37e35f9031e16116438d88707261671240dafe0dc7ca12cfad01a883  ./logs/focused-current.log
+bb2ba46c6beb71070f57e1c7eda88bef084e56bcb9ef2863f9f3e2bc0880043e  ./logs/generated-drift.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./logs/swift-typecheck.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./logs/typescript.log
+4cec07bd0f495cdacb0ec05b0262389df6015467aec7f1015f1c74b1331ae31b  ./logs/verify-app.log
+6bef5cdcfacb18e5dc34cd9053ddd0a165144fb45f578d53662e48e01fff2573  ./REPORT.md

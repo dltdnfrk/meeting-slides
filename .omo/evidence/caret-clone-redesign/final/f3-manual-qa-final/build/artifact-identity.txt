@@ -1,0 +1,21 @@
+build_exit=0 verify_exit=0 codesign_exit=0
+dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+1b22a6d3c58c297be772bc6f122b6e83af39cab03f319bedeb9ca0d0443f6df4  /Users/hyunjun/Applications/Meeting Slides.app/Contents/Info.plist
+55182b91c2255401a77db395b8b7b97c1dccb482721f890337d584693cc7ae0a  /Users/hyunjun/Applications/Meeting Slides.app/Contents/Resources/project-path.txt
+Executable=/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+Identifier=com.meetingslides.app
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=974 flags=0x2(adhoc) hashes=24+3 location=embedded
+Hash type=sha256 size=32
+CandidateCDHash sha256=44fe29d7af85ea59a5a13fbe2adbc5628d215da2
+CandidateCDHashFull sha256=44fe29d7af85ea59a5a13fbe2adbc5628d215da25c62160c17f2055c373ab310
+Hash choices=sha256
+CMSDigest=44fe29d7af85ea59a5a13fbe2adbc5628d215da25c62160c17f2055c373ab310
+CMSDigestType=2
+CDHash=44fe29d7af85ea59a5a13fbe2adbc5628d215da2
+Signature=adhoc
+Info.plist entries=20
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=1
+Internal requirements count=0 size=12
+documented_launcher=83:open -a "Meeting Slides"

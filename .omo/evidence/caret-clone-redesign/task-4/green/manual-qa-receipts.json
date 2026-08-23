@@ -1,0 +1,154 @@
+{
+  "library-overview": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 336,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 220
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "rootOverflow": {
+      "horizontal": 0
+    },
+    "environment": {
+      "locale": "ko-KR",
+      "timezone": "Asia/Seoul",
+      "now": 1710376860000,
+      "fontsReady": true,
+      "deviceScaleFactor": 1
+    },
+    "captureTimerText": "00:00",
+    "transcriptLines": 15,
+    "runs": [
+      {
+        "pass": 1,
+        "hash": "1eb840f542e8b779f0e549a7953dd98894675bea0ab9f4b2fe2b15184f0b3797",
+        "external": [],
+        "blocked": 2
+      },
+      {
+        "pass": 2,
+        "hash": "1eb840f542e8b779f0e549a7953dd98894675bea0ab9f4b2fe2b15184f0b3797",
+        "external": [],
+        "blocked": 2
+      }
+    ],
+    "identical": true
+  },
+  "live-capturing": {
+    "viewport": {
+      "width": 960,
+      "height": 760,
+      "deviceScaleFactor": 1
+    },
+    "geometry": {
+      "#workspace": {
+        "x": 12,
+        "y": 72,
+        "width": 936,
+        "height": 606
+      },
+      "#stage-pane": {
+        "x": 25,
+        "y": 83,
+        "width": 517,
+        "height": 586
+      },
+      "#current-slide": {
+        "x": 36,
+        "y": 229,
+        "width": 495,
+        "height": 437
+      },
+      "#transcript-pane": {
+        "x": 547,
+        "y": 83,
+        "width": 388,
+        "height": 586
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 326,
+        "y": 688,
+        "width": 309,
+        "height": 72
+      }
+    },
+    "rootOverflow": {
+      "horizontal": 0
+    },
+    "environment": {
+      "locale": "ko-KR",
+      "timezone": "Asia/Seoul",
+      "now": 1710376860000,
+      "fontsReady": true,
+      "deviceScaleFactor": 1
+    },
+    "captureTimerText": "02:05",
+    "transcriptLines": 15,
+    "runs": [
+      {
+        "pass": 1,
+        "hash": "6ff774e4182e2314227e8738f9ec5a51d9fd32c4ec50d0e061a540349108245b",
+        "external": [],
+        "blocked": 2
+      },
+      {
+        "pass": 2,
+        "hash": "6ff774e4182e2314227e8738f9ec5a51d9fd32c4ec50d0e061a540349108245b",
+        "external": [],
+        "blocked": 2
+      }
+    ],
+    "identical": true
+  },
+  "failureProbe": {
+    "name": "CaretFixtureTimeoutError",
+    "fixtureId": "live-capturing-pre-subscription",
+    "missingState": "capture:capturing",
+    "timeoutMs": 5000,
+    "capturedStale": false,
+    "message": "caret fixture \"live-capturing-pre-subscription\" timed out after 5000ms waiting for client state \"capture:capturing\""
+  }
+}

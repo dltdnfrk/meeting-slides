@@ -1,0 +1,74 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/native-launcher-boundary.test.ts:
+(pass) native launcher seam: sources and compilation > the lifecycle module, transport module and fixture driver exist [0.07ms]
+(pass) native launcher seam: sources and compilation > swiftc compiles the pure modules with the fixture driver [0.05ms]
+(pass) native launcher seam: sources and compilation > the pure modules stay free of AppKit, EventKit and window/process APIs [0.40ms]
+(pass) native launcher seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.02ms]
+(pass) native launcher seam: project and port resolution > HTTP_PORT in .env wins [0.04ms]
+(pass) native launcher seam: project and port resolution > a missing key, out-of-range value, unparsable value or missing file falls back to 8787 [0.01ms]
+(pass) native launcher seam: project and port resolution > the bun lookup order is preserved
+(pass) native launcher seam: project and port resolution > the launcher log stays at the documented user log path
+(pass) native launcher seam: Bun launch plan > the launch plan reproduces the existing bun invocation and environment
+(pass) native launcher seam: Bun launch plan > a missing bun binary is a typed failure, not a crash [0.01ms]
+(pass) native launcher seam: startup decision uses one Bun session > an unreachable port starts a server owned by the launcher
+475 |   test("an unreachable port starts a server owned by the launcher", () => {
+476 |     expect(value("startup-fresh-server")).toEqual({ decision: "startServer", ownsServer: true });
+477 |   });
+478 | 
+479 |   test("an already-running healthy Bun session is adopted instead of duplicated", () => {
+480 |     expect(value("startup-already-running-bun")).toEqual({
+                                                       ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "decision": "adoptRunningServer",
+-   "ownsServer": false,
++   "decision": "startServer",
++   "ownsServer": true,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:480:50)
+(fail) native launcher seam: startup decision uses one Bun session > an already-running healthy Bun session is adopted instead of duplicated [0.16ms]
+(pass) native launcher seam: startup decision uses one Bun session > a foreign listener on the port is a typed port conflict, never a second server
+(pass) native launcher seam: health signature > the existing title + runtime-bootstrap signature marks the webapp healthy
+(pass) native launcher seam: health signature > a non-200 status, foreign body or unreachable port is unhealthy with a machine reason
+(pass) native launcher seam: readiness without sleeps > readiness resolves on the first healthy attempt and reports the attempt index
+(pass) native launcher seam: readiness without sleeps > an exhausted attempt sequence reports not-ready instead of hanging
+(pass) native launcher seam: process ownership and shutdown > a clean server exit propagates its status without terminating twice
+(pass) native launcher seam: process ownership and shutdown > quitting terminates the launcher-owned server exactly once
+(pass) native launcher seam: process ownership and shutdown > an adopted server is never terminated by this launcher
+(pass) native launcher seam: process ownership and shutdown > repeated interrupts terminate the child exactly once
+(pass) native launcher seam: process ownership and shutdown > a crashed server propagates its non-zero status
+(pass) native launcher seam: process ownership and shutdown > a readiness failure terminates the owned server and exits non-zero
+(pass) native launcher seam: transport boundary > the transport targets the existing local /ws endpoint
+(pass) native launcher seam: transport boundary > an open socket plus a capture snapshot hydrates online state
+(pass) native launcher seam: transport boundary > a dropped socket becomes reconnecting while retaining the last known capture state
+(pass) native launcher seam: transport boundary > an authoritative snapshot after reconnect restores online state
+(pass) native launcher seam: transport boundary > a malformed payload is counted as a typed decode failure and never clears state
+(pass) native launcher seam: transport boundary > an unknown capture phase is a typed decode failure, not a crash or a guess
+(pass) native launcher seam: transport boundary > messages outside the observed subset leave the projection untouched
+(pass) native launcher seam: transport boundary > a status message updates transport status text only
+(pass) native launcher seam: transport boundary > reconnect backoff is monotonic and bounded [0.03ms]
+(pass) native launcher seam: outbound command emission > rapid Stop activations emit exactly one existing stopCapture action [0.01ms]
+(pass) native launcher seam: outbound command emission > Stop while the socket is down emits nothing
+(pass) native launcher seam: outbound command emission > the Stop guard rearms only after an authoritative capture snapshot
+(pass) native launcher seam: outbound command emission > the native surface invents no protocol spelling
+(pass) native launcher seam: launcher entry point and build wiring > the launcher keeps the browser workspace and never imports WebKit [0.08ms]
+(pass) native launcher seam: launcher entry point and build wiring > the launcher keeps mic permission, calendar auto-capture and bun supervision [0.07ms]
+(pass) native launcher seam: launcher entry point and build wiring > the launcher delegates decisions to the pure modules instead of re-deriving them [0.05ms]
+(pass) native launcher seam: launcher entry point and build wiring > the entry point holds side effects only, never lifecycle rules [0.14ms]
+(pass) native launcher seam: launcher entry point and build wiring > the build script compiles every native source the entry point needs [0.06ms]
+(pass) native launcher seam: launcher entry point and build wiring > minibar-only modules are still not wired into the shipped bundle [0.02ms]
+
+1 tests failed:
+(fail) native launcher seam: startup decision uses one Bun session > an already-running healthy Bun session is adopted instead of duplicated [0.16ms]
+
+ 41 pass
+ 1 fail
+ 90 expect() calls
+Ran 42 tests across 1 file. [2.15s]
+exit=1

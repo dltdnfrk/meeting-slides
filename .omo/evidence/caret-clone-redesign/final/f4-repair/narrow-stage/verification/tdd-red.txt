@@ -1,0 +1,23 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-narrow-stage.test.ts:
+250 |       expect(geometry.slideContained).toBe(true);
+251 |       expect(geometry.textElementCount).toBe(2);
+252 |       expect(geometry.characterCount).toBeGreaterThan(0);
+253 |       expect(geometry.partialCharacters).toEqual([]);
+254 |       expect(geometry.slideOverflow.x).toBeLessThanOrEqual(1);
+255 |       expect(geometry.slideOverflow.y).toBeLessThanOrEqual(1);
+                                             ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 1
+Received: 88
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-narrow-stage.test.ts:255:40)
+(fail) F4 M2 · exact 320x667 narrow live stage > the complete placeholder stays inside the 16:9 slide without shrinking contract text [162.55ms]
+(pass) F4 M2 · exact 320x667 narrow live stage > a complete generated slide, transcript tail, and Stop remain reachable [128.82ms]
+
+ 1 pass
+ 1 fail
+ 24 expect() calls
+Ran 2 tests across 1 file. [3.52s]

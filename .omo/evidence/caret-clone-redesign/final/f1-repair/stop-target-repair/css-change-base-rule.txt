@@ -1,0 +1,31 @@
+
+
+body .live-topbar__capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cf-space-3);
+  /* Contains a 44px Stop target (DESIGN 9.12) without adding chrome of its own. */
+  min-height: var(--cf-target-min);
+  padding: var(--cf-space-1) var(--cf-space-4) var(--cf-space-1) var(--cf-space-1);
+  border: var(--cf-rule-width) solid var(--cf-record-line);
+  border-radius: var(--cf-radius-pill);
+  background: var(--cf-surface);
+}
+
+body .live-topbar__stop {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cf-space-2);
+  /* DESIGN 9.12 pointer target. The glyph and label keep their own scale; only
+     the hit area grows, so visual density is unchanged. */
+  min-height: var(--cf-target-min);
+  min-width: var(--cf-target-min);
+  padding: 0 var(--cf-space-3);
+  border: 0;
+  border-radius: var(--cf-radius-pill);
+  background: var(--cf-record);
+  color: var(--cf-canvas);
+  font-family: var(--cf-font-body);
+  font-size: var(--cf-text-xs);

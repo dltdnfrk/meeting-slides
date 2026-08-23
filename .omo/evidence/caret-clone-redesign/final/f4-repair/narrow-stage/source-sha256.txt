@@ -1,0 +1,2 @@
+794ed65af8a53cb81cdde9b565c373d7385db6a357bf7f0fbbb73d2a62083dde  public/caret-operator.css
+db65f2a93b3bda6931f3b8b4889263402c8986d82286a897c0c794f0fdf1ab3a  tests/public-caret-narrow-stage.test.ts

@@ -1,0 +1,99 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/caret-dual-surface.test.ts:
+(pass) dual-surface seam builds and connects > the native client compiles against the SHIPPING pure modules [0.06ms]
+(pass) dual-surface seam builds and connects > one session holds both surfaces as independent clients [0.03ms]
+(pass) dual-surface seam builds and connects > the native driver drives the real transport module, not a copy [0.11ms]
+(pass) browser client hydration is not connection state > both surfaces hydrate idle from the same connect snapshot [0.77ms]
+(pass) manual start from the browser reaches both surfaces > startCapture uses the existing action and meeting_id spelling [3.12ms]
+(pass) manual start from the browser reaches both surfaces > both surfaces derive the SAME timer from the server startedAt [0.29ms]
+(pass) live transcript projects into both surfaces > finalized lines reach the browser stream and the native viewport [5.81ms]
+(pass) live transcript projects into both surfaces > a provisional caption is provisional on both surfaces [1.04ms]
+(pass) independent transport loss never claims capture stopped > the native client alone drops: reconnecting, capture truth retained [0.74ms]
+(pass) independent transport loss never claims capture stopped > the native client re-enters live from the reconnect snapshot [1.75ms]
+(pass) independent transport loss never claims capture stopped > the browser alone drops: live content and timer retained, no phantom stop [2.42ms]
+(pass) independent transport loss never claims capture stopped > browser reload during capture re-enters live with a deduplicated transcript [54.61ms]
+(pass) stale and malformed frames cannot overwrite current state > a meeting payload for a meeting nobody selected is ignored [1.55ms]
+(pass) stale and malformed frames cannot overwrite current state > a malformed frame leaves both projections untouched [1.63ms]
+348 |     session.broadcast({ type: "compile", status: "error", jobId: "job-1", error: "stale" });
+349 |     await stale;
+350 | 
+351 |     const state = await web.read();
+352 |     // The superseded job's failure never replaced the running job's state.
+353 |     expect(state.compileStatusState).toBe("started");
+                                           ^
+error: expect(received).toBe(expected)
+
+Expected: "started"
+Received: "error"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/caret-dual-surface.test.ts:353:38)
+(fail) stale and malformed frames cannot overwrite current state > an out-of-order compile result for a superseded job does not disturb capture [1.59ms]
+(pass) rapid Stop emits exactly one existing command > the native surface sends one stopCapture under repeated activation [0.78ms]
+234 |         try {
+235 |           snapshot = await page.evaluate(readState);
+236 |         } catch {
+237 |           snapshot = "unavailable";
+238 |         }
+239 |         reject(new BrowserStateTimeoutError(label, timeoutMs, snapshot));
+                     ^
+BrowserStateTimeoutError: browser surface timed out after 6000ms waiting for "browser:stop-pending"; last state: {"connection":"connected","connectionState":"online","capturePhase":"capturing","uiState":"compile-running","shell":"live","capturing":true,"captureTimerText":"02:05","liveTimerText":"02:05","recordPressed":"true","transcriptTexts":["첫 번째 문장입니다","두 번째 문장입니다","세 번째 문장입니다"],"transcriptLineCount":3,"captionText":"녹음 중 02:05","selectedMeetingTitle":null,"selectedMeetingIds":[],"meetingTitles":["주간 팀 회의","제품 로드맵 검토"],"slideTitle":null,"statusText":"녹음을 중지하는 중…","compileStatusState":"error","compileStatusHidden":false}
+ missingState: "browser:stop-pending",
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/helpers/browser-dual-surface-client.ts:239:16)
+(fail) rapid Stop emits exactly one existing command > the browser surface sends one stopCapture under a double activation [6002.95ms]
+410 |     // Stop and the timer stay present through the whole stop window.
+411 |     expect(state.capturePhase).toBe("stopping");
+412 |     expect(state.captureTimerText).toBe(EXPECTED_TIMER);
+413 |     expect(state.shell).toBe("live");
+414 |     expect(native.latest?.status).toBe("stopping");
+415 |     expect(native.latest?.timer).toBe(EXPECTED_TIMER);
+                                       ^
+error: expect(received).toBe(expected)
+
+Expected: "02:05"
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/caret-dual-surface.test.ts:415:34)
+(fail) the stop window stays truthful while trailing lines flush > both surfaces report stopping, not idle, before the flush completes [1.14ms]
+(pass) the stop window stays truthful while trailing lines flush > trailing lines emitted after the stop broadcast are kept by both surfaces [2.13ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > idle ends capture on both surfaces [0.74ms]
+234 |         try {
+235 |           snapshot = await page.evaluate(readState);
+236 |         } catch {
+237 |           snapshot = "unavailable";
+238 |         }
+239 |         reject(new BrowserStateTimeoutError(label, timeoutMs, snapshot));
+                     ^
+BrowserStateTimeoutError: browser surface timed out after 6000ms waiting for "browser:just-ended"; last state: {"connection":"connected","connectionState":"online","capturePhase":"idle","uiState":"compile-running","shell":"live","capturing":false,"captureTimerText":"02:05","liveTimerText":"02:05","recordPressed":"false","transcriptTexts":["첫 번째 문장입니다","두 번째 문장입니다","세 번째 문장입니다","마지막 정리 문장입니다"],"transcriptLineCount":4,"captionText":"녹음 대기","selectedMeetingTitle":null,"selectedMeetingIds":[],"meetingTitles":["주간 팀 회의","제품 로드맵 검토"],"slideTitle":null,"statusText":"녹음 중지 완료. 슬라이드와 전사 원문을 저장할 수 있습니다","compileStatusState":"error","compileStatusHidden":false}
+ missingState: "browser:just-ended",
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/helpers/browser-dual-surface-client.ts:239:16)
+(fail) authoritative idle restores the just-ended meeting exactly once > the just-ended meeting is restored, and selected exactly once [6005.65ms]
+471 |     await seen;
+472 |     await native.snapshot("idle-repeat-barrier");
+473 | 
+474 |     expect(session.commandsOf("selectMeeting").length).toBe(before);
+475 |     const state = await web.read();
+476 |     expect(state.selectedMeetingIds).toEqual(["7"]);
+                                           ^
+error: expect(received).toEqual(expected)
+
+- [
+-   "7",
+- ]
++ []
+
+- Expected  - 3
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/caret-dual-surface.test.ts:476:38)
+(fail) authoritative idle restores the just-ended meeting exactly once > the restoration does not repeat when further idle snapshots arrive [2.08ms]
+(pass) phase-less capture frames stay compatible > a phase-less capture message still drives both surfaces [3.00ms]
+(pass) calendar auto-capture and natural recorder failure > automatic capture reaches both surfaces without a client command [0.92ms]
+(pass) calendar auto-capture and natural recorder failure > a natural recorder failure ends capture truthfully on both surfaces [0.71ms]
+
+ 20 pass
+ 5 fail
+ 76 expect() calls
+Ran 25 tests across 1 file. [15.23s]

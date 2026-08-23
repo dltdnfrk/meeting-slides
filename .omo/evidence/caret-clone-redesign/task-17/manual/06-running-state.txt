@@ -1,0 +1,19 @@
+== RUNNING rebuilt app: process + port state ==
+92036 /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+
+92038 /Users/hyunjun/.bun/bin/bun run server.ts
+
+-- listener --
+lsof: WARNING: can't stat() smbfs file system /Volumes/.timemachine/192.168.75.221/247BE7BA-8793-4425-B99E-3C9B64D03254/TimeMachine
+      Output information may be incomplete.
+      assuming "dev=3600000d" from mount table
+COMMAND   PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+bun     92038 hyunjun   10u  IPv4 0xbc104a9ac83cfd55      0t0  TCP 127.0.0.1:8789 (LISTEN)
+
+-- HTTP readiness signature --
+status=200 bytes=32887
+runtime-bootstrap markers: 1
+<title>Meeting Slides — 실시간 회의 슬라이드
+
+-- WebSocket endpoint the minibar uses --
+ws upgrade probe status=101

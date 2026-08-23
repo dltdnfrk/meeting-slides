@@ -1,0 +1,29 @@
+{
+  "segment": "A",
+  "expectedHash": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+  "port": 54741,
+  "deadlines": [
+    {
+      "label": "initial-connected",
+      "ms": 30000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "capturing",
+      "ms": 60000,
+      "subscribedBeforeTrigger": true
+    }
+  ],
+  "installed": {
+    "pid": 5979,
+    "actualHash": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+    "isolatedProject": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/f3-manual-qa.0d6eRD/project",
+    "database": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/f3-manual-qa.0d6eRD/meetings.db",
+    "exports": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/f3-manual-qa.0d6eRD/project/exports"
+  },
+  "result": "FAIL",
+  "error": "ReferenceError: s is not defined\n    at owner (/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-a-browser.ts:18:856)\n    at click (/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-a-browser.ts:19:71)\n    at /Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-a-browser.ts:32:131\n    at processTicksAndRejections (native:7:39)",
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ]
+}

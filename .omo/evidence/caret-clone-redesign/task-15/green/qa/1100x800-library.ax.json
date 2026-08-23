@@ -1,0 +1,297 @@
+{
+  "role": "RootWebArea",
+  "backendNodeId": 2,
+  "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+  "name": "Meeting Slides — 실시간 회의 슬라이드",
+  "url": "http://localhost:50182/",
+  "children": [
+    {
+      "role": "banner",
+      "backendNodeId": 52,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "",
+      "children": [
+        {
+          "role": "StaticText",
+          "backendNodeId": 360,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "Meeting "
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 361,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "Slides"
+        },
+        {
+          "role": "button",
+          "backendNodeId": 58,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "참석자 지정",
+          "description": "참석자 지정",
+          "expanded": false
+        },
+        {
+          "role": "status",
+          "backendNodeId": 69,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "",
+          "atomic": true,
+          "live": "polite",
+          "relevant": "additions text",
+          "children": [
+            {
+              "role": "StaticText",
+              "backendNodeId": 368,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "온보딩 지표 점검 기록을 불러왔습니다"
+            }
+          ]
+        },
+        {
+          "role": "button",
+          "backendNodeId": 70,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "설정 열기",
+          "description": "설정 열기",
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "role": "complementary",
+      "backendNodeId": 134,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "회의 기록",
+      "children": [
+        {
+          "role": "StaticText",
+          "backendNodeId": 394,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "Meetings"
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 395,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "1"
+        },
+        {
+          "role": "button",
+          "backendNodeId": 141,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "온보딩 지표 점검 3월 14일 오전 8:41 종료",
+          "pressed": true
+        },
+        {
+          "role": "button",
+          "backendNodeId": 146,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "온보딩 지표 점검 삭제",
+          "description": "회의 기록 삭제"
+        }
+      ]
+    },
+    {
+      "role": "separator",
+      "backendNodeId": 150,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "회의 기록 목록 너비 조절",
+      "value": 232,
+      "valuetext": "",
+      "valuemax": 530,
+      "valuemin": 180,
+      "orientation": "vertical"
+    },
+    {
+      "role": "heading",
+      "backendNodeId": 156,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "온보딩 지표 점검",
+      "level": 1
+    },
+    {
+      "role": "StaticText",
+      "backendNodeId": 402,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "0문장"
+    },
+    {
+      "role": "StaticText",
+      "backendNodeId": 403,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "2024/03/14"
+    },
+    {
+      "role": "tab",
+      "backendNodeId": 161,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "Overview",
+      "selected": true
+    },
+    {
+      "role": "tab",
+      "backendNodeId": 162,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "Notes",
+      "selected": false
+    },
+    {
+      "role": "tab",
+      "backendNodeId": 163,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "Transcript",
+      "selected": false
+    },
+    {
+      "role": "tabpanel",
+      "backendNodeId": 164,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "Overview",
+      "children": [
+        {
+          "role": "heading",
+          "backendNodeId": 180,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "대화가 충분히 쌓이면 슬라이드 초안을 만들어 보세요",
+          "level": 2
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 410,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "지금까지의 대화로 편집 가능한 PowerPoint 초안을 만듭니다"
+        },
+        {
+          "role": "region",
+          "backendNodeId": 182,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "회의 개요",
+          "children": [
+            {
+              "role": "heading",
+              "backendNodeId": 184,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "SUMMARY",
+              "level": 2
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 412,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "No summary yet"
+            },
+            {
+              "role": "heading",
+              "backendNodeId": 187,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "ACTIONS",
+              "level": 2
+            },
+            {
+              "role": "heading",
+              "backendNodeId": 191,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "Send follow-up",
+              "level": 3
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 415,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "회의가 끝나면 후속 메일 초안이 여기 쌓입니다."
+            },
+            {
+              "role": "button",
+              "backendNodeId": 194,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "Copy",
+              "disabled": true
+            },
+            {
+              "role": "button",
+              "backendNodeId": 195,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "Open draft",
+              "disabled": true
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 418,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "Subject: Following up - …\n\nHi,\nThank you for your time today.\nHere's a quick recap of the meeting:\n-"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "navigation",
+      "backendNodeId": 265,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "작업 결과 보기",
+      "children": [
+        {
+          "role": "link",
+          "backendNodeId": 266,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "슬라이드",
+          "url": "http://localhost:50182/#stage-pane",
+          "children": [
+            {
+              "role": "StaticText",
+              "backendNodeId": 436,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "슬라이드"
+            }
+          ]
+        },
+        {
+          "role": "link",
+          "backendNodeId": 268,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "전체 전사",
+          "url": "http://localhost:50182/#transcript-pane",
+          "children": [
+            {
+              "role": "StaticText",
+              "backendNodeId": 437,
+              "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+              "name": "전체 전사"
+            }
+          ]
+        },
+        {
+          "role": "button",
+          "backendNodeId": 270,
+          "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+          "name": "회의 결과. 검토할 회의 결과가 필요합니다",
+          "description": "검토할 회의 결과가 필요합니다",
+          "disabled": true
+        }
+      ]
+    },
+    {
+      "role": "button",
+      "backendNodeId": 275,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "녹음 시작",
+      "pressed": false
+    },
+    {
+      "role": "button",
+      "backendNodeId": 296,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "선택한 회의의 전사에 질문하기",
+      "description": "선택한 회의의 전사에 질문하기"
+    },
+    {
+      "role": "DisclosureTriangle",
+      "backendNodeId": 303,
+      "loaderId": "B3E6886291F69DBFCBE5DF9CAC7204EA",
+      "name": "슬라이드 만들기, 저장과 내보내기 더 보기",
+      "description": "만들기·저장·내보내기",
+      "expanded": false
+    }
+  ]
+}

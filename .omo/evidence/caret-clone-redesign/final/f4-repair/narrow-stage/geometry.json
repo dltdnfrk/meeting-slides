@@ -1,0 +1,423 @@
+{
+  "generatedAt": "2024-03-14T00:41:00.000Z",
+  "results": {
+    "320x667": {
+      "placeholder": {
+        "viewport": {
+          "width": 320,
+          "height": 667,
+          "deviceScaleFactor": 1
+        },
+        "frame": {
+          "x": 12,
+          "y": 143,
+          "width": 296,
+          "height": 166.5,
+          "right": 308,
+          "bottom": 309.5
+        },
+        "slide": {
+          "x": 12,
+          "y": 143,
+          "width": 296,
+          "height": 166.5,
+          "right": 308,
+          "bottom": 309.5
+        },
+        "stop": {
+          "x": 88.953125,
+          "y": 82,
+          "width": 66.09375,
+          "height": 44,
+          "right": 155.046875,
+          "bottom": 126
+        },
+        "transcript": {
+          "x": 0,
+          "y": 378,
+          "width": 320,
+          "height": 120,
+          "right": 320,
+          "bottom": 498
+        },
+        "transcriptBody": {
+          "x": 13,
+          "y": 417,
+          "width": 294,
+          "height": 120,
+          "right": 307,
+          "bottom": 537
+        },
+        "aspect": 1.7777777777777777,
+        "slideOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "rootOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "characterCount": 52,
+        "partialCharacters": [],
+        "occludedCharacters": [],
+        "textFontSizes": [
+          14,
+          13
+        ],
+        "stopVisibleEnabled": true,
+        "transcriptScrollable": true,
+        "transcriptOverflowY": "auto"
+      },
+      "generated": {
+        "viewport": {
+          "width": 320,
+          "height": 667,
+          "deviceScaleFactor": 1
+        },
+        "frame": {
+          "x": 12,
+          "y": 143,
+          "width": 296,
+          "height": 166.5,
+          "right": 308,
+          "bottom": 309.5
+        },
+        "slide": {
+          "x": 12,
+          "y": 143,
+          "width": 296,
+          "height": 166.5,
+          "right": 308,
+          "bottom": 309.5
+        },
+        "stop": {
+          "x": 88.953125,
+          "y": 82,
+          "width": 66.09375,
+          "height": 44,
+          "right": 155.046875,
+          "bottom": 126
+        },
+        "transcript": {
+          "x": 0,
+          "y": 378,
+          "width": 320,
+          "height": 120,
+          "right": 320,
+          "bottom": 498
+        },
+        "transcriptBody": {
+          "x": 13,
+          "y": 417,
+          "width": 294,
+          "height": 120,
+          "right": 307,
+          "bottom": 537
+        },
+        "aspect": 1.7777777777777777,
+        "slideOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "rootOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "characterCount": 75,
+        "partialCharacters": [],
+        "occludedCharacters": [],
+        "textFontSizes": [
+          8,
+          8,
+          14.7,
+          9,
+          9,
+          9,
+          9
+        ],
+        "stopVisibleEnabled": true,
+        "transcriptScrollable": true,
+        "transcriptOverflowY": "auto"
+      }
+    },
+    "375x812": {
+      "placeholder": {
+        "viewport": {
+          "width": 375,
+          "height": 812,
+          "deviceScaleFactor": 1
+        },
+        "frame": {
+          "x": 12,
+          "y": 143,
+          "width": 351,
+          "height": 197.4375,
+          "right": 363,
+          "bottom": 340.4375
+        },
+        "slide": {
+          "x": 12,
+          "y": 143,
+          "width": 351,
+          "height": 197.4375,
+          "right": 363,
+          "bottom": 340.4375
+        },
+        "stop": {
+          "x": 116.453125,
+          "y": 82,
+          "width": 66.09375,
+          "height": 44,
+          "right": 182.546875,
+          "bottom": 126
+        },
+        "transcript": {
+          "x": 0,
+          "y": 408.9375,
+          "width": 375,
+          "height": 234.0625,
+          "right": 375,
+          "bottom": 643
+        },
+        "transcriptBody": {
+          "x": 13,
+          "y": 447.9375,
+          "width": 349,
+          "height": 182.0625,
+          "right": 362,
+          "bottom": 630
+        },
+        "aspect": 1.7777777777777777,
+        "slideOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "rootOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "characterCount": 52,
+        "partialCharacters": [],
+        "occludedCharacters": [],
+        "textFontSizes": [
+          14,
+          13
+        ],
+        "stopVisibleEnabled": true,
+        "transcriptScrollable": true,
+        "transcriptOverflowY": "auto"
+      },
+      "generated": {
+        "viewport": {
+          "width": 375,
+          "height": 812,
+          "deviceScaleFactor": 1
+        },
+        "frame": {
+          "x": 12,
+          "y": 143,
+          "width": 351,
+          "height": 197.4375,
+          "right": 363,
+          "bottom": 340.4375
+        },
+        "slide": {
+          "x": 12,
+          "y": 143,
+          "width": 351,
+          "height": 197.4375,
+          "right": 363,
+          "bottom": 340.4375
+        },
+        "stop": {
+          "x": 116.453125,
+          "y": 82,
+          "width": 66.09375,
+          "height": 44,
+          "right": 182.546875,
+          "bottom": 126
+        },
+        "transcript": {
+          "x": 0,
+          "y": 408.9375,
+          "width": 375,
+          "height": 234.0625,
+          "right": 375,
+          "bottom": 643
+        },
+        "transcriptBody": {
+          "x": 13,
+          "y": 447.9375,
+          "width": 349,
+          "height": 182.0625,
+          "right": 362,
+          "bottom": 630
+        },
+        "aspect": 1.7777777777777777,
+        "slideOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "rootOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "characterCount": 75,
+        "partialCharacters": [],
+        "occludedCharacters": [],
+        "textFontSizes": [
+          8,
+          8,
+          17.45,
+          9.074,
+          9.074,
+          9.074,
+          9
+        ],
+        "stopVisibleEnabled": true,
+        "transcriptScrollable": true,
+        "transcriptOverflowY": "auto"
+      }
+    },
+    "820x900": {
+      "placeholder": {
+        "viewport": {
+          "width": 820,
+          "height": 900,
+          "deviceScaleFactor": 1
+        },
+        "frame": {
+          "x": 16,
+          "y": 134,
+          "width": 788,
+          "height": 306,
+          "right": 804,
+          "bottom": 440
+        },
+        "slide": {
+          "x": 138,
+          "y": 134,
+          "width": 544,
+          "height": 306,
+          "right": 682,
+          "bottom": 440
+        },
+        "stop": {
+          "x": 338.953125,
+          "y": 73,
+          "width": 66.09375,
+          "height": 44,
+          "right": 405.046875,
+          "bottom": 117
+        },
+        "transcript": {
+          "x": 0,
+          "y": 508.5,
+          "width": 820,
+          "height": 242.5,
+          "right": 820,
+          "bottom": 751
+        },
+        "transcriptBody": {
+          "x": 17,
+          "y": 555.5,
+          "width": 786,
+          "height": 182.5,
+          "right": 803,
+          "bottom": 738
+        },
+        "aspect": 1.7777777777777777,
+        "slideOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "rootOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "characterCount": 52,
+        "partialCharacters": [],
+        "occludedCharacters": [],
+        "textFontSizes": [
+          14,
+          13
+        ],
+        "stopVisibleEnabled": true,
+        "transcriptScrollable": true,
+        "transcriptOverflowY": "auto"
+      },
+      "generated": {
+        "viewport": {
+          "width": 820,
+          "height": 900,
+          "deviceScaleFactor": 1
+        },
+        "frame": {
+          "x": 16,
+          "y": 134,
+          "width": 788,
+          "height": 306,
+          "right": 804,
+          "bottom": 440
+        },
+        "slide": {
+          "x": 138,
+          "y": 134,
+          "width": 544,
+          "height": 306,
+          "right": 682,
+          "bottom": 440
+        },
+        "stop": {
+          "x": 338.953125,
+          "y": 73,
+          "width": 66.09375,
+          "height": 44,
+          "right": 405.046875,
+          "bottom": 117
+        },
+        "transcript": {
+          "x": 0,
+          "y": 508.5,
+          "width": 820,
+          "height": 242.5,
+          "right": 820,
+          "bottom": 751
+        },
+        "transcriptBody": {
+          "x": 17,
+          "y": 555.5,
+          "width": 786,
+          "height": 182.5,
+          "right": 803,
+          "bottom": 738
+        },
+        "aspect": 1.7777777777777777,
+        "slideOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "rootOverflow": {
+          "x": 0,
+          "y": 0
+        },
+        "characterCount": 75,
+        "partialCharacters": [],
+        "occludedCharacters": [],
+        "textFontSizes": [
+          10.84,
+          10.84,
+          27.1,
+          14.092,
+          14.092,
+          14.092,
+          13.008
+        ],
+        "stopVisibleEnabled": true,
+        "transcriptScrollable": true,
+        "transcriptOverflowY": "auto"
+      }
+    }
+  },
+  "result": "PASS"
+}

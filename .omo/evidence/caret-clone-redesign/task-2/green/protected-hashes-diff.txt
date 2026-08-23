@@ -1,0 +1,17 @@
+--- .omo/evidence/caret-clone-redesign/task-2/green/protected-hashes-before.tsv	2026-08-11 15:41:59
++++ .omo/evidence/caret-clone-redesign/task-2/green/protected-hashes-after.tsv	2026-08-11 15:46:00
+@@ -192,12 +192,12 @@
+ .omo/ulw-loop/ppt-engine-research-20260809-205918/brief.md	research-artifact	5743	2026-08-09T12:02:02Z	sha256	bfe2f6fd7f1c916b514d2b2ba8d8bcdf602f3728982f87559eea87d41a10304b
+ .omo/ulw-loop/ppt-engine-research-20260809-205918/goals.json	research-artifact	25366	2026-08-09T12:17:52Z	sha256	e0866c73812e24e6e29ba61afed3ec78d9630db03fc25178d811d7041436a035
+ .omo/ulw-loop/ppt-engine-research-20260809-205918/ledger.jsonl	research-artifact	8058	2026-08-09T12:17:52Z	sha256	0ba45e0b6cad39065a38afbab368319bce6d9eb9649fd53bd2a75f3c409da6a9
+-public/index.html	product-surface	27675	2026-08-11T06:32:47Z	sha256	c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e
++public/index.html	product-surface	27675	2026-08-11T06:45:02Z	sha256	c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e
+ public/style.css	product-surface	70667	2026-08-09T11:44:59Z	sha256	94ef3ec9906ff0a779c440cb1b99a157cbf6c06d9dca8c1c46c3bd447bebcd33
+ public/workspace-shell.css	product-surface	11160	2026-08-09T11:18:05Z	sha256	9c1c1cd7fea8e250d3e8668cd79107e74e736dd796e626c9d7be8e3d15b4ae65
+ public/operational-liquid.css	product-surface	16587	2026-08-09T13:34:49Z	sha256	49ba380018173480c2224914f2c8be208705f89793e27ac6497b7aacdaca7bde
+ public/caret-shell.css	product-surface	13621	2026-08-11T00:42:02Z	sha256	9dba178a97db9d41a58f5e037bbb2eba2a0f4b2e4075bc7707b194c702f42aa6
+-public/app.js	product-surface	71450	2026-08-11T06:32:58Z	sha256	6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad
++public/app.js	product-surface	71450	2026-08-11T06:45:02Z	sha256	6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad
+ public/operator-surface.js	product-surface	5269	2026-08-10T11:58:13Z	sha256	e589a1fecb564ede96733cca2be08ea1802bc267584f02d8d3a1dcf86c11a56f
+ public/workspace-split.js	product-surface	8059	2026-08-10T08:16:56Z	sha256	ce5b33e747269f43ab611eb574b17fbcf83d01e0b9737f3444b2ab6f8a584599
+ public/transcript-resize.js	product-surface	5924	2026-08-03T11:58:15Z	sha256	c99bc091ac7ae392636d842d2f71600685210d3ee95e1c97c9d656e80b7ce535

@@ -1,0 +1,7 @@
+full_attempt_failure_count=18
+full_attempt_exit_status=1
+aggregate_exit_status=0
+aggregate_summary= 966 pass  0 fail  4852 expect() calls Ran 966 tests across 71 files. [119.66s] 
+focus_trap_sha256=0c706e13cf47afee5643e26283303e3888acda6d11e8d5f0f660cec8c961dc19
+accessibility_test_sha256=9d7ae56990d81e78a99a308ad6becea9e172c6852c9b6f3dd6465f8061ce934d
+index_reference=515:  <script src="/focus-trap.js"></script>

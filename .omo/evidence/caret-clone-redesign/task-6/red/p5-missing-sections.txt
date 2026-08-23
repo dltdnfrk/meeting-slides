@@ -1,0 +1,51 @@
+# RED probe: p5-missing-sections
+{
+  "design": "/tmp/p5-missing-sections.md",
+  "designSha256": "1547d7bfc6f7fff3de2c9162b26982b5c125e4304ddefb7ad81b3476a490f895",
+  "checks": 115,
+  "passed": 105,
+  "failed": 10,
+  "failures": [
+    {
+      "id": "heading/9.9",
+      "detail": "missing required active heading \"### 9.9 Geometry: wide and narrow\""
+    },
+    {
+      "id": "heading/9.10",
+      "detail": "missing required active heading \"### 9.10 Browser and native minibar division\""
+    },
+    {
+      "id": "token/1440x900",
+      "detail": "active contract must name \"1440x900\""
+    },
+    {
+      "id": "token/1244x836",
+      "detail": "active contract must name \"1244x836\""
+    },
+    {
+      "id": "token/960x760",
+      "detail": "active contract must name \"960x760\""
+    },
+    {
+      "id": "token/820x900",
+      "detail": "active contract must name \"820x900\""
+    },
+    {
+      "id": "token/375x812",
+      "detail": "active contract must name \"375x812\""
+    },
+    {
+      "id": "token/320x667",
+      "detail": "active contract must name \"320x667\""
+    },
+    {
+      "id": "token/360x56",
+      "detail": "active contract must name \"360x56\""
+    },
+    {
+      "id": "token/560x220",
+      "detail": "active contract must name \"560x220\""
+    }
+  ]
+}
+exit=1

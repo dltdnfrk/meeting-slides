@@ -1,0 +1,16 @@
+./checksum-validation.txt: OK
+./cleanup-receipt.txt: OK
+./current-state.txt: OK
+./DoneClaim.json: OK
+./governance-receipt.txt: OK
+./logs/aggregate-attempt.log: OK
+./logs/broad-attempt.log: OK
+./logs/build-app.log: OK
+./logs/codesign.log: OK
+./logs/diff-and-protected-hashes.log: OK
+./logs/focused-current.log: OK
+./logs/generated-drift.log: OK
+./logs/swift-typecheck.log: OK
+./logs/typescript.log: OK
+./logs/verify-app.log: OK
+./REPORT.md: OK

@@ -1,0 +1,51 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+773 |           };
+774 |         });
+775 |         expect(probe).not.toBeNull();
+776 |         // 1. The target itself.
+777 |         expect({ w: probe!.w >= MIN_TARGET_PX, h: probe!.h >= MIN_TARGET_PX, actual: `${probe!.w}x${probe!.h}` })
+778 |           .toEqual({ w: true, h: true, actual: `${probe!.w}x${probe!.h}` });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+    "actual": "66x28",
+-   "h": true,
++   "h": false,
+    "w": true,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:778:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 1244x836 live: #btn-live-stop meets 44px without inflating its glyph [180.29ms]
+773 |           };
+774 |         });
+775 |         expect(probe).not.toBeNull();
+776 |         // 1. The target itself.
+777 |         expect({ w: probe!.w >= MIN_TARGET_PX, h: probe!.h >= MIN_TARGET_PX, actual: `${probe!.w}x${probe!.h}` })
+778 |           .toEqual({ w: true, h: true, actual: `${probe!.w}x${probe!.h}` });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+    "actual": "66x28",
+-   "h": true,
++   "h": false,
+    "w": true,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:778:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 1440x900 live: #btn-live-stop meets 44px without inflating its glyph [107.76ms]
+
+ 0 pass
+ 103 filtered out
+ 2 fail
+ 4 expect() calls
+Ran 2 tests across 1 file. [1294.00ms]

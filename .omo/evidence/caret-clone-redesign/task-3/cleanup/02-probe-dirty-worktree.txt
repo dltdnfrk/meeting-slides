@@ -1,0 +1,37 @@
+=== PROBE: dirty_worktree — unrelated work preserved ===
+Intent: prove this task added only its own files and touched no unrelated dirty work.
+
+--- files added by THIS task (untracked, mine) ---
+?? tests/fixtures/
+?? tests/public-dom-protocol-contract.test.ts
+
+--- unrelated dirty files: modified BY THIS TASK? ---
+.env.example                               b1449a31bf94f07a
+DESIGN.md                                  c1fb2ba3c9299345
+README.md                                  e1c3844f5cb4bb74
+public/app.js                              6a9942ec1ba1e32b
+public/index.html                          c375457e136d0fee
+public/operator-surface.js                 e589a1fecb564ede
+public/workspace-split.js                  ce5b33e747269f43
+server.ts                                  80084305117b2616
+src/app-settings.ts                        ee456f49538f5eec
+src/config.ts                              0cdc3197595e30d3
+src/llm.ts                                 12eaba3b65342171
+src/minutes.ts                             b9b8c4436264860f
+src/provider-adapters.ts                   17b4fa02f0c4f443
+src/providers.ts                           624995935cf4bcaf
+tests/app-settings.test.ts                 2e8ec7b84774a973
+tests/providers.test.ts                    73d9c3d62bdaab1b
+tests/public-operator-surface.test.ts      a4ee68f1497be5a0
+tests/public-workspace.test.ts             90e3d3e89b3e3cd9
+
+--- no commits / staging / reset performed ---
+HEAD now:      a1ed25f95980980cd958044b90e739ac45e8280d
+HEAD baseline: a1ed25f95980980cd958044b90e739ac45e8280d
+staged files:  0
+
+--- protected artifacts untouched ---
+.omo/ulw-loop
+.omo/ulw-research
+HANDOFF.md
+models

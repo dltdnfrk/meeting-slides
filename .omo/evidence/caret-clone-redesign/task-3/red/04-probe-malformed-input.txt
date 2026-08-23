@@ -1,0 +1,45 @@
+=== PROBE: malformed_input — invalid/duplicate/missing manifest values ===
+Intent: prove the test fails loudly on a bad manifest rather than silently passing.
+
+--- A. manifest names an id that does not exist in the shipped HTML ---
+(fail) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.33ms]
+(fail) shipped DOM contract > binding controls keep their element and control types [0.23ms]
+(fail) shipped DOM contract > scripts still resolve the binding ids they own [0.25ms]
+ 18 pass
+ 3 fail
+
+--- B. manifest declares a duplicate entry for an existing id ---
+ 21 pass
+ 0 fail
+
+--- C. manifest ancestry references a missing ancestor ---
+(fail) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.16ms]
+ 20 pass
+ 1 fail
+
+--- D. protocol manifest names an action the client never emits ---
+(fail) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.19ms]
+(fail) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.09ms]
+ 19 pass
+ 2 fail
+
+--- restoration check ---
+dom manifest restored: OK
+protocol manifest restored: OK
+
+=== PROBE B RE-RUN after closing the duplicate-manifest-entry gap ===
+--- B1. duplicate DOM manifest entry ---
+(fail) shipped DOM contract > the manifest itself lists each binding id exactly once [0.21ms]
+(fail) shipped DOM contract > the manifest itself lists each binding id exactly once [0.21ms]
+ 22 pass
+ 1 fail
+
+--- B2. duplicate protocol manifest entry ---
+(fail) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.18ms]
+(fail) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.18ms]
+ 22 pass
+ 1 fail
+
+--- restoration ---
+dom manifest restored: OK
+protocol manifest restored: OK

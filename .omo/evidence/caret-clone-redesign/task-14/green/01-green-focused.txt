@@ -1,0 +1,10 @@
+== bun test tests/native-minibar.test.ts tests/native-surface-contract.test.ts tests/native-launcher-boundary.test.ts ==
+(pass) native launcher seam: launcher entry point and build wiring > the entry point holds side effects only, never lifecycle rules [0.06ms]
+(pass) native launcher seam: launcher entry point and build wiring > the build script compiles every native source the entry point needs [0.04ms]
+(pass) native launcher seam: launcher entry point and build wiring > the shipped bundle links the transport into exactly one executable [0.03ms]
+
+ 119 pass
+ 0 fail
+ 295 expect() calls
+Ran 119 tests across 3 files. [7.23s]
+exit=0

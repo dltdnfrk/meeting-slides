@@ -1,0 +1,11 @@
+harness_shell_syntax=PASS
+wait_receipt_py_compile=PASS
+window_inventory_swift_typecheck=PASS
+fake_server_bun_build=PASS
+checksums=PASS
+checksum_entries=44
+acd_preserved=true
+port_54745_free=true
+app_process_gone=true
+marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+installed_hash=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c

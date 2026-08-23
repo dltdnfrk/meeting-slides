@@ -1,0 +1,97 @@
+{
+  "viewports": [
+    {
+      "viewport": "1244x836",
+      "steps": [
+        {
+          "step": "hydrated idle",
+          "ok": true
+        },
+        {
+          "step": "tabbed to Start with real Tab keys",
+          "tabPresses": 7,
+          "reachedStart": true
+        }
+      ],
+      "outboundCommand": {
+        "action": "startCapture"
+      },
+      "afterStart": {
+        "activeId": "btn-live-stop",
+        "stopFocused": true,
+        "stopFocusVisible": true,
+        "stopAccessibleName": "녹음 중지",
+        "stopTargetPx": {
+          "w": 66,
+          "h": 44
+        },
+        "meets44": true,
+        "edgeMisses": [],
+        "glyphPx": {
+          "w": 8,
+          "h": 8
+        },
+        "labelFontSizePx": 12,
+        "capsuleHeightPx": 54,
+        "topbarOverflow": 0,
+        "capsuleWithinStage": true,
+        "rootOverflow": 0,
+        "focusRing": {
+          "outlineWidth": "2px"
+        },
+        "shell": "live"
+      },
+      "stopCommand": {
+        "action": "stopCapture"
+      },
+      "verdict": "PASS"
+    },
+    {
+      "viewport": "1440x900",
+      "steps": [
+        {
+          "step": "hydrated idle",
+          "ok": true
+        },
+        {
+          "step": "tabbed to Start with real Tab keys",
+          "tabPresses": 7,
+          "reachedStart": true
+        }
+      ],
+      "outboundCommand": {
+        "action": "startCapture"
+      },
+      "afterStart": {
+        "activeId": "btn-live-stop",
+        "stopFocused": true,
+        "stopFocusVisible": true,
+        "stopAccessibleName": "녹음 중지",
+        "stopTargetPx": {
+          "w": 66,
+          "h": 44
+        },
+        "meets44": true,
+        "edgeMisses": [],
+        "glyphPx": {
+          "w": 8,
+          "h": 8
+        },
+        "labelFontSizePx": 12,
+        "capsuleHeightPx": 54,
+        "topbarOverflow": 0,
+        "capsuleWithinStage": true,
+        "rootOverflow": 0,
+        "focusRing": {
+          "outlineWidth": "2px"
+        },
+        "shell": "live"
+      },
+      "stopCommand": {
+        "action": "stopCapture"
+      },
+      "verdict": "PASS"
+    }
+  ],
+  "verdict": "PASS"
+}

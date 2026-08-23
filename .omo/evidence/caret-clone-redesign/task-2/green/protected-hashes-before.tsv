@@ -1,0 +1,205 @@
+path	class	bytes	mtime_utc	identity_kind	identity
+src/providers.ts	provider-alibaba	5085	2026-08-07T13:39:05Z	sha256	624995935cf4bcaf2647942b949146d3d546f1b4ec91edbd0cee5dde83b07f5b
+src/config.ts	provider-alibaba	8152	2026-08-07T13:39:05Z	sha256	0cdc3197595e30d3fc725249e26e7c667cd040b7c651e04d93eb8c19b49f90a8
+src/llm.ts	provider-alibaba	15250	2026-08-07T13:39:05Z	sha256	12eaba3b65342171d6d53ad8cecddc8c6d291bc91a38fe403c61f618c0d43a15
+src/provider-adapters.ts	provider-alibaba	5736	2026-08-07T13:39:05Z	sha256	17b4fa02f0c4f443ab49584f6f80f9787be432e52a23ae15d9413d382236bdb9
+src/app-settings.ts	provider-alibaba	3664	2026-08-07T13:39:05Z	sha256	ee456f49538f5eec09789b6afe582aafff6b9180dba19e86e67cccb52dacf444
+src/minutes.ts	provider-alibaba	8962	2026-08-07T13:39:05Z	sha256	b9b8c4436264860f5b03a829f90ca8d256cb999b8758cd26812f8579631cea0e
+.env.example	provider-alibaba	2977	2026-08-07T13:39:05Z	sha256	b1449a31bf94f07a8357743507b4574a12f937c25660712386930fa80d84c445
+server.ts	provider-alibaba	72863	2026-08-08T23:29:16Z	sha256	80084305117b26160b063c5c59b80ecc07fc92a2ac01ca40a64310281520a923
+README.md	provider-alibaba	7101	2026-08-07T13:39:05Z	sha256	e1c3844f5cb4bb74d052b5deea9ee615940431ffa75bc49a73670e1ea912e64b
+tests/providers.test.ts	provider-alibaba	3988	2026-08-07T13:39:05Z	sha256	73d9c3d62bdaab1bcb2acec8ce0aa845e893b0567ebed82995570e70fb4402c5
+tests/app-settings.test.ts	provider-alibaba	1681	2026-08-07T13:39:05Z	sha256	2e8ec7b84774a973e9263932c83390b8fec00f8389b6a19fad9c6787b211b5a7
+models/ggml-large-v3-turbo.bin	model-weights	1624555275	2026-07-27T22:27:15Z	size+mtime(dataless)	bytes=1624555275;mtime=2026-07-27T22:27:15Z
+models/ggml-medium.bin	model-weights	1533763059	2026-07-25T09:25:47Z	size+mtime(dataless)	bytes=1533763059;mtime=2026-07-25T09:25:47Z
+models/stt/ggml-large-v3-turbo-q8_0.bin	model-weights	874188075	2026-08-04T09:17:55Z	size+mtime(dataless)	bytes=874188075;mtime=2026-08-04T09:17:55Z
+models/stt/nemotron-3.5-asr-streaming-0.6b-Q8_0.gguf	model-weights	751094240	2026-08-08T23:19:21Z	size+mtime(dataless)	bytes=751094240;mtime=2026-08-08T23:19:21Z
+HANDOFF.md	handoff	26263	2026-08-10T00:09:52Z	sha256	280e4186041fba8216721ce4da46fcc01a52e728a6684d00e761b250dd1a721e
+DESIGN.md	redesign-input	24583	2026-08-10T11:58:13Z	sha256	c1fb2ba3c9299345dec6d60f7694267074ee85092ac43f67fab91d7b31da6648
+.omo/plans/caret-clone-redesign.md	redesign-input	55019	2026-08-11T05:54:46Z	sha256	591a99fb4c98fb85fca13b7fb70fd5ea323c490f8989d47a90d1c5092ac7aeb4
+.omo/drafts/caret-clone-redesign.md	redesign-input	14386	2026-08-11T05:57:03Z	sha256	76f3112dda303e7b7994509bc3624a30a6d65daffaec51e615a72b908d5b25d6
+.omo/plans/tiro-operator-rebuild.md	redesign-input	3124	2026-08-09T09:59:55Z	sha256	1d5337b3af00d80e4ac0563895af050c8a6550d825581000fa82930685e5db3b
+.omo/ulw-research/20260809-065345/brief.md	research-artifact	3058	2026-08-08T21:54:37Z	sha256	22aff15dbe24ece2c8815783b91465f2705c2ef21091b3fd6dd73f718fdc8d85
+.omo/ulw-research/20260809-065345/candidate-ranking.md	research-artifact	5946	2026-08-08T22:47:57Z	sha256	4e6e16ff0569d3b41d8a70092a670111cbf6262b92dcf3c2eb910a03830fa3cd
+.omo/ulw-research/20260809-065345/claim-graph.json	research-artifact	3194	2026-08-08T22:50:58Z	sha256	839aa4f1dfa894d99f22705ef75c17f9f5fc5bed4efbb400d40635e3a9e6a557
+.omo/ulw-research/20260809-065345/final-report.md	research-artifact	14600	2026-08-08T23:00:27Z	size+mtime(dataless)	bytes=14600;mtime=2026-08-08T23:00:27Z
+.omo/ulw-research/20260809-065345/integration-surface.md	research-artifact	3352	2026-08-08T22:44:01Z	sha256	fbd20285060b888ae5af9d6a8ea8acc2a47b1b985010eac99f59bc8039b70cf2
+.omo/ulw-research/20260809-065345/intent-diff.md	research-artifact	885	2026-08-08T22:50:58Z	sha256	6029821ca6da0c9a7079939a9bc7085bb4c576bf703d7acfef613230ff97b9c1
+.omo/ulw-research/20260809-065345/observation-manifest.md	research-artifact	20332	2026-08-08T22:56:20Z	sha256	f44d42a36eb3fa622695ede255167045185f6955974a9dac324ba9d7b059e760
+.omo/ulw-research/20260809-065345/outputs/qa/.gitkeep	research-artifact	1	2026-08-08T22:56:53Z	sha256	01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+.omo/ulw-research/20260809-065345/outputs/qa/compact-page-03.png	research-artifact	126311	2026-08-08T23:00:43Z	size+mtime(dataless)	bytes=126311;mtime=2026-08-08T23:00:43Z
+.omo/ulw-research/20260809-065345/outputs/qa/compact-page-04.png	research-artifact	134162	2026-08-08T23:00:43Z	size+mtime(dataless)	bytes=134162;mtime=2026-08-08T23:00:43Z
+.omo/ulw-research/20260809-065345/outputs/qa/final-page-03.png	research-artifact	122193	2026-08-08T22:59:30Z	size+mtime(dataless)	bytes=122193;mtime=2026-08-08T22:59:30Z
+.omo/ulw-research/20260809-065345/outputs/qa/final-page-04.png	research-artifact	126167	2026-08-08T22:59:30Z	size+mtime(dataless)	bytes=126167;mtime=2026-08-08T22:59:30Z
+.omo/ulw-research/20260809-065345/outputs/qa/final-page-05.png	research-artifact	130788	2026-08-08T22:59:30Z	size+mtime(dataless)	bytes=130788;mtime=2026-08-08T22:59:30Z
+.omo/ulw-research/20260809-065345/outputs/qa/html-page-03.png	research-artifact	117411	2026-08-08T22:57:47Z	size+mtime(dataless)	bytes=117411;mtime=2026-08-08T22:57:47Z
+.omo/ulw-research/20260809-065345/outputs/qa/html-page-04.png	research-artifact	92936	2026-08-08T22:57:48Z	size+mtime(dataless)	bytes=92936;mtime=2026-08-08T22:57:48Z
+.omo/ulw-research/20260809-065345/outputs/qa/landscape-page-03.png	research-artifact	117411	2026-08-08T22:58:34Z	size+mtime(dataless)	bytes=117411;mtime=2026-08-08T22:58:34Z
+.omo/ulw-research/20260809-065345/outputs/qa/landscape-page-04.png	research-artifact	92936	2026-08-08T22:58:34Z	size+mtime(dataless)	bytes=92936;mtime=2026-08-08T22:58:34Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-01.png	research-artifact	153322	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=153322;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-02.png	research-artifact	124044	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=124044;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-03.png	research-artifact	123804	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=123804;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-04.png	research-artifact	118378	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=118378;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-05.png	research-artifact	127917	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=127917;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-06.png	research-artifact	125709	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=125709;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-07.png	research-artifact	148116	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=148116;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-08.png	research-artifact	139645	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=139645;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-09.png	research-artifact	125286	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=125286;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-10.png	research-artifact	133438	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=133438;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/page-11.png	research-artifact	82782	2026-08-08T22:57:04Z	size+mtime(dataless)	bytes=82782;mtime=2026-08-08T22:57:04Z
+.omo/ulw-research/20260809-065345/outputs/qa/STT-ASR-Model-Landscape-2026-landscape.html	research-artifact	31647	2026-08-08T22:58:32Z	size+mtime(dataless)	bytes=31647;mtime=2026-08-08T22:58:32Z
+.omo/ulw-research/20260809-065345/outputs/qa/STT-ASR-Model-Landscape-2026-landscape.pdf	research-artifact	375059	2026-08-08T22:58:34Z	size+mtime(dataless)	bytes=375059;mtime=2026-08-08T22:58:34Z
+.omo/ulw-research/20260809-065345/outputs/qa/STT-ASR-Model-Landscape-2026.pdf	research-artifact	375059	2026-08-08T22:57:47Z	size+mtime(dataless)	bytes=375059;mtime=2026-08-08T22:57:47Z
+.omo/ulw-research/20260809-065345/outputs/report.css	research-artifact	3589	2026-08-08T22:59:12Z	sha256	ed29df9bc6cdb8304fb2fc840936b4348b35bd23f1ece18d9a397923b26180f4
+.omo/ulw-research/20260809-065345/outputs/STT-ASR-Model-Landscape-2026.docx	research-artifact	20366	2026-08-08T23:00:41Z	size+mtime(dataless)	bytes=20366;mtime=2026-08-08T23:00:41Z
+.omo/ulw-research/20260809-065345/outputs/STT-ASR-Model-Landscape-2026.html	research-artifact	30718	2026-08-08T23:00:41Z	size+mtime(dataless)	bytes=30718;mtime=2026-08-08T23:00:41Z
+.omo/ulw-research/20260809-065345/outputs/STT-ASR-Model-Landscape-2026.md	research-artifact	14941	2026-08-08T23:00:40Z	size+mtime(dataless)	bytes=14941;mtime=2026-08-08T23:00:40Z
+.omo/ulw-research/20260809-065345/outputs/STT-ASR-Model-Landscape-2026.pdf	research-artifact	313167	2026-08-08T23:00:43Z	size+mtime(dataless)	bytes=313167;mtime=2026-08-08T23:00:43Z
+.omo/ulw-research/20260809-065345/sources-ledger.md	research-artifact	18752	2026-08-08T22:44:01Z	size+mtime(dataless)	bytes=18752;mtime=2026-08-08T22:44:01Z
+.omo/ulw-research/20260809-065345/team-state.json	research-artifact	224	2026-08-08T22:50:58Z	sha256	0bb0bdc2980c45667b87685de2ecc867eaaec06f4618f775cd028fa70ae47b6b
+.omo/ulw-research/20260809-065345/traceability-matrix.md	research-artifact	1666	2026-08-08T22:50:58Z	sha256	c4e9218f8501f8f66e6c7685f0ec84ea125d01f279085cdf017ee8a7f456126c
+.omo/ulw-research/20260809-065345/wave-0-scope-xai-google.md	research-artifact	2575	2026-08-08T21:59:58Z	sha256	3953e0d7af93f0a7177f50efb4b004dd45a31e0ddd65a4c3fe1f8b8de1b068ad
+.omo/ulw-research/20260809-065345/wave-1-major-labs.md	research-artifact	3711	2026-08-08T22:07:04Z	sha256	9937d7579d21db52901ef8fc84a29a8995f34fe0c5d30709fff253200554531a
+.omo/ulw-research/20260809-065345/wave-2-independent-multimodal.md	research-artifact	2516	2026-08-08T22:15:36Z	sha256	eda1315da1dcec42e02bb5ef7e1f5bbc2bbbb46c7fa0fd7265407a36c5e663a6
+.omo/ulw-research/20260809-065345/wave-3-vendor-and-korean-gaps.md	research-artifact	3122	2026-08-08T22:20:43Z	sha256	f45658274d1e38aa17e6900f2d1abdefd8b273421f60576489cb10a47646a02c
+.omo/ulw-research/20260809-065345/wave-4-apple-silicon-runtime.md	research-artifact	5085	2026-08-08T22:44:01Z	sha256	b030341f2b4feba18615f9eb8ceaf827a0e00e046747dafbb23de993f8e39642
+.omo/ulw-research/20260809-205918/brief.md	research-artifact	5974	2026-08-09T12:02:29Z	sha256	3f95d4dce9104d63c5e21618a59064937e57c3e9926d6fde13249fe7b8bfeeac
+.omo/ulw-research/20260809-205918/cause-disappearance.md	research-artifact	214	2026-08-09T12:00:53Z	sha256	5b01cd28336b060841cc84225a0d03587dbb1544fc525b6f68ff613862c0ae4c
+.omo/ulw-research/20260809-205918/claim-graph.md	research-artifact	11598	2026-08-09T12:52:32Z	size+mtime(dataless)	bytes=11598;mtime=2026-08-09T12:52:32Z
+.omo/ulw-research/20260809-205918/debate-log.md	research-artifact	5954	2026-08-09T12:45:17Z	sha256	1e8b8e34f6e8bce9fbf38e09f6f8c90786a2f5dd481d4eb1ead5449d264839d3
+.omo/ulw-research/20260809-205918/design-spec.md	research-artifact	1674	2026-08-09T12:02:29Z	sha256	c9b2692af6312df35d7055f47d4b008232237e35682f4e9b9db4b6b702162410
+.omo/ulw-research/20260809-205918/excursion-log.md	research-artifact	187	2026-08-09T12:00:53Z	sha256	cc12def0b0d2dee7d2aac0a23796fa5f8e43d7a111c7798582184faa8381f238
+.omo/ulw-research/20260809-205918/executive-deck/.slides-grab/design-gate-report.md	research-artifact	5495	2026-08-09T12:59:15Z	sha256	30b2aaef8076c6ec4058a434eb3f3934af59e57b82bc6fdb918c87fb7c5858af
+.omo/ulw-research/20260809-205918/executive-deck/.slides-grab/design-gate.json	research-artifact	14355	2026-08-09T12:59:15Z	size+mtime(dataless)	bytes=14355;mtime=2026-08-09T12:59:15Z
+.omo/ulw-research/20260809-205918/executive-deck/contact-sheet-720.png	research-artifact	522207	2026-08-09T12:30:32Z	size+mtime(dataless)	bytes=522207;mtime=2026-08-09T12:30:32Z
+.omo/ulw-research/20260809-205918/executive-deck/contact-sheet-final.png	research-artifact	468655	2026-08-09T12:53:30Z	size+mtime(dataless)	bytes=468655;mtime=2026-08-09T12:53:30Z
+.omo/ulw-research/20260809-205918/executive-deck/contact-sheet.png	research-artifact	490821	2026-08-09T12:28:24Z	sha256	70da62ee86c760346c15f241c4bc7e6e24db38d9a4da38c29ee7cef34fe6349d
+.omo/ulw-research/20260809-205918/executive-deck/deck.css	research-artifact	10825	2026-08-09T12:57:05Z	size+mtime(dataless)	bytes=10825;mtime=2026-08-09T12:57:05Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-01 2.png	research-artifact	337940	2026-08-09T12:48:02Z	size+mtime(dataless)	bytes=337940;mtime=2026-08-09T12:48:02Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-01.png	research-artifact	343076	2026-08-09T12:53:27Z	size+mtime(dataless)	bytes=343076;mtime=2026-08-09T12:53:27Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-02 2.png	research-artifact	367260	2026-08-09T12:48:02Z	sha256	e1bb711f90951e32e4e40bc5bc48d730bcfd7ab80fe633e8b12005c7a1da2277
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-02.png	research-artifact	390054	2026-08-09T12:53:27Z	size+mtime(dataless)	bytes=390054;mtime=2026-08-09T12:53:27Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-03 2.png	research-artifact	409457	2026-08-09T12:48:02Z	size+mtime(dataless)	bytes=409457;mtime=2026-08-09T12:48:02Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-03.png	research-artifact	465290	2026-08-09T12:53:28Z	size+mtime(dataless)	bytes=465290;mtime=2026-08-09T12:53:28Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-04 2.png	research-artifact	321375	2026-08-09T12:48:03Z	size+mtime(dataless)	bytes=321375;mtime=2026-08-09T12:48:03Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-04.png	research-artifact	320590	2026-08-09T12:53:28Z	sha256	36bdccab6562ccf5d02a1211ea8dd7849250c35541f25bb72db10f484832e2ab
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-05 2.png	research-artifact	303993	2026-08-09T12:48:03Z	size+mtime(dataless)	bytes=303993;mtime=2026-08-09T12:48:03Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-05.png	research-artifact	299821	2026-08-09T12:53:28Z	size+mtime(dataless)	bytes=299821;mtime=2026-08-09T12:53:28Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-06 2.png	research-artifact	296708	2026-08-09T12:48:03Z	size+mtime(dataless)	bytes=296708;mtime=2026-08-09T12:48:03Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-06.png	research-artifact	293826	2026-08-09T12:53:28Z	size+mtime(dataless)	bytes=293826;mtime=2026-08-09T12:53:28Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-07 2.png	research-artifact	383186	2026-08-09T12:48:03Z	size+mtime(dataless)	bytes=383186;mtime=2026-08-09T12:48:03Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-07.png	research-artifact	383394	2026-08-09T12:53:28Z	size+mtime(dataless)	bytes=383394;mtime=2026-08-09T12:53:28Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-08 2.png	research-artifact	332352	2026-08-09T12:48:03Z	size+mtime(dataless)	bytes=332352;mtime=2026-08-09T12:48:03Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-08.png	research-artifact	333026	2026-08-09T12:53:29Z	size+mtime(dataless)	bytes=333026;mtime=2026-08-09T12:53:29Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-09 2.png	research-artifact	453869	2026-08-09T12:48:04Z	size+mtime(dataless)	bytes=453869;mtime=2026-08-09T12:48:04Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-09.png	research-artifact	473561	2026-08-09T12:53:29Z	size+mtime(dataless)	bytes=473561;mtime=2026-08-09T12:53:29Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-10 2.png	research-artifact	338641	2026-08-09T12:48:04Z	size+mtime(dataless)	bytes=338641;mtime=2026-08-09T12:48:04Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-10.png	research-artifact	338937	2026-08-09T12:53:29Z	size+mtime(dataless)	bytes=338937;mtime=2026-08-09T12:53:29Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-11 2.png	research-artifact	328045	2026-08-09T12:48:04Z	size+mtime(dataless)	bytes=328045;mtime=2026-08-09T12:48:04Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-11.png	research-artifact	325756	2026-08-09T12:53:29Z	size+mtime(dataless)	bytes=325756;mtime=2026-08-09T12:53:29Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-12 2.png	research-artifact	289919	2026-08-09T12:48:04Z	size+mtime(dataless)	bytes=289919;mtime=2026-08-09T12:48:04Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-12.png	research-artifact	287326	2026-08-09T12:53:30Z	size+mtime(dataless)	bytes=287326;mtime=2026-08-09T12:53:30Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-01 2.png	research-artifact	173909	2026-08-09T12:36:49Z	size+mtime(dataless)	bytes=173909;mtime=2026-08-09T12:36:49Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-01.png	research-artifact	178391	2026-08-09T12:53:24Z	size+mtime(dataless)	bytes=178391;mtime=2026-08-09T12:53:24Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-02 2.png	research-artifact	194714	2026-08-09T12:36:49Z	size+mtime(dataless)	bytes=194714;mtime=2026-08-09T12:36:49Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-02.png	research-artifact	211130	2026-08-09T12:53:25Z	size+mtime(dataless)	bytes=211130;mtime=2026-08-09T12:53:25Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-03 2.png	research-artifact	242079	2026-08-09T12:36:49Z	size+mtime(dataless)	bytes=242079;mtime=2026-08-09T12:36:49Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-03.png	research-artifact	222617	2026-08-09T12:53:25Z	size+mtime(dataless)	bytes=222617;mtime=2026-08-09T12:53:25Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-04 2.png	research-artifact	171533	2026-08-09T12:36:50Z	size+mtime(dataless)	bytes=171533;mtime=2026-08-09T12:36:50Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-04.png	research-artifact	171837	2026-08-09T12:53:25Z	sha256	994cdfc4c3f69b5b332ce6bd5c4d11898e4bfdd89b722603313dec58da6728d2
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-05 2.png	research-artifact	159643	2026-08-09T12:36:50Z	size+mtime(dataless)	bytes=159643;mtime=2026-08-09T12:36:50Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-05.png	research-artifact	160625	2026-08-09T12:53:25Z	sha256	5652133794571190bbcbfff1279fddb4558c58e4fe6a623f5ea9cfa8be68b549
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-06 2.png	research-artifact	153381	2026-08-09T12:36:50Z	size+mtime(dataless)	bytes=153381;mtime=2026-08-09T12:36:50Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-06.png	research-artifact	156728	2026-08-09T12:53:25Z	size+mtime(dataless)	bytes=156728;mtime=2026-08-09T12:53:25Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-07 2.png	research-artifact	203038	2026-08-09T12:36:50Z	size+mtime(dataless)	bytes=203038;mtime=2026-08-09T12:36:50Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-07.png	research-artifact	205135	2026-08-09T12:53:25Z	size+mtime(dataless)	bytes=205135;mtime=2026-08-09T12:53:25Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-08 2.png	research-artifact	174805	2026-08-09T12:36:50Z	size+mtime(dataless)	bytes=174805;mtime=2026-08-09T12:36:50Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-08.png	research-artifact	176323	2026-08-09T12:53:26Z	size+mtime(dataless)	bytes=176323;mtime=2026-08-09T12:53:26Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-09 2.png	research-artifact	240132	2026-08-09T12:36:51Z	size+mtime(dataless)	bytes=240132;mtime=2026-08-09T12:36:51Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-09.png	research-artifact	251428	2026-08-09T12:53:26Z	size+mtime(dataless)	bytes=251428;mtime=2026-08-09T12:53:26Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-10 2.png	research-artifact	171463	2026-08-09T12:36:51Z	size+mtime(dataless)	bytes=171463;mtime=2026-08-09T12:36:51Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-10.png	research-artifact	179383	2026-08-09T12:53:26Z	size+mtime(dataless)	bytes=179383;mtime=2026-08-09T12:53:26Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-11 2.png	research-artifact	164965	2026-08-09T12:36:51Z	size+mtime(dataless)	bytes=164965;mtime=2026-08-09T12:36:51Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-11.png	research-artifact	176607	2026-08-09T12:53:26Z	size+mtime(dataless)	bytes=176607;mtime=2026-08-09T12:53:26Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-12 2.png	research-artifact	157916	2026-08-09T12:36:51Z	size+mtime(dataless)	bytes=157916;mtime=2026-08-09T12:36:51Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-12.png	research-artifact	157173	2026-08-09T12:53:26Z	size+mtime(dataless)	bytes=157173;mtime=2026-08-09T12:53:26Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-01.png	research-artifact	290642	2026-08-09T12:27:30Z	size+mtime(dataless)	bytes=290642;mtime=2026-08-09T12:27:30Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-02.png	research-artifact	315028	2026-08-09T12:27:30Z	size+mtime(dataless)	bytes=315028;mtime=2026-08-09T12:27:30Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-03.png	research-artifact	461994	2026-08-09T12:27:30Z	size+mtime(dataless)	bytes=461994;mtime=2026-08-09T12:27:30Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-04.png	research-artifact	285822	2026-08-09T12:27:31Z	sha256	f016860485e0a121a90f6ad1ec30afdcff392929ac8c6ce902077ccd4a8149fa
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-05.png	research-artifact	264803	2026-08-09T12:27:31Z	size+mtime(dataless)	bytes=264803;mtime=2026-08-09T12:27:31Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-06.png	research-artifact	248274	2026-08-09T12:27:31Z	size+mtime(dataless)	bytes=248274;mtime=2026-08-09T12:27:31Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-07.png	research-artifact	330445	2026-08-09T12:27:31Z	size+mtime(dataless)	bytes=330445;mtime=2026-08-09T12:27:31Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-08.png	research-artifact	272546	2026-08-09T12:27:31Z	size+mtime(dataless)	bytes=272546;mtime=2026-08-09T12:27:31Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-09.png	research-artifact	455670	2026-08-09T12:27:32Z	sha256	ddf53aed7a347bdf67a6a442550080b0c7c35eeb5e647eab71b1dc2bacdd8e37
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-10.png	research-artifact	266531	2026-08-09T12:27:32Z	size+mtime(dataless)	bytes=266531;mtime=2026-08-09T12:27:32Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-11.png	research-artifact	262613	2026-08-09T12:27:32Z	size+mtime(dataless)	bytes=262613;mtime=2026-08-09T12:27:32Z
+.omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-12.png	research-artifact	256554	2026-08-09T12:27:32Z	size+mtime(dataless)	bytes=256554;mtime=2026-08-09T12:27:32Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-01.png	research-artifact	343076	2026-08-09T12:59:13Z	size+mtime(dataless)	bytes=343076;mtime=2026-08-09T12:59:13Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-02.png	research-artifact	390054	2026-08-09T12:59:13Z	sha256	5bf22a20e5ce901a35045b23a434dbe75ca07305c098395fd0eddd3dd9181417
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-03.png	research-artifact	465290	2026-08-09T12:59:13Z	size+mtime(dataless)	bytes=465290;mtime=2026-08-09T12:59:13Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-04.png	research-artifact	320590	2026-08-09T12:59:13Z	size+mtime(dataless)	bytes=320590;mtime=2026-08-09T12:59:13Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-05.png	research-artifact	299821	2026-08-09T12:59:14Z	size+mtime(dataless)	bytes=299821;mtime=2026-08-09T12:59:14Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-06.png	research-artifact	293826	2026-08-09T12:59:14Z	size+mtime(dataless)	bytes=293826;mtime=2026-08-09T12:59:14Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-07.png	research-artifact	383394	2026-08-09T12:59:14Z	size+mtime(dataless)	bytes=383394;mtime=2026-08-09T12:59:14Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-08.png	research-artifact	333026	2026-08-09T12:59:14Z	size+mtime(dataless)	bytes=333026;mtime=2026-08-09T12:59:14Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-09.png	research-artifact	484663	2026-08-09T12:59:14Z	size+mtime(dataless)	bytes=484663;mtime=2026-08-09T12:59:14Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-10.png	research-artifact	338937	2026-08-09T12:59:15Z	sha256	185bb75019f2b67ef547533cd9fcb5855ba2377eb63950c8946f7d429429d872
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-11.png	research-artifact	325756	2026-08-09T12:59:15Z	size+mtime(dataless)	bytes=325756;mtime=2026-08-09T12:59:15Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-12.png	research-artifact	287326	2026-08-09T12:59:15Z	size+mtime(dataless)	bytes=287326;mtime=2026-08-09T12:59:15Z
+.omo/ulw-research/20260809-205918/executive-deck/qa/pass-a-visual.md	research-artifact	2120	2026-08-09T12:59:04Z	sha256	538d2c74b9bfe7b7ad6cdd911d7884b6e0fe54d2d2e5343eb02ac05b86f829fb
+.omo/ulw-research/20260809-205918/executive-deck/qa/pass-b-content.md	research-artifact	2131	2026-08-09T12:59:04Z	sha256	41eb6828e47b3c55bb834327a03adaa72ea97996b7711b04acacf95fff2246c4
+.omo/ulw-research/20260809-205918/executive-deck/slide-01.html	research-artifact	1224	2026-08-09T12:52:32Z	sha256	d4e71abf9bb50925b8901debead09c28ca793c68397b4aa3602b18e429cb100e
+.omo/ulw-research/20260809-205918/executive-deck/slide-02.html	research-artifact	1219	2026-08-09T12:52:55Z	sha256	5cc2a3ba606ffd7593465b2c5deb944f257bba243a674b06dcffe84764116a7e
+.omo/ulw-research/20260809-205918/executive-deck/slide-03.html	research-artifact	951	2026-08-09T12:47:39Z	sha256	0e773633a01c251d7a03d5d096c0acf1739ea3d29551cc7807be7fca4d76e793
+.omo/ulw-research/20260809-205918/executive-deck/slide-04.html	research-artifact	1363	2026-08-09T12:47:39Z	sha256	959342926fe8f697ceadf1758e57304138070eef48c0654d15bae540383b053d
+.omo/ulw-research/20260809-205918/executive-deck/slide-05.html	research-artifact	1338	2026-08-09T12:47:39Z	sha256	0566e2ab98d7733f9dc95059f282648502419e8f7d45ca18437ca16130e39a2e
+.omo/ulw-research/20260809-205918/executive-deck/slide-06.html	research-artifact	1140	2026-08-09T12:52:32Z	sha256	22d0e88f26ef8413d2ea25e3e8729eee454cf57dffb2897a83949b45c26d4a90
+.omo/ulw-research/20260809-205918/executive-deck/slide-07.html	research-artifact	1398	2026-08-09T12:47:39Z	sha256	13feaf6d61889d41d77371f9666fb99aea1fe1acf2831afdb39aec7b33e05ad4
+.omo/ulw-research/20260809-205918/executive-deck/slide-08.html	research-artifact	1127	2026-08-09T12:33:32Z	sha256	fd4ae02781e2b142472433764b4d0fd12eaf8e109ad307a19d7c5b1f513344be
+.omo/ulw-research/20260809-205918/executive-deck/slide-09.html	research-artifact	1275	2026-08-09T12:47:39Z	sha256	34f76178ac1c03f1e72e69bd3968662ecb22092ec66fc36fadb8bc0d76dd113a
+.omo/ulw-research/20260809-205918/executive-deck/slide-10.html	research-artifact	1265	2026-08-09T12:52:32Z	sha256	3b903a7d67cda3e180ad0d9b8e1aa7b81b726fd76b482246ccf1a218d86ce4ba
+.omo/ulw-research/20260809-205918/executive-deck/slide-11.html	research-artifact	1429	2026-08-09T12:47:39Z	sha256	be1bd521c5063155fc12c99c448c3c18bdf9785ef5922e015a9deabd41c9b757
+.omo/ulw-research/20260809-205918/executive-deck/slide-12.html	research-artifact	1375	2026-08-09T12:47:39Z	sha256	355e89d6fac437f260b526b2ff9efebe4eed09bf4bf5587a541c7d46777de75e
+.omo/ulw-research/20260809-205918/executive-deck/slide-outline.md	research-artifact	4500	2026-08-09T12:52:32Z	sha256	dc01592775c18a4f7d5296b2e79d4fe7cf39c3b5dfc0803e9b680c51271045f5
+.omo/ulw-research/20260809-205918/expansion-log.md	research-artifact	2441	2026-08-09T12:49:15Z	sha256	cb6a4451e82e6bc23a01154bfd119de8d763bc6a970c7d7770924e5975cfde00
+.omo/ulw-research/20260809-205918/intent-diff.md	research-artifact	2564	2026-08-09T12:49:03Z	sha256	508055a2bf87892232313c3f4828499902cfb0ee7c82525689e5bdd938efdd7a
+.omo/ulw-research/20260809-205918/journal.md	research-artifact	9074	2026-08-09T13:01:27Z	size+mtime(dataless)	bytes=9074;mtime=2026-08-09T13:01:27Z
+.omo/ulw-research/20260809-205918/observation-manifest.md	research-artifact	9672	2026-08-09T12:45:17Z	size+mtime(dataless)	bytes=9672;mtime=2026-08-09T12:45:17Z
+.omo/ulw-research/20260809-205918/outputs/evaluation-economics-scorecard.md	research-artifact	25547	2026-08-09T12:19:10Z	size+mtime(dataless)	bytes=25547;mtime=2026-08-09T12:19:10Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-01.png	research-artifact	343076	2026-08-09T12:59:33Z	size+mtime(dataless)	bytes=343076;mtime=2026-08-09T12:59:33Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-02.png	research-artifact	390054	2026-08-09T12:59:34Z	sha256	5bf22a20e5ce901a35045b23a434dbe75ca07305c098395fd0eddd3dd9181417
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-03.png	research-artifact	465290	2026-08-09T12:59:34Z	size+mtime(dataless)	bytes=465290;mtime=2026-08-09T12:59:34Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-04.png	research-artifact	320590	2026-08-09T12:59:34Z	size+mtime(dataless)	bytes=320590;mtime=2026-08-09T12:59:34Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-05.png	research-artifact	299821	2026-08-09T12:59:34Z	size+mtime(dataless)	bytes=299821;mtime=2026-08-09T12:59:34Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-06.png	research-artifact	293826	2026-08-09T12:59:34Z	size+mtime(dataless)	bytes=293826;mtime=2026-08-09T12:59:34Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-07.png	research-artifact	383394	2026-08-09T12:59:35Z	size+mtime(dataless)	bytes=383394;mtime=2026-08-09T12:59:35Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-08.png	research-artifact	333026	2026-08-09T12:59:35Z	size+mtime(dataless)	bytes=333026;mtime=2026-08-09T12:59:35Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-09.png	research-artifact	484663	2026-08-09T12:59:35Z	size+mtime(dataless)	bytes=484663;mtime=2026-08-09T12:59:35Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-10.png	research-artifact	338937	2026-08-09T12:59:35Z	size+mtime(dataless)	bytes=338937;mtime=2026-08-09T12:59:35Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-11.png	research-artifact	325756	2026-08-09T12:59:36Z	size+mtime(dataless)	bytes=325756;mtime=2026-08-09T12:59:36Z
+.omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-12.png	research-artifact	287326	2026-08-09T12:59:36Z	size+mtime(dataless)	bytes=287326;mtime=2026-08-09T12:59:36Z
+.omo/ulw-research/20260809-205918/outputs/ppt-engine-executive-deck.experimental.pptx	research-artifact	2968040	2026-08-09T12:59:53Z	size+mtime(dataless)	bytes=2968040;mtime=2026-08-09T12:59:53Z
+.omo/ulw-research/20260809-205918/outputs/ppt-engine-executive-deck.pdf	research-artifact	8364091	2026-08-09T12:59:51Z	size+mtime(dataless)	bytes=8364091;mtime=2026-08-09T12:59:51Z
+.omo/ulw-research/20260809-205918/outputs/ppt-engine-strategy.docx	research-artifact	27892	2026-08-09T12:54:24Z	size+mtime(dataless)	bytes=27892;mtime=2026-08-09T12:54:24Z
+.omo/ulw-research/20260809-205918/outputs/ppt-engine-strategy.html	research-artifact	37509	2026-08-09T12:55:15Z	size+mtime(dataless)	bytes=37509;mtime=2026-08-09T12:55:15Z
+.omo/ulw-research/20260809-205918/outputs/ppt-engine-strategy.pdf	research-artifact	686142	2026-08-09T13:00:14Z	size+mtime(dataless)	bytes=686142;mtime=2026-08-09T13:00:14Z
+.omo/ulw-research/20260809-205918/report.css	research-artifact	2638	2026-08-09T12:56:41Z	sha256	92a62c3c75149ff55db6abb1ad1432b4633a69fd767b6bdb754fed617381833c
+.omo/ulw-research/20260809-205918/sources-ledger.md	research-artifact	5196	2026-08-09T12:25:42Z	sha256	bc55d4424f877d48649d42d18a3e824e0c483ff7a6c466ebcf07bbc9d1d7de21
+.omo/ulw-research/20260809-205918/SYNTHESIS.md	research-artifact	27682	2026-08-09T12:52:32Z	size+mtime(dataless)	bytes=27682;mtime=2026-08-09T12:52:32Z
+.omo/ulw-research/20260809-205918/verification-economics.md	research-artifact	1451	2026-08-09T12:34:13Z	sha256	5f1fa7ac02de321777b94c611f517cdea3c712a267868476aba709fdf79095e1
+.omo/ulw-research/20260809-205918/wave-1-distill.md	research-artifact	4838	2026-08-09T12:10:47Z	sha256	f0b7d87488270061af0513fa3b354539356a04158b755b07e58b34056550504b
+.omo/ulw-loop/ppt-engine-research-20260809-205918/brief.md	research-artifact	5743	2026-08-09T12:02:02Z	sha256	bfe2f6fd7f1c916b514d2b2ba8d8bcdf602f3728982f87559eea87d41a10304b
+.omo/ulw-loop/ppt-engine-research-20260809-205918/goals.json	research-artifact	25366	2026-08-09T12:17:52Z	sha256	e0866c73812e24e6e29ba61afed3ec78d9630db03fc25178d811d7041436a035
+.omo/ulw-loop/ppt-engine-research-20260809-205918/ledger.jsonl	research-artifact	8058	2026-08-09T12:17:52Z	sha256	0ba45e0b6cad39065a38afbab368319bce6d9eb9649fd53bd2a75f3c409da6a9
+public/index.html	product-surface	27675	2026-08-11T06:32:47Z	sha256	c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e
+public/style.css	product-surface	70667	2026-08-09T11:44:59Z	sha256	94ef3ec9906ff0a779c440cb1b99a157cbf6c06d9dca8c1c46c3bd447bebcd33
+public/workspace-shell.css	product-surface	11160	2026-08-09T11:18:05Z	sha256	9c1c1cd7fea8e250d3e8668cd79107e74e736dd796e626c9d7be8e3d15b4ae65
+public/operational-liquid.css	product-surface	16587	2026-08-09T13:34:49Z	sha256	49ba380018173480c2224914f2c8be208705f89793e27ac6497b7aacdaca7bde
+public/caret-shell.css	product-surface	13621	2026-08-11T00:42:02Z	sha256	9dba178a97db9d41a58f5e037bbb2eba2a0f4b2e4075bc7707b194c702f42aa6
+public/app.js	product-surface	71450	2026-08-11T06:32:58Z	sha256	6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad
+public/operator-surface.js	product-surface	5269	2026-08-10T11:58:13Z	sha256	e589a1fecb564ede96733cca2be08ea1802bc267584f02d8d3a1dcf86c11a56f
+public/workspace-split.js	product-surface	8059	2026-08-10T08:16:56Z	sha256	ce5b33e747269f43ab611eb574b17fbcf83d01e0b9737f3444b2ab6f8a584599
+public/transcript-resize.js	product-surface	5924	2026-08-03T11:58:15Z	sha256	c99bc091ac7ae392636d842d2f71600685210d3ee95e1c97c9d656e80b7ce535
+public/review-panel.js	product-surface	10249	2026-08-06T00:42:51Z	sha256	6d71c1cd0476b89b9c78d11b2e43881fa036de11fa9aab1fa4e64d7d2fc9897d
+public/review-panel-render.js	product-surface	8839	2026-08-04T13:35:28Z	sha256	b44ecbc2ad43002e816444149350132baebf447ee7be16d228ed013ce6ec0a3e

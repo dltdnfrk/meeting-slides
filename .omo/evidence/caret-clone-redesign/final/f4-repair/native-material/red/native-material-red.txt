@@ -1,0 +1,81 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/native-minibar.test.ts:
+(pass) native minibar seam: sources and compilation > the projection module, AppKit shell and fixture driver exist [0.16ms]
+(pass) native minibar seam: sources and compilation > swiftc compiles the pure modules with the fixture driver [0.08ms]
+(pass) native minibar seam: sources and compilation > swiftc typechecks the AppKit shell against the pure modules [0.02ms]
+(pass) native minibar seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.03ms]
+(pass) native minibar seam: sources and compilation > the projection module stays pure: no AppKit, window, socket or clock [0.69ms]
+(pass) native minibar seam: sources and compilation > the AppKit shell imports no WebKit and hosts no second engine [0.27ms]
+(pass) native minibar seam: sources and compilation > the panel frame is authoritative so content cannot grow past the contract size [0.16ms]
+(pass) native minibar seam: sources and compilation > the AppKit shell stays thin: geometry and status come from the pure modules [0.13ms]
+(pass) native minibar seam: sources and compilation > no native source advertises Pause, share or screen-share exclusion [0.45ms]
+(pass) native minibar seam: sources and compilation > the bundle build compiles the minibar sources into the app executable [0.11ms]
+(pass) native minibar seam: geometry > collapsed is exactly 360x56 and expanded exactly 560x220 [0.07ms]
+(pass) native minibar seam: geometry > the deterministic default frame honours the 16px gutter on the active display [0.02ms]
+(pass) native minibar seam: geometry > a saved frame that no longer intersects a display falls back deterministically [0.01ms]
+(pass) native minibar seam: geometry > expanding a restored frame keeps the anchor and clamps into the gutter
+(pass) native minibar seam: launcher quit protection > idle quit protection is false [0.01ms]
+(pass) native minibar seam: launcher quit protection > starting quit protection is true
+(pass) native minibar seam: launcher quit protection > capturing quit protection is true
+(pass) native minibar seam: launcher quit protection > stopping quit protection is true
+(pass) native minibar seam: launcher quit protection > switching-model quit protection is true
+(pass) native minibar seam: launcher quit protection > the AppKit controller delegates quit protection to the pure phase seam [0.11ms]
+(pass) native minibar seam: explicit status projection > idle, starting, live, stopping and switching-model are distinct explicit states [0.02ms]
+(pass) native minibar seam: explicit status projection > before any snapshot the surface says connecting rather than idle
+(pass) native minibar seam: explicit status projection > a lost socket becomes reconnecting while the known capture truth is retained [0.02ms]
+(pass) native minibar seam: explicit status projection > a malformed payload surfaces error without discarding the known capture phase [0.01ms]
+(pass) native minibar seam: explicit status projection > every status carries a non-color glyph and a distinct title [0.07ms]
+(pass) native minibar seam: timer derives from server startedAt > elapsed time is computed from the server timestamp and the injected clock [0.01ms]
+(pass) native minibar seam: timer derives from server startedAt > a clock skew never renders a negative timer
+(pass) native minibar seam: timer derives from server startedAt > a capture without startedAt shows no invented timer
+(pass) native minibar seam: timer derives from server startedAt > reconnecting keeps the last known timer basis rather than resetting it
+(pass) native minibar seam: bounded transcript projection > collapsed shows exactly one line: the latest finalized sentence [0.01ms]
+(pass) native minibar seam: bounded transcript projection > collapsed prefers the provisional caption when one is live
+(pass) native minibar seam: bounded transcript projection > expanded shows at most three finalized lines plus one provisional row [0.02ms]
+(pass) native minibar seam: bounded transcript projection > a finalized line replaces its provisional caption instead of duplicating it
+(pass) native minibar seam: bounded transcript projection > an authoritative idle snapshot clears the surface instead of keeping meeting content
+(pass) native minibar seam: bounded transcript projection > a malformed transcript payload retains the last known lines [0.02ms]
+(pass) native minibar seam: bounded transcript projection > a reconnect snapshot replaces the projected lines without duplicating them [0.02ms]
+(pass) native minibar seam: truthful controls > collapsed exposes a persistent Stop plus a disclosure and nothing else [0.02ms]
+(pass) native minibar seam: truthful controls > Stop stays visible and truthfully disabled when there is nothing to stop [0.01ms]
+(pass) native minibar seam: truthful controls > expanded adds Open Workspace and keeps the same Stop control [0.01ms]
+(pass) native minibar seam: truthful controls > Stop stays reachable while reconnecting but refuses to lie about being sent [0.06ms]
+(pass) native minibar seam: truthful controls > the control vocabulary is closed: no Pause, no share, no second engine [0.02ms]
+(pass) native minibar seam: Stop emits exactly one existing command > five rapid Stop activations emit exactly one stopCapture
+(pass) native minibar seam: Stop emits exactly one existing command > Stop spam across a reconnect still emits exactly one stopCapture
+(pass) native minibar seam: Stop emits exactly one existing command > Stop while idle emits nothing at all
+(pass) native minibar seam: activation policy > user-started capture shows the surface and focuses the visible Stop [0.01ms]
+(pass) native minibar seam: activation policy > automatic calendar capture shows the surface without stealing OS focus
+(pass) native minibar seam: activation policy > a later user interaction on an automatic capture may take focus
+(pass) native minibar seam: mode and Escape > Escape collapses an expanded panel and never stops a recording
+(pass) native minibar seam: mode and Escape > Escape on a collapsed panel is a no-op
+(pass) native minibar seam: mode and Escape > the disclosure toggles between the two contract sizes [0.01ms]
+(pass) native minibar seam: window policy > the panel is a borderless floating non-activating ambient surface [0.02ms]
+1044 |     const controller = readFileSync(CONTROLLER_SWIFT, "utf8")
+1045 |       .split("\n")
+1046 |       .filter((line) => !line.trim().startsWith("//"))
+1047 |       .join("\n");
+1048 | 
+1049 |     expect(view).toMatch(/final class MinibarView: NSVisualEffectView/);
+                        ^
+error: expect(received).toMatch(expected)
+
+Expected substring or pattern: /final class MinibarView: NSVisualEffectView/
+Received: "\nimport AppKit\nimport Foundation\n\nprotocol MinibarViewDelegate: AnyObject {\n    func minibarViewDidActivate(_ control: MinibarControl)\n}\n\nfinal class MinibarView: NSView {\n    weak var delegate: MinibarViewDelegate?\n\n    private let statusGlyph = NSTextField(labelWithString: \"\")\n    private let statusTitle = NSTextField(labelWithString: \"\")\n    private let timerLabel = NSTextField(labelWithString: \"\")\n    private let stopButton = NSButton()\n    private let disclosureButton = NSButton()\n    private let openWorkspaceButton = NSButton()\n    private let transcriptStack = NSStackView()\n    private let collapsedLine = NSTextField(labelWithString: \"\")\n    private let headerRow = NSStackView()\n    private let controlRow = NSStackView()\n    private var model: MinibarViewModel?\n\n    private static let targetSide: CGFloat = 44\n    private static let rowHeight: CGFloat = 44\n\n    override init(frame frameRect: NSRect) {\n        super.init(frame: frameRect)\n        build()\n    }\n\n    @available(*, unavailable)\n    required init?(coder: NSCoder) { nil }\n\n    override var isFlipped: Bool { true }\n\n\n    private func build() {\n        wantsLayer = true\n        layer?.cornerRadius = 14\n        layer?.masksToBounds = true\n\n        statusGlyph.font = .monospacedSystemFont(ofSize: 13, weight: .semibold)\n        statusTitle.font = .systemFont(ofSize: 13, weight: .semibold)\n        timerLabel.font = .monospacedDigitSystemFont(ofSize: 13, weight: .regular)\n\n        timerLabel.setAccessibilityElement(false)\n\n        configure(stopButton, control: .stop)\n        configure(disclosureButton, control: .disclosure)\n        configure(openWorkspaceButton, control: .openWorkspace)\n\n        transcriptStack.orientation = .vertical\n        transcriptStack.alignment = .leading\n        transcriptStack.spacing = 4\n        transcriptStack.setAccessibilityElement(false)\n\n        controlRow.orientation = .horizontal\n        controlRow.spacing = 8\n        controlRow.alignment = .centerY\n        controlRow.addArrangedSubview(stopButton)\n        controlRow.addArrangedSubview(disclosureButton)\n        controlRow.addArrangedSubview(openWorkspaceButton)\n\n        headerRow.orientation = .horizontal\n        headerRow.spacing = 8\n        headerRow.alignment = .centerY\n        collapsedLine.font = .systemFont(ofSize: 12)\n        collapsedLine.lineBreakMode = .byTruncatingTail\n        collapsedLine.maximumNumberOfLines = 1\n        collapsedLine.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)\n\n        headerRow.addArrangedSubview(statusGlyph)\n        headerRow.addArrangedSubview(statusTitle)\n        headerRow.addArrangedSubview(collapsedLine)\n        headerRow.addArrangedSubview(timerLabel)\n        headerRow.addArrangedSubview(controlRow)\n\n        let root = NSStackView(views: [headerRow, transcriptStack])\n        root.orientation = .vertical\n        root.alignment = .leading\n        root.spacing = 6\n        root.translatesAutoresizingMaskIntoConstraints = false\n        addSubview(root)\n\n        NSLayoutConstraint.activate([\n            root.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),\n            root.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),\n            root.topAnchor.constraint(equalTo: topAnchor, constant: 6),\n            root.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -6),\n            headerRow.heightAnchor.constraint(equalToConstant: MinibarView.rowHeight),\n        ])\n\n        setAccessibilityElement(true)\n        setAccessibilityRole(.group)\n    }\n\n    private func configure(_ button: NSButton, control: MinibarControl) {\n        button.bezelStyle = .rounded\n        button.target = self\n        button.tag = MinibarView.tag(for: control)\n        button.action = #selector(controlActivated(_:))\n        button.translatesAutoresizingMaskIntoConstraints = false\n        NSLayoutConstraint.activate([\n            button.widthAnchor.constraint(greaterThanOrEqualToConstant: MinibarView.targetSide),\n            button.heightAnchor.constraint(equalToConstant: MinibarView.targetSide),\n        ])\n    }\n\n    private static func tag(for control: MinibarControl) -> Int {\n        switch control {\n        case .stop: return 1\n        case .disclosure: return 2\n        case .openWorkspace: return 3\n        }\n    }\n\n    private static func control(for tag: Int) -> MinibarControl? {\n        switch tag {\n        case 1: return .stop\n        case 2: return .disclosure\n        case 3: return .openWorkspace\n        default: return nil\n        }\n    }\n\n\n    func render(_ model: MinibarViewModel) {\n        self.model = model\n\n        statusGlyph.stringValue = model.glyph\n        statusTitle.stringValue = model.title\n        timerLabel.stringValue = model.timer ?? \"\"\n        timerLabel.isHidden = model.timer == nil\n\n        setAccessibilityLabel(model.accessibility.label)\n        statusTitle.setAccessibilityLabel(model.accessibility.statusAnnouncement)\n        statusTitle.setAccessibilityValue(model.accessibility.statusAnnouncement)\n        if model.accessibility.announces {\n            NSAccessibility.post(\n                element: statusTitle,\n                notification: .announcementRequested,\n                userInfo: [\n                    .announcement: model.accessibility.statusAnnouncement,\n                    .priority: NSAccessibilityPriorityLevel.medium.rawValue,\n                ]\n            )\n        }\n\n        for button in [stopButton, disclosureButton, openWorkspaceButton] {\n            button.isHidden = true\n        }\n        for control in model.controls {\n            guard let button = self.button(for: control.id) else { continue }\n            button.isHidden = false\n            button.isEnabled = control.enabled\n            button.title = control.label\n            button.setAccessibilityLabel(control.label)\n            button.setAccessibilityHelp(control.help)\n        }\n\n        let collapsed = model.mode == .collapsed\n        transcriptStack.isHidden = collapsed\n        collapsedLine.isHidden = !collapsed\n        collapsedLine.stringValue = collapsed ? (model.lines.first.map(text(for:)) ?? \"\") : \"\"\n        collapsedLine.alphaValue = model.lines.first?.provisional == true ? 0.7 : 1\n        renderTranscript(collapsed ? [] : model.lines)\n        needsDisplay = true\n    }\n\n    private func button(for control: MinibarControl) -> NSButton? {\n        switch control {\n        case .stop: return stopButton\n        case .disclosure: return disclosureButton\n        case .openWorkspace: return openWorkspaceButton\n        }\n    }\n\n    private func renderTranscript(_ lines: [MinibarLine]) {\n        for view in transcriptStack.arrangedSubviews {\n            transcriptStack.removeArrangedSubview(view)\n            view.removeFromSuperview()\n        }\n        for line in lines {\n            let label = NSTextField(labelWithString: text(for: line))\n            label.font = .systemFont(ofSize: 12)\n            label.lineBreakMode = .byTruncatingTail\n            label.maximumNumberOfLines = 1\n            label.alphaValue = line.provisional ? 0.7 : 1\n            transcriptStack.addArrangedSubview(label)\n        }\n    }\n\n    private func text(for line: MinibarLine) -> String {\n        let body = line.provisional ? \"\\(line.text)…\" : line.text\n        guard let speaker = line.speaker else { return body }\n        return \"화자 \\(speaker) · \\(body)\"\n    }\n\n\n    @objc private func controlActivated(_ sender: NSButton) {\n        guard let control = MinibarView.control(for: sender.tag) else { return }\n        delegate?.minibarViewDidActivate(control)\n    }\n\n    var stopControl: NSView { stopButton }\n\n    override func draw(_ dirtyRect: NSRect) {\n        NSColor.windowBackgroundColor.setFill()\n        dirtyRect.fill()\n        super.draw(dirtyRect)\n    }\n}\n"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1049:18)
+(fail) native minibar seam: window policy > the shipping view uses a readable layered native HUD material, never an opaque utility fill [0.58ms]
+(pass) native minibar seam: accessibility > the surface publishes a labelled group, status text and target sizes [0.03ms]
+(pass) native minibar seam: accessibility > reduced motion removes the transition entirely rather than shortening it [0.01ms]
+(pass) native minibar seam: announcement discipline (Todo 15) > a status announces once and never repeats on a timer tick [0.07ms]
+(pass) native minibar seam: announcement discipline (Todo 15) > an error announces its machine reason once, and recovery announces once [0.03ms]
+(pass) native minibar seam: announcement discipline (Todo 15) > every painted control carries a name, a value and a truthful help string [0.07ms]
+
+1 tests failed:
+(fail) native minibar seam: window policy > the shipping view uses a readable layered native HUD material, never an opaque utility fill [0.58ms]
+
+ 56 pass
+ 1 fail
+ 188 expect() calls
+Ran 57 tests across 1 file. [4.40s]

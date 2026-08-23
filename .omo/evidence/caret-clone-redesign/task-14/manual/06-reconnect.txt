@@ -1,0 +1,16 @@
+== 6. reconnect: capture truth must survive a dropped socket ==
+-- live before the drop --
+●, 녹음 중, 04:26, 화자 1 · 첫 번째 확정 문장입니다
+
+-- server closes the socket mid-capture --
+●, 녹음 중, 04:27, 화자 1 · 첫 번째 확정 문장입니다
+buttons while reconnecting (Stop must not claim it can send):
+녹음 중지, 미니바 접기, 작업 공간 열기, true, true, true
+
+-- Stop pressed while offline (must emit nothing) --
+button 녹음 중지 of group 1 of window 1 of application process meeting-slides
+received before: ["{\"action\":\"stopCapture\"}"]
+received after : ["{\"action\":\"stopCapture\"}","{\"action\":\"stopCapture\"}"]
+
+-- reconnect happens on the backoff schedule; authoritative snapshot restores state --
+○, 대기 중

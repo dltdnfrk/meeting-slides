@@ -1,0 +1,27 @@
+== DOM manifest counts ==
+ids declared in shipped HTML (total occurrences): 119
+distinct ids: 119
+duplicated ids: []
+pinned binding ids in manifest: 99
+pinned ancestry constraints: 26
+pinned disjoint pairs: 3
+persisted layout keys: workspace.layout.v1, workspace.transcript.v1
+unpinned (structural, not machine-bound) ids: 20
+
+== ancestry chains for the load-bearing nodes ==
+#current-slide <div> :: #slide-frame < #stage-pane < #workspace
+#slide-frame <section> :: #stage-pane < #workspace
+#transcript-stream <div> :: #transcript-body < #transcript-card < #transcript-pane < #workspace
+#btn-live-stop <button> :: #live-topbar < #stage-pane < #workspace
+#notes-input <textarea> :: #notes-box < #transcript-card < #transcript-pane < #workspace
+#session-list <ul> :: #session-rail < #workspace
+
+== protocol manifest counts ==
+client actions: 29
+actions with payload keys: 21
+distinct payload keys: attendees, effort, id, itemId, key, kind, meetingId, meeting_id, model, modelId, notes, patch, question, reviewId
+critical spellings guarded: 5
+server message types: 20 (client-handled: 17 server-only: 3)
+handlerMap actions: 20
+capture phases: idle, starting, capturing, stopping, switching-model
+startCapture payload key: meeting_id

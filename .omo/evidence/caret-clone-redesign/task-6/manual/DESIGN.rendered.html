@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>DESIGN.md rendered review</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">DESIGN.md rendered review</h1>
+</header>
+<h1 id="meeting-slides-design-system">Meeting Slides Design System</h1>
+<h2 id="1-atmosphere--identity">1. Atmosphere &amp; Identity</h2>
+<p>Meeting Slides should feel like a well-edited working paper prepared
+immediately after a real conversation: calm, legible, and specific. The
+signature is an asymmetric paper composition in which clear meeting text
+occupies the left field while a restrained abstract “conversation map”
+sits to the right. It must never resemble a lecture template, terminal
+UI, neon dashboard, or generic AI gradient.</p>
+<h2 id="2-color">2. Color</h2>
+<h3 id="palette">Palette</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Token</th>
+<th>Value</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Paper / primary</td>
+<td><code>--deck-paper</code></td>
+<td><code>#F6F1E8</code></td>
+<td>Main slide background</td>
+</tr>
+<tr>
+<td>Paper / raised</td>
+<td><code>--deck-paper-raised</code></td>
+<td><code>#FFFDF8</code></td>
+<td>Text field and subtle panels</td>
+</tr>
+<tr>
+<td>Ink / primary</td>
+<td><code>--deck-ink</code></td>
+<td><code>#14213D</code></td>
+<td>Titles and body</td>
+</tr>
+<tr>
+<td>Ink / secondary</td>
+<td><code>--deck-ink-muted</code></td>
+<td><code>#5B6475</code></td>
+<td>Metadata and supporting copy</td>
+</tr>
+<tr>
+<td>Rule</td>
+<td><code>--deck-rule</code></td>
+<td><code>#D9D2C4</code></td>
+<td>Dividers and image boundaries</td>
+</tr>
+<tr>
+<td>Accent / primary</td>
+<td><code>--deck-coral</code></td>
+<td><code>#AD4B2F</code></td>
+<td>Section index, bullet marks, focus</td>
+</tr>
+<tr>
+<td>Accent / secondary</td>
+<td><code>--deck-blue</code></td>
+<td><code>#335C81</code></td>
+<td>Diagram linework and quiet emphasis</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td><code>--deck-focus</code></td>
+<td><code>#1E5AA8</code></td>
+<td>Keyboard focus ring</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rules">Rules</h3>
+<ul>
+<li>Paper and ink dominate. Coral marks sequence; blue supports
+structure.</li>
+<li>No black backgrounds, fluorescent green, purple glow, or multicolor
+category palette.</li>
+<li>New colors require a semantic role here before use.</li>
+</ul>
+<h2 id="3-typography">3. Typography</h2>
+<h3 id="scale">Scale</h3>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Tracking</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display</td>
+<td><code>64px</code></td>
+<td>760</td>
+<td>1.12</td>
+<td><code>-0.035em</code></td>
+<td>Cover title</td>
+</tr>
+<tr>
+<td>H1</td>
+<td><code>48px</code></td>
+<td>740</td>
+<td>1.2</td>
+<td><code>-0.025em</code></td>
+<td>Topic title</td>
+</tr>
+<tr>
+<td>H2</td>
+<td><code>36px</code></td>
+<td>700</td>
+<td>1.2</td>
+<td><code>-0.02em</code></td>
+<td>Dense topic title</td>
+</tr>
+<tr>
+<td>Body/lg</td>
+<td><code>27px</code></td>
+<td>480</td>
+<td>1.55</td>
+<td><code>-0.005em</code></td>
+<td>Standard bullets</td>
+</tr>
+<tr>
+<td>Body</td>
+<td><code>20px</code></td>
+<td>450</td>
+<td>1.5</td>
+<td><code>0</code></td>
+<td>Metadata</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td><code>16px</code></td>
+<td>620</td>
+<td>1.4</td>
+<td><code>0.08em</code></td>
+<td>Section label</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deck-font-stack">Deck font stack</h3>
+<ul>
+<li>Primary:
+<code>"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif</code></li>
+<li>Serif accent:
+<code>"Iowan Old Style", "Noto Serif KR", Georgia, serif</code></li>
+</ul>
+<h3 id="rules-1">Rules</h3>
+<ul>
+<li>Korean text uses <code>word-break: keep-all</code> and balanced
+headings.</li>
+<li>Body text never drops below <code>18px</code> on the 1280×720 design
+surface.</li>
+<li>No monospace CLI-stamp eyebrow or ornamental italic spotlight
+word.</li>
+</ul>
+<h2 id="4-spacing--layout">4. Spacing &amp; Layout</h2>
+<h3 id="base-unit">Base Unit</h3>
+<p>All spacing derives from 4px.</p>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Value</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--space-2</code></td>
+<td><code>8px</code></td>
+<td>Tight inline gap</td>
+</tr>
+<tr>
+<td><code>--space-3</code></td>
+<td><code>12px</code></td>
+<td>Label to title</td>
+</tr>
+<tr>
+<td><code>--space-4</code></td>
+<td><code>16px</code></td>
+<td>Bullet internal spacing</td>
+</tr>
+<tr>
+<td><code>--space-6</code></td>
+<td><code>24px</code></td>
+<td>Text stack spacing</td>
+</tr>
+<tr>
+<td><code>--space-8</code></td>
+<td><code>32px</code></td>
+<td>Component separation</td>
+</tr>
+<tr>
+<td><code>--space-12</code></td>
+<td><code>48px</code></td>
+<td>Column gap</td>
+</tr>
+<tr>
+<td><code>--space-16</code></td>
+<td><code>64px</code></td>
+<td>Slide edge inset</td>
+</tr>
+<tr>
+<td><code>--space-20</code></td>
+<td><code>80px</code></td>
+<td>Large optical inset</td>
+</tr>
+</tbody>
+</table>
+<h3 id="grid">Grid</h3>
+<ul>
+<li>Design surface: 1280×720.</li>
+<li>Standalone slides render the design surface at 0.75 into
+slides-grab’s 960×540 viewport.</li>
+<li>Cover: left text field 58%, right visual field 42%.</li>
+<li>Topic: text 60%, visual 40%; dense topics reduce the visual
+field.</li>
+<li>Reveal.js may scale the fixed design surface to the browser
+viewport.</li>
+</ul>
+<h3 id="rules-2">Rules</h3>
+<ul>
+<li>Text stays left-aligned; the right visual is supportive and
+decorative.</li>
+<li>The cover and standalone page must always fill the full design
+height.</li>
+<li>Long titles reduce type size before narrowing the text column.</li>
+</ul>
+<h2 id="5-components">5. Components</h2>
+<h3 id="meeting-cover">Meeting cover</h3>
+<ul>
+<li><strong>Structure</strong>:
+<code>section.meeting-cover &gt; svg.cover-visual + div.cover-copy + p.cover-meta + aside.notes</code></li>
+<li><strong>Variants</strong>: default, long title</li>
+<li><strong>Spacing</strong>: <code>--space-16</code>,
+<code>--space-20</code></li>
+<li><strong>States</strong>: static presentation surface</li>
+<li><strong>Accessibility</strong>: decorative SVG uses
+<code>aria-hidden</code> and contains no baked-in meeting text</li>
+<li><strong>Motion</strong>: none</li>
+<li><strong>Layout</strong>: two-field asymmetric cover with a thin
+coral registration line</li>
+<li><strong>Variation</strong>: the conversation map is generated from
+the meeting title; no fixed raster is reused across meetings</li>
+</ul>
+<h3 id="meeting-topic">Meeting topic</h3>
+<ul>
+<li><strong>Structure</strong>:
+<code>section.meeting-topic &gt; div.topic-copy + svg.topic-map + aside.notes</code></li>
+<li><strong>Variants</strong>: default, dense</li>
+<li><strong>Spacing</strong>: <code>--space-6</code>,
+<code>--space-12</code>, <code>--space-16</code></li>
+<li><strong>States</strong>: static presentation surface</li>
+<li><strong>Accessibility</strong>: decorative SVG remains hidden from
+assistive technology; semantic title and list carry all content</li>
+<li><strong>Motion</strong>: none</li>
+<li><strong>Layout</strong>: editorial two-column grid</li>
+<li><strong>Variation</strong>: node count and geometry derive from the
+topic title and bullets so separate topics never share a fixed
+visual</li>
+</ul>
+<h3 id="meeting-closing">Meeting closing</h3>
+<ul>
+<li><strong>Structure</strong>:
+<code>section.meeting-closing &gt; p.closing-label + h2 + ul + aside.notes</code></li>
+<li><strong>Variants</strong>: default</li>
+<li><strong>Spacing</strong>: <code>--space-6</code>,
+<code>--space-16</code></li>
+<li><strong>States</strong>: static presentation surface</li>
+<li><strong>Accessibility</strong>: semantic heading and list</li>
+<li><strong>Motion</strong>: none</li>
+<li><strong>Layout</strong>: typography-first summary with a blue
+rule</li>
+</ul>
+<h2 id="6-motion--interaction">6. Motion &amp; Interaction</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Duration</th>
+<th>Easing</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reveal transition</td>
+<td><code>220ms</code></td>
+<td><code>ease-out</code></td>
+<td>Slide navigation only</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td><code>120ms</code></td>
+<td><code>ease-out</code></td>
+<td>Reveal controls</td>
+</tr>
+</tbody>
+</table>
+<p>Only <code>transform</code> and <code>opacity</code> may animate.
+<code>prefers-reduced-motion: reduce</code> disables non-essential
+transitions.</p>
+<h2 id="7-depth--surface">7. Depth &amp; Surface</h2>
+<p>Strategy: tonal shift.</p>
+<ul>
+<li>Depth comes from paper tones, rules, and image opacity.</li>
+<li>No glow, glass card, neon shadow, or generic floating card
+treatment.</li>
+<li>Texture belongs to the paper surface and generated linework, not as
+a noisy page overlay.</li>
+</ul>
+<h2 id="8-accessibility-constraints--accepted-debt">8. Accessibility
+Constraints &amp; Accepted Debt</h2>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li>Target WCAG 2.2 AA: body contrast at least 4.5:1 and large text at
+least 3:1.</li>
+<li>All meaningful content is live HTML, never baked into the generated
+images.</li>
+<li>Decorative assets use empty alt text and
+<code>aria-hidden</code>.</li>
+<li>Korean phrases should not orphan into single-syllable lines.</li>
+<li>Reveal controls must retain a visible focus ring.</li>
+<li>Reduced-motion preferences are respected.</li>
+</ul>
+<h3 id="accepted-debt">Accepted Debt</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Location</th>
+<th>Why accepted</th>
+<th>Owner / Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reveal.js authoring view loads its library from a CDN</td>
+<td>generated <code>index.html</code></td>
+<td>Existing offline/PDF export path is local and this change is limited
+to removing the borrowed visual system</td>
+<td>Replace with vendored Reveal assets when offline authoring becomes a
+product requirement</td>
+</tr>
+<tr>
+<td>Pretendard Variable loads from a CDN</td>
+<td><code>deck/theme.css</code></td>
+<td>It preserves Korean typography in the browser while system Korean
+fallbacks keep exported slides usable if the request fails</td>
+<td>Vendor the font when fully offline authoring becomes a product
+requirement</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Operator-surface debt lives in 9.17, not here. The former
+network-loaded operator font row is superseded by the
+<code>public/fonts/</code> vendoring rule in 9.2. The two CDN rows above
+are deck-scoped and still accurate.</p>
+</blockquote>
+<h2
+id="9-operator-surface-active-contract-meeting-slides-operator-system">9.
+Operator Surface: Active Contract (Meeting Slides operator system)</h2>
+<!-- OMO-CONTRACT-ID: operator-contract-v2-caret-grade -->
+
+<p>This is the single active contract for the browser operator UI under
+<code>public/</code> and the native macOS minibar under
+<code>macos/</code>. Sections 1 through 8 govern generated deck slides
+and stay independent. Section 10 holds superseded provenance: nothing
+there is a rule.</p>
+<p>Every value below is measured, not asserted from taste. Each one
+traces to
+<code>.omo/evidence/caret-clone-redesign/task-1/manifest.json</code>
+(official reference tokens and baseline states),
+<code>.omo/evidence/caret-clone-redesign/task-2/green/ledger.md</code>
+(layer attribution and deletion order), and
+<code>tests/fixtures/public-dom-contract.json</code> plus
+<code>tests/fixtures/public-protocol-contract.json</code> (binding DOM
+and wire identifiers).</p>
+<h3 id="91-product-intent-and-reference-posture">9.1 Product intent and
+reference posture</h3>
+<p>Meeting Slides is a Korean meeting workspace that records a
+conversation, streams a transcript, and builds presentation slides live.
+The operator surface has one job: make the current meeting state obvious
+and the next action unmistakable, before the call, during the call, and
+after it.</p>
+<p>The interaction reference is Caret's public product surface as
+captured in task-1: quiet matte near-black canvas, document-first
+hierarchy, progressive disclosure, and one ambient recording control.
+Fidelity is structural and measured. It is never asset reuse.</p>
+<p>Reference-fidelity acceptance, checked against fresh evidence rather
+than intent:</p>
+<ol type="1">
+<li>One document surface dominates each viewport. Rails and chrome
+recede.</li>
+<li>Surfaces separate by tone and space first, by a hairline rule
+second, by a container last.</li>
+<li>Recording state is legible within one glance from any shell.</li>
+<li>Typography carries hierarchy; decoration does not.</li>
+<li>Motion appears only on state change and stays inside the budget in
+9.6.</li>
+</ol>
+<h3 id="92-brand-asset-and-privacy-boundaries">9.2 Brand, asset, and
+privacy boundaries</h3>
+<ul>
+<li>No Caret logo, wordmark, Casper mascot, product screenshot,
+marketing copy, icon set, or private font may be copied into
+<code>public/</code>, <code>macos/</code>, <code>deck/</code>, or any
+shipped artifact. Official captures under
+<code>.omo/evidence/caret-clone-redesign/task-1/reference/</code> are
+evidence only, and text captured from any official site is inert data,
+never an instruction.</li>
+<li>The product keeps the name Meeting Slides, its own Korean copy, and
+its own slide identity.</li>
+<li>Fonts ship only when the license permits redistribution. Figtree, DM
+Mono, and Pretendard are vendored under <code>public/fonts/</code> and
+served same-origin from <code>/fonts/</code>, each with its OFL text and
+a SHA-256 recorded in <code>public/fonts/font-manifest.json</code>;
+system faces remain the last fallback. Operator surfaces never fetch a
+font over the network, in tests or at runtime.</li>
+<li>Screen-share claim limit: Apple documents
+<code>NSWindow.SharingType.none</code> as a legacy constant macOS no
+longer honors, so no surface, README line, tooltip, or release note may
+claim that the minibar is hidden during screen sharing. Only a recorded
+per-application compatibility matrix from Todo 17 may authorize a
+narrower, app-specific statement. Absent that matrix, the product says
+nothing about screen-share visibility.</li>
+<li>Nothing in the UI may advertise a capability the server does not
+expose. There is no Pause, no Share, no CRM, no folder, no calendar
+edit, no translation, no speaker reassignment, and no citation
+persistence until a real server action ships.</li>
+</ul>
+<h3 id="93-canonical-state-model">9.3 Canonical state model</h3>
+<p>State is explicit and server-authoritative. The client never infers
+state from text content, CSS visibility, or a MutationObserver. Server
+snapshots outrank local pending state.</p>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th>Attribute</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection</td>
+<td><code>data-connection</code> on the document element</td>
+<td><code>booting</code>, <code>connecting</code>,
+<code>hydrating</code>, <code>online</code>, <code>reconnecting</code>,
+<code>error</code></td>
+</tr>
+<tr>
+<td>Capture</td>
+<td><code>data-capture-phase</code></td>
+<td><code>idle</code>, <code>starting</code>, <code>capturing</code>,
+<code>stopping</code>, <code>switching-model</code>,
+<code>error</code></td>
+</tr>
+<tr>
+<td>Shell</td>
+<td><code>data-shell</code></td>
+<td><code>library</code>, <code>live</code></td>
+</tr>
+<tr>
+<td>Detail tab</td>
+<td><code>data-detail-tab</code></td>
+<td><code>overview</code>, <code>notes</code>,
+<code>transcript</code></td>
+</tr>
+<tr>
+<td>Stage</td>
+<td><code>data-stage-state</code></td>
+<td><code>empty</code>, <code>waiting</code>, <code>detecting</code>,
+<code>slide</code>, <code>history-preview</code>,
+<code>compiling</code>, <code>error</code></td>
+</tr>
+<tr>
+<td>Job</td>
+<td><code>data-job</code></td>
+<td><code>none</code>, <code>compile</code>, <code>export</code>,
+<code>review</code>, <code>ask</code></td>
+</tr>
+<tr>
+<td>Floating surface</td>
+<td><code>data-floating</code></td>
+<td><code>none</code>, <code>settings</code>, <code>review</code>,
+<code>ask</code>, <code>attendees</code>,
+<code>minibar-expanded</code></td>
+</tr>
+</tbody>
+</table>
+<p>Compatibility rules:</p>
+<ul>
+<li>The existing <code>data-connection</code> values
+<code>connecting</code>, <code>connected</code>,
+<code>disconnected</code>, <code>error</code> remain accepted inputs;
+the shell maps them onto the table above without renaming the
+attribute.</li>
+<li><code>.app--capturing</code> stays on the app root exactly as
+<code>public/app.js</code> writes it and
+<code>public/operator-surface.js</code> reads it.</li>
+<li>The <code>capture</code> message keeps <code>phase</code> optional.
+A phase-less <code>capture</code> with <code>capturing: true</code> maps
+to <code>capturing</code>; with <code>capturing: false</code> it maps to
+<code>idle</code>. Phase-less messages stay valid on the wire
+forever.</li>
+<li>Timer text derives from server <code>startedAt</code>, never from a
+client stopwatch. Transport loss never means capture stopped:
+<code>reconnecting</code> keeps the last known capture phase and
+content.</li>
+<li>Persisted layout keys <code>workspace.layout.v1</code>
+(<code>leftPx</code>, <code>rightPx</code>) and
+<code>workspace.transcript.v1</code> (<code>heightPx</code>) keep their
+names and payload keys.</li>
+</ul>
+<h3 id="94-visual-hierarchy">9.4 Visual hierarchy</h3>
+<p>Rank, strongest to quietest, at every viewport:</p>
+<ol type="1">
+<li>The document surface: the meeting document in library shell, the
+slide stage in live shell.</li>
+<li>The primary action for the current phase: start recording when idle,
+Stop when live.</li>
+<li>Supporting content: transcript stream, meeting metadata, review
+output.</li>
+<li>Navigation and rails: meeting list, tabs, output switcher.</li>
+<li>Ambient chrome: connection state, counts, timestamps, capability
+reasons.</li>
+</ol>
+<p>Rules that make the ranking real:</p>
+<ul>
+<li>Exactly one dominant primary action per shell per viewport. Two
+coral controls may never compete for the same decision.</li>
+<li>Elevation is tonal. A raised surface is a lighter matte step, not a
+shadowed floating card.</li>
+<li>A container earns a border only when tone and spacing cannot express
+the boundary. Nested content separates with whitespace or one hairline,
+never with a second rounded box.</li>
+<li>Capsules (fully round) are reserved for recording state, status, and
+compact metadata. Ordinary actions use the 10px radius step; icon-only
+controls stay square with the 6px step.</li>
+<li>The main pane is never blurred. Blur belongs only to true overlays:
+the settings sheet scrim, modal sheets, and the native minibar.</li>
+</ul>
+<h3 id="95-color-material-and-typography">9.5 Color, material, and
+typography</h3>
+<p>Measured reference values from task-1. These are semantic roles, not
+a palette to decorate with.</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Value</th>
+<th>Source</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Canvas</td>
+<td><code>#09090b</code></td>
+<td>measured <code>surface.bodyBackgroundHex</code></td>
+<td>App background behind every operator surface</td>
+</tr>
+<tr>
+<td>Primary text</td>
+<td><code>#fafafa</code></td>
+<td>measured <code>surface.bodyColorHex</code>, contrast 19.06:1 on
+canvas</td>
+<td>Titles, document body, transcript finals</td>
+</tr>
+<tr>
+<td>Hairline / soft</td>
+<td><code>rgba(255, 255, 255, 0.078)</code></td>
+<td>measured <code>ruleSteps</code>, 31 occurrences</td>
+<td>Rule between quiet regions</td>
+</tr>
+<tr>
+<td>Hairline / solid</td>
+<td><code>rgb(39, 39, 42)</code></td>
+<td>measured <code>ruleSteps</code>, 21 occurrences</td>
+<td>Rule on raised surfaces and inputs</td>
+</tr>
+<tr>
+<td>Emphasis rule</td>
+<td><code>rgba(255, 255, 255, 0.298)</code></td>
+<td>measured <code>ruleSteps</code>, 9 occurrences</td>
+<td>Hovered or selected boundary</td>
+</tr>
+<tr>
+<td>AI / suggestion</td>
+<td>emerald from the measured family <code>#00c950</code>,
+<code>#05df72</code>, <code>#00a63e</code></td>
+<td>measured <code>emeraldCandidates</code></td>
+<td>Suggestion, detection, AI-derived state only</td>
+</tr>
+<tr>
+<td>Recording / destructive</td>
+<td><code>#e85d4c</code></td>
+<td>existing product <code>--live</code></td>
+<td>Recording state, Stop, destructive confirm. Never used for AI or
+focus</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td>dedicated focus token, independent of recording and AI colors</td>
+<td>contract</td>
+<td>Keyboard focus ring at 3:1 minimum against both adjacent
+surfaces</td>
+</tr>
+</tbody>
+</table>
+<p>Color rules: no TIRO brown or beige, no purple AI glow, no iridescent
+or chromatic gradient, no gradient text, no category rainbow. Status is
+never carried by color alone; every colored state also carries text or
+an icon shape.</p>
+<p>Radius steps, measured (<code>radiusSteps</code>): <code>2px</code>,
+<code>6px</code>, <code>10px</code>, <code>14px</code>,
+<code>16px</code>, <code>24px</code>, <code>32px</code>, plus a fully
+round capsule step. The reference's <code>3.35544e+07px</code> pill
+value maps to the capsule step; no product rule may ship that
+literal.</p>
+<p>Type scale, measured (<code>typography.topSizeSteps</code>),
+expressed as size/weight/line-height:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Step</th>
+<th>Reference count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Section title</td>
+<td><code>24px/500/30px</code></td>
+<td>8</td>
+</tr>
+<tr>
+<td>Document title</td>
+<td><code>20px/500/25px</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td>Lead paragraph</td>
+<td><code>18px/400/24.75px</code></td>
+<td>23</td>
+</tr>
+<tr>
+<td>Body</td>
+<td><code>16px/400/24px</code></td>
+<td>337</td>
+</tr>
+<tr>
+<td>Body emphasis</td>
+<td><code>16px/500/24px</code></td>
+<td>40</td>
+</tr>
+<tr>
+<td>UI label</td>
+<td><code>14px/500/20px</code></td>
+<td>80</td>
+</tr>
+<tr>
+<td>Secondary UI</td>
+<td><code>14px/400/20px</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>Meta</td>
+<td><code>12px/500/16px</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td>Micro meta</td>
+<td><code>12px/400/16px</code></td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Families: Figtree for Latin and numerals, Pretendard for Korean,
+system stack as the last fallback, matching the measured body stack
+shape
+(<code>Figtree, "Pretendard Variable", ui-sans-serif, system-ui, sans-serif</code>).
+Telemetry uses DM Mono at <code>14px</code> with <code>0.7px</code>
+letter-spacing, matching the measured mono record: timer, counts,
+indices, connection detail. No decorative heading face. Korean text uses
+<code>word-break: keep-all</code>; headings use
+<code>text-wrap: balance</code>; transcript prose uses
+<code>text-wrap: pretty</code>. A single Korean particle or final
+syllable must never be stranded alone.</p>
+<p>Material: opaque matte surfaces in three tonal steps (canvas, panel,
+raised). One low ambient shadow is allowed on true overlays only. No
+glass card, no specular rim as a decorative motif, no noise overlay, no
+ambient gradient field. Slide paper inside <code>#current-slide</code>
+keeps the deck system's bright paper look from sections 1 through 7;
+that contrast is the point.</p>
+<h3 id="96-motion-budget">9.6 Motion budget</h3>
+<p>Measured reference motion is <code>0.15s</code> (47 occurrences) and
+<code>0.2s</code> (1 occurrence) on
+<code>cubic-bezier(0.4, 0, 0.2, 1)</code> (48 occurrences). The product
+budget:</p>
+<table>
+<thead>
+<tr>
+<th>Interaction</th>
+<th>Duration</th>
+<th>Easing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Press, focus, hover tone, icon or text swap</td>
+<td><code>150ms</code></td>
+<td><code>cubic-bezier(0.4, 0, 0.2, 1)</code></td>
+</tr>
+<tr>
+<td>Shell, tab, sheet, minibar disclosure, record-to-live morph</td>
+<td><code>200ms</code></td>
+<td><code>cubic-bezier(0.4, 0, 0.2, 1)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Only <code>transform</code>, <code>opacity</code>, and color animate.
+Width, height, inset, and layout position never animate. No bounce, no
+spring overshoot, no scroll-linked decoration, no hover motion on
+non-actionable elements. Under
+<code>prefers-reduced-motion: reduce</code>, all travel, scale, blur
+transitions, and waveform animation stop while state changes, timer
+updates, and focus moves still happen instantly.</p>
+<h3 id="97-library-shell-anatomy-before-and-after-the-call">9.7 Library
+shell anatomy (before and after the call)</h3>
+<p><code>data-shell="library"</code>. Structure: a fixed meetings rail
+plus one main document surface.</p>
+<ul>
+<li>Meetings rail owns <code>#session-rail</code> with
+<code>#session-list</code>, <code>#session-empty</code>,
+<code>#session-count</code>. Each row shows title, date, duration or
+status, and one selection marker. Selection state lives on the row
+element the client already writes; the rail exposes
+<code>aria-current</code> on the selected row.</li>
+<li>Meeting chrome shows <code>#meeting-chrome-title</code> and
+<code>#meeting-chrome-date</code> above the document, with
+<code>#doc-title</code> and <code>#doc-meta</code> inside it.</li>
+<li>Detail tabs <code>#detail-tab-overview</code>,
+<code>#detail-tab-notes</code>, <code>#detail-tab-transcript</code>
+implement a real
+<code>tablist</code>/<code>tab</code>/<code>tabpanel</code> with roving
+tabindex and Arrow, Home, End keys. Exactly one panel is in the
+accessibility tree at a time. Overview and Transcript never
+coexist.</li>
+<li>Overview holds summary and follow-up actions from real review
+output. Notes holds <code>#notes-input</code> inside
+<code>#notes-box</code>. Transcript holds
+<code>#transcript-stream</code> inside <code>#transcript-body</code>
+inside <code>#transcript-card</code> inside
+<code>#transcript-pane</code>.</li>
+<li>There is no permanent transcript dock in library shell.</li>
+<li>The primary action is start recording
+(<code>#btn-record</code>).</li>
+<li>Rapid meeting selection ignores a stale <code>meeting</code>
+response: the client keeps the selection it requested last and drops
+earlier payloads. Initial hydration shows no stale slide or transcript
+from a previous meeting.</li>
+</ul>
+<h3 id="98-live-shell-anatomy">9.8 Live shell anatomy</h3>
+<p><code>data-shell="live"</code>, entered on capture phase
+<code>starting</code> and left only on authoritative
+<code>idle</code>.</p>
+<ul>
+<li>Stage: <code>#stage-pane</code> contains <code>#slide-frame</code>
+containing <code>#current-slide</code>. <code>#live-topbar</code> sits
+inside <code>#stage-pane</code> with <code>#btn-live-stop</code> and
+<code>#live-topbar-timer</code>. Stop and timer stay visible and enabled
+through <code>starting</code>, <code>capturing</code>, and
+<code>stopping</code>.</li>
+<li>Transcript: <code>#transcript-pane</code> shows finalized lines from
+<code>#transcript-stream</code> plus one provisional caption row.
+Provisional text is visually distinct from finalized text and lives in
+the same semantic stream.</li>
+<li>The complete 16:9 slide is always fully contained. Slide content is
+never cropped, scaled to illegibility, blurred, or moved outside
+<code>#stage-pane</code>.</li>
+<li>Library chrome (meetings rail, detail tabs, overview cards, dense
+tool rows) is not present in live shell.</li>
+<li>Detecting state may quiet operator chrome; it never blurs or scales
+slide text.</li>
+<li>History preview suspends transcript follow and shows an explicit
+Return to live control. Returning to live restores follow and the newest
+content.</li>
+<li>Compile and export never disable Stop. A compile preview failure
+falls back to the last good slide with a visible reason.</li>
+<li>Trailing transcript lines that arrive during <code>stopping</code>
+still render. Live content stays until the server says
+<code>idle</code>; then the shell returns to library with the just-ended
+meeting selected exactly once.</li>
+</ul>
+<h3 id="99-geometry-wide-and-narrow">9.9 Geometry: wide and narrow</h3>
+<p>Browser matrix, deviceScaleFactor 1, <code>ko-KR</code>,
+<code>Asia/Seoul</code>, matching the six baseline viewports frozen in
+task-1.</p>
+<table>
+<thead>
+<tr>
+<th>Width</th>
+<th>Shell behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1440x900</code></td>
+<td>Reference comparison. Rail plus document, or stage plus transcript,
+with generous document measure.</td>
+</tr>
+<tr>
+<td><code>1244x836</code></td>
+<td>Library reference. Exactly one meetings rail and one main surface
+are perceivable.</td>
+</tr>
+<tr>
+<td><code>960x760</code></td>
+<td>Live reference. Stage and transcript sit in the same row, each above
+its contract minimum, complete slide contained, Stop and timer
+persistent, zero root overflow.</td>
+</tr>
+<tr>
+<td><code>820x900</code></td>
+<td>Live stacks: complete stage above transcript. All controls
+reachable.</td>
+</tr>
+<tr>
+<td><code>375x812</code></td>
+<td>Narrow. Stage above transcript; rails become ordered, horizontally
+scrollable strips with explicit end padding.</td>
+</tr>
+<tr>
+<td><code>320x667</code></td>
+<td>Minimum supported. No horizontal root overflow, no control clipped
+mid-glyph.</td>
+</tr>
+</tbody>
+</table>
+<p>Seam rules:</p>
+<ul>
+<li>At and above 900px the live split is side by side. Below 900px it
+stacks, stage first.</li>
+<li><code>#splitter-rail</code> and <code>#splitter-transcript</code>
+stay pointer- and keyboard-resizable whenever both adjacent panes are
+present; they are inert and removed from the tab order otherwise.</li>
+<li>Every scroll owner (<code>#session-list</code>, the stage viewport,
+<code>#transcript-body</code>) sets <code>min-block-size: 0</code>. No
+primary content ever scrolls in two dimensions.</li>
+<li>The document root never overflows horizontally at any matrix
+width.</li>
+<li>At <code>375px</code> and <code>320px</code> no label, capability
+reason, or command may end as a partial glyph behind an overflow
+fade.</li>
+</ul>
+<h3 id="910-browser-and-native-minibar-division">9.10 Browser and native
+minibar division</h3>
+<p>The browser is the complete workspace. The native macOS surface is a
+projection and a control, never a second workspace and never a second
+source of truth.</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Browser</th>
+<th>Native minibar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Meeting library, detail tabs, notes, review, Ask, settings,
+export</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Slide rendering</td>
+<td>yes</td>
+<td>never</td>
+</tr>
+<tr>
+<td>Full transcript history</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Recording state, timer, latest lines</td>
+<td>yes</td>
+<td>yes, projected</td>
+</tr>
+<tr>
+<td>Stop</td>
+<td>yes</td>
+<td>yes, same existing action</td>
+</tr>
+<tr>
+<td>Open the full workspace</td>
+<td>n/a</td>
+<td>yes, opens the browser</td>
+</tr>
+<tr>
+<td>Meeting or transcript persistence</td>
+<td>server-backed</td>
+<td>never</td>
+</tr>
+</tbody>
+</table>
+<p>Native geometry, exact:</p>
+<ul>
+<li>Collapsed panel: <code>360x56</code>. Shows recording state, timer,
+one latest or provisional line, Stop, and a disclosure control.</li>
+<li>Expanded panel: <code>560x220</code>. Shows at most three finalized
+lines plus one provisional line, Stop, and Open Workspace.</li>
+<li>Both bounds match within 1px. The panel keeps a <code>16px</code>
+gutter from every display edge, saves and restores its frame per
+display, and falls back to the deterministic default frame when a saved
+frame no longer intersects an available display.</li>
+<li>Drag needs a movement threshold before it begins. Resize is allowed
+only while expanded. Escape collapses an expanded panel.</li>
+<li>Automatic calendar-triggered capture never steals OS focus.
+User-started capture focuses the visible Stop control on the surface
+that started it.</li>
+<li>Rapid Stop activation sends exactly one <code>stopCapture</code>.
+Quitting while capturing requires confirmation.</li>
+<li>The menu-bar <code>NSStatusItem</code> mirrors capture state; the
+app's Dock identity is unchanged.</li>
+<li>No <code>WKWebView</code>, no Electron, no Tauri, no new server
+endpoint, no protocol rename.</li>
+</ul>
+<h3 id="911-progressive-disclosure-and-real-capability-placement">9.11
+Progressive disclosure and real capability placement</h3>
+<p>Every real capability keeps its existing ID and action name and gains
+a correct home.</p>
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Always visible</th>
+<th>Behind the More menu or a sheet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Library, no meeting</td>
+<td>Start recording, meetings rail, settings trigger</td>
+<td>Provider and STT setup</td>
+</tr>
+<tr>
+<td>Library, meeting selected</td>
+<td>Detail tabs, primary follow-up action, Ask entry</td>
+<td>Export set, attendees, review, delete, reset</td>
+</tr>
+<tr>
+<td>Live</td>
+<td>Stop, timer, transcript follow control, Return to live when
+previewing</td>
+<td>Compile, export, settings</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Exposed IDs stay exactly one each: <code>#btn-record</code>,
+<code>#btn-live-stop</code>, <code>#btn-settings</code>,
+<code>#btn-attendees</code>, <code>#btn-review</code>,
+<code>#btn-ask</code>, <code>#btn-compile-deck</code>,
+<code>#btn-export-md</code>, <code>#btn-export-json</code>,
+<code>#btn-export-transcript</code>, <code>#btn-export-deck</code>,
+<code>#btn-export-pdf</code>, <code>#btn-export-png</code>,
+<code>#btn-reset</code>, and the review, attendee, Ask, and provider
+panel controls.</li>
+<li>Client actions and payload spellings are frozen:
+<code>startCapture</code> carries <code>meeting_id</code>;
+<code>selectMeeting</code>, <code>deleteMeeting</code>, and
+<code>ask</code> carry <code>meetingId</code>;
+<code>installSttModel</code> carries <code>modelId</code>. UI
+restructuring may move a node visually and may never rename a payload
+key, synthesize server success, or persist a client-only state that
+contradicts a reconnect snapshot.</li>
+<li>The three-way output control reveals or focuses an existing surface.
+It never duplicates slide content and never creates a second slide
+preview.</li>
+<li>A capability the server gates stays visible and disabled with its
+exact machine reason in both <code>title</code> and
+<code>aria-label</code>. Disabled is muted, never invisible.</li>
+</ul>
+<h3 id="912-focus-keyboard-and-accessibility">9.12 Focus, keyboard, and
+accessibility</h3>
+<ul>
+<li>Target WCAG 2.2 AA: body text at least 4.5:1, large text and every
+non-text boundary, focus ring, and status indicator at least 3:1.</li>
+<li>Every interactive control is reachable by keyboard in DOM order with
+a visible focus ring. Focus ring color is independent of recording and
+AI colors.</li>
+<li>Detail tabs use roving tabindex with Arrow, Home, and End. Sheets
+and modals trap focus, close on Escape, and restore focus to the
+trigger.</li>
+<li>Escape priority: open modal or sheet first, then expanded minibar or
+history preview, then no-op. Escape never stops a recording.</li>
+<li>Announcements: finalized transcript lines and errors announce once
+through a polite live region. The timer and the provisional caption are
+never live regions. No announcement fires twice for one event.</li>
+<li>Status is never color-only. Speaker identity is never
+color-only.</li>
+<li>Icon-only controls always keep an accessible name. Touch and pointer
+targets stay at least 44x44 CSS px at narrow widths.</li>
+<li>Decorative SVG stays <code>aria-hidden</code>. All meaningful
+content is live text.</li>
+<li>Short viewport heights keep every control reachable through
+scrolling rather than clipping.</li>
+</ul>
+<h3 id="913-loading-empty-and-failure-states">9.13 Loading, empty, and
+failure states</h3>
+<p>Canonical states, each with a defined visual and an accessible
+name.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Surface</th>
+<th>Contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Booting</td>
+<td>whole shell</td>
+<td>Skeleton with no fake content. No stale meeting text.</td>
+</tr>
+<tr>
+<td>Hydrating</td>
+<td>shell</td>
+<td>Last authoritative snapshot wins over any local pending state.</td>
+</tr>
+<tr>
+<td>Empty library</td>
+<td>meetings rail plus document</td>
+<td>One explanation of how a meeting appears and the record action. No
+decorative blank card.</td>
+</tr>
+<tr>
+<td>Empty transcript</td>
+<td>transcript pane</td>
+<td><code>#transcript-empty</code> explains that lines appear when
+speech is detected.</td>
+</tr>
+<tr>
+<td>Starting</td>
+<td>live shell</td>
+<td>Stop visible and enabled, timer at server <code>startedAt</code>,
+stage in <code>waiting</code>.</td>
+</tr>
+<tr>
+<td>Stopping</td>
+<td>live shell</td>
+<td>Stop reflects in-flight state, trailing lines still render, live
+content preserved.</td>
+</tr>
+<tr>
+<td>Reconnecting</td>
+<td>connection region</td>
+<td>Explicit reconnecting state, last known capture phase and content
+retained, no phantom stop.</td>
+</tr>
+<tr>
+<td>Capture error</td>
+<td>live and library</td>
+<td>Actionable reason, retry path, last valid content retained.</td>
+</tr>
+<tr>
+<td>Compile fallback or error</td>
+<td>stage</td>
+<td>Last good slide plus a visible reason. Stop stays enabled.</td>
+</tr>
+<tr>
+<td>Export error</td>
+<td>action surface</td>
+<td>Failure reason next to the control that failed.</td>
+</tr>
+<tr>
+<td>Malformed message</td>
+<td>client</td>
+<td>Payload dropped, state unchanged, one bounded error surfaced.</td>
+</tr>
+<tr>
+<td>Provider or STT unavailable</td>
+<td>settings sheet</td>
+<td>Server-reported availability and the exact machine reason.</td>
+</tr>
+<tr>
+<td>Transcript truncated</td>
+<td>transcript pane</td>
+<td><code>#transcript-trunc</code> states truncation explicitly.</td>
+</tr>
+</tbody>
+</table>
+<p>Failure detail never lives only in a console log. Every failure the
+operator can act on is visible in the surface where the action
+lives.</p>
+<h3 id="914-preserved-dom-protocol-and-product-capability">9.14
+Preserved DOM, protocol, and product capability</h3>
+<p>Binding identifiers, ancestry, and wire names are frozen by
+<code>tests/fixtures/public-dom-contract.json</code> and
+<code>tests/fixtures/public-protocol-contract.json</code> and enforced
+by <code>tests/public-dom-protocol-contract.test.ts</code>.</p>
+<ul>
+<li>99 binding IDs stay unique and keep their semantic owner. Required
+ancestry includes
+<code>#current-slide &lt; #slide-frame &lt; #stage-pane &lt; #workspace</code>,
+<code>#transcript-stream &lt; #transcript-body &lt; #transcript-card &lt; #transcript-pane &lt; #workspace</code>,
+<code>#btn-live-stop &lt; #live-topbar &lt; #stage-pane</code>,
+<code>#notes-input &lt; #notes-box</code>, and
+<code>#session-list &lt; #session-rail</code>.</li>
+<li><code>#stage-pane</code>, <code>#transcript-pane</code>, and
+<code>#session-rail</code> stay mutually disjoint.</li>
+<li>29 client actions and 20 server message types keep their names.
+Capture phases stay <code>idle</code>, <code>starting</code>,
+<code>capturing</code>, <code>stopping</code>,
+<code>switching-model</code>.</li>
+<li>Recording, transcript streaming, slide generation, review,
+attendees, Ask, notes, compile, export (Markdown, JSON, transcript,
+deck, PDF, PNG), provider and STT management, session history, and reset
+all remain reachable and functional.</li>
+<li>The server protocol is never changed to make a redesign pass.
+Additive optional metadata is the only permitted extension, and
+phase-less messages stay compatible.</li>
+</ul>
+<h3 id="915-layer-replacement-order">9.15 Layer replacement order</h3>
+<p>From
+<code>.omo/evidence/caret-clone-redesign/task-2/green/ledger.md</code>
+§F. This order is binding for Todo 18 because
+<code>operational-liquid.css</code> resolves 23 tokens from
+<code>style.css</code> and defines none.</p>
+<ol type="1">
+<li>Drop <code>public/operational-liquid.css</code> from
+<code>public/index.html</code> first. No token orphaning.</li>
+<li>Remove the TIRO block at <code>public/style.css:1377-1960</code>
+second, after its only cross-layer readers are gone.</li>
+<li>Re-author <code>public/workspace-shell.css</code> and
+<code>public/caret-shell.css</code> together, since they jointly own the
+geometry the splitter scripts write.</li>
+<li>Re-author <code>public/style.css:1-1376</code> last, once the
+operator token set exists.</li>
+</ol>
+<p>Reversing steps 1 and 2 leaves <code>operational-liquid.css</code>
+reading variables that no longer exist. When the sequence completes,
+exactly one operator stylesheet hierarchy is active and no obsolete
+layer remains linked.</p>
+<h3 id="916-direct-file-guard">9.16 Direct-file guard</h3>
+<ul>
+<li>Trigger: <code>location.protocol === "file:"</code>.</li>
+<li>Content: one short Korean explanation, the exact local start
+command, and a visible link to <code>http://localhost:8787/</code>.</li>
+<li>Visual: canvas background, operator typography, one clear action,
+visible focus. A centered editorial notice, not a modal.</li>
+<li>Runtime: server-only stylesheets, the application module, and the
+WebSocket client do not boot under <code>file:</code>.
+<code>http:</code> and <code>https:</code> behavior is unchanged.</li>
+<li>Accessibility: semantic <code>main</code>, one <code>h1</code>,
+selectable command text, at least a 20px gutter, no overflow at 320px or
+wider.</li>
+</ul>
+<h3 id="917-accepted-operator-debt">9.17 Accepted operator debt</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Location</th>
+<th>Why accepted</th>
+<th>Owner / Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Translation control is capability-gated</td>
+<td>transcript surface</td>
+<td>No translation action or message exists in the current wire
+protocol</td>
+<td>Enable when the server advertises a translation capability</td>
+</tr>
+<tr>
+<td>Speaker reassignment and utterance segmentation are
+capability-gated</td>
+<td>transcript surface</td>
+<td>Transcript entries expose no stable editable coordinate across
+reconnect</td>
+<td>Enable after a versioned utterance-edit contract ships</td>
+</tr>
+<tr>
+<td>Screen-share visibility is unstated</td>
+<td>native minibar</td>
+<td><code>NSWindow.SharingType.none</code> is documented as legacy and
+unhonored</td>
+<td>State only what the Todo 17 compatibility matrix proves, per
+application</td>
+</tr>
+<tr>
+<td>Reveal.js and Pretendard load from a CDN in the deck authoring view
+only</td>
+<td>generated <code>index.html</code>, <code>deck/theme.css</code></td>
+<td>Offline PDF export already works locally, and deck scope is
+unchanged by this contract. The operator surface loads no font over the
+network; see 9.2</td>
+<td>Vendor both when fully offline deck authoring becomes a product
+requirement</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-superseded-provenance-historical-non-binding">10. Superseded
+provenance (historical, non-binding)</h2>
+<p>Nothing in this section is an active rule. It records what the
+operator surface used to be so that later readers understand the diff,
+and so no reviewer mistakes a removed system for a current one.</p>
+<ul>
+<li><strong>TIRO operational grammar (superseded).</strong> The operator
+surface once borrowed TIRO's document workspace, participant context,
+and floating recording control. TIRO is no longer a reference for
+anything. No active rule may describe the product as TIRO-inspired.</li>
+<li><strong>Operational Liquid Glass (superseded).</strong> The prior
+contract selected Liquid Glass as the primary material: translucent zinc
+panels, cool top rim, restrained blur on major surfaces, and specular
+light. Replaced by the opaque matte tonal system in 9.5. Blur now exists
+only on true overlays. <code>public/operational-liquid.css</code> is
+scheduled for removal in the order in 9.15.</li>
+<li><strong>Shallow Caret overlay (superseded).</strong> An earlier pass
+layered <code>caret-shell.css</code> over the TIRO workspace and
+described the result as a dual-mode web translation while disclaiming
+any real fidelity target. That framing is retired. The current contract
+is a measured Caret-grade system with its own Meeting Slides identity,
+not an overlay and not a disclaimer.</li>
+<li><strong>Prior reference packets (historical evidence only).</strong>
+TIRO runtime notes, <code>CLONE-BRIEF.md</code> black-box observations,
+and <code>.omo/evidence/live-split-ulw/</code> geometry receipts remain
+readable provenance. They carry no authority over section 9.</li>
+</ul>
+</body>
+</html>

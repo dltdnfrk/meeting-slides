@@ -1,0 +1,34 @@
+{
+  "320": {
+    "shell": "library",
+    "detailTab": "overview",
+    "capturePhase": "idle",
+    "stageState": "empty",
+    "uiState": "idle-library",
+    "connectionState": "online"
+  },
+  "375": {
+    "shell": "library",
+    "detailTab": "overview",
+    "capturePhase": "idle",
+    "stageState": "empty",
+    "uiState": "idle-library",
+    "connectionState": "online"
+  },
+  "960": {
+    "shell": "library",
+    "detailTab": "overview",
+    "capturePhase": "idle",
+    "stageState": "empty",
+    "uiState": "idle-library",
+    "connectionState": "online"
+  },
+  "1280": {
+    "shell": "library",
+    "detailTab": "overview",
+    "capturePhase": "idle",
+    "stageState": "empty",
+    "uiState": "idle-library",
+    "connectionState": "online"
+  }
+}

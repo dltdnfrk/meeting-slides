@@ -1,0 +1,2987 @@
+diff --git a/public/index.html b/public/index.html
+index f4abcb6..1ebae43 100644
+--- a/public/index.html
++++ b/public/index.html
+@@ -4,11 +4,10 @@
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Meeting Slides — 실시간 회의 슬라이드</title>
+-  <link rel="preconnect" href="https://fonts.googleapis.com">
+-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+-  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" rel="stylesheet">
++  <!-- Deterministic bundled typography: no network font dependency. Assets, hashes
++       and OFL receipts are recorded in /fonts/font-manifest.json. -->
++  <link rel="preload" href="/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
++  <link rel="preload" href="/fonts/pretendard-variable.woff2" as="font" type="font/woff2" crossorigin>
+   <script id="runtime-bootstrap">
+     // Meeting Slides.app health check signature + file:// guard flag.
+     document.documentElement.dataset.runtime = location.protocol === "file:" ? "file" : "server";
+@@ -16,21 +15,21 @@
+   <style>
+     .direct-file-guard { display: none; }
+     html[data-runtime="file"] { min-height: 100%; background: #09090b; color-scheme: dark; }
+-    html[data-runtime="file"] body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #09090b; color: #f4f4f5; font-family: "Inter", "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; }
++    html[data-runtime="file"] body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #09090b; color: #f4f4f5; font-family: "Figtree", "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; }
+     html[data-runtime="file"] .ambient,
+     html[data-runtime="file"] .app { display: none; }
+     html[data-runtime="file"] .direct-file-guard { display: grid; width: min(640px, calc(100vw - 40px)); gap: 18px; padding-left: 28px; border-left: 2px solid #e85d4c; box-sizing: border-box; }
+-    .direct-file-guard__eyebrow { margin: 0; color: #e85d4c; font: 600 12px/1.3 "JetBrains Mono", monospace; letter-spacing: .12em; }
++    .direct-file-guard__eyebrow { margin: 0; color: #e85d4c; font: 500 12px/1.3 "DM Mono", ui-monospace, monospace; letter-spacing: .12em; }
+     .direct-file-guard h1 { margin: 0; max-width: 560px; font-size: clamp(30px, 7vw, 54px); line-height: 1.06; letter-spacing: -.035em; word-break: keep-all; }
+     .direct-file-guard__copy { margin: 0; max-width: 560px; color: #a1a1aa; font-size: 17px; line-height: 1.65; word-break: keep-all; }
+     .direct-file-guard__command { display: grid; gap: 7px; margin-top: 4px; }
+     .direct-file-guard__command span { color: #7f7f89; font-size: 12px; font-weight: 600; letter-spacing: .08em; }
+-    .direct-file-guard code { width: fit-content; padding: 10px 14px; border: 1px solid #27272a; border-radius: 8px; background: #131316; color: #f4f4f5; font: 600 14px/1.4 "JetBrains Mono", monospace; }
++    .direct-file-guard code { width: fit-content; padding: 10px 14px; border: 1px solid #27272a; border-radius: 8px; background: #131316; color: #f4f4f5; font: 500 14px/1.4 "DM Mono", ui-monospace, monospace; }
+     .direct-file-guard a { width: fit-content; margin-top: 6px; color: #09090b; background: #e85d4c; padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; }
+   </style>
++  <!-- Generated slide/review rendering and the single Caret operator shell. -->
+   <link rel="stylesheet" href="/style.css">
+-  <link rel="stylesheet" href="/workspace-shell.css">
+-  <link rel="stylesheet" href="/operational-liquid.css">
++  <link rel="stylesheet" href="/caret-operator.css">
+ </head>
+ <body>
+   <main class="direct-file-guard">
+@@ -52,7 +51,8 @@
+     <div class="ambient__noise"></div>
+   </div>
+ 
+-  <div class="app">
++  <div class="app" data-shell="library" data-detail-tab="overview"
++    data-capture-phase="idle" data-stage-state="empty" data-ui-state="startup">
+     <!-- ── 상단 바 ─────────────────────────────── -->
+     <header class="topbar">
+       <div class="topbar__brand">
+@@ -78,8 +78,20 @@
+           <span class="onair__label">녹음 대기</span>
+         </div>
+         <div class="topbar__status">
+-          <span class="status__indicator" id="status-indicator"></span>
+-          <span class="status__text" id="status-text">앱 서버에 연결하는 중…</span>
++          <!-- DESIGN 9.12/9.13: `renderStatus()` is the only surface that carries
++               connection loss, capture failure, export failure and save
++               completion. `#status-text` alone is therefore the shell's ONE
++               polite status region - scoped to the sentence itself rather than
++               to the whole strip, so the settings button beside it (which the
++               narrow shell rule requires to stay a sibling)
++               never becomes announceable content. `role="status"` already
++               implies polite; adding `aria-live` too would nest one region
++               inside another and announce a single event twice. -->
++          <!-- The dot repeats the status the sentence states; it is decoration
++               for that sentence, never the status itself (9.12: status is never
++               color-only). -->
++          <span class="status__indicator" id="status-indicator" aria-hidden="true"></span>
++          <span class="status__text" id="status-text" role="status" aria-atomic="true">앱 서버에 연결하는 중…</span>
+           <button id="btn-settings" class="icon-btn" type="button" title="설정 열기" aria-label="설정 열기">설정</button>
+         </div>
+       </div>
+@@ -139,8 +151,13 @@
+       <p class="attendee-panel__hint">녹음 전에 추가하면 회의록의 발언자와 담당자를 연결할 때 사용합니다. 선택 사항입니다.</p>
+     </div>
+ 
+-    <!-- ── 글랜서블 상태 스트립 (진행 과정 한눈에) ── -->
+-    <div class="glance" aria-live="polite">
++    <!-- ── 글랜서블 상태 스트립 (진행 과정 한눈에) ──
++         NOT a live region (DESIGN 9.12). The slide count, the sentence count and
++         the provider name change on every unrelated tick; a container-level
++         `aria-live` here re-announced all three for one transcript line, which
++         is exactly the duplicate noise the contract forbids. The state these
++         chips show is announced once by the status region above. -->
++    <div class="glance">
+       <div class="glance__chip glance__chip--capturing" id="glance-capture">
+         <span class="glance__dot"></span>
+         <span class="glance__label">대기</span>
+@@ -166,28 +183,67 @@
+     <!-- ── 워크스페이스: 세션 레일 | 비주얼 스테이지 | 전사 ── -->
+     <div class="workspace" id="workspace">
+ 
+-    <!-- 좌: 세션 레일 -->
++    <!-- 좌: 회의 레일 — 라이브러리에서 유일한 내비게이션 -->
+     <aside class="session-rail" id="session-rail" aria-label="회의 기록">
+       <div class="pane__head">
+-        <span class="pane__title">회의 기록</span>
++        <span class="pane__title caret-brand"><span class="caret-brand__mark" aria-hidden="true"></span>Meetings</span>
+         <span class="pane__count" id="session-count">0</span>
+       </div>
+       <div class="pane__body">
+         <ul class="session-list" id="session-list"></ul>
+-        <p class="pane__empty" id="session-empty">저장된 회의가 없습니다</p>
++        <p class="pane__empty" id="session-empty">저장된 회의가 없습니다. 녹음을 시작하면 이곳에 회의가 쌓입니다.</p>
+       </div>
+     </aside>
+ 
+     <!-- 좌|중앙 스플리터 -->
+     <div class="splitter splitter--rail" id="splitter-rail" role="separator" aria-orientation="vertical" aria-label="회의 기록 목록 너비 조절" tabindex="0"></div>
+ 
+-    <!-- 중앙: 시각 자료 무대 (Tiro 히어로 슬롯) -->
+-    <main class="stage stage-pane" id="stage-pane" tabindex="-1">
+-      <section class="slide-frame" id="slide-frame">
++    <!-- 중앙: 단 하나의 문서 표면. 머리말(제목/날짜/탭) 아래로
++         Overview · Notes · Transcript 패널이 서로를 교체한다. -->
++    <div class="document-surface" id="document-surface">
++      <div class="meeting-chrome" id="meeting-chrome">
++        <div class="meeting-chrome__title-row">
++          <h1 class="meeting-chrome__title" id="meeting-chrome-title">Untitled</h1>
++        </div>
++        <!-- DESIGN §9.7: #doc-title and #doc-meta live inside the meeting chrome.
++             They are the document's own title and meta line. -->
+         <div class="doc-head">
+           <h1 class="doc-title" id="doc-title">새 회의 준비</h1>
+           <p class="doc-meta" id="doc-meta">녹음을 시작하면 발언이 기록됩니다</p>
+         </div>
++        <div class="meeting-chrome__props" aria-label="회의 속성">
++          <span class="meeting-chrome__prop" id="meeting-chrome-date">Date</span>
++        </div>
++        <div class="detail-tabs" role="tablist" aria-label="회의 상세 보기">
++          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-overview"
++            data-detail-tab="overview" aria-selected="true" aria-controls="stage-pane" tabindex="0">Overview</button>
++          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-notes"
++            data-detail-tab="notes" aria-selected="false" aria-controls="notes-panel" tabindex="-1">Notes</button>
++          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-transcript"
++            data-detail-tab="transcript" aria-selected="false" aria-controls="transcript-pane" tabindex="-1">Transcript</button>
++        </div>
++      </div>
++
++    <!-- Overview 패널: 슬라이드 무대 + 요약/후속 작업 -->
++    <main class="stage stage-pane detail-panel" id="stage-pane" tabindex="-1"
++      role="tabpanel" aria-labelledby="detail-tab-overview">
++      <!-- 라이브 녹음 컨트롤은 무대가 소유한다 (task-3 계약: #live-topbar < #stage-pane). -->
++      <header class="live-topbar" id="live-topbar" aria-label="라이브 녹음 컨트롤">
++        <div class="live-topbar__nav" aria-hidden="true"></div>
++        <div class="live-topbar__capsule">
++          <button type="button" class="live-topbar__stop" id="btn-live-stop" aria-label="녹음 중지">
++            <span class="live-topbar__stop-dot" aria-hidden="true"></span>
++            Stop
++          </button>
++          <span class="live-topbar__sep" aria-hidden="true"></span>
++          <!-- DESIGN 9.12: "The timer and the provisional caption are never live
++               regions." A per-second timer inside a polite region floods the
++               announcement queue and drowns the transcript beside it. The label
++               names it so it stays readable on demand. -->
++          <span class="live-topbar__timer" id="live-topbar-timer" aria-label="녹음 경과 시간">00:00</span>
++        </div>
++      </header>
++      <section class="slide-frame" id="slide-frame">
+         <div class="slide" id="current-slide">
+           <div class="slide__placeholder">
+             <div class="placeholder__mic">
+@@ -204,6 +260,34 @@
+         </div>
+       </section>
+ 
++      <section class="meeting-overview" id="meeting-overview" aria-label="회의 개요">
++        <div class="meeting-overview__block">
++          <h2 class="meeting-overview__label">Summary</h2>
++          <p class="meeting-overview__empty" id="summary-empty">No summary yet</p>
++        </div>
++        <div class="meeting-overview__block">
++          <h2 class="meeting-overview__label">Actions</h2>
++          <article class="action-card" id="action-followup">
++            <div class="action-card__head">
++              <div>
++                <h3 class="action-card__title">Send follow-up</h3>
++                <p class="action-card__sub" id="action-followup-sub">회의가 끝나면 후속 메일 초안이 여기 쌓입니다.</p>
++              </div>
++              <div class="action-card__actions">
++                <button type="button" class="action-card__btn" id="btn-action-copy" disabled>Copy</button>
++                <button type="button" class="action-card__btn" id="btn-action-open" disabled>Open draft</button>
++              </div>
++            </div>
++            <p class="action-card__body" id="action-followup-body">Subject: Following up - …
++
++Hi,
++Thank you for your time today.
++Here's a quick recap of the meeting:
++-</p>
++          </article>
++        </div>
++      </section>
++
+       <!-- 상태 필: 캡처/AI/자막/대기 + 핵심 메트릭을 한 줄로 -->
+       <section class="island" id="island">
+         <span class="island__dot"></span>
+@@ -214,11 +298,23 @@
+       </section>
+     </main>
+ 
+-    <!-- 중앙|우 스플리터 -->
++    <!-- Notes 패널: 회의 메모의 유일한 거처. 저장/히스토리 계약은 #notes-input이 그대로 소유한다. -->
++    <section class="notes-panel detail-panel" id="notes-panel" role="tabpanel"
++      aria-labelledby="detail-tab-notes" tabindex="-1" hidden>
++      <details class="notes-box" id="notes-box" open>
++        <summary class="notes-box__summary">회의 메모 · AI 정리에 반영</summary>
++        <textarea id="notes-input" class="notes-box__input" placeholder="회의 중 떠오른 결정, 액션, 맥락을 적어두세요 — 회의록 정리 시 전사와 함께 사용됩니다"></textarea>
++      </details>
++      <textarea class="live-note" id="live-note" placeholder="Leave a quick note" aria-label="라이브 노트"></textarea>
++      <p class="notes-panel__hint">메모는 회의록을 정리할 때 전사와 함께 사용됩니다.</p>
++    </section>
++
++    <!-- 중앙|우 스플리터: 라이브 셸에서만 보이고 조작 가능하다. -->
+     <div class="splitter splitter--transcript" id="splitter-transcript" role="separator" aria-orientation="vertical" aria-label="전사 패널 너비 조절" tabindex="0"></div>
+ 
+-    <!-- 우: 전사 패널 — 라이브 전사의 1차 거처 -->
+-    <aside class="transcript-pane" id="transcript-pane" aria-label="실시간 기록" tabindex="-1">
++    <!-- Transcript 패널 — 라이브에서는 오른쪽 전사 열, 라이브러리에서는 문서 탭 하나. -->
++    <aside class="transcript-pane detail-panel" id="transcript-pane" aria-label="실시간 기록" tabindex="-1"
++      role="tabpanel" aria-labelledby="detail-tab-transcript" hidden>
+       <section class="transcript-card" id="transcript-card">
+         <div class="pane__head">
+           <span>
+@@ -261,14 +357,17 @@
+           <span class="capability-reason">편집 좌표 연결 전</span>
+         </div>
+         <div class="pane__body" id="transcript-body">
+-          <div class="transcript-stream" id="transcript-stream"></div>
++          <!-- DESIGN 9.12: finalized transcript lines announce ONCE through a
++               polite region. `role="log"` is the polite region shaped for an
++               append-only stream: only the added line is announced, not the
++               whole backlog, and `aria-atomic="false"` keeps it that way. The
++               provisional caption lives outside this element (#caption-text) so
++               a not-yet-final phrase is never announced. -->
++          <div class="transcript-stream" id="transcript-stream" role="log"
++            aria-label="확정된 발언 기록" aria-atomic="false"></div>
+           <p class="pane__empty" id="transcript-empty">녹음을 시작하면<br>발언 내용이 여기에 기록됩니다</p>
+           <div class="transcript-trunc" id="transcript-trunc" hidden>오래된 기록 일부가 화면에서 생략되었습니다</div>
+         </div>
+-        <details class="notes-box" id="notes-box">
+-          <summary class="notes-box__summary">회의 중 메모 · AI 정리에 반영</summary>
+-          <textarea id="notes-input" class="notes-box__input" placeholder="회의 중 떠오른 결정, 액션, 맥락을 적어두세요 — 회의록 정리 시 전사와 함께 사용됩니다"></textarea>
+-        </details>
+         <!-- 남/남서 리사이즈 손잡이: 서쪽 폭은 워크스페이스 스플리터가 담당 -->
+         <div class="transcript-grip transcript-grip--s" id="transcript-grip-s" role="separator" aria-orientation="horizontal" aria-label="전사 패널 높이 조절" tabindex="0"></div>
+         <div class="transcript-grip transcript-grip--sw" id="transcript-grip-sw" role="separator" aria-orientation="horizontal" aria-label="전사 패널 너비·높이 조절" tabindex="0"></div>
+@@ -277,6 +376,8 @@
+ 
+     </div>
+ 
++    </div>
++
+     <!-- ── 하단 도크: 슬라이드 히스토리 + export (전사는 우측 패널로 이전) ─ -->
+     <div class="dock">
+       <div class="dock__commandbar">
+@@ -327,16 +428,31 @@
+           슬라이드 <span class="dock__count" id="history-count">0장</span>
+         </span>
+         <div class="dock__spacer"></div>
+-        <button id="btn-compile-deck" class="dock__btn dock__btn--compile" type="button" title="지금까지의 대화로 편집 가능한 PowerPoint 초안 만들기" aria-label="슬라이드 초안 만들기">슬라이드 초안 만들기</button>
++        <!-- DESIGN §9.11 "Library, meeting selected · Always visible: ... Ask
++             entry". Ask is the one secondary capability the contract keeps in the
++             open, so it lives in the primary row and never behind a disclosure
++             whose label advertises saving and exporting. -->
++        <button id="btn-ask" class="dock__btn dock__btn--ask" type="button" title="선택한 회의의 전사에 질문하기" aria-label="선택한 회의의 전사에 질문하기">Ask</button>
+         <span id="compile-status" class="compile-status" role="status" aria-live="polite" hidden></span>
+-        <button id="btn-export-md" class="dock__btn" type="button" title="회의 메모를 Markdown으로 저장" aria-label="회의 메모 저장">회의 메모</button>
+-        <button id="btn-export-json" class="dock__btn" type="button" title="회의 데이터를 JSON으로 저장" aria-label="회의 데이터 저장">데이터</button>
+-        <button id="btn-export-transcript" class="dock__btn" type="button" title="전사 원문 저장" aria-label="전사 원문 저장">전사 원문</button>
+-        <button id="btn-export-deck" class="dock__btn" type="button" title="브라우저에서 볼 수 있는 슬라이드 저장" aria-label="웹 슬라이드 저장">웹 슬라이드</button>
+-        <button id="btn-export-pdf" class="dock__btn" type="button" title="검토용 PDF 만들기" aria-label="검토용 PDF 만들기">PDF</button>
+-        <button id="btn-export-png" class="dock__btn" type="button" title="슬라이드를 PNG 이미지로 저장" aria-label="슬라이드 이미지 저장">이미지</button>
+-        <button id="btn-ask" class="dock__btn" type="button" title="선택한 회의의 전사에 질문하기" aria-label="회의에 질문하기">Ask</button>
+-        <button id="btn-reset" class="dock__btn dock__btn--danger" type="button" title="현재 회의를 닫고 새 회의 준비" aria-label="새 회의 준비">새 회의</button>
++        <!-- Progressive disclosure (DESIGN §9.11): compile and the whole export
++             set sit behind ONE disclosure in BOTH shells - "Live · Behind the
++             More menu or a sheet: Compile, export, settings". Nothing is removed
++             and nothing is faked: every control keeps its ID, its action, its
++             accessible name and its place in the tab order, and `<details>` is
++             natively keyboard-operable and exposed to assistive technology. -->
++        <details class="dock__more" id="dock-more">
++          <summary class="dock__more-summary" aria-label="슬라이드 만들기, 저장과 내보내기 더 보기">만들기·저장·내보내기</summary>
++          <div class="dock__more-set">
++            <button id="btn-compile-deck" class="dock__btn dock__btn--compile" type="button" title="지금까지의 대화로 편집 가능한 PowerPoint 초안 만들기" aria-label="슬라이드 초안 만들기">슬라이드 초안 만들기</button>
++            <button id="btn-export-md" class="dock__btn" type="button" title="회의 메모를 Markdown으로 저장" aria-label="회의 메모 저장">회의 메모</button>
++            <button id="btn-export-json" class="dock__btn" type="button" title="회의 데이터를 JSON으로 저장" aria-label="회의 데이터 저장">데이터</button>
++            <button id="btn-export-transcript" class="dock__btn" type="button" title="전사 원문 저장" aria-label="전사 원문 저장">전사 원문</button>
++            <button id="btn-export-deck" class="dock__btn" type="button" title="브라우저에서 볼 수 있는 슬라이드 저장" aria-label="웹 슬라이드 저장">웹 슬라이드</button>
++            <button id="btn-export-pdf" class="dock__btn" type="button" title="검토용 PDF 만들기" aria-label="검토용 PDF 만들기">PDF</button>
++            <button id="btn-export-png" class="dock__btn" type="button" title="슬라이드를 PNG 이미지로 저장" aria-label="슬라이드 이미지 저장">이미지</button>
++            <button id="btn-reset" class="dock__btn dock__btn--danger" type="button" title="현재 회의를 닫고 새 회의 준비" aria-label="새 회의 준비">새 회의</button>
++          </div>
++        </details>
+         <span class="last-saved" id="last-saved" hidden></span>
+       </div>
+ 
+@@ -375,7 +491,9 @@
+     </div>
+   </div>
+ 
+-  <div class="ask-panel" id="ask-panel" hidden>
++  <!-- DESIGN §9.12: a re-homed panel is a real dialog - named, Escape-closable,
++       and it returns focus to the control that opened it. -->
++  <div class="ask-panel" id="ask-panel" role="dialog" aria-modal="false" aria-label="Ask 회의 질문" hidden>
+     <div class="ask-panel__head">
+       <span class="pane__title">Ask 회의 질문</span>
+       <button id="btn-ask-close" class="ask-panel__close" type="button" aria-label="Ask 패널 닫기">×</button>
+@@ -394,9 +512,12 @@
+ 
+   <script src="/workspace-split.js"></script>
+   <script src="/transcript-resize.js"></script>
+-  <script src="/operator-surface.js"></script>
++  <!-- The shell is an ES module: it imports the canonical reducers from the
++       generated browser artifacts (scripts/build-public-modules.ts). Modules are
++       deferred by definition, so it runs before app.js, which is also deferred. -->
++  <script type="module" src="/operator-surface.js"></script>
+   <script src="/review-panel-render.js"></script>
+   <script src="/review-panel.js"></script>
+-  <script src="/app.js"></script>
++  <script defer src="/app.js"></script>
+ </body>
+ </html>
+diff --git a/public/operational-liquid.css b/public/operational-liquid.css
+deleted file mode 100644
+index 2586a2a..0000000
+--- a/public/operational-liquid.css
++++ /dev/null
+@@ -1,861 +0,0 @@
+-/* ============================================================
+-   Operational Liquid Glass
+-   Style-gallery selection: Liquid Glass, translated for a dense
+-   meeting operator. Geometry and protocol contracts live elsewhere.
+-   ============================================================ */
+-
+-html {
+-  color-scheme: dark;
+-  background: var(--z950);
+-}
+-
+-body {
+-  background: var(--z950);
+-}
+-
+-.ambient {
+-  background:
+-    radial-gradient(circle at 50% 32%, var(--line-soft), transparent 34%),
+-    radial-gradient(circle at 18% 0%, var(--live-soft), transparent 30%),
+-    radial-gradient(circle at 84% 8%, var(--line-faint), transparent 28%),
+-    var(--z950);
+-}
+-
+-.ambient__grid {
+-  display: block;
+-  position: absolute;
+-  inset: 0;
+-  opacity: 0.16;
+-  background-image:
+-    linear-gradient(var(--line-faint) 1px, transparent 1px),
+-    linear-gradient(90deg, var(--line-faint) 1px, transparent 1px);
+-  background-size: 48px 48px;
+-  mask-image: radial-gradient(circle at 50% 28%, black, transparent 70%);
+-}
+-
+-.topbar,
+-.session-rail,
+-.stage-pane,
+-.transcript-pane,
+-.dock__commandbar,
+-.dock__tabs,
+-.dock__panel {
+-  border: 1px solid var(--glass-border);
+-  border-top-color: var(--glass-highlight);
+-  background: var(--glass-bg);
+-  box-shadow: var(--glass-shadow), var(--glass-inset);
+-  backdrop-filter: var(--glass-blur);
+-  -webkit-backdrop-filter: var(--glass-blur);
+-}
+-
+-.topbar {
+-  overflow: hidden;
+-  border-bottom-color: var(--line-soft);
+-  background:
+-    linear-gradient(180deg, var(--line-soft), transparent 45%),
+-    var(--glass-bg);
+-  box-shadow:
+-    0 12px 36px color-mix(in srgb, var(--z950) 82%, transparent),
+-    var(--glass-inset);
+-}
+-
+-.topbar::after,
+-.stage-pane::before,
+-.dock__commandbar::before {
+-  content: "";
+-  position: absolute;
+-  inset: 0 14% auto;
+-  height: 1px;
+-  pointer-events: none;
+-  background: linear-gradient(90deg, transparent, var(--glass-highlight), transparent);
+-}
+-
+-.brand__mark {
+-  box-shadow:
+-    0 0 0 4px var(--live-soft),
+-    0 0 22px var(--live-line);
+-}
+-
+-.brand__name {
+-  color: var(--z100);
+-  letter-spacing: -0.02em;
+-}
+-
+-.topbar__status {
+-  min-height: 30px;
+-  padding: 0 10px;
+-  border: 1px solid var(--line-soft);
+-  border-radius: 999px;
+-  background: color-mix(in srgb, var(--z950) 66%, transparent);
+-}
+-
+-.status__text {
+-  color: var(--z300);
+-  opacity: 1;
+-}
+-
+-.icon-btn,
+-.attendee-btn {
+-  border-color: var(--line-soft);
+-  background: color-mix(in srgb, var(--z900) 72%, transparent);
+-  box-shadow: inset 0 1px 0 var(--line-faint);
+-}
+-
+-.icon-btn:hover:not(:disabled),
+-.attendee-btn:hover:not(:disabled) {
+-  border-color: var(--glass-highlight);
+-  background: var(--z850);
+-}
+-
+-.workspace {
+-  isolation: isolate;
+-}
+-
+-.session-rail,
+-.transcript-pane {
+-  border-color: var(--line-soft);
+-  border-top-color: var(--glass-border);
+-  background:
+-    linear-gradient(180deg, var(--line-faint), transparent 24%),
+-    color-mix(in srgb, var(--z950) 74%, transparent);
+-  box-shadow:
+-    0 14px 42px color-mix(in srgb, var(--z950) 84%, transparent),
+-    var(--glass-inset);
+-}
+-
+-.pane__head {
+-  min-height: 46px;
+-  padding-inline: 15px;
+-  border-bottom-color: var(--line-faint);
+-  background: transparent;
+-}
+-
+-.pane__eyebrow {
+-  color: var(--live);
+-  letter-spacing: 0.14em;
+-}
+-
+-.pane__title {
+-  color: var(--z300);
+-  letter-spacing: -0.015em;
+-}
+-
+-.pane__count {
+-  border-color: var(--line-faint);
+-  background: color-mix(in srgb, var(--z900) 78%, transparent);
+-  color: var(--z500);
+-}
+-
+-.session-list {
+-  padding: 6px 8px 12px;
+-}
+-
+-.session-row {
+-  position: relative;
+-  padding: 13px 10px 13px 14px;
+-  border: 0;
+-  border-bottom: 1px solid var(--line-faint);
+-  border-radius: 10px;
+-  background: transparent;
+-  transition:
+-    background var(--motion-quick) var(--ease-out),
+-    color var(--motion-quick) var(--ease-out);
+-}
+-
+-.session-row::before {
+-  content: "";
+-  position: absolute;
+-  inset: 13px auto 13px 4px;
+-  width: 2px;
+-  border-radius: 2px;
+-  background: transparent;
+-}
+-
+-.session-row:hover {
+-  background: var(--line-faint);
+-}
+-
+-.session-row--selected {
+-  background: var(--live-soft);
+-}
+-
+-.session-row--selected::before {
+-  background: var(--live);
+-  box-shadow: 0 0 12px var(--live-line);
+-}
+-
+-.session-row__title {
+-  color: var(--z300);
+-}
+-
+-.session-row__meta {
+-  color: var(--z500);
+-}
+-
+-.stage-pane {
+-  position: relative;
+-  overflow: hidden;
+-  border-color: var(--glass-border);
+-  border-top-color: var(--glass-highlight);
+-  background:
+-    radial-gradient(circle at 50% 18%, var(--line-soft), transparent 42%),
+-    linear-gradient(180deg, color-mix(in srgb, var(--z850) 82%, transparent), color-mix(in srgb, var(--z950) 88%, transparent));
+-  box-shadow:
+-    0 24px 68px color-mix(in srgb, var(--z950) 72%, transparent),
+-    var(--glass-inset);
+-}
+-
+-.doc-head {
+-  position: relative;
+-  z-index: 1;
+-  padding: 18px 44px 8px;
+-}
+-
+-.doc-title {
+-  max-width: 18ch;
+-  color: var(--z100);
+-  font-size: clamp(30px, 3vw, 42px);
+-  font-weight: 700;
+-  line-height: 1.08;
+-  letter-spacing: -0.045em;
+-  text-wrap: balance;
+-}
+-
+-.doc-meta {
+-  color: var(--z500);
+-  font-family: var(--font-mono);
+-  letter-spacing: 0.02em;
+-}
+-
+-.stage {
+-  position: relative;
+-  z-index: 1;
+-  padding: 10px 44px 22px;
+-}
+-
+-.slide:has(.slide__placeholder) {
+-  opacity: 1;
+-  transform: none;
+-  animation: none;
+-  border-color: var(--line-faint);
+-  border-top-color: var(--glass-border);
+-  background:
+-    radial-gradient(circle at 50% 34%, var(--live-soft), transparent 20%),
+-    linear-gradient(180deg, var(--line-faint), transparent 42%),
+-    color-mix(in srgb, var(--z950) 58%, transparent);
+-  box-shadow:
+-    inset 0 1px 0 var(--line-soft),
+-    inset 0 -48px 80px color-mix(in srgb, var(--z950) 55%, transparent);
+-}
+-
+-.slide__placeholder {
+-  width: 100%;
+-  overflow: visible;
+-  min-height: 0;
+-  border: 0;
+-  border-radius: 0;
+-  background: transparent;
+-  box-shadow: none;
+-}
+-
+-.placeholder__mic {
+-  width: 64px;
+-  height: 64px;
+-  border-color: var(--live-line);
+-  background: var(--live-soft);
+-  box-shadow:
+-    inset 0 1px 0 var(--live-line),
+-    0 12px 36px color-mix(in srgb, var(--z950) 66%, transparent);
+-}
+-
+-.mic__core {
+-  color: var(--live);
+-  filter: drop-shadow(0 0 12px var(--live-line));
+-}
+-
+-.placeholder__title {
+-  max-width: 33ch;
+-  color: var(--z300);
+-  font-size: clamp(18px, 1.8vw, 24px);
+-  font-weight: 650;
+-  line-height: 1.35;
+-  letter-spacing: -0.03em;
+-  text-wrap: balance;
+-}
+-
+-.placeholder__sub {
+-  max-width: 42ch;
+-  color: var(--z500);
+-  line-height: 1.6;
+-  text-wrap: balance;
+-}
+-
+-.glance {
+-  min-height: 44px;
+-  padding-inline: 17px;
+-  border-color: var(--glass-border);
+-  background:
+-    linear-gradient(180deg, var(--line-faint), transparent 60%),
+-    color-mix(in srgb, var(--z950) 64%, transparent);
+-  box-shadow:
+-    0 16px 38px color-mix(in srgb, var(--z950) 76%, transparent),
+-    var(--glass-inset);
+-}
+-
+-.glance__label {
+-  color: var(--z300);
+-}
+-
+-.glance__metric {
+-  color: var(--z500);
+-}
+-
+-.transcript-card {
+-  border: 0;
+-  background: transparent;
+-  box-shadow: none;
+-}
+-
+-.transcript-context {
+-  display: flex;
+-  align-items: center;
+-  gap: 12px;
+-  padding: 12px 14px;
+-  border-bottom: 1px solid var(--line-faint);
+-  background: color-mix(in srgb, var(--z950) 42%, transparent);
+-}
+-
+-.language-direction {
+-  display: grid;
+-  flex: 0 0 28px;
+-  width: 28px;
+-  height: 28px;
+-  padding: 0;
+-  border: 0;
+-  background: transparent;
+-  color: var(--z500);
+-  place-items: center;
+-}
+-
+-.language-direction svg {
+-  width: 16px;
+-  height: 16px;
+-  fill: none;
+-  stroke: currentColor;
+-  stroke-width: 1.6;
+-}
+-
+-.language-field__label {
+-  color: var(--z500);
+-}
+-
+-.language-field__select {
+-  color: var(--z300);
+-}
+-
+-.transcript-tools {
+-  gap: 8px;
+-  padding: 8px 12px 10px;
+-  border-bottom: 1px solid var(--line-faint);
+-  background: color-mix(in srgb, var(--z950) 34%, transparent);
+-}
+-
+-.capability-btn {
+-  min-height: 30px;
+-  padding: 0 10px;
+-  border-color: var(--line-soft);
+-  border-radius: 6px;
+-  background: color-mix(in srgb, var(--z900) 72%, transparent);
+-  color: var(--z300);
+-}
+-
+-.capability-btn:disabled,
+-.dock__btn:disabled,
+-.output-switcher__item:disabled {
+-  opacity: 1;
+-  border-color: var(--line-faint);
+-  background: color-mix(in srgb, var(--z950) 52%, transparent);
+-  color: var(--z500);
+-}
+-
+-.capability-reason,
+-.output-switcher__reason {
+-  color: var(--z300);
+-}
+-
+-.capability-btn:disabled span {
+-  color: var(--z300);
+-  opacity: 0.82;
+-}
+-
+-.transcript-stream {
+-  margin: 10px 12px 0;
+-  padding: 10px 0 14px;
+-  border-top: 1px solid var(--line-faint);
+-}
+-
+-.pane__empty {
+-  margin: 0 0 8px;
+-  border-color: var(--line-faint);
+-  border-radius: 12px;
+-  background: color-mix(in srgb, var(--z950) 40%, transparent);
+-  color: var(--z500);
+-}
+-
+-.splitter::before {
+-  background: transparent;
+-}
+-
+-.splitter:hover::before,
+-.splitter:focus-visible::before {
+-  background: var(--live-line);
+-}
+-
+-.dock {
+-  gap: 8px;
+-}
+-
+-.dock__commandbar {
+-  position: relative;
+-  overflow: visible;
+-  min-height: 66px;
+-  padding: 8px 12px;
+-  border-radius: 20px;
+-  background:
+-    linear-gradient(180deg, var(--line-soft), transparent 46%),
+-    var(--glass-bg-strong);
+-  box-shadow:
+-    0 20px 52px color-mix(in srgb, var(--z950) 74%, transparent),
+-    var(--glass-inset);
+-}
+-
+-.output-switcher {
+-  min-width: 0;
+-  padding: 4px;
+-  border: 1px solid var(--line-faint);
+-  border-radius: 999px;
+-  background: color-mix(in srgb, var(--z950) 62%, transparent);
+-}
+-
+-.output-switcher__item {
+-  min-height: 34px;
+-  padding-inline: 12px;
+-  border: 0;
+-  border-radius: 999px;
+-  background: transparent;
+-  color: var(--z500);
+-}
+-
+-.output-switcher__item:hover:not(:disabled) {
+-  background: var(--line-faint);
+-  color: var(--z300);
+-}
+-
+-.output-switcher__item[aria-current="page"] {
+-  background: var(--z800);
+-  color: var(--z100);
+-  box-shadow:
+-    inset 0 1px 0 var(--line-soft),
+-    0 5px 16px color-mix(in srgb, var(--z950) 72%, transparent);
+-}
+-
+-.capture-pill {
+-  min-height: 50px;
+-  padding: 4px;
+-  border-color: var(--live-line);
+-  background:
+-    linear-gradient(180deg, var(--line-soft), transparent 60%),
+-    color-mix(in srgb, var(--z950) 72%, transparent);
+-  box-shadow:
+-    0 18px 42px color-mix(in srgb, var(--z950) 70%, transparent),
+-    0 0 0 1px var(--live-soft),
+-    var(--glass-inset);
+-  transform: translateY(-2px);
+-}
+-
+-.capture-pill__mode {
+-  color: var(--z500);
+-}
+-
+-.record-btn {
+-  min-height: 42px;
+-  padding-inline: 18px;
+-  border: 0;
+-  background: var(--live);
+-  color: var(--z950);
+-  box-shadow:
+-    inset 0 1px 0 var(--glass-highlight),
+-    0 8px 22px var(--live-soft);
+-}
+-
+-.record-btn:hover:not(:disabled) {
+-  filter: brightness(1.08);
+-  transform: translateY(-1px);
+-}
+-
+-.record-btn:active:not(:disabled) {
+-  transform: translateY(0) scale(0.98);
+-}
+-
+-.dock__context {
+-  color: var(--z500);
+-}
+-
+-.dock__context strong {
+-  color: var(--z300);
+-}
+-
+-.dock__tabs {
+-  position: relative;
+-  min-height: 40px;
+-  padding: 4px 10px;
+-  border-radius: 16px;
+-  background:
+-    linear-gradient(180deg, var(--line-faint), transparent 70%),
+-    color-mix(in srgb, var(--z900) 76%, transparent);
+-  box-shadow:
+-    0 10px 30px color-mix(in srgb, var(--z950) 78%, transparent),
+-    var(--glass-inset);
+-  scrollbar-width: none;
+-}
+-
+-.dock__tabs::-webkit-scrollbar {
+-  display: none;
+-}
+-
+-.dock__label {
+-  color: var(--z300);
+-}
+-
+-.dock__btn {
+-  min-height: 30px;
+-  padding-inline: 10px;
+-  border-color: transparent;
+-  border-radius: 8px;
+-  background: transparent;
+-  color: var(--z500);
+-}
+-
+-.dock__btn:hover:not(:disabled) {
+-  border-color: var(--line-soft);
+-  background: var(--line-faint);
+-  color: var(--z300);
+-}
+-
+-.dock__btn--compile {
+-  border-color: var(--live-line);
+-  background: var(--live-soft);
+-  color: var(--z300);
+-}
+-
+-.dock__btn--danger {
+-  color: var(--live);
+-}
+-
+-.compile-status,
+-.last-saved {
+-  color: var(--z500);
+-}
+-
+-.dock__panel {
+-  border-radius: 16px;
+-  background:
+-    linear-gradient(180deg, var(--line-faint), transparent 52%),
+-    color-mix(in srgb, var(--z900) 72%, transparent);
+-  box-shadow:
+-    0 12px 34px color-mix(in srgb, var(--z950) 78%, transparent),
+-    var(--glass-inset);
+-}
+-
+-.filmstrip__empty {
+-  color: var(--z500);
+-}
+-
+-.filmstrip__empty-ring {
+-  border-color: var(--line-soft);
+-  border-top-color: var(--z500);
+-}
+-
+-.attendee-panel,
+-.provider-panel,
+-.review-panel,
+-.ask-panel {
+-  border-color: var(--glass-border);
+-  border-top-color: var(--glass-highlight);
+-  background:
+-    linear-gradient(180deg, var(--line-soft), transparent 22%),
+-    var(--glass-bg-strong);
+-  box-shadow: var(--glass-shadow), var(--glass-inset);
+-  backdrop-filter: var(--glass-blur);
+-  -webkit-backdrop-filter: var(--glass-blur);
+-}
+-
+-:where(
+-  button,
+-  a,
+-  select,
+-  input,
+-  textarea,
+-  summary,
+-  [tabindex]
+-):focus-visible {
+-  outline: 2px solid var(--focus-ring);
+-  outline-offset: 3px;
+-}
+-
+-@media (max-width: 1180px) {
+-  .doc-head {
+-    padding-inline: 32px;
+-  }
+-
+-  .stage {
+-    padding-inline: 32px;
+-  }
+-
+-  .dock__commandbar {
+-    padding-inline: 10px;
+-  }
+-
+-  .dock__context {
+-    color: var(--z300);
+-  }
+-}
+-
+-@media (max-width: 900px) {
+-  .ambient__grid {
+-    opacity: 0.1;
+-    background-size: 40px 40px;
+-  }
+-
+-  .topbar,
+-  .stage-pane,
+-  .transcript-pane,
+-  .dock__commandbar,
+-  .dock__tabs,
+-  .dock__panel {
+-    border-radius: 16px;
+-  }
+-
+-  .doc-head {
+-    padding: 16px 26px 8px;
+-  }
+-
+-  .doc-title {
+-    font-size: clamp(26px, 6.4vw, 34px);
+-  }
+-
+-  .stage {
+-    padding: 8px 26px 20px;
+-  }
+-
+-  .slide__placeholder {
+-    border-radius: 18px;
+-  }
+-
+-  .dock__commandbar {
+-    padding: 8px;
+-  }
+-
+-  .output-switcher {
+-    scroll-padding-inline: 12px;
+-  }
+-
+-  .dock__tabs {
+-    padding-inline: 10px;
+-    scroll-padding-inline: 10px;
+-  }
+-
+-  .dock__tabs::after {
+-    content: none;
+-    display: none;
+-  }
+-}
+-
+-@media (max-width: 520px) {
+-  .topbar {
+-    background:
+-      linear-gradient(180deg, var(--line-soft), transparent 52%),
+-      var(--glass-bg-strong);
+-  }
+-
+-  .topbar__status {
+-    padding-inline: 8px;
+-  }
+-
+-  .doc-head {
+-    padding: 15px 20px 6px;
+-  }
+-
+-  .doc-title {
+-    max-width: 15ch;
+-    font-size: 27px;
+-  }
+-
+-  .stage {
+-    padding: 8px 20px 18px;
+-  }
+-
+-  .slide:has(.slide__placeholder) {
+-    padding: 8px;
+-  }
+-
+-  .slide__placeholder {
+-    gap: 8px;
+-  }
+-
+-  .placeholder__mic {
+-    flex: 0 0 44px;
+-    width: 44px;
+-    height: 44px;
+-  }
+-
+-  .placeholder__title {
+-    font-size: 17px;
+-    line-height: 1.25;
+-    overflow-wrap: normal;
+-    word-break: keep-all;
+-  }
+-
+-  .placeholder__sub {
+-    display: none;
+-  }
+-
+-  #transcript-empty {
+-    min-height: 0;
+-    max-height: 100%;
+-    margin-bottom: 0;
+-    padding-block: 8px;
+-  }
+-
+-  .capture-pill {
+-    min-height: 48px;
+-    transform: none;
+-  }
+-
+-  .record-btn {
+-    min-height: 40px;
+-    padding-inline: 20px;
+-  }
+-
+-  .output-switcher {
+-    width: 100%;
+-  }
+-
+-  .output-switcher__item {
+-    flex: 0 0 auto;
+-  }
+-
+-  .dock__tabs {
+-    gap: 4px;
+-    padding-inline: 8px;
+-    scroll-padding: 0 52px 0 8px;
+-  }
+-
+-  .dock__tabs .dock__spacer {
+-    flex: 0 0 0;
+-  }
+-
+-  .dock__label {
+-    flex: 0 0 88px;
+-    padding-inline: 8px;
+-    white-space: nowrap;
+-  }
+-
+-  .dock__btn {
+-    flex: 0 0 auto;
+-    margin-right: 0;
+-    white-space: nowrap;
+-  }
+-
+-  #btn-compile-deck {
+-    flex-basis: 122px;
+-    justify-content: center;
+-    margin-right: 104px;
+-  }
+-
+-  #btn-export-md {
+-    flex-basis: 98px;
+-    justify-content: center;
+-    margin-right: 8px;
+-  }
+-
+-  .dock__tabs::after {
+-    content: "→";
+-    position: sticky;
+-    right: -1px;
+-    z-index: 3;
+-    display: grid;
+-    flex: 0 0 44px;
+-    align-self: stretch;
+-    color: var(--z300);
+-    border-left: 1px solid var(--line-soft);
+-    background: var(--z900);
+-    box-shadow: -12px 0 18px color-mix(in srgb, var(--z950) 86%, transparent);
+-    font: 700 11px/1 var(--font-mono);
+-    place-items: center;
+-    pointer-events: none;
+-  }
+-
+-  .provider-panel {
+-    overflow-y: auto;
+-    overscroll-behavior: contain;
+-    scroll-padding-block: 16px;
+-  }
+-
+-  .provider-row {
+-    gap: 2px;
+-    margin-bottom: 4px;
+-    padding: 6px;
+-  }
+-
+-  .provider-row__select {
+-    gap: 2px;
+-    padding: 3px 6px;
+-  }
+-
+-  .provider-row__actions {
+-    gap: 5px;
+-    padding: 0 6px 2px;
+-  }
+-
+-  .provider-config {
+-    gap: 6px;
+-    margin-top: 8px;
+-    padding-top: 8px;
+-  }
+-}
+-
+-@media (prefers-reduced-motion: no-preference) {
+-  .placeholder__mic {
+-    animation: operator-breathe 3.6s var(--ease-out) infinite;
+-  }
+-
+-  .record-waveform__bar {
+-    transform-origin: center;
+-  }
+-}
+-
+-@media (prefers-reduced-motion: reduce) {
+-  .placeholder__mic,
+-  .record-waveform__bar,
+-  .record-btn,
+-  .output-switcher__item,
+-  .session-row {
+-    animation: none !important;
+-    transition-duration: 0.01ms !important;
+-  }
+-}
+-
+-@keyframes operator-breathe {
+-  0%,
+-  100% {
+-    box-shadow:
+-      inset 0 1px 0 var(--live-line),
+-      0 12px 36px color-mix(in srgb, var(--z950) 66%, transparent);
+-  }
+-  50% {
+-    box-shadow:
+-      inset 0 1px 0 var(--live-line),
+-      0 16px 42px var(--live-soft);
+-  }
+-}
+diff --git a/public/style.css b/public/style.css
+index 0d7df44..935b591 100644
+--- a/public/style.css
++++ b/public/style.css
+@@ -14,7 +14,6 @@
+   --z300: #d4d4d8;
+   --z100: #f4f4f5;
+ 
+-  /* Tiro-like calm accent: warm coral, not neon emerald */
+   --live: #e85d4c;
+   --live-soft: rgba(232, 93, 76, 0.14);
+   --live-line: rgba(232, 93, 76, 0.4);
+@@ -41,7 +40,10 @@
+   --island-gap: 10px;
+   --focus-ring: rgba(244, 244, 245, 0.9);
+   --motion-quick: 120ms;
+-  --motion-state: 220ms;
++  /* DESIGN 9.6 motion budget: shell/tab/sheet transitions are 200ms. The
++     previous 220ms was over the approved token by 20ms with no contract
++     backing it. */
++  --motion-state: 200ms;
+   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+ 
+   /* 4px spacing scale */
+@@ -203,7 +205,9 @@ body {
+ 
+ /* 상태 */
+ .topbar__status { display: flex; align-items: center; gap: 7px; min-width: 0; }
+-.status__indicator { width: 7px; height: 7px; border-radius: 50%; background: var(--z500); flex-shrink: 0; transition: background 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth); }
++/* Colour-only tone change on a decorative dot: 150ms per the DESIGN 9.6
++   press/focus/hover-tone row, not the 300ms it used to take. */
++.status__indicator { width: 7px; height: 7px; border-radius: 50%; background: var(--z500); flex-shrink: 0; transition: background 150ms var(--ease-smooth), box-shadow 150ms var(--ease-smooth); }
+ .status__indicator--ok { background: var(--live); box-shadow: 0 0 8px rgba(232,93,76,0.6); }
+ .status__indicator--warn { background: var(--warn); box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+ .status__indicator--error { background: var(--err); box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+@@ -382,7 +386,8 @@ body {
+   border: 1px solid rgba(255,255,255,0.1); border-radius: 999px;
+   background: var(--z900); box-shadow: 0 8px 24px rgba(0,0,0,0.38);
+   max-width: 100%;
+-  transition: border-color 0.3s var(--ease-smooth);
++  /* Border tone swap on a state change: the DESIGN 9.6 150ms row. */
++  transition: border-color 150ms var(--ease-smooth);
+ }
+ .island--live { border-color: rgba(232,93,76,0.35); }
+ .island__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--live); flex-shrink: 0; animation: recpulse 1.6s ease-in-out infinite; }
+@@ -1373,588 +1378,3 @@ button:focus-visible { outline-offset: 1px; }
+   resize: vertical;
+ }
+ .notes-box__input:focus { outline: 1px solid var(--live); }
+-
+-/* ================================================================
+-   TIRO-inspired focused operator surface
+-   Runtime interaction grammar only; project zinc/coral/glass stay authoritative.
+-   ================================================================ */
+-
+-.pane__eyebrow {
+-  display: block;
+-  margin-bottom: 3px;
+-  color: var(--live);
+-  font-family: var(--font-mono);
+-  font-size: 8px;
+-  font-weight: 700;
+-  letter-spacing: 0.16em;
+-}
+-
+-.transcript-context,
+-.transcript-tools {
+-  flex-shrink: 0;
+-  display: flex;
+-  align-items: center;
+-  gap: var(--sp-2);
+-  padding: var(--sp-2) var(--sp-3);
+-  border-bottom: 1px solid var(--line-faint);
+-}
+-
+-.transcript-context {
+-  background:
+-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+-    var(--z900);
+-}
+-
+-.language-field {
+-  min-width: 0;
+-  display: grid;
+-  gap: 2px;
+-}
+-
+-.language-field__label {
+-  color: var(--z500);
+-  font-family: var(--font-body);
+-  font-size: 9px;
+-  font-weight: 600;
+-  letter-spacing: 0;
+-}
+-
+-.language-field__select {
+-  width: 74px;
+-  min-width: 0;
+-  border: 0;
+-  background: transparent;
+-  color: var(--z300);
+-  font: 600 11px/1.4 var(--font-body);
+-  appearance: none;
+-}
+-
+-.language-field__select:disabled { opacity: 1; }
+-
+-.language-direction {
+-  width: 18px;
+-  height: 18px;
+-  color: var(--z700);
+-}
+-
+-.language-direction svg {
+-  width: 100%;
+-  height: 100%;
+-  fill: none;
+-  stroke: currentColor;
+-  stroke-linecap: round;
+-  stroke-linejoin: round;
+-  stroke-width: 1.5;
+-}
+-
+-.capability-btn {
+-  min-width: 0;
+-  padding: 5px 8px;
+-  border: 1px solid var(--line-soft);
+-  border-radius: var(--r-sm);
+-  background: rgba(255, 255, 255, 0.025);
+-  color: var(--z500);
+-  font: 600 9px/1.2 var(--font-body);
+-  white-space: nowrap;
+-}
+-
+-.capability-btn span {
+-  display: block;
+-  margin-top: 2px;
+-  color: var(--z500);
+-  font-family: var(--font-mono);
+-  font-size: 7px;
+-  letter-spacing: 0.06em;
+-}
+-
+-.capability-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+-.transcript-tools {
+-  flex-wrap: wrap;
+-  overflow-x: auto;
+-}
+-.capability-reason {
+-  flex: 1 0 100%;
+-  margin: 0;
+-  color: var(--z500);
+-  font-family: var(--font-body);
+-  font-size: 10px;
+-  line-height: 1.4;
+-  white-space: normal;
+-}
+-
+-.provider-panel {
+-  top: 68px;
+-  right: 20px;
+-  bottom: 20px;
+-  width: min(420px, calc(100vw - 40px));
+-  max-height: none;
+-  padding: 20px;
+-  border-color: var(--glass-border);
+-  border-radius: 20px;
+-  background:
+-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 14%),
+-    var(--glass-bg);
+-  box-shadow: var(--glass-shadow), var(--glass-inset);
+-}
+-
+-.provider-panel__head {
+-  margin-bottom: var(--sp-3);
+-  font-size: 13px;
+-}
+-
+-.provider-row {
+-  padding: var(--sp-2);
+-  border-color: var(--line-faint);
+-  background: rgba(12, 12, 14, 0.5);
+-}
+-
+-.provider-row--current {
+-  border-color: var(--live-line);
+-  background: var(--live-soft);
+-}
+-
+-.dock {
+-  position: relative;
+-  z-index: 20;
+-  height: 210px;
+-  padding: 0 14px 12px;
+-  overflow: visible;
+-  border-top: 1px solid var(--hairline);
+-  background: rgba(12, 12, 14, 0.96);
+-  backdrop-filter: none;
+-}
+-
+-.dock__commandbar {
+-  position: relative;
+-  z-index: 2;
+-  display: grid;
+-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+-  align-items: center;
+-  gap: var(--sp-3);
+-  min-width: 0;
+-  min-height: 58px;
+-  padding: 8px;
+-  border: 1px solid var(--glass-border);
+-  border-radius: 24px;
+-  background:
+-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 46%),
+-    var(--glass-bg);
+-  backdrop-filter: var(--glass-blur);
+-  box-shadow: var(--glass-shadow), var(--glass-inset);
+-}
+-
+-.output-switcher {
+-  justify-self: start;
+-  display: inline-flex;
+-  align-items: center;
+-  min-width: 0;
+-  padding: 3px;
+-  border: 1px solid var(--line-faint);
+-  border-radius: 999px;
+-  background: rgba(12, 12, 14, 0.52);
+-}
+-
+-.output-switcher__item {
+-  min-width: max-content;
+-  padding: 7px 10px;
+-  border: 0;
+-  border-radius: 999px;
+-  background: transparent;
+-  color: var(--z500);
+-  font: 600 10px/1 var(--font-body);
+-  text-decoration: none;
+-  cursor: pointer;
+-  transition:
+-    color var(--motion-quick) var(--ease-out),
+-    background var(--motion-state) var(--ease-out),
+-    transform var(--motion-quick) var(--ease-out);
+-}
+-
+-.output-switcher__item:hover:not(:disabled) { color: var(--z100); }
+-.output-switcher__item:active:not(:disabled) { transform: scale(0.97); }
+-.output-switcher__item[aria-current="page"] {
+-  background: var(--z800);
+-  color: var(--z100);
+-  box-shadow: var(--glass-inset);
+-}
+-.output-switcher__item:disabled { color: var(--z500); cursor: not-allowed; }
+-.output-switcher__reason {
+-  margin-inline-start: 4px;
+-  color: var(--z500);
+-  font-family: var(--font-body);
+-  font-size: 9px;
+-  font-weight: 600;
+-  letter-spacing: 0;
+-}
+-
+-.capture-pill {
+-  justify-self: center;
+-  display: inline-flex;
+-  align-items: center;
+-  gap: 8px;
+-  min-width: 0;
+-  padding: 4px;
+-  border: 1px solid rgba(232, 93, 76, 0.26);
+-  border-radius: 999px;
+-  background: rgba(12, 12, 14, 0.72);
+-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+-}
+-
+-.capture-pill__mode {
+-  padding-inline-start: 10px;
+-  color: var(--z500);
+-  font: 700 9px/1 var(--font-mono);
+-  letter-spacing: 0.12em;
+-}
+-
+-.capture-pill .record-btn {
+-  min-width: 118px;
+-  height: 40px;
+-  padding: 0 14px;
+-  border-color: transparent;
+-  background: var(--live);
+-  color: var(--z950);
+-}
+-
+-.capture-pill .record-btn:hover:not(:disabled) {
+-  border-color: rgba(255, 255, 255, 0.22);
+-  background: #f06b5a;
+-}
+-
+-.capture-pill .record-btn__dot {
+-  width: 10px;
+-  height: 10px;
+-  border: 2px solid var(--z950);
+-  background: transparent;
+-}
+-
+-.capture-pill .record-btn--on {
+-  background: var(--z100);
+-  color: var(--z950);
+-}
+-
+-.capture-pill .record-btn--on .record-btn__dot {
+-  border: 0;
+-  border-radius: 2px;
+-  background: var(--live);
+-  animation: none;
+-}
+-
+-.record-waveform {
+-  display: none;
+-  align-items: center;
+-  gap: 3px;
+-  height: 24px;
+-  padding-inline: 2px;
+-}
+-
+-.record-waveform__bar {
+-  width: 3px;
+-  height: 18px;
+-  border-radius: 999px;
+-  background: var(--live);
+-  transform: scaleY(0.36);
+-  animation: record-level 760ms ease-in-out infinite alternate;
+-}
+-
+-.record-waveform__bar:nth-child(2) { animation-delay: -420ms; }
+-.record-waveform__bar:nth-child(3) { animation-delay: -180ms; }
+-.record-waveform__bar:nth-child(4) { animation-delay: -560ms; }
+-.record-waveform__bar:nth-child(5) { animation-delay: -280ms; }
+-
+-@keyframes record-level {
+-  from { transform: scaleY(0.28); opacity: 0.56; }
+-  to { transform: scaleY(1); opacity: 1; }
+-}
+-
+-.app--capturing .record-waveform { display: inline-flex; }
+-
+-.capture-live {
+-  display: inline-flex;
+-  align-items: center;
+-  gap: 6px;
+-  padding-inline-end: 10px;
+-}
+-.capture-live[hidden] { display: none; }
+-.capture-live__label {
+-  color: var(--live);
+-  font: 700 8px/1 var(--font-mono);
+-  letter-spacing: 0.12em;
+-}
+-.capture-live__timer {
+-  color: var(--z100);
+-  font: 700 11px/1 var(--font-mono);
+-  font-variant-numeric: tabular-nums;
+-}
+-
+-.dock__context {
+-  justify-self: end;
+-  display: grid;
+-  grid-template-columns: auto auto 1px auto auto;
+-  align-items: center;
+-  gap: 6px;
+-  min-width: 0;
+-  color: var(--z500);
+-  font: 600 9px/1.2 var(--font-body);
+-}
+-.dock__context strong { color: var(--z300); font-size: 10px; }
+-.dock__context-separator { width: 1px; height: 18px; background: var(--line-soft); }
+-
+-.dock__tabs {
+-  min-width: 0;
+-  overflow-x: auto;
+-  overflow-y: hidden;
+-  flex-wrap: nowrap;
+-  border-bottom-color: var(--line-faint);
+-  scrollbar-width: thin;
+-}
+-
+-.dock__tabs > * { flex-shrink: 0; }
+-.dock__spacer { min-width: 14px; }
+-.dock__panel { padding-top: 8px; }
+-.filmstrip__empty { padding-block: 18px; }
+-
+-.stage-pane:focus,
+-.transcript-pane:focus { outline: none; }
+-.stage-pane:focus-visible,
+-.transcript-pane:focus-visible {
+-  box-shadow: inset 0 0 0 2px var(--focus-ring);
+-}
+-
+-.slide-frame { overflow: hidden; }
+-.slide-frame > .slide {
+-  flex: 1 1 auto;
+-  min-height: 0;
+-}
+-
+-@media (max-width: 900px) {
+-  .dock { height: 224px; }
+-  .dock__commandbar { grid-template-columns: minmax(0, 1fr) auto; }
+-  .dock__context { display: none; }
+-  .transcript-context { flex-wrap: wrap; }
+-  .capability-reason { font-size: 9px; }
+-  .slide-frame > .slide { padding: 22px; }
+-}
+-
+-@media (max-width: 600px) {
+-  .topbar { grid-template-columns: auto 1fr auto; }
+-  .topbar__center { justify-self: center; }
+-  .onair { display: none; }
+-  .dock {
+-    height: 230px;
+-    padding-inline: 10px;
+-  }
+-  .dock__commandbar {
+-    display: flex;
+-    flex-wrap: wrap;
+-    justify-content: center;
+-    gap: 4px;
+-    padding: 4px;
+-    border-radius: 20px;
+-  }
+-  .capture-pill { order: 1; }
+-  .capture-pill .record-btn { height: 36px; }
+-  .output-switcher {
+-    order: 2;
+-    justify-content: center;
+-    width: 100%;
+-    overflow-x: auto;
+-  }
+-  .output-switcher__item { padding: 6px 8px; }
+-  .dock__label { padding-inline: 10px; }
+-  .dock__panel {
+-    padding: 4px 10px 0;
+-  }
+-  .filmstrip__empty { padding-block: 10px; }
+-  .provider-panel {
+-    inset: 60px 10px 10px;
+-    width: auto;
+-    padding: 16px;
+-  }
+-  .transcript-context,
+-  .transcript-tools { padding-inline: 10px; }
+-  .language-field__select { width: 66px; }
+-  .slide-frame > .slide { padding: 14px; }
+-  .slide__placeholder { gap: 10px; }
+-  .placeholder__mic {
+-    width: 54px;
+-    height: 54px;
+-  }
+-  .placeholder__mic .mic__core {
+-    width: 42px;
+-    height: 42px;
+-  }
+-  .placeholder__mic svg {
+-    width: 22px;
+-    height: 22px;
+-  }
+-  .placeholder__title {
+-    font-size: 16px;
+-    line-height: 1.35;
+-  }
+-  .placeholder__sub { display: none; }
+-  .notes-box { display: none; }
+-}
+-
+-@media (prefers-reduced-motion: reduce) {
+-  .output-switcher__item,
+-  .record-btn,
+-  .record-waveform__bar { transition: none !important; animation: none !important; }
+-  .record-waveform__bar { transform: scaleY(0.58); opacity: 0.8; }
+-}
+-
+-/* ── Floating glass island composition ───────────────────────── */
+-.topbar {
+-  height: 50px;
+-  margin: 10px 14px 0;
+-  padding-inline: 16px;
+-  border: 1px solid var(--glass-border);
+-  border-radius: var(--glass-radius);
+-  background:
+-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 54%),
+-    var(--glass-bg);
+-  backdrop-filter: var(--glass-blur);
+-  -webkit-backdrop-filter: var(--glass-blur);
+-  box-shadow: var(--glass-shadow), var(--glass-inset);
+-}
+-
+-.dock {
+-  border-top: 0;
+-  background: transparent;
+-}
+-
+-.dock__commandbar,
+-.dock__tabs,
+-.dock__panel {
+-  border: 1px solid var(--glass-border);
+-  background:
+-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 52%),
+-    var(--glass-bg);
+-  backdrop-filter: var(--glass-blur);
+-  -webkit-backdrop-filter: var(--glass-blur);
+-  box-shadow: var(--glass-inset);
+-}
+-
+-.dock__tabs {
+-  margin-top: 6px;
+-  padding-inline: 8px;
+-  border-radius: 14px;
+-}
+-
+-.dock__panel {
+-  margin-top: 6px;
+-  padding-inline: 12px;
+-  border-radius: 16px;
+-}
+-
+-.capture-pill {
+-  background: rgba(12, 12, 14, 0.5);
+-  backdrop-filter: blur(16px) saturate(1.2);
+-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+-}
+-
+-.provider-panel {
+-  background:
+-    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 18%),
+-    var(--glass-bg-strong);
+-  backdrop-filter: var(--glass-blur);
+-  -webkit-backdrop-filter: var(--glass-blur);
+-  z-index: 40;
+-  box-sizing: border-box;
+-  max-height: calc(100dvh - 88px);
+-  overflow-y: auto;
+-  overscroll-behavior: contain;
+-}
+-
+-body:has(#provider-panel:not([hidden])) .app::after {
+-  content: "";
+-  position: fixed;
+-  inset: 0;
+-  z-index: 30;
+-  pointer-events: none;
+-  background: rgba(5, 5, 7, 0.38);
+-  backdrop-filter: blur(3px) saturate(0.86);
+-  -webkit-backdrop-filter: blur(3px) saturate(0.86);
+-}
+-
+-.status__text {
+-  color: var(--z500);
+-}
+-
+-.dock__btn:disabled {
+-  border-color: var(--line-soft);
+-  color: var(--z500);
+-  opacity: 1;
+-  cursor: not-allowed;
+-}
+-
+-.transcript-context .capability-btn:disabled {
+-  opacity: 1;
+-}
+-
+-.transcript-context .capability-btn:disabled span {
+-  color: var(--z500);
+-}
+-
+-@media (max-width: 900px) {
+-  .dock__tabs {
+-    column-gap: 6px;
+-    contain: paint;
+-    clip-path: inset(0 round 14px);
+-    scrollbar-color: var(--z500) transparent;
+-    box-shadow:
+-      inset -20px 0 18px -22px rgba(255, 255, 255, 0.8),
+-      var(--glass-inset);
+-  }
+-  .dock__btn { padding-inline: 9px; }
+-  #btn-ask { margin-inline-start: 44px; }
+-  .dock__tabs::after {
+-    content: "→";
+-    position: sticky;
+-    right: -1px;
+-    z-index: 3;
+-    flex: 0 0 44px;
+-    align-self: stretch;
+-    display: grid;
+-    place-items: center;
+-    color: var(--z300);
+-    font: 700 11px/1 var(--font-mono);
+-    border-left: 1px solid var(--line-soft);
+-    background: var(--z900);
+-    box-shadow: -12px 0 18px rgba(12, 12, 14, 0.86);
+-    pointer-events: none;
+-  }
+-}
+-
+-@media (max-width: 600px) {
+-  .topbar {
+-    height: 48px;
+-    margin: 8px 10px 0;
+-    padding-inline: 10px;
+-    border-radius: 15px;
+-  }
+-  .dock { height: 220px; }
+-  .brand__name,
+-  .attendee-btn__label { display: inline; }
+-  .brand__name {
+-    font-size: 11px;
+-    letter-spacing: -0.01em;
+-  }
+-  .attendee-btn {
+-    min-width: 0;
+-    padding-inline: 8px;
+-  }
+-  .attendee-btn__label { font-size: 10px; }
+-  .capture-pill__mode { display: none; }
+-  .dock__tabs {
+-    margin-top: 4px;
+-    padding-inline: 6px;
+-  }
+-  .dock__panel {
+-    margin-top: 4px;
+-    padding-inline: 10px;
+-  }
+-  .provider-panel {
+-    max-height: calc(100dvh - 70px);
+-  }
+-}
+diff --git a/public/transcript-overlay.css b/public/transcript-overlay.css
+deleted file mode 100644
+index 7a764aa..0000000
+--- a/public/transcript-overlay.css
++++ /dev/null
+@@ -1,340 +0,0 @@
+-:root {
+-  --overlay-surface: rgba(12, 12, 15, 0.82); --overlay-rule: rgba(255, 255, 255, 0.12);
+-  --overlay-highlight: rgba(255, 255, 255, 0.055); --overlay-inset: rgba(255, 255, 255, 0.06); --overlay-shadow: rgba(0, 0, 0, 0.46);
+-  --overlay-live: #34d399; --overlay-live-border: rgba(52, 211, 153, 0.34); --overlay-live-halo: rgba(52, 211, 153, 0.1);
+-  --overlay-detect: #60a5fa; --overlay-detect-border: rgba(96, 165, 250, 0.38); --overlay-detect-halo: rgba(96, 165, 250, 0.11);
+-  --overlay-confirmed: #f4f4f5; --overlay-current: #a1a1aa; --overlay-status-rule: rgba(255, 255, 255, 0.09); --overlay-divider: rgba(255, 255, 255, 0.075);
+-  --overlay-radius: 22px; --overlay-duration: 240ms;
+-}
+-
+-.sr-only {
+-  position: absolute;
+-  width: 1px; height: 1px;
+-  padding: 0; margin: -1px;
+-  overflow: hidden;
+-  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+-}
+-
+-.stage { position: relative; }
+-
+-.transcript-overlay {
+-  position: absolute;
+-  z-index: 20;
+-  top: clamp(140px, 48%, 460px);
+-  left: 50%;
+-  width: min(720px, calc(100% - 32px));
+-  max-height: min(300px, 42vh);
+-  overflow: hidden;
+-  border: 1px solid var(--overlay-rule);
+-  border-radius: var(--overlay-radius);
+-  background:
+-    linear-gradient(145deg, var(--overlay-highlight), transparent 42%),
+-    var(--overlay-surface);
+-  box-shadow:
+-    0 22px 60px var(--overlay-shadow),
+-    inset 0 1px 0 var(--overlay-inset);
+-  backdrop-filter: blur(18px) saturate(1.1);
+-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+-  transform: translateX(-50%);
+-  transform-origin: top center;
+-  transition:
+-    max-height var(--overlay-duration) cubic-bezier(0.22, 1, 0.36, 1),
+-    border-color 160ms ease-out,
+-    background-color 160ms ease-out;
+-  touch-action: none;
+-}
+-
+-.transcript-overlay[data-positioned="true"] {
+-  right: auto;
+-  bottom: auto;
+-  max-height: none;
+-  transform: none;
+-}
+-
+-.transcript-overlay--dragging,
+-.transcript-overlay--resizing {
+-  transition: none;
+-  user-select: none;
+-}
+-
+-.transcript-overlay--dragging {
+-  cursor: grabbing;
+-}
+-
+-.transcript-overlay[hidden] { display: none; }
+-
+-.transcript-overlay[data-state="minimized"] { max-height: 54px; border-radius: 999px; }
+-
+-.transcript-overlay--capturing { border-color: var(--overlay-live-border); }
+-
+-.transcript-overlay--detecting { border-color: var(--overlay-detect-border); }
+-
+-.transcript-overlay__toggle {
+-  display: grid;
+-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+-  align-items: center;
+-  gap: 9px;
+-  width: 100%;
+-  min-height: 52px;
+-  cursor: grab;
+-  padding: 11px 14px 10px 16px;
+-  border: 0;
+-  background: transparent;
+-  color: var(--overlay-confirmed);
+-  text-align: left;
+-  cursor: pointer;
+-}
+-
+-.transcript-overlay__signal {
+-  width: 8px;
+-  height: 8px;
+-  border-radius: 50%;
+-  background: var(--overlay-live);
+-  box-shadow: 0 0 0 4px var(--overlay-live-halo);
+-}
+-
+-.transcript-overlay--capturing .transcript-overlay__signal { animation: overlay-pulse 1.7s ease-in-out infinite; }
+-
+-.transcript-overlay--detecting .transcript-overlay__signal {
+-  background: var(--overlay-detect);
+-  box-shadow: 0 0 0 4px var(--overlay-detect-halo);
+-}
+-
+-@keyframes overlay-pulse {
+-  0%, 100% { opacity: 1; }
+-  50% { opacity: 0.45; }
+-}
+-
+-.transcript-overlay__label {
+-  font-family: var(--font-mono);
+-  font-size: 10px;
+-  font-weight: 700;
+-  letter-spacing: 0.12em;
+-  white-space: nowrap;
+-}
+-
+-.transcript-overlay__summary {
+-  min-width: 0;
+-  overflow: hidden;
+-  color: var(--overlay-current);
+-  font-size: 12px;
+-  line-height: 1.4;
+-  text-overflow: ellipsis;
+-  white-space: nowrap;
+-  opacity: 0;
+-  transition: opacity 120ms ease-out;
+-}
+-
+-.transcript-overlay[data-state="minimized"] .transcript-overlay__summary {
+-  opacity: 1;
+-}
+-
+-.transcript-overlay__status {
+-  padding: 3px 7px;
+-  border: 1px solid var(--overlay-status-rule);
+-  border-radius: 999px;
+-  color: var(--overlay-current);
+-  font-family: var(--font-mono);
+-  font-size: 9px;
+-  font-weight: 700;
+-  letter-spacing: 0.08em;
+-  white-space: nowrap;
+-}
+-
+-.transcript-overlay__chevron {
+-  color: var(--overlay-current);
+-  font-size: 13px;
+-  transform: rotate(0deg);
+-  transition: transform var(--overlay-duration) cubic-bezier(0.22, 1, 0.36, 1);
+-}
+-
+-.transcript-overlay[data-state="minimized"] .transcript-overlay__chevron {
+-  transform: rotate(180deg);
+-}
+-
+-.transcript-overlay[data-positioned="true"] {
+-  display: flex;
+-  flex-direction: column;
+-}
+-
+-.transcript-overlay[data-positioned="true"] .transcript-overlay__body {
+-  flex: 1 1 auto;
+-  max-height: none;
+-  min-height: 0;
+-}
+-
+-.transcript-overlay__body {
+-  max-height: min(246px, calc(42vh - 54px));
+-  padding: 0 16px 14px;
+-  overflow-y: auto;
+-  opacity: 1;
+-  animation: overlay-content-in 160ms ease-out both;
+-}
+-
+-.transcript-overlay__body[hidden] { display: none; }
+-
+-@keyframes overlay-content-in {
+-  from { opacity: 0; transform: translateY(-4px); filter: blur(2px); }
+-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+-}
+-
+-.transcript-overlay__confirmed {
+-  display: flex;
+-  flex-direction: column;
+-  gap: 9px;
+-  margin: 0;
+-  padding: 3px 0 12px;
+-  list-style: none;
+-}
+-
+-.transcript-overlay__line {
+-  display: grid;
+-  grid-template-columns: auto minmax(0, 1fr);
+-  align-items: start;
+-  gap: 9px;
+-}
+-
+-.transcript-overlay__speaker,
+-.transcript-overlay__current-speaker {
+-  padding: 2px 6px;
+-  border: 1px solid color-mix(in srgb, var(--speaker-color, var(--overlay-live)) 42%, transparent);
+-  border-radius: 999px;
+-  color: var(--speaker-color, var(--overlay-live));
+-  font-family: var(--font-mono);
+-  font-size: 9px;
+-  font-weight: 700;
+-  line-height: 1.4;
+-  white-space: nowrap;
+-}
+-
+-.transcript-overlay__line-text {
+-  min-width: 0;
+-  color: var(--overlay-confirmed);
+-  font-size: 14px;
+-  font-weight: 500;
+-  line-height: 1.55;
+-  overflow-wrap: anywhere;
+-  word-break: keep-all;
+-  text-wrap: balance;
+-}
+-
+-.transcript-overlay__current {
+-  display: grid;
+-  grid-template-columns: auto auto minmax(0, 1fr);
+-  align-items: start;
+-  gap: 8px;
+-  padding: 10px 0 12px;
+-  border-top: 1px solid var(--overlay-divider);
+-}
+-
+-.transcript-overlay__current[hidden] { display: none; }
+-
+-.transcript-overlay__current-label {
+-  padding-top: 2px;
+-  color: var(--overlay-live);
+-  font-family: var(--font-mono);
+-  font-size: 9px;
+-  font-weight: 700;
+-  letter-spacing: 0.1em;
+-}
+-
+-.transcript-overlay__current-text {
+-  min-width: 0;
+-  color: var(--overlay-current);
+-  font-size: 13px;
+-  line-height: 1.55;
+-  overflow-wrap: anywhere;
+-  word-break: keep-all;
+-  text-wrap: balance;
+-}
+-
+-.transcript-overlay__full {
+-  display: inline-flex;
+-  align-items: center;
+-  gap: 7px;
+-  padding: 7px 0 2px;
+-  border: 0;
+-  background: transparent;
+-  color: var(--overlay-live);
+-  font-family: var(--font-mono);
+-  font-size: 10px;
+-  font-weight: 700;
+-  letter-spacing: 0.06em;
+-  cursor: pointer;
+-}
+-
+-.transcript-overlay__toggle:focus-visible,
+-.transcript-overlay__full:focus-visible {
+-  outline: 2px solid var(--overlay-live);
+-  outline-offset: -2px;
+-}
+-
+-@media (max-width: 420px) {
+-  .transcript-overlay {
+-    top: 48%;
+-    width: calc(100% - 28px);
+-    max-height: min(284px, 44vh);
+-  }
+-
+-  .transcript-overlay__toggle {
+-    grid-template-columns: auto auto minmax(0, 1fr) auto;
+-    padding-inline: 13px;
+-  }
+-
+-  .transcript-overlay__status {
+-    display: none;
+-  }
+-
+-  .transcript-overlay__body {
+-    max-height: min(230px, calc(44vh - 54px));
+-    padding-inline: 13px;
+-  }
+-
+-  .transcript-overlay__line {
+-    grid-template-columns: 1fr;
+-    gap: 5px;
+-  }
+-
+-  .transcript-overlay__speaker {
+-    justify-self: start;
+-  }
+-}
+-
+-
+-.transcript-overlay__resize {
+-  position: absolute;
+-  right: 6px;
+-  bottom: 6px;
+-  width: 16px;
+-  height: 16px;
+-  padding: 0;
+-  border: 0;
+-  border-radius: 4px;
+-  background:
+-    linear-gradient(135deg, transparent 0 46%, rgba(255,255,255,0.35) 46% 54%, transparent 54% 70%, rgba(255,255,255,0.35) 70% 78%, transparent 78%),
+-    transparent;
+-  cursor: nwse-resize;
+-  touch-action: none;
+-}
+-
+-.transcript-overlay__resize:focus-visible {
+-  outline: 2px solid var(--overlay-live);
+-  outline-offset: 1px;
+-}
+-
+-.transcript-overlay[data-state="minimized"] .transcript-overlay__resize {
+-  display: none;
+-}
+-
+-@media (prefers-reduced-motion: reduce) {
+-  .transcript-overlay,
+-  .transcript-overlay__summary,
+-  .transcript-overlay__chevron {
+-    transition: none;
+-  }
+-
+-  .transcript-overlay__body,
+-  .transcript-overlay--capturing .transcript-overlay__signal {
+-    animation: none;
+-  }
+-}
+diff --git a/public/transcript-overlay.js b/public/transcript-overlay.js
+deleted file mode 100644
+index 39af682..0000000
+--- a/public/transcript-overlay.js
++++ /dev/null
+@@ -1,425 +0,0 @@
+-const MAX_CONFIRMED_LINES = 3;
+-const SPEAKER_COLORS = ["#10b981", "#60a5fa", "#f59e0b", "#f472b6"];
+-const GEOMETRY_KEY = "meeting-slides.transcript-overlay.geometry";
+-const DRAG_THRESHOLD_PX = 4;
+-const MIN_WIDTH = 280;
+-const MIN_HEIGHT = 120;
+-
+-function normalizeText(value) {
+-  return String(value ?? "").trim().replace(/\s+/g, " ");
+-}
+-
+-function entryKey(entry) {
+-  return [
+-    Number(entry.ts) || 0,
+-    Number(entry.speaker) || 0,
+-    normalizeText(entry.text),
+-  ].join(":");
+-}
+-
+-function speakerColor(speaker) {
+-  return SPEAKER_COLORS[(Number(speaker) - 1) % SPEAKER_COLORS.length] ?? SPEAKER_COLORS[0];
+-}
+-
+-function clamp(n, min, max) {
+-  return Math.min(max, Math.max(min, n));
+-}
+-
+-function readStoredGeometry() {
+-  try {
+-    const raw = localStorage.getItem(GEOMETRY_KEY);
+-    if (!raw) return null;
+-    const parsed = JSON.parse(raw);
+-    if (
+-      typeof parsed?.left !== "number" ||
+-      typeof parsed?.top !== "number" ||
+-      typeof parsed?.width !== "number" ||
+-      typeof parsed?.height !== "number"
+-    ) {
+-      return null;
+-    }
+-    return parsed;
+-  } catch {
+-    return null;
+-  }
+-}
+-
+-function writeStoredGeometry(geometry) {
+-  try {
+-    localStorage.setItem(GEOMETRY_KEY, JSON.stringify(geometry));
+-  } catch {
+-    // Ignore quota / private-mode failures.
+-  }
+-}
+-
+-export function createTranscriptOverlay(root, { onOpenFullTranscript }) {
+-  const stage = root.closest(".stage") ?? root.parentElement;
+-  const toggle = root.querySelector("#transcript-overlay-toggle");
+-  const body = root.querySelector("#transcript-overlay-body");
+-  const summary = root.querySelector("#transcript-overlay-summary");
+-  const status = root.querySelector("#transcript-overlay-status");
+-  const confirmedList = root.querySelector("#transcript-overlay-confirmed");
+-  const currentRow = root.querySelector("#transcript-overlay-current");
+-  const currentSpeaker = root.querySelector("#transcript-overlay-current-speaker");
+-  const currentText = root.querySelector("#transcript-overlay-current-text");
+-  const fullButton = root.querySelector("#transcript-overlay-full");
+-  const announcer = root.querySelector("#transcript-overlay-announcer");
+-  const resizeHandle = root.querySelector("#transcript-overlay-resize");
+-
+-  let confirmed = [];
+-  let currentCaption = null;
+-  let expanded = true;
+-  let activity = { capturing: false, detecting: false };
+-  let geometry = null;
+-  let dragSession = null;
+-  let resizeSession = null;
+-
+-  function stageRect() {
+-    return (stage ?? document.body).getBoundingClientRect();
+-  }
+-
+-  function defaultGeometry() {
+-    const bounds = stageRect();
+-    const width = Math.min(720, Math.max(MIN_WIDTH, bounds.width - 32));
+-    const height = Math.min(300, Math.max(MIN_HEIGHT, bounds.height * 0.42));
+-    return {
+-      left: Math.max(16, (bounds.width - width) / 2),
+-      top: clamp(bounds.height * 0.48 - height / 2, 24, Math.max(24, bounds.height - height - 24)),
+-      width,
+-      height,
+-    };
+-  }
+-
+-  function applyGeometry(next, { persist = true } = {}) {
+-    const bounds = stageRect();
+-    const width = clamp(next.width, MIN_WIDTH, Math.max(MIN_WIDTH, bounds.width - 16));
+-    const height = clamp(
+-      next.height,
+-      expanded ? MIN_HEIGHT : 54,
+-      Math.max(expanded ? MIN_HEIGHT : 54, bounds.height - 16),
+-    );
+-    const left = clamp(next.left, 8, Math.max(8, bounds.width - width - 8));
+-    const top = clamp(next.top, 8, Math.max(8, bounds.height - height - 8));
+-    geometry = { left, top, width, height };
+-
+-    root.dataset.positioned = "true";
+-    root.style.left = `${left}px`;
+-    root.style.top = `${top}px`;
+-    root.style.width = `${width}px`;
+-    root.style.height = expanded ? `${height}px` : "54px";
+-    root.style.maxHeight = "none";
+-    root.style.transform = "none";
+-
+-    if (persist) writeStoredGeometry(geometry);
+-  }
+-
+-  function ensureGeometry() {
+-    if (geometry) return geometry;
+-    const stored = readStoredGeometry();
+-    applyGeometry(stored ?? defaultGeometry(), { persist: false });
+-    return geometry;
+-  }
+-
+-  function setExpanded(nextExpanded) {
+-    expanded = nextExpanded;
+-    root.dataset.state = expanded ? "expanded" : "minimized";
+-    toggle.setAttribute("aria-expanded", String(expanded));
+-    toggle.setAttribute(
+-      "aria-label",
+-      expanded ? "실시간 전사 최소화" : "실시간 전사 펼치기",
+-    );
+-    body.hidden = !expanded;
+-    if (resizeHandle) resizeHandle.hidden = !expanded;
+-    if (geometry) {
+-      applyGeometry(geometry, { persist: false });
+-    }
+-  }
+-
+-  function renderConfirmed() {
+-    confirmedList.replaceChildren();
+-    for (const entry of confirmed) {
+-      const item = document.createElement("li");
+-      item.className = "transcript-overlay__line";
+-
+-      if (entry.speaker) {
+-        const speaker = document.createElement("span");
+-        speaker.className = "transcript-overlay__speaker";
+-        speaker.textContent = `화자 ${entry.speaker}`;
+-        speaker.style.setProperty("--speaker-color", speakerColor(entry.speaker));
+-        item.appendChild(speaker);
+-      }
+-
+-      const text = document.createElement("span");
+-      text.className = "transcript-overlay__line-text";
+-      text.textContent = entry.text;
+-      item.appendChild(text);
+-      confirmedList.appendChild(item);
+-    }
+-  }
+-
+-  function renderCurrent() {
+-    const text = normalizeText(currentCaption?.text);
+-    if (!text) {
+-      currentRow.hidden = true;
+-      currentSpeaker.hidden = true;
+-      currentSpeaker.textContent = "";
+-      currentText.textContent = "";
+-      return;
+-    }
+-
+-    currentRow.hidden = false;
+-    currentText.textContent = text;
+-    if (currentCaption?.speaker) {
+-      currentSpeaker.hidden = false;
+-      currentSpeaker.textContent = `화자 ${currentCaption.speaker}`;
+-      currentSpeaker.style.setProperty(
+-        "--speaker-color",
+-        speakerColor(currentCaption.speaker),
+-      );
+-    } else {
+-      currentSpeaker.hidden = true;
+-      currentSpeaker.textContent = "";
+-    }
+-  }
+-
+-  function renderActivity() {
+-    root.classList.toggle("transcript-overlay--capturing", Boolean(activity.capturing));
+-    root.classList.toggle("transcript-overlay--detecting", Boolean(activity.detecting));
+-    status.textContent = activity.detecting ? "AI 정리 중" : "전사";
+-  }
+-
+-  function renderSummary() {
+-    if (currentCaption?.text) {
+-      summary.textContent = normalizeText(currentCaption.text);
+-      return;
+-    }
+-    const last = confirmed[confirmed.length - 1];
+-    summary.textContent = last ? last.text : "";
+-  }
+-
+-  function announce(text) {
+-    announcer.textContent = text;
+-  }
+-
+-  function caption(partial) {
+-    const text = normalizeText(partial?.text);
+-    if (!text) {
+-      currentCaption = null;
+-      renderCurrent();
+-      renderSummary();
+-      if (confirmed.length === 0) root.hidden = true;
+-      return;
+-    }
+-    ensureGeometry();
+-    root.hidden = false;
+-    currentCaption = {
+-      text,
+-      speaker: partial?.speaker ? Number(partial.speaker) : 0,
+-    };
+-    renderCurrent();
+-    renderSummary();
+-  }
+-
+-  function line(entry) {
+-    ensureGeometry();
+-    root.hidden = false;
+-    const text = normalizeText(entry?.text);
+-    if (!text) return;
+-
+-    const next = {
+-      text,
+-      speaker: entry?.speaker ? Number(entry.speaker) : 0,
+-      ts: Number(entry?.ts) || Date.now(),
+-    };
+-    const key = entryKey(next);
+-    if (!confirmed.some((item) => entryKey(item) === key)) {
+-      confirmed = [...confirmed, next].slice(-MAX_CONFIRMED_LINES);
+-    }
+-    if (
+-      currentCaption &&
+-      normalizeText(currentCaption.text) === text &&
+-      (!currentCaption.speaker || currentCaption.speaker === next.speaker)
+-    ) {
+-      currentCaption = null;
+-    }
+-    renderConfirmed();
+-    renderCurrent();
+-    renderSummary();
+-    announce(text);
+-  }
+-
+-  function snapshot(entries) {
+-    ensureGeometry();
+-    const list = Array.isArray(entries) ? entries : [];
+-    confirmed = list
+-      .map((entry) => ({
+-        text: normalizeText(entry?.text),
+-        speaker: entry?.speaker ? Number(entry.speaker) : 0,
+-        ts: Number(entry?.ts) || 0,
+-      }))
+-      .filter((entry) => entry.text)
+-      .slice(-MAX_CONFIRMED_LINES);
+-    currentCaption = null;
+-    root.hidden = confirmed.length === 0;
+-    if (!root.hidden) ensureGeometry();
+-    renderConfirmed();
+-    renderCurrent();
+-    renderSummary();
+-  }
+-
+-  function reset() {
+-    confirmed = [];
+-    currentCaption = null;
+-    root.hidden = true;
+-    renderConfirmed();
+-    renderCurrent();
+-    renderSummary();
+-    announce("");
+-  }
+-
+-  let suppressClick = false;
+-
+-  function endPointerSessions() {
+-    dragSession = null;
+-    resizeSession = null;
+-    root.classList.remove("transcript-overlay--dragging");
+-    root.classList.remove("transcript-overlay--resizing");
+-  }
+-
+-  function eventId(event) {
+-    return event.pointerId ?? "mouse";
+-  }
+-
+-  function beginDrag(event) {
+-    if (event.button != null && event.button !== 0) return;
+-    ensureGeometry();
+-    dragSession = {
+-      startX: event.clientX,
+-      startY: event.clientY,
+-      origin: { ...geometry },
+-      moved: false,
+-      pointerId: eventId(event),
+-    };
+-    if (event.pointerId != null) toggle.setPointerCapture?.(event.pointerId);
+-    event.preventDefault();
+-  }
+-
+-  function beginResize(event) {
+-    if (event.button != null && event.button !== 0) return;
+-    if (!expanded || !resizeHandle) return;
+-    ensureGeometry();
+-    resizeSession = {
+-      startX: event.clientX,
+-      startY: event.clientY,
+-      origin: { ...geometry },
+-      pointerId: eventId(event),
+-    };
+-    if (event.pointerId != null) resizeHandle.setPointerCapture?.(event.pointerId);
+-    event.preventDefault();
+-    event.stopPropagation();
+-  }
+-
+-  function onMove(event) {
+-    const id = eventId(event);
+-    if (dragSession && dragSession.pointerId === id) {
+-      const dx = event.clientX - dragSession.startX;
+-      const dy = event.clientY - dragSession.startY;
+-      if (!dragSession.moved) {
+-        if (Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return;
+-        dragSession.moved = true;
+-        root.classList.add("transcript-overlay--dragging");
+-      }
+-      applyGeometry({
+-        left: dragSession.origin.left + dx,
+-        top: dragSession.origin.top + dy,
+-        width: dragSession.origin.width,
+-        height: dragSession.origin.height,
+-      });
+-      return;
+-    }
+-
+-    if (resizeSession && resizeSession.pointerId === id) {
+-      const dx = event.clientX - resizeSession.startX;
+-      const dy = event.clientY - resizeSession.startY;
+-      root.classList.add("transcript-overlay--resizing");
+-      applyGeometry({
+-        left: resizeSession.origin.left,
+-        top: resizeSession.origin.top,
+-        width: resizeSession.origin.width + dx,
+-        height: resizeSession.origin.height + dy,
+-      });
+-    }
+-  }
+-
+-  function onUp(event) {
+-    const id = eventId(event);
+-    if (dragSession && dragSession.pointerId === id) {
+-      const wasDrag = dragSession.moved;
+-      endPointerSessions();
+-      if (!wasDrag) {
+-        setExpanded(!expanded);
+-        suppressClick = true;
+-      } else {
+-        suppressClick = true;
+-      }
+-      return;
+-    }
+-    if (resizeSession && resizeSession.pointerId === id) {
+-      endPointerSessions();
+-      suppressClick = true;
+-    }
+-  }
+-
+-  toggle.addEventListener("pointerdown", beginDrag);
+-  toggle.addEventListener("mousedown", (event) => {
+-    if (event.sourceCapabilities?.firesTouchEvents) return;
+-    // Fallback when PointerEvent is unavailable.
+-    if (typeof PointerEvent === "undefined") beginDrag(event);
+-  });
+-  toggle.addEventListener("click", (event) => {
+-    if (suppressClick) {
+-      suppressClick = false;
+-      event.preventDefault();
+-      return;
+-    }
+-    // Keyboard / accessibility activation.
+-    setExpanded(!expanded);
+-  });
+-  if (resizeHandle) {
+-    resizeHandle.addEventListener("pointerdown", beginResize);
+-    resizeHandle.addEventListener("mousedown", (event) => {
+-      if (typeof PointerEvent === "undefined") beginResize(event);
+-    });
+-  }
+-  window.addEventListener("pointermove", onMove);
+-  window.addEventListener("mousemove", onMove);
+-  window.addEventListener("pointerup", onUp);
+-  window.addEventListener("mouseup", onUp);
+-  window.addEventListener("pointercancel", endPointerSessions);
+-  window.addEventListener("resize", () => {
+-    if (!root.hidden && geometry) applyGeometry(geometry, { persist: false });
+-  });
+-
+-  fullButton.addEventListener("click", onOpenFullTranscript);
+-
+-  setExpanded(true);
+-  renderActivity();
+-  // Keep default CSS centering until first show; geometry applies on first content.
+-
+-  return {
+-    caption,
+-    line,
+-    snapshot,
+-    reset,
+-    setActivity(nextActivity) {
+-      activity = { ...activity, ...nextActivity };
+-      renderActivity();
+-    },
+-    collapseFromEscape() {
+-      if (root.hidden || !expanded) return false;
+-      setExpanded(false);
+-      toggle.focus();
+-      return true;
+-    },
+-  };
+-}
+diff --git a/public/workspace-shell.css b/public/workspace-shell.css
+deleted file mode 100644
+index 0e12690..0000000
+--- a/public/workspace-shell.css
++++ /dev/null
+@@ -1,372 +0,0 @@
+-/* ============================================================
+-   workspace-shell.css — Tiro 스타일 3분할 워크스페이스 셸
+-   세션 레일 | 스플리터 | 시각 자료 무대(히어로) | 스플리터 | 전사 패널
+-   style.css의 zinc/live 토큰 위에 얹는 레이아웃 레이어.
+-   ============================================================ */
+-
+-:root {
+-  /* 워크스페이스 기하: workspace-split.js가 #workspace에 덮어쓰는 단일 소스 */
+-  --rail-w: 232px;
+-  --transcript-w: 320px;
+-
+-  /* 스플리터 기하: 시각 두께는 얇게, 포인터 히트 영역은 넉넉하게 */
+-  --splitter-w: 5px;
+-  --splitter-grab: 9px;
+-  /* 도킹 패널 모서리 그립(S/SW) 히트 영역 */
+-  --grip-h: 9px;
+-  --grip-corner: 18px;
+-
+-  /* 셸 스페이싱 스케일 (2px 그리드 기반) */
+-  --sp-1: 4px;
+-  --sp-2: 8px;
+-  --sp-3: 12px;
+-  --sp-4: 16px;
+-  --sp-5: 24px;
+-
+-  /* 셸 라운드/보더 */
+-  --radius-sm: 8px;
+-  --radius-md: 12px;
+-  /* 사이드 패널 면: 중앙 히어로가 떠 보이도록 한 단계 누른 바탕 */
+-  --pane-surface: rgba(16, 16, 18, 0.78);
+-  --rule: 1px solid rgba(255, 255, 255, 0.06);
+-  --rule-strong: 1px solid rgba(255, 255, 255, 0.09);
+-}
+-
+-/* ── 3분할 그리드: 좌 레일 · 중앙 무대 · 우 전사 ── */
+-.workspace {
+-  flex: 1;
+-  min-height: 0;
+-  display: grid;
+-  grid-template-columns:
+-    var(--rail-w) var(--splitter-w) minmax(0, 1fr) var(--splitter-w) var(--transcript-w);
+-  align-items: stretch;
+-}
+-/* 드래그 중에는 전역 커서를 고정하고 텍스트 선택을 막는다 */
+-.workspace--resizing { cursor: col-resize; user-select: none; }
+-.workspace--resizing * { cursor: col-resize !important; }
+-
+-/* 사이드 패널 공통 골격 */
+-.session-rail,
+-.transcript-pane {
+-  min-width: 0;
+-  min-height: 0;
+-  display: flex;
+-  flex-direction: column;
+-  background: var(--pane-surface);
+-}
+-.session-rail { border-right: var(--rule); }
+-.transcript-pane { border-left: var(--rule); }
+-
+-.pane__head {
+-  flex-shrink: 0;
+-  display: flex;
+-  align-items: center;
+-  justify-content: space-between;
+-  gap: var(--sp-2);
+-  padding: var(--sp-3) var(--sp-4);
+-  border-bottom: var(--rule);
+-}
+-.pane__title {
+-  font-family: var(--font-body);
+-  font-size: 12px;
+-  font-weight: 600;
+-  letter-spacing: -0.01em;
+-  color: var(--z500);
+-}
+-.pane__count {
+-  padding: 1px var(--sp-2);
+-  border: var(--rule-strong);
+-  border-radius: 999px;
+-  font-family: var(--font-mono);
+-  font-size: 9px;
+-  font-weight: 700;
+-  color: var(--z700);
+-}
+-
+-.pane__body {
+-  flex: 1;
+-  min-height: 0;
+-  overflow-y: auto;
+-  padding: var(--sp-2) var(--sp-3) var(--sp-4);
+-}
+-/* 빈 상태는 패널 위쪽에 붙여 목록이 채워질 자리를 미리 보여준다 */
+-.pane__empty {
+-  padding: var(--sp-3) var(--sp-2);
+-  border: 1px dashed rgba(255, 255, 255, 0.07);
+-  border-radius: var(--radius-md);
+-  text-align: center;
+-  font-size: 11px;
+-  line-height: 1.7;
+-  color: var(--z500);
+-}
+-.pane__empty[hidden] { display: none; }
+-
+-/* 세션 레일 */
+-.session-list {
+-  list-style: none;
+-  display: flex;
+-  flex-direction: column;
+-  gap: var(--sp-1);
+-}
+-.session-list:empty { display: none; }
+-.session-row {
+-  width: 100%;
+-  display: flex;
+-  flex-direction: column;
+-  gap: var(--sp-2);
+-  padding: var(--sp-3);
+-  border: 1px solid transparent;
+-  border-radius: var(--radius-sm);
+-  background: transparent;
+-  color: var(--z300);
+-  text-align: left;
+-  cursor: pointer;
+-  transition: border-color 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth);
+-}
+-.session-row:hover { background: rgba(255, 255, 255, 0.035); }
+-.session-row--selected {
+-  border-color: var(--live-line);
+-  background: var(--live-soft);
+-}
+-.session-row__title {
+-  overflow: hidden;
+-  font-size: 12px;
+-  font-weight: 700;
+-  line-height: 1.4;
+-  text-overflow: ellipsis;
+-  white-space: nowrap;
+-}
+-.session-row__meta {
+-  display: flex;
+-  align-items: center;
+-  justify-content: space-between;
+-  gap: var(--sp-2);
+-  font-family: var(--font-mono);
+-  font-size: 9px;
+-  color: var(--z500);
+-}
+-.session-row__status { white-space: nowrap; }
+-.session-row__status--open { color: #f0a59c; }
+-
+-/* ── 도킹된 전사 카드: 라이브 전사의 1차 거처 ── */
+-/* 기본은 패널을 가득 채운다. S/SW 그립으로 높이를 잡으면
+-   --transcript-card-h가 들어오고 아래는 여백으로 남는다. */
+-.transcript-card {
+-  position: relative;
+-  flex: 1;
+-  min-height: 0;
+-  display: flex;
+-  flex-direction: column;
+-}
+-.transcript-pane--sized .transcript-card {
+-  flex: 0 0 var(--transcript-card-h);
+-  height: var(--transcript-card-h);
+-  border-bottom: var(--rule);
+-  /* 아래 여백과 구분되도록 카드는 패널과 같은 면을 깔고 앉는다 */
+-  background: var(--pane-surface);
+-}
+-/* 남은 여백은 미약한 사선 결로 칠해 “의도된 빈 공간”임을 드러낸다 —
+-   그냥 검은 면이면 렌더 사고처럼 읽힌다. */
+-.transcript-pane--sized {
+-  background-image: repeating-linear-gradient(
+-    135deg,
+-    rgba(255, 255, 255, 0.018) 0 6px,
+-    transparent 6px 12px
+-  );
+-}
+-/* 드래그 중에는 본문 선택을 막아 포인터가 그립에 붙어 있게 한다 */
+-.transcript-pane--resizing { user-select: none; }
+-
+-.transcript-stream {
+-  display: flex;
+-  flex-direction: column;
+-  gap: var(--sp-2);
+-}
+-.transcript-stream:empty { display: none; }
+-
+-/* 상한 경고는 스트림 끝에 붙여 잘린 지점을 보여준다 */
+-.transcript-trunc {
+-  margin-top: var(--sp-2);
+-  padding: var(--sp-2) var(--sp-3);
+-  border: 1px solid rgba(245, 158, 11, 0.3);
+-  border-radius: var(--radius-sm);
+-  background: rgba(245, 158, 11, 0.08);
+-  color: var(--warn);
+-  font-size: 10px;
+-  line-height: 1.5;
+-  text-align: center;
+-}
+-.transcript-trunc[hidden] { display: none; }
+-
+-/* ── 다중 모서리 그립: 남(높이) · 남서(높이+폭) ──
+-   서쪽 폭은 워크스페이스 스플리터가 이미 담당하므로 여기엔 두지 않는다. */
+-.transcript-grip {
+-  position: absolute;
+-  bottom: 0;
+-  touch-action: none;
+-  background: transparent;
+-}
+-.transcript-grip:focus-visible { outline: none; }
+-
+-.transcript-grip--s {
+-  left: var(--grip-corner);
+-  right: 0;
+-  height: var(--grip-h);
+-  cursor: ns-resize;
+-}
+-/* 보이는 1px 룰은 그립 중앙에 얇게 — 스플리터와 같은 언어 */
+-.transcript-grip--s::after {
+-  content: "";
+-  position: absolute;
+-  inset: calc(50% - 0.5px) 0;
+-  background: rgba(255, 255, 255, 0.06);
+-  transition: background 0.2s var(--ease-smooth);
+-}
+-.transcript-grip--s:hover::after,
+-.transcript-grip--s:focus-visible::after,
+-.transcript-grip--s.transcript-grip--active::after { background: var(--live); }
+-
+-/* 남서 코너: 사선 두 줄로 “여기를 잡으면 둘 다 바뀜다”를 말한다 */
+-.transcript-grip--sw {
+-  left: 0;
+-  width: var(--grip-corner);
+-  height: var(--grip-corner);
+-  cursor: nesw-resize;
+-}
+-.transcript-grip--sw::after {
+-  content: "";
+-  position: absolute;
+-  inset: 0;
+-  background:
+-    linear-gradient(45deg, transparent 42%, rgba(255, 255, 255, 0.22) 42%, rgba(255, 255, 255, 0.22) 50%, transparent 50%),
+-    linear-gradient(45deg, transparent 66%, rgba(255, 255, 255, 0.14) 66%, rgba(255, 255, 255, 0.14) 74%, transparent 74%);
+-  transition: opacity 0.2s var(--ease-smooth);
+-  opacity: 0.75;
+-}
+-.transcript-grip--sw:hover::after,
+-.transcript-grip--sw:focus-visible::after,
+-.transcript-grip--sw.transcript-grip--active::after { opacity: 1; }
+-
+-/* ── 스플리터: 얇은 룰 + 넓은 히트 영역 ── */
+-.splitter {
+-  position: relative;
+-  min-width: 0;
+-  border: none;
+-  padding: 0;
+-  background: transparent;
+-  cursor: col-resize;
+-  touch-action: none;
+-  transition: background 0.2s var(--ease-smooth);
+-}
+-/* 히트 영역을 트랙 밖으로 넓혀 5px 룰에서도 잡기 쉽게 한다 */
+-.splitter::before {
+-  content: "";
+-  position: absolute;
+-  inset: 0 calc((var(--splitter-w) - var(--splitter-grab)) / 2);
+-}
+-/* 실제로 보이는 1px 룰 */
+-.splitter::after {
+-  content: "";
+-  position: absolute;
+-  inset: 0 calc(50% - 0.5px);
+-  background: rgba(255, 255, 255, 0.06);
+-  transition: background 0.2s var(--ease-smooth);
+-}
+-.splitter:hover::after,
+-.splitter:focus-visible::after,
+-.splitter--active::after { background: var(--live); }
+-.splitter:focus-visible { outline: none; }
+-
+-/* ── 중앙 무대: 기존 히어로가 그대로 산다 ── */
+-.stage-pane {
+-  min-width: 0;
+-  min-height: 0;
+-  overflow-y: auto;
+-}
+-
+-/* ── 하단 도크 행: 버튼이 넘치면 행 내부에서만 스크롤한다 ──
+-   작업 순서를 한 줄로 보존하고 문서 전체 가로 스크롤은 만들지 않는다. */
+-.dock__tabs {
+-  min-width: 0;
+-  flex-wrap: nowrap;
+-  overflow-x: auto;
+-  overflow-y: hidden;
+-  padding-bottom: var(--sp-1);
+-}
+-/* 스페이서는 넓은 화면에서 라벨과 액션을 가르고 좁은 화면에서는 함께 스크롤된다 */
+-.dock__tabs .dock__spacer { min-width: 0; }
+-
+-/* ── 반응형: 좁아지면 사이드부터 접어 무대를 지킨다 ── */
+-@media (max-width: 1180px) {
+-  .workspace { grid-template-columns: minmax(0, 1fr) var(--splitter-w) var(--transcript-w); }
+-  .session-rail,
+-  .splitter--rail { display: none; }
+-}
+-/* 좌우 분할이 무리인 폭에서는 전사를 숨기지 않고 무대 아래로 쌓는다 —
+-   도크 복제본을 없앱으므로 여기서 숨기면 전사에 도달할 경로가 사라진다. */
+-@media (max-width: 900px) {
+-  /* 두 패널이 워크스페이스 높이를 나눠 갖는다 — 무대 우선, 전사는 고정 몶
+-     워크스페이스 자체는 스크롤하지 않고 각 패널 안에서만 흐른다. */
+-  .workspace {
+-    grid-template-columns: minmax(0, 1fr);
+-    grid-template-rows: minmax(0, 1fr) minmax(0, 0.62fr);
+-  }
+-  .splitter--transcript { display: none; }
+-  .transcript-pane {
+-    border-left: none;
+-    border-top: var(--rule);
+-  }
+-  /* 세로 모드에서는 그립 높이 조절이 의미가 없다 */
+-  .transcript-grip { display: none; }
+-  .transcript-pane--sized .transcript-card {
+-    flex: 1;
+-    height: auto;
+-    border-bottom: none;
+-  }
+-  .transcript-pane--sized { background-image: none; }
+-}
+-
+-@media (max-width: 600px) {
+-  .workspace {
+-    grid-template-rows: minmax(0, 21fr) minmax(0, 19fr);
+-  }
+-}
+-
+-/* ── Floating glass islands: five-column geometry stays intact ── */
+-.workspace {
+-  gap: 0;
+-  padding: var(--island-gap) 14px 8px;
+-}
+-
+-.session-rail,
+-.stage-pane,
+-.transcript-pane {
+-  border: 1px solid var(--glass-border);
+-  border-radius: var(--glass-radius);
+-  background:
+-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 42%),
+-    var(--glass-bg);
+-  backdrop-filter: var(--glass-blur);
+-  -webkit-backdrop-filter: var(--glass-blur);
+-  box-shadow: var(--glass-inset), 0 14px 36px rgba(0, 0, 0, 0.2);
+-  overflow: hidden;
+-}
+-
+-.stage-pane {
+-  background:
+-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 44%),
+-    rgba(18, 18, 22, 0.42);
+-  overflow-x: hidden;
+-  overflow-y: auto;
+-}
+-
+-.session-rail { border-right: 1px solid var(--glass-border); }
+-.transcript-pane { border-left: 1px solid var(--glass-border); }
+-
+-@media (max-width: 900px) {
+-  .workspace {
+-    row-gap: 8px;
+-    padding: 8px 10px 4px;
+-  }
+-  .transcript-pane { border-top: 1px solid var(--glass-border); }
+-}

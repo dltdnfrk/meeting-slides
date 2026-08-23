@@ -1,0 +1,27 @@
+{
+  "metrics": {
+    "shell": "live",
+    "phase": "capturing",
+    "detail": "overview",
+    "connection": "disconnected",
+    "rootOverflow": 0,
+    "duplicateIds": [],
+    "minTarget": 44,
+    "narrowTargetFailures": [],
+    "status": {
+      "text": "앱 서버 연결이 끊겼습니다. 다시 연결하는 중…",
+      "display": "block",
+      "color": "rgb(165, 165, 174)",
+      "role": "status"
+    },
+    "activeRemovedReferences": [],
+    "stopVisible": true,
+    "transcriptLines": 1
+  },
+  "focused": {
+    "id": "btn-settings",
+    "outline": "solid",
+    "width": "2px",
+    "shadow": "none"
+  }
+}

@@ -1,0 +1,10 @@
+PRE-EXISTING, NOT CAUSED BY TASK 4 — REPORTED, NOT FIXED
+--------------------------------------------------------
+src/session.ts(29,46): error TS6133: 'index' is declared but its value is never read.
+
+Surfaced only when noUnusedLocals/noUnusedParameters are enabled; the repository
+tsconfig.json does NOT enable them, so this is not an error under the project's own
+strict contract. src/session.ts is untouched by this task:
+  git diff --quiet src/session.ts  ->  clean
+The scoped task-4 strict config therefore mirrors the repository compiler options
+(strict + noImplicitAny) and exits 0.

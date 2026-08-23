@@ -1,0 +1,5 @@
+== MUTATION 2: transcript viewport unbounded (minibar becomes a store) ==
+ 1 fail
+ 45 pass
+(fail) native minibar seam: bounded transcript projection > expanded shows at most three finalized lines plus one provisional row [0.16ms]
+59e419c655438bbe6dfe8d06868eb10e96c1e33ad95730ba6267e11911133d44  macos/MinibarProjection.swift

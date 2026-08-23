@@ -1,0 +1,19 @@
+# PID 32804 one-shot residue investigation and cleanup
+2026-08-11T19:32:55Z
+## initial observation
+ps: PID 32804 PPID 1 state U (uninterruptible kernel wait), command python3 - /tmp/task18-fresh-qa.ZvoNeI/capture-qa.ts ...
+listeners: none
+## signals
+TERM delivered
+KILL delivered
+## temp cleanup
+removed /tmp/task18-fresh-qa.ZvoNeI
+## final single observation
+32804     1 U    07:23 python3 - /tmp/task18-fresh-qa.ZvoNeI/capture-qa.ts /tmp/task18-fresh-qa.ZvoNeI /Users/hyunjun/Documents/MUNI/meeting-slides
+## listeners after signals
+lsof: WARNING: can't stat() smbfs file system /Volumes/.timemachine/192.168.75.221/247BE7BA-8793-4425-B99E-3C9B64D03254/TimeMachine
+      Output information may be incomplete.
+      assuming "dev=3600000d" from mount table
+## task ports
+OK port 8787 free
+OK port 8789 free

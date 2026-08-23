@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "task": "F4. Scope fidelity rerun after M1/M2 repairs",
+  "taskId": "st_019ff4ae",
+  "parentSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "completedAt": "2026-08-12T06:37:37Z",
+  "status": "FAIL",
+  "verdict": "REJECT",
+  "auditedHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "findings": [
+    {
+      "id": "M1R",
+      "severity": "medium",
+      "title": "Required installed collapsed-live pixels remain visibly idle, and expanded native content density remains lopsided",
+      "references": [
+        ".omo/evidence/caret-clone-redesign/final/f4-repair/native-material-direct-capture/02-collapsed-live.png",
+        ".omo/evidence/caret-clone-redesign/final/f4-repair/native-material-direct-capture/02-collapsed-live-ax.txt",
+        ".omo/evidence/caret-clone-redesign/final/f4-repair/native-material-direct-capture/03-expanded-live.png",
+        "macos/MinibarView.swift"
+      ]
+    }
+  ],
+  "originalFindingClosure": {
+    "M1": "PARTIAL: native HUD material and exact geometry closed; truthful collapsed-live pixels and expanded density remain open",
+    "M2": "PASS: 320x667 placeholder and generated slide fully contained; 375x812 and 820x900 regressions pass"
+  },
+  "dimensionResults": {
+    "referenceHierarchy": "PASS",
+    "geometry": "PASS",
+    "typography": "PASS",
+    "material": "PASS",
+    "motion": "PASS",
+    "progressiveDisclosure": "PASS",
+    "nativeAmbientControlIntent": "FAIL",
+    "meetingSlidesIdentityAndFunction": "PASS",
+    "browserOnlyStartNativeStop": "PASS",
+    "brandPrivateAssetBoundary": "PASS",
+    "screenShareClaimBoundary": "PASS",
+    "unsupportedCapabilityBoundary": "PASS"
+  },
+  "verification": {
+    "officialPacket": "PASS: 304/304 checks",
+    "nativeEvidenceChecksums": "PASS: all entries",
+    "narrowEvidenceChecksums": "PASS: all entries",
+    "browserFocusedTests": "PASS: 87/87, 864 expectations",
+    "nativeFocusedTests": "PASS: 121/121, 380 expectations",
+    "installedBundleVerifier": "PASS",
+    "codesignStrict": "PASS",
+    "installedExecutableSha256": "7847745f6d94512434c6ac41e3e3352e5c33825aa3c9f921fc8613d86b8e5281",
+    "nativeMaterialSourceSha256": "c83cecbad9a69593ef3dbceb2cfab2f48383578e5f653afabcb9f41fecc15140",
+    "narrowCssSha256": "794ed65af8a53cb81cdde9b565c373d7385db6a357bf7f0fbbb73d2a62083dde",
+    "privateReferenceByteMatches": 0,
+    "unsupportedUserFacingScreenShareClaims": 0
+  },
+  "boundaries": {
+    "productFilesEdited": false,
+    "planEdited": false,
+    "ledgerEdited": false,
+    "boulderEdited": false,
+    "todoEvidenceEdited": false,
+    "commitCreated": false,
+    "stagingPerformed": false,
+    "onlyFreshEvidenceDirectoryWritten": true
+  },
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f4-scope-fidelity-rerun/REPORT.md",
+    "sha256": "8719b85f673f499e479be98ce74cff35b2434b8371281b64eb283e08cea37d32"
+  },
+  "checksum": {
+    "algorithm": "sha256",
+    "scope": "UTF-8 pretty JSON with checksum.value replaced by null and one trailing LF",
+    "value": "01cde1d10395fe2ca92581db803c554c8942464668373f387d9c744ba24b7d80"
+  }
+}

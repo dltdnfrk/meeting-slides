@@ -1,0 +1,55 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-shell.test.ts:
+(pass) 라이브 MeetingCard 렌더 > 슬라이드가 없으면 플레이스홀더를 유지한다 [18.15ms]
+(pass) 라이브 MeetingCard 렌더 > kicker/emphasis 포함 카드가 모두 렌더된다 [8.86ms]
+(pass) 라이브 MeetingCard 렌더 > 375px 폭에서 가로 오버플로가 없다 [6.00ms]
+(pass) 라이브 MeetingCard 렌더 > 한국어 제목과 불릿은 단어를 보존하고 예외적으로 긴 토큰만 줄바꿈한다 [3.74ms]
+(pass) 라이브 MeetingCard 렌더 > kicker/emphasis 없는 레거시 슬라이드도 제목/불릿만으로 렌더된다 [14.72ms]
+(pass) 라이브 MeetingCard 렌더 > 불릿이 비어도 제목 카드가 깨지지 않는다 [1.86ms]
+(pass) 라이브 MeetingCard 렌더 > 히스토리 미리보기에서도 같은 카드 레이아웃을 쓴다 [16.24ms]
+(pass) HTML 이스케이프 > 모델 텍스트의 마크업이 실행되지 않는다 [3.78ms]
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.20ms]
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.21ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.26ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.35ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.06ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.03ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.19ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.44ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.15ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.08ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.21ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.08ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.21ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.06ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [2.20ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.33ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.21ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.44ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.14ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.21ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.10ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.06ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.08ms]
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.14ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.25ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [1.24ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.12ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.07ms]
+(pass) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [5.77ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.37ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.13ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.19ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.18ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.07ms]
+
+ 43 pass
+ 0 fail
+ 147 expect() calls
+Ran 43 tests across 3 files. [1028.00ms]

@@ -1,0 +1,56 @@
+== canonical boundary ==
+pwd=/Users/hyunjun/Documents/MUNI/meeting-slides
+git_toplevel=/Users/hyunjun/Documents/MUNI/meeting-slides
+origin=https://github.com/dltdnfrk/meeting-slides.git
+branch=main
+head=a1ed25f95980980cd958044b90e739ac45e8280d
+
+== pre-work git status --short ==
+ M .env.example
+ M .omo/start-work/ledger.jsonl
+ M DESIGN.md
+ M README.md
+ M public/app.js
+ M public/index.html
+ M public/operator-surface.js
+ M public/workspace-split.js
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-operator-surface.test.ts
+ M tests/public-workspace.test.ts
+?? .omo/drafts/
+?? .omo/evidence/caret-clone-redesign/
+?? .omo/evidence/live-split-ulw/
+?? .omo/evidence/style-gallery-baseline/
+?? .omo/evidence/style-gallery-final/
+?? .omo/evidence/style-gallery-panels/
+?? .omo/evidence/tiro-operator/
+?? .omo/evidence/tiro-reference/
+?? .omo/plans/caret-clone-redesign.md
+?? .omo/plans/tiro-operator-rebuild.md
+?? .omo/ulw-loop/
+?? .omo/ulw-research/
+?? HANDOFF.md
+?? models/
+?? public/caret-shell.css
+?? tests/public-harness-baseline.test.ts
+
+== source hashes (pre-work) ==
+c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e  public/index.html
+6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad  public/app.js
+e589a1fecb564ede96733cca2be08ea1802bc267584f02d8d3a1dcf86c11a56f  public/operator-surface.js
+6d71c1cd0476b89b9c78d11b2e43881fa036de11fa9aab1fa4e64d7d2fc9897d  public/review-panel.js
+ce5b33e747269f43ab611eb574b17fbcf83d01e0b9737f3444b2ab6f8a584599  public/workspace-split.js
+c99bc091ac7ae392636d842d2f71600685210d3ee95e1c97c9d656e80b7ce535  public/transcript-resize.js
+710be07ffefa67fa9054c7aba98f4c95319183cd4e390bc52acdae76d2b5e99e  src/session.ts
+80084305117b26160b063c5c59b80ecc07fc92a2ac01ca40a64310281520a923  server.ts
+
+== tooling ==
+1.3.14

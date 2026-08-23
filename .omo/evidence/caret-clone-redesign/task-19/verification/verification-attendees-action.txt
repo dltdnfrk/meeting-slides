@@ -1,0 +1,18 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/attendees-action.test.ts:
+15 | let fakeWhisperPidPath: string;
+16 | const messages: Record<string, unknown>[] = [];
+17 | 
+18 | function waitFor<T>(subscribe: (done: (value: T) => void, fail: (error: Error) => void) => void): Promise<T> {
+19 |   return new Promise<T>((resolve, reject) => {
+20 |     const timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);
+                                                   ^
+error: timed out after 10000ms
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/attendees-action.test.ts:20:47)
+(fail) setAttendees replaces a prepared roster and rejects capturing or ended meetings [10007.62ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [12.08s]

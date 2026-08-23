@@ -1,0 +1,101 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-library.test.ts:
+(pass) browser-valid reducer artifacts > every reducer source has a committed, non-drifting generated artifact [2.35ms]
+(pass) browser-valid reducer artifacts > rebuilding into a clean directory reproduces byte-identical artifacts [1.60ms]
+(pass) browser-valid reducer artifacts > a mutated source is detected as drift rather than silently shipped [2.82ms]
+(pass) browser-valid reducer artifacts > generated artifacts are served as executable JavaScript, never octet-stream [1.47ms]
+(pass) browser-valid reducer artifacts > the shipped page really evaluates the reducers - no dead TypeScript seam [72.32ms]
+(pass) document-centric library frame > 1244x836 shows one meetings rail and exactly one document surface [132.62ms]
+(pass) document-centric library frame > Overview and Transcript never coexist: exactly one panel is perceivable [150.72ms]
+(pass) document-centric library frame > no redundant centre detail panel duplicates the document surface [130.63ms]
+(pass) detail tabs are a real tablist > tablist, tab and tabpanel roles are complete and cross-linked [124.36ms]
+(pass) detail tabs are a real tablist > ArrowRight, ArrowLeft, Home and End move selection and focus [150.39ms]
+(pass) detail tabs are a real tablist > document body text meets the WCAG AA contrast floor on its real surface [145.29ms]
+(pass) detail tabs are a real tablist > every tab is keyboard reachable and paints a visible focus ring [143.49ms]
+(pass) meeting selection refreshes the single document surface > selecting another meeting replaces the document content [177.21ms]
+(pass) meeting selection refreshes the single document surface > a stale meeting payload arriving after a newer selection is ignored [150.87ms]
+(pass) meeting selection refreshes the single document surface > initial hydration shows no stale slide or transcript content [76.68ms]
+(pass) real note and transcript data survive the rebuild > typing a note reaches #notes-input and is sent with its contracted action [159.26ms]
+(pass) real note and transcript data survive the rebuild > transcript history renders finalized lines with speaker and time metadata [150.88ms]
+(pass) library empty, loading, error and reconnect states > an empty library explains itself and keeps the record action [75.04ms]
+(pass) library empty, loading, error and reconnect states > connection state is explicit and survives a reconnect without losing content [129.12ms]
+(pass) library empty, loading, error and reconnect states > a malformed server frame is dropped without disturbing the shell [134.97ms]
+(pass) explicit state attributes and preserved binding contracts > the shell exposes every contracted state attribute [129.73ms]
+(pass) explicit state attributes and preserved binding contracts > .app--capturing still tracks the authoritative capture phase [127.04ms]
+(pass) explicit state attributes and preserved binding contracts > no fake event, folder or share controls exist in the library shell [122.24ms]
+1085 |         // Exactly one panel is not enough on its own: a panel collapsed into a
+1086 |         // 5px grid track is still "one panel". It must also be usable.
+1087 |         expect({
+1088 |           name: viewport.name,
+1089 |           documentUsable: (frame.documentBox?.width ?? 0) >= MIN_DOCUMENT_WIDTH,
+1090 |         }).toEqual({ name: viewport.name, documentUsable: true });
+                  ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "documentUsable": true,
++   "documentUsable": false,
+    "name": "seam",
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI.nosync/meeting-slides/tests/public-caret-library.test.ts:1090:12)
+(fail) library shell across the canonical viewport matrix > no root overflow and one document surface at every matrix width [388.69ms]
+1129 |         expect({ name: viewport.name, present: geometry.document !== null })
+1130 |           .toEqual({ name: viewport.name, present: true });
+1131 |         expect({
+1132 |           name: viewport.name,
+1133 |           documentUsable: geometry.document!.width >= MIN_DOCUMENT_WIDTH,
+1134 |         }).toEqual({ name: viewport.name, documentUsable: true });
+                  ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "documentUsable": true,
++   "documentUsable": false,
+    "name": "seam",
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI.nosync/meeting-slides/tests/public-caret-library.test.ts:1134:12)
+(fail) library shell across the canonical viewport matrix > the document surface and slide frame stay usable at every matrix width [405.85ms]
+1182 |         expect({ name: viewport.name, inputHidden: notes!.inputDisplay === "none" })
+1183 |           .toEqual({ name: viewport.name, inputHidden: false });
+1184 |         expect({
+1185 |           name: viewport.name,
+1186 |           sized: notes!.width >= MIN_NOTES_WIDTH && notes!.height >= MIN_NOTES_HEIGHT,
+1187 |         }).toEqual({ name: viewport.name, sized: true });
+                  ^
+error: expect(received).toEqual(expected)
+
+  {
+    "name": "seam",
+-   "sized": true,
++   "sized": false,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI.nosync/meeting-slides/tests/public-caret-library.test.ts:1187:12)
+(fail) library shell across the canonical viewport matrix > Notes stays visible, sized and focusable at every matrix width [440.26ms]
+(pass) library shell across the canonical viewport matrix > no visible label is clipped or truncated at any matrix width [910.33ms]
+(pass) library shell across the canonical viewport matrix > no dock control is clipped or truncated at any matrix width [1200.81ms]
+(pass) library shell across the canonical viewport matrix > the meetings rail stays reachable at 320x667 without clipping controls [147.56ms]
+(pass) determinism guards > the library shell issues no off-origin request [82.87ms]
+(pass) determinism guards > this suite contains no sleep or polling wait [0.94ms]
+
+3 tests failed:
+(fail) library shell across the canonical viewport matrix > no root overflow and one document surface at every matrix width [388.69ms]
+(fail) library shell across the canonical viewport matrix > the document surface and slide frame stay usable at every matrix width [405.85ms]
+(fail) library shell across the canonical viewport matrix > Notes stays visible, sized and focusable at every matrix width [440.26ms]
+
+ 28 pass
+ 3 fail
+ 198 expect() calls
+Ran 31 tests across 1 file. [6.69s]

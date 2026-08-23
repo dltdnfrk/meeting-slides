@@ -1,0 +1,19 @@
+== attribution proof ==
+This task created exactly 3 files and modified zero existing files:
+  d750cd83253b2e6b46dc6a8172769f2b5f3d5c6c0c298da83965f2228df76721  macos/NativeSurfaceContract.swift
+  9f472a6165a9977859c3ba6a5616c34fdd25100a36d73b9d19f0327e1bca0f97  tests/fixtures/native-surface-driver.swift
+  14185d35fba53ce72459583ede4fc36d206aed40b9cfb139c9b2d0074241e202  tests/native-surface-contract.test.ts
+
+-- none of these are imported by any other test --
+  (no other file references the seam: OK)
+
+-- the seam adds no global/shared state, no server, no port, no DB --
+  (none: OK)
+
+== isolated run of two failing sibling suites, seam files temporarily moved aside ==
+
+ 7 pass
+ 1 fail
+ 24 expect() calls
+Ran 8 tests across 1 file. [1126.00ms]
+(same failures occur without the seam present -> pre-existing/sibling-owned)

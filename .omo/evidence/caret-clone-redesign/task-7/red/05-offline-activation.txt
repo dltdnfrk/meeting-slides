@@ -1,0 +1,6 @@
+$ # RED for the offline-activation defect found by the transition table (pre-fix reducer)
+- Expected  - 1
++ Received  + 5
+(fail) connection and restore > capture activation is refused while the transport is not online [0.46ms]
+ 0 pass
+ 1 fail

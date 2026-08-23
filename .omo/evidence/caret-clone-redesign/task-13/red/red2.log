@@ -1,0 +1,365 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-context.test.ts:
+(pass) Todo 13 · every binding ID keeps exactly one home > library: each of the 35 binding IDs resolves to exactly one element [165.95ms]
+(pass) Todo 13 · every binding ID keeps exactly one home > live: each of the 35 binding IDs resolves to exactly one element [103.53ms]
+(pass) Todo 13 · DESIGN 9.11 capability placement > library with a meeting selected: the Ask entry is open, not buried in a disclosure [115.26ms]
+(pass) Todo 13 · DESIGN 9.11 capability placement > library: the export set is behind ONE disclosure, not a permanent wall [87.63ms]
+(pass) Todo 13 · DESIGN 9.11 capability placement > live: compile and export are behind a disclosure; Stop and the timer are not [107.96ms]
+(pass) Todo 13 · DESIGN 9.11 capability placement > every capability is reachable once its own disclosure is opened, in both shells [204.16ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 1440x900: library action surface stays under two fifths of the viewport [90.93ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 1244x836: library action surface stays under two fifths of the viewport [94.06ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 1100x800: library action surface stays under two fifths of the viewport [94.25ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 960x760: library action surface stays under two fifths of the viewport [88.71ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 900x760: library action surface stays under two fifths of the viewport [90.04ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 899x760: library action surface stays under two fifths of the viewport [96.96ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 820x900: library action surface stays under two fifths of the viewport [89.19ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 375x812: library action surface stays under two fifths of the viewport [87.94ms]
+(pass) Todo 13 · the contextual surface is composed, never a dashboard wall > 320x667: library action surface stays under two fifths of the viewport [86.91ms]
+(pass) Todo 13 · the disclosure state belongs to the user > a set opened during `starting` is still open after `capturing` arrives [92.89ms]
+(pass) Todo 13 · the disclosure state belongs to the user > a set closed in the library stays closed across repeated meeting selections [98.76ms]
+(pass) Todo 13 · the disclosure state belongs to the user > crossing the shell boundary applies the shell's own default exactly once [93.87ms]
+(pass) Todo 13 · panels are real dialogs > #provider-panel: dialog role + accessible name, Escape closes, focus returns to #btn-settings [116.98ms]
+(pass) Todo 13 · panels are real dialogs > #attendee-panel: dialog role + accessible name, Escape closes, focus returns to #btn-attendees [106.56ms]
+(pass) Todo 13 · panels are real dialogs > #ask-panel: dialog role + accessible name, Escape closes, focus returns to #btn-ask [99.79ms]
+(pass) Todo 13 · disabled controls carry their exact machine reason > a disconnected client disables the gated set and states why in title AND aria-label [92.63ms]
+(pass) Todo 13 · disabled controls carry their exact machine reason > Ask states its gate reason in title AND aria-label while no meeting is selected [106.41ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > compile, export, save and reset emit their existing action names [103.80ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > reset emits `reset` from the library, where it is truthfully enabled [104.79ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > Ask sends `ask` with the frozen `meetingId` payload key [98.33ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > repeated compile activation while a job is in flight emits exactly one action [105.12ms]
+(pass) Todo 13 · narrow widths keep real target sizes > 375x812: every painted action meets the 44px target [81.75ms]
+(pass) Todo 13 · narrow widths keep real target sizes > 320x667: every painted action meets the 44px target [84.89ms]
+991 |           // Non-vacuous: the shell really does expose controls here.
+992 |           expect(targets.length).toBeGreaterThan(3);
+993 |           const undersized = targets
+994 |             .filter((t) => !t.meetsBox)
+995 |             .map((t) => `${t.id}:${t.w}x${t.h}`);
+996 |           expect({ context, undersized }).toEqual({ context, undersized: [] });
+                                                ^
+error: expect(received).toEqual(expected)
+
+  {
+    "context": "library",
+-   "undersized": [],
++   "undersized": [
++     "btn-attendees:60x28",
++     "btn-settings:39x26",
++     "detail-tab-overview:60x42",
++     "detail-tab-notes:38x42",
++     "detail-tab-transcript:63x42",
++     "btn-action-copy:58x32",
++     "btn-action-open:91x32",
++   ],
+  }
+
+- Expected  - 1
++ Received  + 9
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:996:43)
+(fail) Todo 13 · narrow widths keep real target sizes > 375x812 library: every painted shell control passes a real 44px edge-band hit test [85.48ms]
+991 |           // Non-vacuous: the shell really does expose controls here.
+992 |           expect(targets.length).toBeGreaterThan(3);
+993 |           const undersized = targets
+994 |             .filter((t) => !t.meetsBox)
+995 |             .map((t) => `${t.id}:${t.w}x${t.h}`);
+996 |           expect({ context, undersized }).toEqual({ context, undersized: [] });
+                                                ^
+error: expect(received).toEqual(expected)
+
+  {
+    "context": "live",
+-   "undersized": [],
++   "undersized": [
++     "btn-attendees:60x28",
++     "btn-settings:39x26",
++     "btn-live-stop:66x28",
++     "btn-record:118x40",
++   ],
+  }
+
+- Expected  - 1
++ Received  + 6
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:996:43)
+(fail) Todo 13 · narrow widths keep real target sizes > 375x812 live: every painted shell control passes a real 44px edge-band hit test [96.65ms]
+991 |           // Non-vacuous: the shell really does expose controls here.
+992 |           expect(targets.length).toBeGreaterThan(3);
+993 |           const undersized = targets
+994 |             .filter((t) => !t.meetsBox)
+995 |             .map((t) => `${t.id}:${t.w}x${t.h}`);
+996 |           expect({ context, undersized }).toEqual({ context, undersized: [] });
+                                                ^
+error: expect(received).toEqual(expected)
+
+  {
+    "context": "library",
+-   "undersized": [],
++   "undersized": [
++     "btn-attendees:60x28",
++     "btn-settings:39x26",
++     "detail-tab-overview:60x42",
++     "detail-tab-notes:38x42",
++     "detail-tab-transcript:63x42",
++     "btn-action-copy:58x32",
++     "btn-action-open:91x32",
++   ],
+  }
+
+- Expected  - 1
++ Received  + 9
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:996:43)
+(fail) Todo 13 · narrow widths keep real target sizes > 320x667 library: every painted shell control passes a real 44px edge-band hit test [88.62ms]
+991 |           // Non-vacuous: the shell really does expose controls here.
+992 |           expect(targets.length).toBeGreaterThan(3);
+993 |           const undersized = targets
+994 |             .filter((t) => !t.meetsBox)
+995 |             .map((t) => `${t.id}:${t.w}x${t.h}`);
+996 |           expect({ context, undersized }).toEqual({ context, undersized: [] });
+                                                ^
+error: expect(received).toEqual(expected)
+
+  {
+    "context": "live",
+-   "undersized": [],
++   "undersized": [
++     "btn-attendees:60x28",
++     "btn-settings:39x26",
++     "btn-live-stop:66x28",
++     "btn-record:118x40",
++   ],
+  }
+
+- Expected  - 1
++ Received  + 6
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:996:43)
+(fail) Todo 13 · narrow widths keep real target sizes > 320x667 live: every painted shell control passes a real 44px edge-band hit test [104.27ms]
+1037 |           }
+1038 | 
+1039 |           const s = await session.page.evaluate(readCaptureSurfaces, IDS);
+1040 |           expect(s.shell).toBe("live");
+1041 |           // Exactly one Stop affordance, and it is the live one.
+1042 |           expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
+                                            ^
+error: expect(received).toEqual(expected)
+
+  [
+    "btn-live-stop",
++   "btn-record",
+  ]
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1042:38)
+(fail) Todo 13 · exactly one Stop and one timer > 1244 starting: one perceivable Stop and one perceivable timer [91.38ms]
+1037 |           }
+1038 | 
+1039 |           const s = await session.page.evaluate(readCaptureSurfaces, IDS);
+1040 |           expect(s.shell).toBe("live");
+1041 |           // Exactly one Stop affordance, and it is the live one.
+1042 |           expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
+                                            ^
+error: expect(received).toEqual(expected)
+
+  [
+    "btn-live-stop",
++   "btn-record",
+  ]
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1042:38)
+(fail) Todo 13 · exactly one Stop and one timer > 1244 capturing: one perceivable Stop and one perceivable timer [93.12ms]
+1030 |             );
+1031 |           }
+1032 |           if (phase === "stopping") {
+1033 |             await session.act(
+1034 |               'document.querySelector(".app")?.dataset.capturePhase === "stopping"',
+1035 |               () => harness.pushMessage(CAPTURE_STOPPING),
+                                                               ^
+ReferenceError: CAPTURE_STOPPING is not defined
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1035:57)
+      at act (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:216:13)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1033:27)
+(fail) Todo 13 · exactly one Stop and one timer > 1244 stopping: one perceivable Stop and one perceivable timer [90.73ms]
+1037 |           }
+1038 | 
+1039 |           const s = await session.page.evaluate(readCaptureSurfaces, IDS);
+1040 |           expect(s.shell).toBe("live");
+1041 |           // Exactly one Stop affordance, and it is the live one.
+1042 |           expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
+                                            ^
+error: expect(received).toEqual(expected)
+
+  [
+    "btn-live-stop",
++   "btn-record",
+  ]
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1042:38)
+(fail) Todo 13 · exactly one Stop and one timer > 375 starting: one perceivable Stop and one perceivable timer [99.78ms]
+1037 |           }
+1038 | 
+1039 |           const s = await session.page.evaluate(readCaptureSurfaces, IDS);
+1040 |           expect(s.shell).toBe("live");
+1041 |           // Exactly one Stop affordance, and it is the live one.
+1042 |           expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
+                                            ^
+error: expect(received).toEqual(expected)
+
+  [
+    "btn-live-stop",
++   "btn-record",
+  ]
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1042:38)
+(fail) Todo 13 · exactly one Stop and one timer > 375 capturing: one perceivable Stop and one perceivable timer [94.15ms]
+1030 |             );
+1031 |           }
+1032 |           if (phase === "stopping") {
+1033 |             await session.act(
+1034 |               'document.querySelector(".app")?.dataset.capturePhase === "stopping"',
+1035 |               () => harness.pushMessage(CAPTURE_STOPPING),
+                                                               ^
+ReferenceError: CAPTURE_STOPPING is not defined
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1035:57)
+      at act (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:216:13)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1033:27)
+(fail) Todo 13 · exactly one Stop and one timer > 375 stopping: one perceivable Stop and one perceivable timer [92.67ms]
+1037 |           }
+1038 | 
+1039 |           const s = await session.page.evaluate(readCaptureSurfaces, IDS);
+1040 |           expect(s.shell).toBe("live");
+1041 |           // Exactly one Stop affordance, and it is the live one.
+1042 |           expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
+                                            ^
+error: expect(received).toEqual(expected)
+
+  [
+    "btn-live-stop",
++   "btn-record",
+  ]
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1042:38)
+(fail) Todo 13 · exactly one Stop and one timer > 320 starting: one perceivable Stop and one perceivable timer [97.59ms]
+1037 |           }
+1038 | 
+1039 |           const s = await session.page.evaluate(readCaptureSurfaces, IDS);
+1040 |           expect(s.shell).toBe("live");
+1041 |           // Exactly one Stop affordance, and it is the live one.
+1042 |           expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
+                                            ^
+error: expect(received).toEqual(expected)
+
+  [
+    "btn-live-stop",
++   "btn-record",
+  ]
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1042:38)
+(fail) Todo 13 · exactly one Stop and one timer > 320 capturing: one perceivable Stop and one perceivable timer [93.51ms]
+1030 |             );
+1031 |           }
+1032 |           if (phase === "stopping") {
+1033 |             await session.act(
+1034 |               'document.querySelector(".app")?.dataset.capturePhase === "stopping"',
+1035 |               () => harness.pushMessage(CAPTURE_STOPPING),
+                                                               ^
+ReferenceError: CAPTURE_STOPPING is not defined
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1035:57)
+      at act (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:216:13)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1033:27)
+(fail) Todo 13 · exactly one Stop and one timer > 320 stopping: one perceivable Stop and one perceivable timer [89.82ms]
+1064 |         'document.documentElement.dataset.connection === "disconnected"',
+1065 |         () => harness.disconnectClients(),
+1066 |       );
+1067 |       const s = await session.page.evaluate(readCaptureSurfaces, IDS);
+1068 |       // Transport loss must not resurrect the second Stop or the second clock.
+1069 |       expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
+                                        ^
+error: expect(received).toEqual(expected)
+
+  [
+    "btn-live-stop",
++   "btn-record",
+  ]
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1069:34)
+(fail) Todo 13 · exactly one Stop and one timer > reconnect during capture still shows exactly one Stop and one timer [101.18ms]
+1084 |       const inbound = harness.nextClientMessage();
+1085 |       await session.page.evaluate(() =>
+1086 |         (document.getElementById("btn-compile-deck") as HTMLElement).click());
+1087 |       expect((await inbound as { action?: string }).action).toBe("compileTranscriptSnapshot");
+1088 |       const s = await session.page.evaluate(readCaptureSurfaces, IDS);
+1089 |       expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
+                                        ^
+error: expect(received).toEqual(expected)
+
+  [
+    "btn-live-stop",
++   "btn-record",
+  ]
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1089:34)
+(fail) Todo 13 · exactly one Stop and one timer > a compile job in flight never adds a second Stop or timer [109.46ms]
+(pass) Todo 13 · exactly one Stop and one timer > the library restores #btn-record as its capture control, with no live Stop [118.07ms]
+1145 |       });
+1146 |       expect(gated.disabled).toBe(true);
+1147 |       // Disabled is muted, never invisible (DESIGN 9.11).
+1148 |       expect(gated.painted).toBe(true);
+1149 |       // The exact machine reason, in BOTH places.
+1150 |       expect(gated.title).toBe(gated.ariaLabel);
+                                 ^
+error: expect(received).toBe(expected)
+
+Expected: "녹음 시작"
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:1150:27)
+(fail) Todo 13 · the capture control states its own gate reason > #btn-record carries the exact reason in title AND aria-label when disconnected [105.42ms]
+(pass) Todo 13 · the output switcher reveals, never duplicates > each switcher item targets a distinct existing surface and creates no second slide [113.90ms]
+
+16 tests failed:
+(fail) Todo 13 · narrow widths keep real target sizes > 375x812 library: every painted shell control passes a real 44px edge-band hit test [85.48ms]
+(fail) Todo 13 · narrow widths keep real target sizes > 375x812 live: every painted shell control passes a real 44px edge-band hit test [96.65ms]
+(fail) Todo 13 · narrow widths keep real target sizes > 320x667 library: every painted shell control passes a real 44px edge-band hit test [88.62ms]
+(fail) Todo 13 · narrow widths keep real target sizes > 320x667 live: every painted shell control passes a real 44px edge-band hit test [104.27ms]
+(fail) Todo 13 · exactly one Stop and one timer > 1244 starting: one perceivable Stop and one perceivable timer [91.38ms]
+(fail) Todo 13 · exactly one Stop and one timer > 1244 capturing: one perceivable Stop and one perceivable timer [93.12ms]
+(fail) Todo 13 · exactly one Stop and one timer > 1244 stopping: one perceivable Stop and one perceivable timer [90.73ms]
+(fail) Todo 13 · exactly one Stop and one timer > 375 starting: one perceivable Stop and one perceivable timer [99.78ms]
+(fail) Todo 13 · exactly one Stop and one timer > 375 capturing: one perceivable Stop and one perceivable timer [94.15ms]
+(fail) Todo 13 · exactly one Stop and one timer > 375 stopping: one perceivable Stop and one perceivable timer [92.67ms]
+(fail) Todo 13 · exactly one Stop and one timer > 320 starting: one perceivable Stop and one perceivable timer [97.59ms]
+(fail) Todo 13 · exactly one Stop and one timer > 320 capturing: one perceivable Stop and one perceivable timer [93.51ms]
+(fail) Todo 13 · exactly one Stop and one timer > 320 stopping: one perceivable Stop and one perceivable timer [89.82ms]
+(fail) Todo 13 · exactly one Stop and one timer > reconnect during capture still shows exactly one Stop and one timer [101.18ms]
+(fail) Todo 13 · exactly one Stop and one timer > a compile job in flight never adds a second Stop or timer [109.46ms]
+(fail) Todo 13 · the capture control states its own gate reason > #btn-record carries the exact reason in title AND aria-label when disconnected [105.42ms]
+
+ 31 pass
+ 16 fail
+ 175 expect() calls
+Ran 47 tests across 1 file. [5.43s]

@@ -1,0 +1,5 @@
+# anti-slop scan (em/en dash + banned phrases) over DESIGN.md
+$ grep -n '[—–]' DESIGN.md
+matches=1(1 = none)
+$ grep -nEi 'delve|leverage|utilize|in order to|robust|streamline|facilitate' DESIGN.md
+matches=1(1 = none)

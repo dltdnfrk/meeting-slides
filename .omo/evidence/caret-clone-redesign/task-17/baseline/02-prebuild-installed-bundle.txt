@@ -1,0 +1,37 @@
+== installed bundle PRE-BUILD hashes ==
+ad3c20a34d7ac63497f1f0f79b2e261b22ed4d322d6ac3f8b2fb6d0b62a0c344  /Users/hyunjun/Applications/Meeting Slides.app/Contents/_CodeSignature/CodeResources
+ce111995689098c96140668314c063b0c154d723ed8a178fb7414f090683326e  /Users/hyunjun/Applications/Meeting Slides.app/Contents/Info.plist
+7173f815172d5e32045c35e3621062e9508af0f6a50f01b88264de6fa0186744  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+55182b91c2255401a77db395b8b7b97c1dccb482721f890337d584693cc7ae0a  /Users/hyunjun/Applications/Meeting Slides.app/Contents/Resources/project-path.txt
+
+== pre-build codesign ==
+Executable=/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+Identifier=com.meetingslides.app
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=398 flags=0x2(adhoc) hashes=6+3 location=embedded
+Hash type=sha256 size=32
+CandidateCDHash sha256=c88f89e76c4bbb46885c0f447a226307cdedbdb0
+CandidateCDHashFull sha256=c88f89e76c4bbb46885c0f447a226307cdedbdb097e017a512707d2ef75ed177
+Hash choices=sha256
+CMSDigest=c88f89e76c4bbb46885c0f447a226307cdedbdb097e017a512707d2ef75ed177
+CMSDigestType=2
+CDHash=c88f89e76c4bbb46885c0f447a226307cdedbdb0
+Signature=adhoc
+Info.plist entries=18
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=1
+Internal requirements count=0 size=12
+
+== repo symlink ==
+lrwxr-xr-x@ 1 hyunjun  staff  46 Aug 11 18:19 Meeting Slides.app -> /Users/hyunjun/Applications/Meeting Slides.app
+/Users/hyunjun/Applications/Meeting Slides.app
+
+== source hashes ==
+172fde90302b6d4fe9cac8674f79515b0b21beeebe4593dab1d04892773ee37c  macos/AppLifecycle.swift
+cc12dcffa9a6bfe184b2952a1c230767b2420404f4ccb3fbaea125c53cd419b4  macos/launcher.swift
+7847d1d3a3e5970ba0263f8d01317b53776f43dfa058e725eee2154fcd003316  macos/MinibarProjection.swift
+33f53850136754b16d85e7bf8b303a3e88c7eba88b7158d532200ff2e8f98f80  macos/MinibarView.swift
+79ebcc97662f301f07f9817feff4fde0825b48db3130f5580c6ab73a53f1b688  macos/MinibarWindowController.swift
+d750cd83253b2e6b46dc6a8172769f2b5f3d5c6c0c298da83965f2228df76721  macos/NativeSurfaceContract.swift
+110f12cf8fcc2ae913f49f386df1253319aa77f6fc0f88f2ec6b8604bdb60b6f  macos/TransportClient.swift
+b829809c23c75a955c30beabc2c5c08cd5d15791533b19a7a882fb19f1c2ba7c  scripts/build-app.sh

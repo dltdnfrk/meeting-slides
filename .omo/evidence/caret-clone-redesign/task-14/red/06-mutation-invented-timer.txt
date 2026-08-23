@@ -1,0 +1,6 @@
+== MUTATION 5: timer invented when the server gives no startedAt ==
+ 1 fail
+ 45 pass
+(fail) native minibar seam: timer derives from server startedAt > a capture without startedAt shows no invented timer [0.11ms]
+59e419c655438bbe6dfe8d06868eb10e96c1e33ad95730ba6267e11911133d44  macos/MinibarProjection.swift
+59e419c655438bbe6dfe8d06868eb10e96c1e33ad95730ba6267e11911133d44  /tmp/MinibarProjection.bak

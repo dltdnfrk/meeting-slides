@@ -1,0 +1,136 @@
+{
+  "stateId": "home-live-suggestion",
+  "url": "https://caret.so/en",
+  "finalUrl": "https://caret.so/en",
+  "viewport": {
+    "name": "1440x900",
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-08-11T06:34:30.128Z",
+  "deterministic": {
+    "locale": "ko-KR",
+    "timezone": "Asia/Seoul",
+    "deviceScaleFactor": 1,
+    "colorScheme": "dark",
+    "reducedMotion": "reduce"
+  },
+  "httpStatus": 200,
+  "anchorSelector": "[data-omo-state-anchor='1']",
+  "stageMarker": "[01] LIVE SUGGESTION",
+  "failedRequests": [
+    {
+      "url": "https://sr-client-cfg.amplitude.com/config/c66d626fa74aead399cece02de598bbd?config_group=browser",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://caret.so/en/auth/sign-in?next=/download?os=mac&_rsc=ry-B8umWgNEV4JR9",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://caret.so/en/auth/sign-in?next=/download?os=mac&_rsc=1vwYfVB7_E9t4fEj",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://caret.so/en",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://caret.so/en/auth/sign-in?_rsc=ry-B8umWgNEV4JR9",
+      "failure": "net::ERR_ABORTED"
+    }
+  ],
+  "record": {
+    "root": {
+      "selector": ":root",
+      "typography": {
+        "fontFamily": "ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(0, 0, 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(2.75381 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": -795,
+        "width": 1440,
+        "height": 5929.92
+      }
+    },
+    "stateAnchor": {
+      "selector": "[data-omo-state-anchor='1']",
+      "typography": {
+        "fontFamily": "\"DM Mono\", \"DM Mono Fallback\", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace",
+        "fontSize": "14px",
+        "fontWeight": "500",
+        "lineHeight": "20px",
+        "letterSpacing": "0.7px",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "oklab(0.919998 0.00111461 -0.00381714 / 0.5)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(98.26 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 208,
+        "y": 80,
+        "width": 182,
+        "height": 20
+      }
+    }
+  },
+  "missing": [],
+  "documentScrollWidth": 1440,
+  "documentClientWidth": 1440
+}

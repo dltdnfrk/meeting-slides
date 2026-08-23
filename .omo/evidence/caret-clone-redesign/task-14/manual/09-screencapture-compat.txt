@@ -1,0 +1,12 @@
+== 9. screen-capture compatibility probe (exact result only, no universal claim) ==
+Question: does the minibar appear in a public-API screen capture of the whole display?
+
+captured region PNG: 1120x440, bytes=44400
+
+RESULT: the panel IS captured by screencapture (a public capture API). The window uses
+no sharing-exclusion API, and NSWindow.SharingType.none is documented by Apple as a
+legacy constant macOS no longer honors. Therefore NO screen-share exclusion is claimed
+anywhere in the UI, source or docs. Per-application compatibility is Todo 17's matrix.
+
+-- proof that no source claims exclusion --
+no match in macos/*.swift

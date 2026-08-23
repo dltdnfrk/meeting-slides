@@ -1,0 +1,1164 @@
+{
+  "observer" : "CGWindowListCopyWindowInfo(.optionOnScreenOnly)",
+  "ownerInventory" : [
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 28,
+        "Width" : 29,
+        "X" : 5169,
+        "Y" : 1
+      },
+      "layer" : 2147483630,
+      "name" : "StatusIndicator",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 103576
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 28,
+        "Width" : 29,
+        "X" : 5169,
+        "Y" : 1
+      },
+      "layer" : 2147483630,
+      "name" : "StatusIndicator",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 103575
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 28,
+        "Width" : 29,
+        "X" : 3249,
+        "Y" : 1
+      },
+      "layer" : 2147483630,
+      "name" : "StatusIndicator",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 103574
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 28,
+        "Width" : 29,
+        "X" : 3249,
+        "Y" : 1
+      },
+      "layer" : 2147483630,
+      "name" : "StatusIndicator",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 103573
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 28,
+        "Width" : 29,
+        "X" : 6249,
+        "Y" : -123
+      },
+      "layer" : 2147483630,
+      "name" : "StatusIndicator",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 103572
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 28,
+        "Width" : 29,
+        "X" : 6249,
+        "Y" : -123
+      },
+      "layer" : 2147483630,
+      "name" : "StatusIndicator",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 103571
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 29,
+        "Width" : 29,
+        "X" : 1331,
+        "Y" : 2
+      },
+      "layer" : 2147483630,
+      "name" : "StatusIndicator",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 103570
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 29,
+        "Width" : 29,
+        "X" : 1331,
+        "Y" : 2
+      },
+      "layer" : 2147483630,
+      "name" : "StatusIndicator",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 103569
+    },
+    {
+      "alpha" : 0,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 1920,
+        "X" : 3432,
+        "Y" : 0
+      },
+      "layer" : 26,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "Kaku",
+      "ownerPID" : 31012,
+      "windowNumber" : 102635
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 32,
+        "X" : 4891,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.meetingslides.app",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 103568
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 32,
+        "X" : 5971,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "com.meetingslides.app",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 103567
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 32,
+        "X" : 2971,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.meetingslides.app",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 103565
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 32,
+        "X" : 1053,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "Item-0",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 103564
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 34,
+        "X" : 3003,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.steipete.codexbar",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96560
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 38,
+        "X" : 3037,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.kakao.KakaoTalkMac",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96558
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 44,
+        "X" : 3075,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.apple.TextInputMenuAgent",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96554
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 42,
+        "X" : 3119,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96492
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 38,
+        "X" : 3161,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96534
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 32,
+        "X" : 3199,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.apple.Spotlight",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96552
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 42,
+        "X" : 3231,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96546
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 159,
+        "X" : 3273,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96523
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 34,
+        "X" : 6003,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "com.steipete.codexbar",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 101616
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 38,
+        "X" : 6037,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "com.kakao.KakaoTalkMac",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 101615
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 44,
+        "X" : 6075,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "com.apple.TextInputMenuAgent",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 101614
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 42,
+        "X" : 6119,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 101608
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 38,
+        "X" : 6161,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 101611
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 32,
+        "X" : 6199,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "com.apple.Spotlight",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 101613
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 42,
+        "X" : 6231,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 101612
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 159,
+        "X" : 6273,
+        "Y" : -124
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 101610
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 42,
+        "X" : 1313,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "BentoBox-0",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 74
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 34,
+        "X" : 1085,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "codexbar-merged",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 70285
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 38,
+        "X" : 1119,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "Item-0",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 15186
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 44,
+        "X" : 1157,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "Item-0",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 631
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 42,
+        "X" : 1201,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "Battery",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 70
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 38,
+        "X" : 1243,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "WiFi",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 73
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 32,
+        "X" : 1281,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "Item-0",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 132
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 159,
+        "X" : 1355,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "Clock",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 72
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 34,
+        "X" : 4923,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.steipete.codexbar",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96413
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 38,
+        "X" : 4957,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.kakao.KakaoTalkMac",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96411
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 44,
+        "X" : 4995,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.apple.TextInputMenuAgent",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96407
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 32,
+        "X" : 5119,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "com.apple.Spotlight",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96405
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 42,
+        "X" : 5039,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96296
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 38,
+        "X" : 5081,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96390
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 42,
+        "X" : 5151,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96397
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 159,
+        "X" : 5193,
+        "Y" : 0
+      },
+      "layer" : 25,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "제어 센터",
+      "ownerPID" : 807,
+      "windowNumber" : 96369
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 1080,
+        "X" : 5352,
+        "Y" : -124
+      },
+      "layer" : 24,
+      "name" : "Menubar",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 96556
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 1920,
+        "X" : 3432,
+        "Y" : 0
+      },
+      "layer" : 24,
+      "name" : "Menubar",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 97005
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 30,
+        "Width" : 1920,
+        "X" : 1512,
+        "Y" : 0
+      },
+      "layer" : 24,
+      "name" : "Menubar",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 96996
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 33,
+        "Width" : 1512,
+        "X" : 0,
+        "Y" : 0
+      },
+      "layer" : 24,
+      "name" : "Menubar",
+      "onScreen" : true,
+      "ownerName" : "Window Server",
+      "ownerPID" : 414,
+      "windowNumber" : 92916
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 982,
+        "Width" : 1512,
+        "X" : 0,
+        "Y" : 0
+      },
+      "layer" : 20,
+      "name" : "Dock",
+      "onScreen" : true,
+      "ownerName" : "Dock",
+      "ownerPID" : 846,
+      "windowNumber" : 27
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 56,
+        "Width" : 360,
+        "X" : 1136,
+        "Y" : 854
+      },
+      "layer" : 3,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "Meeting Slides",
+      "ownerPID" : 76243,
+      "windowNumber" : 103563
+    },
+    {
+      "alpha" : 0,
+      "bounds" : {
+        "Height" : 20,
+        "Width" : 20,
+        "X" : 755,
+        "Y" : 481
+      },
+      "layer" : 3,
+      "name" : "CodexBarLifecycleKeepalive",
+      "onScreen" : true,
+      "ownerName" : "CodexBar",
+      "ownerPID" : 34466,
+      "windowNumber" : 70284
+    },
+    {
+      "alpha" : 0,
+      "bounds" : {
+        "Height" : 68,
+        "Width" : 1920,
+        "X" : 1512,
+        "Y" : 30
+      },
+      "layer" : 0,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "Aside",
+      "ownerPID" : 44555,
+      "windowNumber" : 94481
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 1050,
+        "Width" : 1920,
+        "X" : 1512,
+        "Y" : 30
+      },
+      "layer" : 0,
+      "name" : "Meeting Slides - F3 isolated",
+      "onScreen" : true,
+      "ownerName" : "Aside",
+      "ownerPID" : 44555,
+      "windowNumber" : 94478
+    },
+    {
+      "alpha" : 0,
+      "bounds" : {
+        "Height" : 32,
+        "Width" : 1920,
+        "X" : 3432,
+        "Y" : 30
+      },
+      "layer" : 0,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "Kaku",
+      "ownerPID" : 31012,
+      "windowNumber" : 89189
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 1050,
+        "Width" : 1920,
+        "X" : 3432,
+        "Y" : 30
+      },
+      "layer" : 0,
+      "name" : "Documents\/Neobio",
+      "onScreen" : true,
+      "ownerName" : "Kaku",
+      "ownerPID" : 31012,
+      "windowNumber" : 37416
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 892,
+        "Width" : 380,
+        "X" : 1129,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "에르메스단",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 100495
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 400,
+        "X" : 1111,
+        "Y" : 34
+      },
+      "layer" : 0,
+      "name" : "카카오톡",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 55843
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 380,
+        "X" : 1077,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "현준",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 100144
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 697,
+        "Width" : 964,
+        "X" : 129,
+        "Y" : 163
+      },
+      "layer" : 0,
+      "name" : "orchard-hygiene-pptx-previews",
+      "onScreen" : true,
+      "ownerName" : "Finder",
+      "ownerPID" : 848,
+      "windowNumber" : 94346
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 1512,
+        "X" : 0,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "하나은행 기업뱅킹[ocp3-74001]",
+      "onScreen" : true,
+      "ownerName" : "Google Chrome",
+      "ownerPID" : 89291,
+      "windowNumber" : 102153
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 831,
+        "Width" : 380,
+        "X" : 1019,
+        "Y" : 61
+      },
+      "layer" : 0,
+      "name" : "ASCA WEEK 2026",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 89281
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 891,
+        "Width" : 380,
+        "X" : 1132,
+        "Y" : 34
+      },
+      "layer" : 0,
+      "name" : "김기태, 안종현, 원대연, 전힘찬, 한대희",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 85937
+    },
+    {
+      "alpha" : 0,
+      "bounds" : {
+        "Height" : 32,
+        "Width" : 1080,
+        "X" : 5352,
+        "Y" : -94
+      },
+      "layer" : 0,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "MiaoYan",
+      "ownerPID" : 821,
+      "windowNumber" : 898
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 1890,
+        "Width" : 1080,
+        "X" : 5352,
+        "Y" : -94
+      },
+      "layer" : 0,
+      "name" : "MiaoYan",
+      "onScreen" : true,
+      "ownerName" : "MiaoYan",
+      "ownerPID" : 821,
+      "windowNumber" : 399
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 856,
+        "Width" : 380,
+        "X" : 709,
+        "Y" : 43
+      },
+      "layer" : 0,
+      "name" : "공공AX 네트워크",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 96006
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 1512,
+        "X" : 0,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "모든 iCloud",
+      "onScreen" : true,
+      "ownerName" : "메모",
+      "ownerPID" : 819,
+      "windowNumber" : 543
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 380,
+        "X" : 1132,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "6차산업 20기 단톡방!",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 100443
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 1512,
+        "X" : 0,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "✓ 오케이 마누스로 할 수 있는 활동은?",
+      "onScreen" : true,
+      "ownerName" : "Safari",
+      "ownerPID" : 761,
+      "windowNumber" : 394
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 885,
+        "Width" : 380,
+        "X" : 1086,
+        "Y" : 36
+      },
+      "layer" : 0,
+      "name" : "ㅇ",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 93181
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 1512,
+        "X" : 0,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "Polaris Office Editor",
+      "ownerPID" : 45335,
+      "windowNumber" : 28094
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 380,
+        "X" : 697,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "신지식농업인중앙회 이영래 사무총장님",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 89142
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 380,
+        "X" : 328,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "박수경 교수님, 신지식농업인중앙회 이영래 사무총장님",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 85961
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 383,
+        "X" : 1064,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "이동규 박사님",
+      "onScreen" : true,
+      "ownerName" : "카카오톡",
+      "ownerPID" : 18269,
+      "windowNumber" : 85442
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 893,
+        "Width" : 1512,
+        "X" : 0,
+        "Y" : 33
+      },
+      "layer" : 0,
+      "name" : "ASCA_Week_2026_일정표_한글 파이널 02  -  호환성 모드",
+      "onScreen" : true,
+      "ownerName" : "Microsoft Word",
+      "ownerPID" : 76319,
+      "windowNumber" : 79398
+    },
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 408,
+        "Width" : 230,
+        "X" : 731,
+        "Y" : 429
+      },
+      "layer" : 0,
+      "name" : "계산기",
+      "onScreen" : true,
+      "ownerName" : "계산기",
+      "ownerPID" : 837,
+      "windowNumber" : 305
+    }
+  ],
+  "targetPID" : 76243,
+  "targetWindowCount" : 1,
+  "targetWindows" : [
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 56,
+        "Width" : 360,
+        "X" : 1136,
+        "Y" : 854
+      },
+      "layer" : 3,
+      "name" : "",
+      "onScreen" : true,
+      "ownerName" : "Meeting Slides",
+      "ownerPID" : 76243,
+      "windowNumber" : 103563
+    }
+  ]
+}

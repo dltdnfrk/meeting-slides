@@ -1,0 +1,4 @@
+README documented launcher invocation:
+81:bash scripts/build-app.sh
+82:bash scripts/verify-app.sh "$HOME/Applications/Meeting Slides.app"
+83:open -a "Meeting Slides"

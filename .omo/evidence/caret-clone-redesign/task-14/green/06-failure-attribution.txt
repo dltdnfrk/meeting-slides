@@ -1,0 +1,21 @@
+== failure attribution (scoped, no pristine re-run) ==
+This task's suites, single run:
+ 119 pass
+ 0 fail
+
+Full-suite run: 640 pass / 64 fail / 4 errors (green/05-full-bun-test.txt).
+Failing suites, by owning file (from the same run):
+  tests/llm-transport.test.ts, tests/scene-pptx.test.ts, tests/scene-compile-action.test.ts,
+  tests/attendees-action.test.ts, tests/public-attendees.test.ts, tests/server-ws-dispatch.test.ts,
+  tests/start-review-action.test.ts, tests/public-workspace.test.ts, tests/public-operator-surface.test.ts,
+  tests/public-transcript-dock.test.ts, tests/public-shell.test.ts, tests/public-caret-harness.test.ts,
+  tests/public-caret-library.test.ts, src/ask.test.ts
+
+None of these loads a macOS Swift source or scripts/build-app.sh:
+tests/native-launcher-boundary.test.ts
+tests/native-minibar.test.ts
+tests/native-surface-contract.test.ts
+
+=> The only suites that read this task's files are native-minibar / native-surface-contract /
+   native-launcher-boundary, and all three are 119/119 green. The rest are Puppeteer-browser,
+   LLM-transport, PPTX and server-dispatch suites owned by sibling/pre-existing work.

@@ -1,0 +1,5 @@
+?? .omo/evidence/caret-clone-redesign/final/f3-repair/menu-toggle/
+?? macos/MinibarWindowController.swift
+?? macos/NativeSurfaceContract.swift
+?? tests/fixtures/native-surface-driver.swift
+?? tests/native-surface-contract.test.ts

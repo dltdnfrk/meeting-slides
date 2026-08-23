@@ -1,0 +1,129 @@
+{
+  "taskId": "st_019ff000",
+  "plan": "caret-clone-redesign",
+  "checkbox": "14",
+  "title": "Implement native macOS minibar projection",
+  "status": "done",
+  "verifiedBy": "senpi-task-st_019ff000",
+  "worktree": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "baselineHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "committed": false,
+  "commitAuthorized": false,
+
+  "deliverables": {
+    "macos/MinibarProjection.swift": "59e419c655438bbe6dfe8d06868eb10e96c1e33ad95730ba6267e11911133d44",
+    "macos/MinibarWindowController.swift": "8dac7b3a23a3b72c2778d738b2593e3e9382a3bbbe7f7f2b12f05962cf64eab4",
+    "macos/MinibarView.swift": "e1c033b44a2febfc15dd3bc367982e9f4cd31794a9f8500718a00087672bccad",
+    "macos/launcher.swift": "cc12dcffa9a6bfe184b2952a1c230767b2420404f4ccb3fbaea125c53cd419b4",
+    "scripts/build-app.sh": "b829809c23c75a955c30beabc2c5c08cd5d15791533b19a7a882fb19f1c2ba7c",
+    "tests/fixtures/native-minibar-driver.swift": "25784ab3599d1eba8b655f14acb6d6a03cd4148dff7b07df085e036953ab754d",
+    "tests/native-minibar.test.ts": "12a3465d098d060317581fe88dfffd61fd733fe83e6e72b70d22b3b3e5cec850",
+    "tests/native-surface-contract.test.ts": "8cfc74163357ff69c51ba0180f7835b61c3ec483564651bea7279ced73a4afba",
+    "tests/native-launcher-boundary.test.ts": "044a4649e9648245f56e75ddc5759af3537bfdb2b387eab33905645ee9a71f82",
+    "evidence": ".omo/evidence/caret-clone-redesign/task-14/"
+  },
+
+  "preservedFromPriorTodos": {
+    "macos/NativeSurfaceContract.swift": "d750cd83253b2e6b46dc6a8172769f2b5f3d5c6c0c298da83965f2228df76721",
+    "macos/AppLifecycle.swift": "172fde90302b6d4fe9cac8674f79515b0b21beeebe4593dab1d04892773ee37c",
+    "macos/TransportClient.swift": "110f12cf8fcc2ae913f49f386df1253319aa77f6fc0f88f2ec6b8604bdb60b6f",
+    "note": "byte-identical to the Todo-5/10 DoneClaim hashes; the minibar reuses their geometry, decoder, StopCommandGuard and connection state machine instead of duplicating them"
+  },
+
+  "namingDeviation": {
+    "planned": "macos/CaretMinibarController.swift, macos/StatusItemController.swift",
+    "delivered": "macos/MinibarWindowController.swift, macos/MinibarView.swift, macos/MinibarProjection.swift",
+    "reason": "Task brief explicitly authorized these names ('names may align with current architecture'). The status item is a ~15-line member of MinibarWindowController rather than a separate file, because a second controller for one NSStatusItem would be indirection without a decision. No 'Caret' prefix ships in product source, consistent with the brand boundary in DESIGN.md 9.2."
+  },
+
+  "acceptanceCriteria": [
+    { "criterion": "Swift driver/native tests and swiftc pass", "result": "pass", "evidence": "green/08-green-final.txt: 120 pass / 0 fail across the three native suites in a single run; swiftc -typecheck of the full native surface exit 0; swiftc -O builds the driver and the bundle executable" },
+    { "criterion": "real panel bounds match 360x56 and 560x220 within 1px", "result": "pass", "evidence": "manual/02: AX reports 360x56 exactly; manual/04: AX reports 560x220 exactly. 0px error, not 1px." },
+    { "criterion": "remain on-screen across display fixtures", "result": "pass", "evidence": "manual/02: default frame at AX (1136,856) independently recomputed from the real 4-display layout = 16px gutter on both axes; manual/08: a saved frame at (90000,90000) falls back to the same deterministic default; driver covers second-display, half-off-display and clamped cases" },
+    { "criterion": "do not activate on automatic capture", "result": "pass", "evidence": "MinibarActivation.plan(origin:.automatic) -> activatesApp=false, focusesStop=false; launcher presents with origin .automatic; mutation red/05 proves the assertion binds" },
+    { "criterion": "project exact server timer/transcript/connection state", "result": "pass", "evidence": "manual/03: AX text ●/녹음 중/지금 말하는 중…/03:51 with the timer derived from the fixture's startedAt; manual/06b: reconnecting retains timer 04:47 and the known line; manual/04: 3 finalized lines with speaker labels, oldest evicted on the 4th" },
+    { "criterion": "send one Stop", "result": "pass", "evidence": "manual/05: 5 rapid real clicks -> exactly one {\"action\":\"stopCapture\"} received by the server; driver covers spam, across-reconnect and while-idle; mutation red/07 proves the guard binds" },
+    { "criterion": "open the browser workspace", "result": "pass", "evidence": "manual/11: 작업 공간 열기 clicked, NSWorkspace.shared.open of http://localhost:<port>/; binary has 0 WebKit references" },
+    { "criterion": "refuse immediate quit while capturing", "result": "pass", "evidence": "manual/10: quit while capturing raises a 경고 / AXDialog with 계속 녹음 / 종료; the quit AppleEvent times out because the modal blocks; the process stays alive and capture is intact; quitting while idle exits cleanly" },
+    { "criterion": "no WebKit import or second state store exists", "result": "pass", "evidence": "otool -L on the built executable: 0 WebKit; test asserts no WebKit/WKWebView/Electron/Tauri in the shell and no AppKit/window/socket/clock in the projection; the bounded 3-row viewport is cleared by an authoritative idle snapshot" },
+    { "criterion": "collapsed shows recording state, timer, one line, Stop and disclosure", "result": "pass", "evidence": "manual/02, 03 and screenshots/01-collapsed-live.png: all five inside one 360x56 row" },
+    { "criterion": "expanded shows at most three finalized lines plus one provisional and Open Workspace", "result": "pass", "evidence": "manual/04 and screenshots/02-expanded-live.png; driver scenario expanded-shows-at-most-three-finals-plus-provisional" },
+    { "criterion": "Escape collapse, expanded-only resize, drag threshold", "result": "pass", "evidence": "manual/11: Escape 560x220 -> 360x56 with the stopCapture count unchanged and capture still live; MinibarWindowPolicy.resizable(in:) is expanded-only and asserted; dragThreshold=4 asserted" },
+    { "criterion": "keep app Dock identity unchanged, no Pause, no screen-share claim", "result": "pass", "evidence": "dockIdentityChanged=false asserted; control vocabulary closed to stop/disclosure/openWorkspace; test asserts no Pause/share/sharingType string in any native source; manual/09 records the exact capture result instead of a claim" }
+  ],
+
+  "qaScenarios": {
+    "happy": "Built a TEMP app bundle into a temp install dir, pointed it at a deterministic local fixture (health signature + scripted capture/line/caption on port 8899, startedAt pinned 65s in the past), and launched the real .app. The launcher adopted the fixture session without spawning a second Bun, opened the browser once, and logged 미니바 준비됨. Drove starting -> capturing -> line -> caption -> expand -> Stop -> idle with real AX clicks, capturing osascript bounds, the AX text/button tree and two screenshots at both contract sizes.",
+    "failure": "Socket dropped mid-capture: the panel showed ↻ 연결 끊김 — 재연결 중 while retaining the timer and the known line, then the authoritative snapshot restored 녹음 중 (manual/06, 06b). Truncated JSON and a badly typed line both surfaced ! 오류 with the last known content intact and no crash (manual/07). A saved frame at (90000,90000) fell back to the deterministic default (manual/08). Quit while capturing raised a blocking confirmation and the process survived (manual/10)."
+  },
+
+  "redProof": {
+    "missingSeam": "red/01-red-missing-seam.txt -> 46 fail / 0 pass, exit 1, before any implementation existed.",
+    "mutations": [
+      "red/02: reconnecting reports idle instead of retaining capture truth -> 2 targeted failures",
+      "red/03: the 3-row transcript cap removed -> 1 targeted failure",
+      "red/04: Stop advertised as enabled while reconnecting -> 1 targeted failure",
+      "red/05: automatic capture steals OS focus -> 1 targeted failure",
+      "red/06: timer invented when the server gives no startedAt -> 1 targeted failure",
+      "red/07: duplicate-Stop guard bypassed -> 4 targeted failures across this suite and Todo 10"
+    ],
+    "restoration": "every mutation reverted from a byte-identical backup with hash equality shown in-run; TransportClient.swift restored to its exact Todo-10 hash 110f12cf…",
+    "designFix": "the decode-failure probe exposed that a badly typed `line` payload is outside the transport's observed subset, so reusing the transport's counter would have hidden a real rejection. The projection now counts its own rejections and the test pins both counters."
+  },
+
+  "defectsFoundByRealQA": [
+    "Collapsed panel measured 360x88 instead of 360x56: Auto Layout content grew the window past the contract. Fixed by pinning contentMinSize/contentMaxSize to the contract size and moving the collapsed single line inline into the one 44pt header row. A regression test now pins both. Re-measured: 360x56 exactly.",
+    "cancelOperation was declared on the NSObject controller, which is not a responder, so Escape would never have fired. Moved onto MinibarPanel, which forwards to the pure MinibarMode rule. Re-verified on the real panel: 560x220 -> 360x56 with no outbound command."
+  ],
+
+  "verification": {
+    "focused": "bun test tests/native-minibar.test.ts tests/native-surface-contract.test.ts tests/native-launcher-boundary.test.ts -> 120 pass / 0 fail, exit 0, single run, no retries",
+    "task5Task10Regression": "Both suites green. One staging assertion in each was replaced, not weakened: they asserted 'the minibar modules are NOT wired into the bundle yet', which Todo 14 is chartered to change. The surviving invariant is stronger and still binding: exactly one `swiftc -O -o` invocation, one CFBundleExecutable, and no `-framework WebKit`.",
+    "swift": "swiftc -typecheck of the full native surface (contract + lifecycle + transport + projection + controller + view + launcher) exit 0; pure-seam-only typecheck exit 0; swiftc -O built the real bundle executable twice",
+    "buildScript": "scripts/build-app.sh run for real into a temp install dir: swiftc, plutil -lint, codesign --force --deep, codesign --verify --deep --strict and the WebKit-linkage rejection all pass, exit 0",
+    "types": "tsc --strict --noEmit exit 0; LSP error diagnostics clean on tests/native-minibar.test.ts",
+    "whitespace": "git diff --check -> exit 0",
+    "full": "bun test -> 640 pass / 64 fail / 4 errors, single run. This task's suites are 120/120 inside the native re-run.",
+    "fullFailureAttribution": "PRE-EXISTING / sibling-owned. The failures are Puppeteer-browser, LLM-transport, PPTX/scene, attendees, server-dispatch and review suites. Only three suites read this task's files and all three are green (green/06-failure-attribution.txt).",
+    "manual": "Real temporary .app bundle launched against a deterministic fixture; collapsed/expanded bounds, AX tree, buttons, Stop-once, reconnect, off-display restoration, bad payload, Escape, Open Workspace, quit-while-capturing and screen-capture compatibility all exercised by hand with osascript and screencapture receipts. The canonical installed app was never rebuilt."
+  },
+
+  "adversarialProbes": {
+    "malformed_json": "truncated JSON and a badly typed line both surface ! 오류 on the real panel while retaining the last known line and timer; no crash; the next authoritative snapshot recovers (manual/07). The driver additionally covers non-JSON, wrong field types and a malformed batch.",
+    "offline_stop": "Stop while the socket is down emits nothing (driver scenario stop-while-idle-emits-nothing and the transport's online guard); Stop is truthfully disabled outside live/starting.",
+    "repeated_stop": "5 rapid real clicks -> exactly one stopCapture frame on the wire (manual/05); spam-across-reconnect also emits exactly one (driver).",
+    "foreign_adopted_server": "the launcher adopted the healthy fixture session instead of spawning a second Bun (launcher log: '이미 실행 중인 Meeting Slides 서버를 사용합니다'), and owned nothing; Todo-10's typed portOccupiedByForeignServer path is unchanged.",
+    "reconnect": "socket dropped mid-capture -> ↻ 연결 끊김 — 재연결 중 with the timer basis and known line retained, then restored by the authoritative snapshot; sampled at 10ms granularity (manual/06b).",
+    "off_display_frame": "a saved frame at (90000,90000) is rejected by the >=50%-visible rule and falls back to the deterministic default 1136,856,360x56 (manual/08).",
+    "repeated_interruption": "Todo-10's ServerLifecycle is unchanged and still terminates at most once; the launcher now quits through applicationShouldTerminate, which runs the same handle(.quit) effects exactly once.",
+    "screen_capture_compatibility": "EXACT RESULT, NO CLAIM: the minibar IS captured by screencapture, a public capture API. No exclusion API is used; NSWindow.SharingType.none is documented as legacy and unhonored. No UI, source or doc string claims screen-share exclusion; rg over macos/*.swift finds no sharingType or screen-share text (manual/09).",
+    "generated_binaries": "the suite builds into mkdtemp and removes it in afterAll; the temp app bundle, temp project, fixture server, app defaults and every helper file were deleted; no listener on 8899 and no orphan process remain (manual/12).",
+    "symlink_side_effect": "the temp-dir build repointed the repo 'Meeting Slides.app' symlink (known Todo-10 risk); detected and restored to $HOME/Applications/Meeting Slides.app in the same turn, verified twice (manual/01, manual/12).",
+    "flaky_tests": "no sleep, poll or timing dependency in the seam; compile and run happen once in beforeAll; async behavior is modeled as ordered event lists and `now` is injected. The only waits are in the manual QA against a real GUI, which is not part of the test suite.",
+    "prompt_injection": "N/A - all driver and fixture input is literal and authored in this task."
+  },
+
+  "cleanup": {
+    "temporaryAppBundle": "deleted; canonical $HOME/Applications/Meeting Slides.app byte-identical to baseline (executable 7173f815…, Info.plist ce111995…)",
+    "repoSymlink": "restored to /Users/hyunjun/Applications/Meeting Slides.app and verified",
+    "temporaryFixture": "fixture server killed (needed SIGKILL after its cwd was deleted), temp project dir removed, port 8899 free",
+    "appDefaults": "com.meetingslides.app defaults deleted, including the minibar.frame.v1 key written during QA",
+    "mutationProbes": "all reverted; module hashes match their backups and the Todo-5/10 DoneClaim hashes",
+    "temporaryBinaries": "suite build dirs removed in afterAll; helper files under /tmp deleted",
+    "processes": "no orphan meeting-slides, bun or fixture process attributable to this task"
+  },
+
+  "preservedDirtyWork": {
+    "unchanged": "22 of 25 protected pre-existing dirty paths are byte-identical, including DESIGN.md, README.md, server.ts, all src/*.ts, public/transcript-state.ts, public/ui-state-machine.ts and the three prior native modules",
+    "changedBySiblings": "public/app.js, public/index.html and public/operator-surface.js changed at 17:58-18:04 by concurrent Todo 11-13 work. This task never opened them for writing and left them exactly as found."
+  },
+
+  "risks": [
+    "scripts/build-app.sh still repoints the repository 'Meeting Slides.app' symlink whenever MEETING_SLIDES_APP_DIR is overridden. It was restored here, but Todo 17 should make that update conditional on building into the canonical install dir.",
+    "The installed $HOME/Applications/Meeting Slides.app was intentionally NOT rebuilt, so the shipped bundle still contains the pre-minibar binary until Todo 17 runs.",
+    "The launcher now sets NSApplication activation policy .regular and runs an AppKit run loop, so the app keeps a Dock tile while the minibar lives. This preserves the documented Dock identity, but Todo 17 should confirm the LSUIElement=false choice is still what the product wants now that a persistent ambient surface exists.",
+    "The minibar is visible to public screen-capture APIs (manual/09). This is recorded as the exact result; if the product later wants any narrower statement, Todo 17's per-application matrix must authorize it.",
+    "windowDidMove/windowDidResize persist the frame with displayId 0 rather than the resolved display id. Restoration is still correct because resolveFrame re-derives the host display from the saved rect, but the stored id is not meaningful and should be either populated or dropped in a later pass.",
+    "The AppKit shell is exercised by real manual QA and swiftc typecheck, not by automated GUI tests. Its thinness is enforced structurally (source assertions) plus the pure projection's 47 tests; a GUI regression would be caught by Todo 17/19 manual QA rather than by bun test."
+  ]
+}

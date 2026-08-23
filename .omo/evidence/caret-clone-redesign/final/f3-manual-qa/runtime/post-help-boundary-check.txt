@@ -1,0 +1,22 @@
+24744ca540901c875784e3e8a3808343e2ea6e84a66301eac14779fc13260806  meetings.db
+2f28a9abc88037a66fd89375e8bc250ad7ef787195a2e1242646a9a460a52d9e  meetings.db-shm
+1bb6f41e4f260aacffe6a06745b1a28c384c0f7757eba496d930b2549d2bc0dc  meetings.db-wal
+37608 /bin/bash -c E=.omo/evidence/caret-clone-redesign/final/f3-manual-qa
+{
+ shasum -a 256 meetings.db meetings.db-shm meetings.db-wal 2>/dev/null || true
+ pgrep -afil '/Meeting Slides.app/Contents/MacOS/meeting-slides|bun run server.ts' || true
+ lsof -nP -iTCP:8787 -sTCP:LISTEN || true
+ echo 'help stdout:'; cat "$E/build/help.stdout"; echo 'help stderr:'; cat "$E/build/help.stderr"; echo exit=$(cat "$E/build/help.exit")
+} | tee "$E/runtime/post-help-boundary-check.txt"
+37609 /bin/bash -c E=.omo/evidence/caret-clone-redesign/final/f3-manual-qa
+{
+ shasum -a 256 meetings.db meetings.db-shm meetings.db-wal 2>/dev/null || true
+ pgrep -afil '/Meeting Slides.app/Contents/MacOS/meeting-slides|bun run server.ts' || true
+ lsof -nP -iTCP:8787 -sTCP:LISTEN || true
+ echo 'help stdout:'; cat "$E/build/help.stdout"; echo 'help stderr:'; cat "$E/build/help.stderr"; echo exit=$(cat "$E/build/help.exit")
+} | tee "$E/runtime/post-help-boundary-check.txt"
+COMMAND     PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+com.docke 78397 hyunjun  155u  IPv4 0xbd84a451bcbcbb18      0t0  TCP 127.0.0.1:8787 (LISTEN)
+help stdout:
+help stderr:
+exit=143

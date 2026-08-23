@@ -1,0 +1,160 @@
+{
+  "phase": "journey",
+  "checkpoints": [
+    {
+      "name": "native-driver-compiled",
+      "at": "2026-08-12T02:27:52.450Z"
+    },
+    {
+      "name": "app-ready",
+      "at": "2026-08-12T02:27:54.036Z",
+      "pid": 21782,
+      "port": 54321
+    },
+    {
+      "name": "empty-library",
+      "at": "2026-08-12T02:27:55.082Z",
+      "sessions": 0
+    },
+    {
+      "name": "native-connected",
+      "at": "2026-08-12T02:27:55.282Z",
+      "connection": "online"
+    },
+    {
+      "name": "cycle1-lines",
+      "at": "2026-08-12T02:27:55.703Z",
+      "finalizedLines": 16,
+      "nativeCapturePhase": "capturing",
+      "nativeTimer": "00:00"
+    },
+    {
+      "name": "native-projection",
+      "at": "2026-08-12T02:27:55.704Z",
+      "lines": 3,
+      "timer": "00:00"
+    },
+    {
+      "name": "native-open-workspace",
+      "at": "2026-08-12T02:27:56.700Z",
+      "target": "http://localhost:54321/"
+    },
+    {
+      "name": "live-viewports",
+      "at": "2026-08-12T02:27:58.175Z",
+      "widths": [
+        "375",
+        "820",
+        "960"
+      ]
+    },
+    {
+      "name": "live-compile-history",
+      "at": "2026-08-12T02:27:58.302Z",
+      "compileStatus": "슬라이드 3장 완성",
+      "compiledThumbnails": 3
+    },
+    {
+      "name": "live-exports",
+      "at": "2026-08-12T02:27:58.380Z",
+      "artifacts": 17
+    },
+    {
+      "name": "reconnect",
+      "at": "2026-08-12T02:28:01.393Z",
+      "linesBeforeReconnect": 16,
+      "linesAfterReconnect": 16,
+      "disconnectedStatus": "앱 서버 연결이 끊겼습니다. 다시 연결하는 중…"
+    },
+    {
+      "name": "live-reopened",
+      "at": "2026-08-12T02:28:01.516Z",
+      "lines": 16
+    },
+    {
+      "name": "native-stop-cycle1",
+      "at": "2026-08-12T02:28:02.471Z",
+      "emitted": 1
+    },
+    {
+      "name": "just-ended-selected",
+      "at": "2026-08-12T02:28:02.554Z",
+      "selected": 1,
+      "sessions": 1
+    },
+    {
+      "name": "review",
+      "at": "2026-08-12T02:28:02.909Z",
+      "state": "ready",
+      "hidden": false,
+      "items": 0,
+      "confirmDisabled": false,
+      "confirmed": true
+    },
+    {
+      "name": "reload",
+      "at": "2026-08-12T02:28:02.989Z",
+      "sessionsAfterReload": 1,
+      "hashesStable": true
+    },
+    {
+      "name": "history-restored",
+      "at": "2026-08-12T02:28:03.038Z",
+      "restoredLines": 16
+    },
+    {
+      "name": "viewports",
+      "at": "2026-08-12T02:28:03.205Z",
+      "widths": [
+        "320",
+        "375",
+        "960",
+        "1280"
+      ]
+    },
+    {
+      "name": "settings",
+      "at": "2026-08-12T02:28:03.252Z",
+      "providers": 6,
+      "current": "cli:claude",
+      "modelControls": 3
+    },
+    {
+      "name": "ask-grounded",
+      "at": "2026-08-12T02:28:03.325Z",
+      "answer": "배포일과 담당자는 누구인가요?금요일 배포로 결정했고 민수가 릴리스 노트를 담당합니다.\n\n\n(전사 5개 구간에서 답변)"
+    },
+    {
+      "name": "failure-announced",
+      "at": "2026-08-12T02:28:03.365Z",
+      "failureText": "슬라이드를 만들지 못했습니다: 저장된 회의를 찾을 수 없습니다",
+      "failureRole": "status"
+    },
+    {
+      "name": "cycle2",
+      "at": "2026-08-12T02:28:06.067Z",
+      "finalizedLines": 5,
+      "stopsSent": 1,
+      "sessions": 2
+    },
+    {
+      "name": "journey-pass",
+      "at": "2026-08-12T02:28:06.068Z",
+      "finalSessions": 2,
+      "totalStops": 2,
+      "totalStarts": 2,
+      "consoleErrors": 1,
+      "exportArtifacts": 17,
+      "nativeDropCount": 0
+    },
+    {
+      "name": "cleanup",
+      "at": "2026-08-12T02:28:06.492Z",
+      "markerRestored": true,
+      "defaultsRestore": true,
+      "portFree": true,
+      "ownedProcessAlive": "no",
+      "temporaryRemoved": true
+    }
+  ]
+}

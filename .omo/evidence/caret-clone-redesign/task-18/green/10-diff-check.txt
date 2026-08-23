@@ -1,0 +1,38 @@
+$ git diff --check
+EXIT=0
+$ git diff --stat
+ .env.example                              |   9 +-
+ .omo/start-work/ledger.jsonl              |  29 +
+ DESIGN.md                                 | 669 ++++++++++++++---------
+ README.md                                 |  42 +-
+ macos/launcher.swift                      | 528 +++++++++++-------
+ public/app.js                             | 262 ++++++++-
+ public/index.html                         | 203 +++++--
+ public/operational-liquid.css             | 861 ------------------------------
+ public/operator-surface.js                | 368 ++++++++++++-
+ public/style.css                          | 598 +--------------------
+ public/transcript-overlay.css             | 340 ------------
+ public/transcript-overlay.js              | 425 ---------------
+ public/workspace-shell.css                | 372 -------------
+ public/workspace-split.js                 |  16 +-
+ scripts/build-app.sh                      |  23 +-
+ server.ts                                 |  43 +-
+ src/app-settings.ts                       |   2 -
+ src/config.ts                             |  12 +-
+ src/llm.ts                                |   4 -
+ src/minutes.ts                            |   1 -
+ src/provider-adapters.ts                  |   2 +-
+ src/providers.ts                          |   9 -
+ tests/app-settings.test.ts                |   1 +
+ tests/providers.test.ts                   |  11 +-
+ tests/public-attendees.test.ts            |  48 +-
+ tests/public-compile-control.test.ts      |   5 +
+ tests/public-operator-surface.test.ts     | 189 ++++++-
+ tests/public-protocol-reliability.test.ts |  17 +
+ tests/public-runtime-guard.test.ts        |   2 +-
+ tests/public-shell.test.ts                |   4 +-
+ tests/public-test-harness.ts              |  61 ++-
+ tests/public-transcript-dock.test.ts      | 198 +------
+ tests/public-workspace.test.ts            | 313 ++++++++---
+ tests/server-ws-dispatch.test.ts          |  54 +-
+ 34 files changed, 2270 insertions(+), 3451 deletions(-)

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "task": "F2. Code quality review",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "completedAt": "2026-08-12T04:28:22Z",
+  "status": "FAIL",
+  "verdict": "REJECT",
+  "auditedHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "findings": {
+    "high": 0,
+    "medium": 1,
+    "low": 0
+  },
+  "blockingDefects": [
+    {
+      "severity": "MEDIUM",
+      "location": "macos/MinibarWindowController.swift:218",
+      "summary": "Quit confirmation excludes stopping and switching-model, allowing termination before capture work reaches authoritative idle.",
+      "relatedLocations": [
+        "macos/launcher.swift:186-191",
+        "server.ts:1408-1412",
+        "server.ts:1552-1559"
+      ]
+    }
+  ],
+  "verification": {
+    "typescript": "PASS",
+    "swiftTypecheck": "PASS",
+    "generatedModules": "PASS",
+    "appBuild": "PASS",
+    "bundleVerifier": "PASS",
+    "codesignStrict": "PASS",
+    "gitDiffCheck": "PASS",
+    "fullBunTest": "FAIL: 991 pass / 8 fail / 999 tests / 75 files",
+    "boundedAggregate": "NON-CLEAN: 975 pass / 2 fail; concurrent browser-spawn ENOENT",
+    "dirtyWorkIsolation": "PASS for the three excluded test hashes and protected provider/config/LLM/minutes hashes"
+  },
+  "diagnostics": {
+    "publicJs": "PASS",
+    "srcTs": "PASS",
+    "serverTs": "PASS with unused-symbol hints",
+    "swiftLsp": "per-file cross-file-resolution noise; aggregate swiftc PASS"
+  },
+  "boundaries": {
+    "productFilesEdited": false,
+    "governanceFilesEdited": false,
+    "commitCreated": false,
+    "stagingPerformed": false,
+    "f3OrF4Entered": false
+  },
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f2-code-quality/REPORT.md",
+    "sha256": "b8418edfa13c15c87c3a4f35fc3e87e418f6140736842ce41b074f1dc7627fae"
+  },
+  "checksum": {
+    "algorithm": "sha256",
+    "scope": "UTF-8 pretty JSON with checksum.value replaced by null and one trailing LF",
+    "value": "59b6b3fbe7739b5e78dcaa77c007593e03877e403529242eda674cada741d1fd"
+  }
+}

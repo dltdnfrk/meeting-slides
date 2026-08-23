@@ -1,0 +1,27 @@
+MUTATION: tests/helpers/caret-browser-driver.ts — push trigger frame BEFORE arming
+the in-page MutationObserver subscription (inverted event-before-trigger ordering).
+
+COMMAND: bun test tests/public-caret-harness.test.ts -t "subscribes to the awaited state before pushing the trigger"
+
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-harness.test.ts:
+162 |   test("the driver subscribes to the awaited state before pushing the trigger", async () => {
+163 |     const capture = await driver.captureState(fixtureById("live-starting"));
+164 |
+165 |     // Every awaited subscription must be registered strictly before its trigger frame.
+166 |     for (const step of capture.timeline) {
+167 |       expect(step.subscribedAtSeq).toBeLessThan(step.triggeredAtSeq);
+                                         ^
+error: expect(received).toBeLessThan(expected)
+
+Expected: < 1
+Received: 1
+
+      at <anonymous> (tests/public-caret-harness.test.ts:167:36)
+(fail) event-before-trigger synchronization > the driver subscribes to the awaited state before pushing the trigger [107.00ms]
+
+ 0 pass
+ 1 fail
+
+RESTORED: diff -q tests/helpers/caret-browser-driver.ts <backup>  ->  identical

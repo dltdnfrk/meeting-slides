@@ -1,0 +1,140 @@
+{
+  "axTrusted" : true,
+  "cgWindows" : [
+    {
+      "alpha" : 1,
+      "bounds" : {
+        "Height" : 220,
+        "Width" : 560,
+        "X" : 936,
+        "Y" : 690
+      },
+      "onScreen" : true,
+      "windowNumber" : 104893
+    }
+  ],
+  "elements" : [
+    {
+      "description" : "Meeting Slides 미니바",
+      "enabled" : null,
+      "help" : null,
+      "path" : "window[0]",
+      "position" : {
+        "x" : 936,
+        "y" : 690
+      },
+      "role" : "AXWindow",
+      "size" : {
+        "height" : 220,
+        "width" : 560
+      },
+      "title" : "",
+      "value" : null
+    },
+    {
+      "description" : "Meeting Slides 미니바",
+      "enabled" : null,
+      "help" : null,
+      "path" : "window[0]\/0",
+      "position" : {
+        "x" : 936,
+        "y" : 690
+      },
+      "role" : "AXGroup",
+      "size" : {
+        "height" : 220,
+        "width" : 560
+      },
+      "title" : null,
+      "value" : null
+    },
+    {
+      "description" : null,
+      "enabled" : true,
+      "help" : null,
+      "path" : "window[0]\/0\/0",
+      "position" : {
+        "x" : 961,
+        "y" : 717
+      },
+      "role" : "AXStaticText",
+      "size" : {
+        "height" : 18,
+        "width" : 10.5
+      },
+      "title" : null,
+      "value" : "○"
+    },
+    {
+      "description" : "대기 중",
+      "enabled" : true,
+      "help" : null,
+      "path" : "window[0]\/0\/1",
+      "position" : {
+        "x" : 977.5,
+        "y" : 715.5
+      },
+      "role" : "AXStaticText",
+      "size" : {
+        "height" : 21,
+        "width" : 45
+      },
+      "title" : null,
+      "value" : "대기 중"
+    },
+    {
+      "description" : "녹음 중지",
+      "enabled" : false,
+      "help" : "중지할 녹음이 없습니다",
+      "path" : "window[0]\/0\/2",
+      "position" : {
+        "x" : 959,
+        "y" : 841
+      },
+      "role" : "AXButton",
+      "size" : {
+        "height" : 46,
+        "width" : 154
+      },
+      "title" : "녹음 중지",
+      "value" : null
+    },
+    {
+      "description" : "미니바 접기",
+      "enabled" : true,
+      "help" : "미니바를 한 줄 높이로 접습니다",
+      "path" : "window[0]\/0\/3",
+      "position" : {
+        "x" : 1135,
+        "y" : 851
+      },
+      "role" : "AXButton",
+      "size" : {
+        "height" : 46,
+        "width" : 172
+      },
+      "title" : "미니바 접기",
+      "value" : null
+    },
+    {
+      "description" : "작업 공간 열기",
+      "enabled" : true,
+      "help" : "브라우저에서 전체 작업 공간을 엽니다",
+      "path" : "window[0]\/0\/4",
+      "position" : {
+        "x" : 1313,
+        "y" : 851
+      },
+      "role" : "AXButton",
+      "size" : {
+        "height" : 46,
+        "width" : 172
+      },
+      "title" : "작업 공간 열기",
+      "value" : null
+    }
+  ],
+  "observer" : "AXUIElement + CGWindowListCopyWindowInfo(.optionOnScreenOnly)",
+  "pid" : 84067,
+  "windowCount" : 1
+}

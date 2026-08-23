@@ -1,0 +1,1442 @@
+[
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "library-empty",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "library-populated",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "library-notes",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "notes",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "library-transcript",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "transcript",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "live-starting",
+    "metrics": {
+      "shell": "live",
+      "phase": "starting",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "live-capturing",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "live-disconnected",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "disconnected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버 연결이 끊겼습니다. 다시 연결하는 중…",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "live-stopping",
+    "metrics": {
+      "shell": "live",
+      "phase": "stopping",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "state": "live-error",
+    "metrics": {
+      "shell": "live",
+      "phase": "error",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "녹음을 시작하지 못했습니다: 입력 장치를 열 수 없습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "library-empty",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "library-populated",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "library-notes",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "notes",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "library-transcript",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "transcript",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "live-starting",
+    "metrics": {
+      "shell": "live",
+      "phase": "starting",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "live-capturing",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "live-disconnected",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "disconnected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버 연결이 끊겼습니다. 다시 연결하는 중…",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "live-stopping",
+    "metrics": {
+      "shell": "live",
+      "phase": "stopping",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 960,
+      "height": 760
+    },
+    "state": "live-error",
+    "metrics": {
+      "shell": "live",
+      "phase": "error",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "녹음을 시작하지 못했습니다: 입력 장치를 열 수 없습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "library-empty",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "library-populated",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "library-notes",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "notes",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "library-transcript",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "transcript",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 5,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "live-starting",
+    "metrics": {
+      "shell": "live",
+      "phase": "starting",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 26,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "live-capturing",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 26,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "live-disconnected",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "disconnected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 26,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버 연결이 끊겼습니다. 다시 연결하는 중…",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "live-stopping",
+    "metrics": {
+      "shell": "live",
+      "phase": "stopping",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 26,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 820,
+      "height": 900
+    },
+    "state": "live-error",
+    "metrics": {
+      "shell": "live",
+      "phase": "error",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 26,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "녹음을 시작하지 못했습니다: 입력 장치를 열 수 없습니다",
+        "display": "block",
+        "color": "rgb(154, 154, 163)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "library-empty",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "library-populated",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "library-notes",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "notes",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "library-transcript",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "transcript",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "live-starting",
+    "metrics": {
+      "shell": "live",
+      "phase": "starting",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "live-capturing",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "live-disconnected",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "disconnected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버 연결이 끊겼습니다. 다시 연결하는 중…",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "live-stopping",
+    "metrics": {
+      "shell": "live",
+      "phase": "stopping",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "state": "live-error",
+    "metrics": {
+      "shell": "live",
+      "phase": "error",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "녹음을 시작하지 못했습니다: 입력 장치를 열 수 없습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "library-empty",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "library-populated",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "library-notes",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "notes",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "library-transcript",
+    "metrics": {
+      "shell": "library",
+      "phase": "idle",
+      "detail": "transcript",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": false,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "live-starting",
+    "metrics": {
+      "shell": "live",
+      "phase": "starting",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-attendees",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "live-capturing",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "live-disconnected",
+    "metrics": {
+      "shell": "live",
+      "phase": "capturing",
+      "detail": "overview",
+      "connection": "disconnected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버 연결이 끊겼습니다. 다시 연결하는 중…",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "live-stopping",
+    "metrics": {
+      "shell": "live",
+      "phase": "stopping",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "앱 서버에 연결되었습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 1
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 667
+    },
+    "state": "live-error",
+    "metrics": {
+      "shell": "live",
+      "phase": "error",
+      "detail": "overview",
+      "connection": "connected",
+      "rootOverflow": 0,
+      "duplicateIds": [],
+      "minTarget": 44,
+      "narrowTargetFailures": [],
+      "status": {
+        "text": "녹음을 시작하지 못했습니다: 입력 장치를 열 수 없습니다",
+        "display": "block",
+        "color": "rgb(165, 165, 174)",
+        "role": "status"
+      },
+      "activeRemovedReferences": [],
+      "stopVisible": true,
+      "transcriptLines": 0
+    },
+    "focused": {
+      "id": "btn-settings",
+      "outline": "solid",
+      "width": "2px",
+      "shadow": "none"
+    }
+  }
+]

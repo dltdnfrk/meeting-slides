@@ -1,0 +1,57 @@
+app_or_qa_processes:
+21161 /bin/bash -c set -euo pipefail
+D=.omo/evidence/caret-clone-redesign/final/completion-audit
+mkdir -p "$D/logs"
+for pair in \
+  '/tmp/caret-completion-audit-tests.log broad-attempt.log' \
+  '/tmp/caret-completion-audit-aggregate.log aggregate-attempt.log' \
+  '/tmp/caret-completion-audit-focused.log focused-current.log' \
+  '/tmp/caret-completion-audit-tsc.log typescript.log' \
+  '/tmp/caret-completion-audit-swift.log swift-typecheck.log' \
+  '/tmp/caret-completion-audit-drift.log generated-drift.log' \
+  '/tmp/caret-completion-audit-diffcheck.log diff-and-protected-hashes.log' \
+  '/tmp/caret-completion-audit-build.log build-app.log' \
+  '/tmp/caret-completion-audit-verify.log verify-app.log' \
+  '/tmp/caret-completion-audit-codesign.log codesign.log'; do
+  set -- $pair; test -f "$1" && cp "$1" "$D/logs/$2"
+done
+{
+  echo "canonical_root=$(pwd -P)"
+  echo "git_top=$(git rev-parse --show-toplevel)"
+  echo "head=$(git rev-parse HEAD)"
+  echo "baseline=a1ed25f95980980cd958044b90e739ac45e8280d"
+  echo "commits_since_baseline=$(git rev-list --count a1ed25f95980980cd958044b90e739ac45e8280d..HEAD)"
+  echo "index_entries=$(git diff --cached --name-only | wc -l | tr -d ' ')"
+  echo "delivery_mode=$(python3 -c 'import json; print(json.load(open(".omo/boulder.json"))["works"]["caret-clone-redesign-019fef5e"]["delivery_mode"])')"
+  echo "plan_checked=$(grep -c '^- \[x\]' .omo/plans/caret-clone-redesign.md)"
+  echo "plan_unchecked=$(grep -c '^- \[ \]' .omo/plans/caret-clone-redesign.md || true)"
+  echo "installed_executable_sha256=$(shasum -a 256 "$HOME/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides" | awk '{print $1}')"
+  echo "symlink=$(readlink 'Meeting Slides.app')"
+  echo "project_marker=$(tr -d '\n' < "$HOME/Applications/Meeting Slides.app/Contents/Resources/project-path.txt")"
+  echo "plan_sha256=$(shasum -a 256 .omo/plans/caret-clone-redesign.md | awk '{print $1}')"
+  echo "ledger_sha256=$(shasum -a 256 .omo/start-work/ledger.jsonl | awk '{print $1}')"
+  echo "boulder_sha256=$(shasum -a 256 .omo/boulder.json | awk '{print $1}')"
+  echo "status_begin"
+  git status --short
+  echo "status_end"
+} > "$D/current-state.txt"
+{
+  echo "checked_top_level:"
+  grep -nE '^- \[x\] ([0-9]+\.|F[1-4]\.)' .omo/plans/caret-clone-redesign.md
+  echo "unchecked_top_level:"
+  grep -nE '^- \[ \] ([0-9]+\.|F[1-4]\.)' .omo/plans/caret-clone-redesign.md || true
+  echo "terminal_ledger:"
+  tail -5 .omo/start-work/ledger.jsonl
+} > "$D/governance-receipt.txt"
+{
+  echo "app_or_qa_processes:"
+  echo "task_ports:"
+  for p in 8789 8901 9911 54741 54742 54743 54744 54745 54746 54748 54831 54832; do test -z "$(lsof -nP -tiTCP:$p -sTCP:LISTEN 2>/dev/null)" || echo "occupied:$p"; done
+  echo "temporary_drivers:"
+  find .omo/qa -maxdepth 2 -type f 2>/dev/null | sort || true
+  echo "unrelated_process_note: PID 43276 is Discord plugin cwd, not this project; Docker owns 8787. Neither is plan residue."
+} > "$D/cleanup-receipt.txt"
+
+task_ports:
+temporary_drivers:
+unrelated_process_note: PID 43276 is Discord plugin cwd, not this project; Docker owns 8787. Neither is plan residue.

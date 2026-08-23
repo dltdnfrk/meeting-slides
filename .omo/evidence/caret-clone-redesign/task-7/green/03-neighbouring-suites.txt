@@ -1,0 +1,60 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-harness-baseline.test.ts:
+(pass) public test harness baseline lifecycle > origin serves the shipped index and rejects traversal names [0.94ms]
+(pass) public test harness baseline lifecycle > clientConnected resolves once a websocket client is accepted [0.03ms]
+(pass) public test harness baseline lifecycle > pushMessage broadcasts the exact JSON payload to connected clients [0.16ms]
+(pass) public test harness baseline lifecycle > nextClientMessage resolves inbound client frames in FIFO order [0.11ms]
+(pass) public test harness baseline lifecycle > disconnectClients closes live sockets without stopping the server [0.43ms]
+
+tests/public-caret-harness.test.ts:
+(pass) canonical fixture catalogue > covers every state named in the plan with unique ids [0.07ms]
+(pass) canonical fixture catalogue > every canonical viewport in the plan matrix is exercised by a real fixture [0.03ms]
+(pass) canonical fixture catalogue > every fixture step is a real trigger: a server message or a user interaction [0.15ms]
+(pass) canonical fixture catalogue > every fixture pins a canonical viewport, locale, timezone and fixed clock [0.05ms]
+(pass) canonical fixture catalogue > canonical viewports include the plan's browser matrix at deviceScaleFactor 1 [0.02ms]
+(pass) canonical fixture catalogue > fixture events are frozen server messages, never mutable current time [0.32ms]
+(pass) deterministic browser state capture > 1244x836 library fixture yields byte-identical machine JSON twice [278.01ms]
+(pass) deterministic browser state capture > 960x760 live fixture yields byte-identical machine JSON twice with a fixed timer [204.69ms]
+(pass) deterministic browser state capture > 1440x900 reference fixture yields byte-identical machine JSON and geometry twice [200.18ms]
+(pass) deterministic browser state capture > 820x900 stacked fixture yields byte-identical machine JSON and the stacked-state contract [191.56ms]
+(pass) deterministic browser state capture > locale, timezone, fonts and clock are pinned inside the page [101.75ms]
+(pass) deterministic browser state capture > no fixture reaches the network beyond the local harness origin [97.44ms]
+(pass) deterministic browser state capture > geometry is the deterministic artifact; screenshots are visual artifacts only [296.98ms]
+(pass) deterministic browser state capture > transcript, meetings, slides and job fixtures land deterministically [191.73ms]
+(pass) event-before-trigger synchronization > the driver subscribes before every message trigger [89.35ms]
+(pass) event-before-trigger synchronization > click-driven steps prove ordering with an in-page observable counter [92.65ms]
+(pass) event-before-trigger synchronization > a slide emitted before the subscribed capture state fails with a named bounded timeout [1570.32ms]
+(pass) event-before-trigger synchronization > the default state deadline stays below Bun's default test timeout [0.02ms]
+(pass) static determinism guards > harness, fixtures and driver never use sleep or polling wait APIs [0.99ms]
+(pass) static determinism guards > no QA driver under tests/helpers reintroduces a polling delay [0.45ms]
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.08ms]
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.06ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.07ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.08ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.03ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.02ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.07ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.19ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.07ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.04ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.08ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.03ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.07ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.03ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.04ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.14ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.10ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.24ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.07ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.09ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.05ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.04ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.05ms]
+
+ 48 pass
+ 0 fail
+ 548 expect() calls
+Ran 48 tests across 3 files. [4.21s]

@@ -1,0 +1,278 @@
+{
+  "state": {
+    "connection": "disconnected",
+    "capturePhase": "capturing",
+    "shell": "live",
+    "detailTab": "overview",
+    "stageState": "slide",
+    "capturingClass": true
+  },
+  "overflow": {
+    "root": 0,
+    "body": 0
+  },
+  "moving": [
+    {
+      "id": "btn-attendees",
+      "transition": 0.2,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "status-indicator",
+      "transition": 0.15,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "btn-settings",
+      "transition": 0.2,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "btn-live-stop",
+      "transition": 0.12,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "island",
+      "transition": 0.15,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "span.island__dot",
+      "transition": 0,
+      "animation": 1.2,
+      "name": "recpulse"
+    },
+    {
+      "id": "splitter-transcript",
+      "transition": 0.2,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "div.feed-line",
+      "transition": 0,
+      "animation": 0.3,
+      "name": "line-in"
+    },
+    {
+      "id": "div.feed-line",
+      "transition": 0,
+      "animation": 0.3,
+      "name": "line-in"
+    },
+    {
+      "id": "a.output-switcher__item",
+      "transition": 0.2,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "a.output-switcher__item",
+      "transition": 0.2,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "button.output-switcher__item",
+      "transition": 0.2,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "btn-ask",
+      "transition": 0.12,
+      "animation": 0,
+      "name": "none"
+    },
+    {
+      "id": "summary.dock__more-summary",
+      "transition": 0.12,
+      "animation": 0,
+      "name": "none"
+    }
+  ],
+  "liveRegions": [
+    {
+      "id": "status-text",
+      "live": null,
+      "role": "status",
+      "atomic": "true",
+      "painted": true
+    },
+    {
+      "id": "stt-list",
+      "live": "polite",
+      "role": null,
+      "atomic": null,
+      "painted": false
+    },
+    {
+      "id": "attendee-error",
+      "live": null,
+      "role": "alert",
+      "atomic": null,
+      "painted": false
+    },
+    {
+      "id": "transcript-stream",
+      "live": null,
+      "role": "log",
+      "atomic": "false",
+      "painted": true
+    },
+    {
+      "id": "compile-status",
+      "live": "polite",
+      "role": "status",
+      "atomic": null,
+      "painted": false
+    },
+    {
+      "id": "review-error",
+      "live": null,
+      "role": "alert",
+      "atomic": null,
+      "painted": false
+    }
+  ],
+  "controls": [
+    {
+      "id": "btn-attendees",
+      "x": 513,
+      "y": 21,
+      "w": 73,
+      "h": 28,
+      "meets44": false
+    },
+    {
+      "id": "btn-settings",
+      "x": 1020,
+      "y": 22,
+      "w": 39,
+      "h": 26,
+      "meets44": false
+    },
+    {
+      "id": "btn-live-stop",
+      "x": 316,
+      "y": 77,
+      "w": 66,
+      "h": 28,
+      "meets44": false
+    },
+    {
+      "id": "splitter-transcript",
+      "x": 775,
+      "y": 60,
+      "w": 5,
+      "h": 557,
+      "meets44": false
+    },
+    {
+      "id": "a.output-switcher__item",
+      "x": 425,
+      "y": 643,
+      "w": 65,
+      "h": 32,
+      "meets44": false
+    },
+    {
+      "id": "a.output-switcher__item",
+      "x": 494,
+      "y": 643,
+      "w": 68,
+      "h": 32,
+      "meets44": false
+    },
+    {
+      "id": "button.output-switcher__item",
+      "x": 567,
+      "y": 643,
+      "w": 109,
+      "h": 32,
+      "meets44": false
+    },
+    {
+      "id": "btn-ask",
+      "x": 16,
+      "y": 700,
+      "w": 100,
+      "h": 40,
+      "meets44": false
+    },
+    {
+      "id": "summary.dock__more-summary",
+      "x": 16,
+      "y": 748,
+      "w": 1068,
+      "h": 40,
+      "meets44": false
+    }
+  ],
+  "undersized": [
+    "btn-attendees:73x28",
+    "btn-settings:39x26",
+    "btn-live-stop:66x28",
+    "splitter-transcript:5x557",
+    "a.output-switcher__item:65x32",
+    "a.output-switcher__item:68x32",
+    "button.output-switcher__item:109x32",
+    "btn-ask:100x40",
+    "summary.dock__more-summary:1068x40"
+  ],
+  "overlaps": [],
+  "contrast": [
+    {
+      "id": "doc-title",
+      "present": false,
+      "ratio": 0,
+      "fontPx": 0
+    },
+    {
+      "id": "doc-meta",
+      "present": false,
+      "ratio": 0,
+      "fontPx": 0
+    },
+    {
+      "id": "status-text",
+      "present": true,
+      "ratio": 13.22,
+      "fontPx": 10
+    },
+    {
+      "id": "meeting-chrome-title",
+      "present": false,
+      "ratio": 0,
+      "fontPx": 0
+    },
+    {
+      "id": "live-topbar-timer",
+      "present": true,
+      "ratio": 17.77,
+      "fontPx": 12
+    },
+    {
+      "id": "caption-text",
+      "present": true,
+      "ratio": 7.1,
+      "fontPx": 13
+    },
+    {
+      "id": "transcript-count",
+      "present": true,
+      "ratio": 4.62,
+      "fontPx": 12
+    }
+  ],
+  "viewport": {
+    "w": 1100,
+    "h": 800
+  }
+}

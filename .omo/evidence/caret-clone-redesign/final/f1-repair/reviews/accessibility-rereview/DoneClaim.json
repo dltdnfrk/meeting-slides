@@ -1,0 +1,77 @@
+{
+  "task": "Read-only independent accessibility re-review",
+  "taskId": "st_019ff402",
+  "sessionId": "019ff402-b15b-72d4-970e-2de12fbdcf46",
+  "parentSession": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSession": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "head": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "timestamp": "2026-08-12T03:33:49Z",
+  "independentOf": ["st_019ff3d7", "st_019ff3d9"],
+  "status": "FAIL",
+  "verdict": "FAIL",
+  "terminal": true,
+  "decisionBasis": "Binding Todo 15 user-started-focus requirement fails on current product bytes: the browser is the only Start surface, and a direct real-Chromium Start-to-authoritative-starting transition leaves focus on BODY while #btn-live-stop is visible. Focus trapping itself is repaired and passes.",
+  "results": {
+    "browserDialogFocusTrap": "PASS: 14 pass / 0 fail across four dialogs, both wrap directions, Escape restoration, closed-dialog exclusion, and residue guard",
+    "browserStartToStopFocus": "FAIL_PRODUCT_DEFECT: outbound startCapture observed; live Stop visible; activeElement BODY; Stop not focused",
+    "currentBrowserFoundationLibraryLive": "PASS: 105 pass / 0 fail",
+    "nativeDeterministicShippingModules": "PASS: 81 pass / 0 fail",
+    "installedNativeRoleLabelHelpEnabledSize": "PASS",
+    "installedNativeAnnouncements": "EXPLICIT_PLATFORM_OBSERVATION_LIMITATION: product observer and known-good AppKit control post were both invisible to external AXObserver; runtime delivery remains unproven",
+    "installedNativeStopFocus": "UNRESOLVED_EVIDENCE_GAP_OR_POSSIBLE_DEFECT: source requests focus but installed AX state remained on window; attribute was externally observable/settable",
+    "nativeReadableTextContrast": "DERIVED_PASS: normal text 14.94:1 Aqua / 12.23:1 Dark Aqua; provisional text 5.59:1 / 6.64:1",
+    "nativeFocusIndicatorContrast": "EXPLICIT_LIMITATION: semantic-color composition 2.15:1 Aqua / 2.57:1 Dark Aqua is below 3:1, but this is not a rendered AppKit focus-bezel pixel measurement",
+    "canonicalViewportReceipts": "PASS_WITH_EXPLICIT_RECEIPT_LIMITATION: all dimensions exist and checksum; repair captures observed library at all six sizes. Actual live 960/820/375 comes from Todo 19 receipts, with current live behavior covered by fresh tests. Repair files named live are not live-shell proof.",
+    "repairEvidenceIntegrity": "PASS: 29/29 SHA256SUMS entries validated"
+  },
+  "verification": {
+    "focusTrapCommand": "bun test tests/public-caret-accessibility.test.ts --test-name-pattern 'every shipped dialog traps'",
+    "focusTrapResult": "14 pass / 0 fail",
+    "focusTrapOutputSha256": "c074d2440ccb1051a9a23c4dbd470232850dbcf87f867044329343913973b6bf",
+    "webMatrixCommand": "bun test tests/public-caret-foundation.test.ts tests/public-caret-library.test.ts tests/public-caret-live.test.ts",
+    "webMatrixResult": "105 pass / 0 fail",
+    "webMatrixOutputSha256": "61097d77f81d12fbfd9941bfd5c2694b8f33cd4c8e2c0a966f09d75dfdf2eb23",
+    "nativeCommand": "bun test tests/native-minibar.test.ts tests/native-surface-contract.test.ts",
+    "nativeResult": "81 pass / 0 fail",
+    "nativeOutputSha256": "21b4dc2be5c4e444501b0b1e4b31b3e7033781ca2536db986b7d40ff3066481a",
+    "repairChecksumValidation": "29/29 OK",
+    "directFocusProbe": {
+      "outboundAction": "startCapture",
+      "authoritativePhase": "starting",
+      "shell": "live",
+      "stopVisible": true,
+      "activeTag": "BODY",
+      "activeId": "",
+      "stopFocused": false
+    }
+  },
+  "keyChecksums": {
+    "DESIGN.md": "b6e7d78e4d24b8cc72a774bf0470ec2083eb2d8f279b5974a9685ef4724ff29d",
+    "public/focus-trap.js": "0c706e13cf47afee5643e26283303e3888acda6d11e8d5f0f660cec8c961dc19",
+    "tests/public-caret-accessibility.test.ts": "9d7ae56990d81e78a99a308ad6becea9e172c6852c9b6f3dd6465f8061ce934d",
+    "macos/MinibarView.swift": "33f53850136754b16d85e7bf8b303a3e88c7eba88b7158d532200ff2e8f98f80",
+    "macos/MinibarProjection.swift": "7847d1d3a3e5970ba0263f8d01317b53776f43dfa058e725eee2154fcd003316",
+    "macos/MinibarWindowController.swift": "6af2816541847b2bb3d44a642f36e810bfac66c70eea7b204e93c9c5b1cbebcc",
+    "installedViewportsJson": "8365f88c419fb993017f5603ead2e87aa8fb9e5884d1598e1fa19e8d97073d92",
+    "nativeTransitionAx": "2b3e4dcf12fd8a14f7066b6e033f8cb7d025f5ca097035dbe576c9a1efab8170",
+    "announcementControlObserver": "71688864299c66556791cc7fa76b23c3541b6c88b929c8a68994cabf14c740a8",
+    "originalAccessibilityRejectionReport": "58884dcf1dc5e86abd9f7131a594309a4d300fae99806cc3b4b9bdfbbbcb65ec",
+    "accessibilityRepairReport": "7f8f9dafbaf278453bc7eb9e77e93a1a2122fd23cbf87295363dbf142338483d",
+    "thisReport": "23455e316615fc945ba62566729957817ae6904f7ab9dfd9c9effdcae848a183"
+  },
+  "constraints": {
+    "productFilesEdited": false,
+    "planFilesEdited": false,
+    "ledgerFilesEdited": false,
+    "commitCreated": false,
+    "filesCreated": [
+      ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/accessibility-rereview/REPORT.md",
+      ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/accessibility-rereview/DoneClaim.json"
+    ]
+  },
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/accessibility-rereview/REPORT.md",
+    "sha256": "23455e316615fc945ba62566729957817ae6904f7ab9dfd9c9effdcae848a183"
+  }
+}

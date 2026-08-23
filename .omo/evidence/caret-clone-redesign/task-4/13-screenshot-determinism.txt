@@ -1,0 +1,22 @@
+SCREENSHOT BYTES ARE VISUAL ARTIFACTS, NOT DETERMINISTIC GOLDENS
+================================================================
+Measured directly (green/repair-qa-receipts.json -> requiredViewports.*):
+
+  fixture            viewport   machineJsonByteStable  geometryByteStable  screenshotByteIdenticalAcrossRuns
+  reference-library  1440x900   true                   true                FALSE
+  library-overview   1244x836   true                   true                FALSE
+  live-capturing     960x760    true                   true                FALSE
+  stacked-live       820x900    true                   true                FALSE
+  narrow-live        375x812    true                   true                FALSE
+  narrow-compact     320x667    true                   true                FALSE
+
+CONCLUSION: two captures of the SAME fixture produce identical machine JSON and
+identical geometry, but NOT identical PNG bytes (font rasterization/compositing
+vary between runs). The regression-grade deterministic artifacts of this harness are
+therefore the machine JSON and the geometry only. Screenshots are retained for human
+and visual-QA review.
+
+The test suite encodes exactly this: `geometry is the deterministic artifact;
+screenshots are visual artifacts only` asserts json/geometry equality across two
+captures and asserts only that a screenshot exists and is non-trivial. No test
+pins screenshot bytes, and no PNG in green/ is a golden.

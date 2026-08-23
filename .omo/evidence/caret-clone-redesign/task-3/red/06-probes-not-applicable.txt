@@ -1,0 +1,34 @@
+=== Adversarial probes marked N/A, with reasons ===
+
+The task named a probe set; the ones exercised are recorded in their own receipts.
+The remaining standard probes do not apply to this task's change surface, which is
+three NEW files (two JSON fixtures + one static-parsing Bun test) and zero changes
+to any shipped source, server contract, or runtime code path.
+
+destructive_actions            N/A - this task performs no delete, reset, stage, commit,
+                               migration, or rewrite. Temporary source mutations were
+                               copy-backed and hash-verified restored
+                               (cleanup/01-source-restoration.txt, cleanup/03).
+
+concurrency / race conditions  N/A - the test is synchronous static file parsing. It
+                               spawns no process, opens no socket, and shares no mutable
+                               state. Three consecutive runs produced an identical
+                               pass/fail ledger hash (green/06-probe-flaky.txt).
+
+network_failure                N/A - zero network use. The suite performs no fetch, no
+                               WebSocket, and no browser launch (verified by construct
+                               scan in green/06-probe-flaky.txt).
+
+auth / permissions             N/A - no credential, key, token, or privileged API is
+                               touched. The task reads repository files only.
+
+large_input / performance      N/A - inputs are the shipped HTML/JS/TS files (max ~73KB,
+                               server.ts). Full suite runtime is ~40ms.
+
+encoding / i18n                N/A for assertions - the contract deliberately pins only
+                               machine-consumed ASCII identifiers. Korean UI copy present
+                               in the sources is never asserted on, per the plan's
+                               "never prose" constraint.
+
+partial_failure / rollback     N/A - no multi-step write transaction exists. The only
+                               writes are three new files.

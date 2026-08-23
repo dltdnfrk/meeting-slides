@@ -1,0 +1,7 @@
+=== strict TypeScript over the changed test ===
+config: tsconfig.task3-check.json (temporary; extends repo tsconfig with strict + checkJs + noUncheckedIndexedAccess)
+command: bunx tsc -p tsconfig.task3-check.json
+--- output ---
+exit=0
+--- interpretation ---
+exit=0 with no diagnostics: tests/public-dom-protocol-contract.test.ts typechecks under strict + checkJs.

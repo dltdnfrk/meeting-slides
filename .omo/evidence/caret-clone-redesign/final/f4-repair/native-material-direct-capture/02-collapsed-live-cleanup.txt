@@ -1,0 +1,6 @@
+state=live
+run_exit=0
+marker_restored=true
+defaults_restored=true
+port_free=true
+app_gone=true

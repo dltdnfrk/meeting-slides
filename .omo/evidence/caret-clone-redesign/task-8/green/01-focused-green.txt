@@ -1,0 +1,64 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/transcript-state.test.ts:
+(pass) transcript projection — finalized lines > Korean multiline finals keep arrival order and speaker metadata [0.49ms]
+(pass) transcript projection — finalized lines > multiline text collapses interior whitespace without losing content [0.02ms]
+(pass) transcript projection — finalized lines > blank finalized text is ignored instead of creating an empty row [0.04ms]
+(pass) transcript projection — finalized lines > a speaker-less final carries a null speaker, not a fabricated one [0.01ms]
+(pass) transcript projection — duplicate suppression > the same finalized line delivered twice appears once [0.02ms]
+(pass) transcript projection — duplicate suppression > duplicate detection normalizes whitespace but respects ts and speaker [0.06ms]
+(pass) transcript projection — duplicate suppression > a duplicate arriving after later lines does not reorder the projection [0.02ms]
+(pass) transcript projection — provisional captions > a caption is provisional only and never enters the finalized list [0.04ms]
+(pass) transcript projection — provisional captions > each caption replaces the previous provisional row [0.02ms]
+(pass) transcript projection — provisional captions > an empty caption clears the provisional row [0.01ms]
+(pass) transcript projection — provisional captions > the matching final replaces its provisional caption [0.05ms]
+(pass) transcript projection — provisional captions > a corrected final replaces the provisional caption it supersedes [0.05ms]
+(pass) transcript projection — provisional captions > a final for a different speaker leaves another speaker's caption standing [0.07ms]
+(pass) transcript projection — out-of-order delivery > an interim caption arriving after its final does not resurrect it [0.06ms]
+(pass) transcript projection — out-of-order delivery > a late final older than the newest line is inserted, not appended [0.03ms]
+(pass) transcript projection — out-of-order delivery > equal timestamps keep arrival order (stable ordering) [0.03ms]
+(pass) transcript projection — snapshots > a snapshot replaces the projection instead of appending [0.11ms]
+(pass) transcript projection — snapshots > a repeated snapshot is idempotent [0.03ms]
+(pass) transcript projection — snapshots > a snapshot clears the provisional caption and carries truncation [0.02ms]
+(pass) transcript projection — snapshots > a snapshot sorts out-of-order entries and drops in-snapshot duplicates [0.02ms]
+(pass) transcript projection — snapshots > an export-reason transcript never touches the projection [0.02ms]
+(pass) transcript projection — snapshots > an empty snapshot clears the projection [0.02ms]
+(pass) transcript projection — meeting boundaries > live lines are rejected while a history meeting is active [0.02ms]
+(pass) transcript projection — meeting boundaries > a live snapshot is rejected while a history meeting is active [0.02ms]
+(pass) transcript projection — meeting boundaries > meeting detail for the active meeting replaces the projection [0.02ms]
+(pass) transcript projection — meeting boundaries > stale meeting detail for a superseded selection is rejected [0.02ms]
+(pass) transcript projection — meeting boundaries > switching meetings isolates projections and clears the provisional row [0.02ms]
+(pass) transcript projection — meeting boundaries > returning to live clears history content [0.02ms]
+(pass) transcript projection — meeting boundaries > re-activating the same meeting is a no-op on content [0.01ms]
+(pass) transcript projection — reset and empty > reset clears finalized, provisional, truncation and counters [0.02ms]
+(pass) transcript projection — reset and empty > the initial state is empty and live
+(pass) transcript projection — reset and empty > reducing an empty event sequence returns the same projection [0.02ms]
+(pass) transcript projection — purity > the reducer never mutates the state it was given [0.05ms]
+(pass) transcript projection — purity > the returned projection is frozen [0.01ms]
+(pass) transcript projection — purity > the same event sequence produces an identical projection twice [0.07ms]
+(pass) transcript projection — minibar > the minibar shows at most three finals plus one provisional [0.12ms]
+(pass) transcript projection — minibar > the minibar derives from the same store, with no duplicate rows [0.02ms]
+(pass) transcript projection — minibar > an empty projection yields no minibar rows [0.02ms]
+(pass) transcript parse boundary > a well-formed line frame parses into a typed event [0.13ms]
+(pass) transcript parse boundary > an absent speaker parses to null rather than undefined [0.02ms]
+(pass) transcript parse boundary > a transcript frame keeps its declared reason and truncation flag [0.04ms]
+(pass) transcript parse boundary > a reason-less transcript frame defaults to the export reason [0.01ms]
+(pass) transcript parse boundary > meeting detail parses meetingId and its transcript entries [0.01ms]
+(pass) transcript parse boundary > a non-object frame is a typed failure, not an exception [0.01ms]
+(pass) transcript parse boundary > a frame with no type is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a non-string text is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a non-numeric ts is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a NaN ts is a typed failure, not an exception
+(pass) transcript parse boundary > a caption with a non-numeric speaker is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with non-array entries is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with an undeclared reason is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with a malformed entry is a typed failure, not an exception
+(pass) transcript parse boundary > a meeting with a non-numeric meetingId is a typed failure, not an exception
+(pass) transcript parse boundary > an unrelated declared message parses to an ignorable event
+(pass) transcript parse boundary > an ignorable event leaves the projection untouched [0.04ms]
+(pass) transcript parse boundary > a rejected frame is recorded without disturbing content [0.04ms]
+
+ 56 pass
+ 0 fail
+ 108 expect() calls
+Ran 56 tests across 1 file. [31.00ms]

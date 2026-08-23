@@ -1,0 +1,71 @@
+--- /tmp/os-prerepair.js	2026-08-12 12:42:02
++++ public/operator-surface.js	2026-08-12 12:41:52
+@@ -70,6 +70,48 @@
+   lastDisclosureShell = shell;
+   const details = document.getElementById("dock-more");
+   if (details instanceof HTMLDetailsElement) details.open = false;
++}
++
++/**
++ * DESIGN 9.12 / Todo 15: a USER-started capture hands focus to the visible Stop.
++ *
++ * The browser is the product's only Start surface, and activating Start removes
++ * `#btn-record` from the live shell while revealing `#btn-live-stop`. Without
++ * this handoff the keyboard operator is left on BODY and must re-traverse the
++ * shell to reach the only control that ends their own recording.
++ *
++ * It is armed ONLY by a local activation (`activateCapture` below), never by the
++ * arrival of a capture frame, so a calendar auto-capture, a reconnect
++ * re-assertion and first-load hydration all leave focus exactly where the
++ * operator put it. It is a one-shot: the flag is cleared on the first attempt,
++ * so one start can move focus at most once.
++ */
++let pendingStartFocus = false;
++
++/**
++ * Moves focus to Stop for a user-started capture, once Stop is actually
++ * perceivable. Deliberately declines in the two cases where something else owns
++ * focus by contract: an open dialog (9.12 traps focus inside its sheet) and a
++ * control the operator has already moved to inside the live shell.
++ */
++function handOffStartFocus() {
++  if (!pendingStartFocus || uiState.shell !== "live") return;
++  const stop = document.getElementById("btn-live-stop");
++  if (!(stop instanceof HTMLElement)) return;
++  const rect = stop.getBoundingClientRect();
++  if (rect.width === 0 || rect.height === 0) return;
++
++  pendingStartFocus = false;
++  const active = document.activeElement;
++  // An open dialog, or any surface that has already taken focus deliberately,
++  // keeps it. Only the default resting places - the document body and the Start
++  // control that just left the shell - are handed over.
++  const yieldsFocus = active === null
++    || active === document.body
++    || active === document.documentElement
++    || active === recordBtn;
++  if (!yieldsFocus) return;
++  stop.focus({ preventScroll: true });
+ }
+ 
+ /** Applies the reducer's projection to the shell's explicit state attributes. */
+@@ -90,6 +132,9 @@
+     setDetailTab(app.dataset.detailTab || "overview");
+     applyDockDisclosureDefault(uiState.shell);
+   }
++  // Focus is never moved BY a state projection; it is moved by the user's own
++  // Start, which this projection has just made perceivable.
++  handOffStartFocus();
+ }
+ 
+ /**
+@@ -131,6 +176,9 @@
+   /** Local activation of the record control (start or stop). */
+   activateCapture() {
+     uiState = reduce(uiState, { kind: "activateCapture" });
++    // `startRequested` is set by the reducer only for a local start the server
++    // has not answered yet, which is precisely "this user just pressed Start".
++    if (uiState.startRequested) pendingStartFocus = true;
+     projectState();
+     return uiState.outbox;
+   },

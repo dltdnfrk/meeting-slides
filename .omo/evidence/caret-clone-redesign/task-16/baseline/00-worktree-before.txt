@@ -1,0 +1,73 @@
+ M .env.example
+ M .omo/start-work/ledger.jsonl
+ M DESIGN.md
+ M README.md
+ M macos/launcher.swift
+ M public/app.js
+ M public/index.html
+ M public/operator-surface.js
+ M public/style.css
+ M public/workspace-split.js
+ M scripts/build-app.sh
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-attendees.test.ts
+ M tests/public-compile-control.test.ts
+ M tests/public-operator-surface.test.ts
+ M tests/public-protocol-reliability.test.ts
+ M tests/public-test-harness.ts
+ M tests/public-workspace.test.ts
+?? .audit2-st019ff026/
+?? .audit3/
+?? .omo/drafts/
+?? .omo/evidence/caret-clone-redesign/
+?? .omo/evidence/live-split-ulw/
+?? .omo/evidence/style-gallery-baseline/
+?? .omo/evidence/style-gallery-final/
+?? .omo/evidence/style-gallery-panels/
+?? .omo/evidence/tiro-operator/
+?? .omo/evidence/tiro-reference/
+?? .omo/plans/caret-clone-redesign.md
+?? .omo/plans/tiro-operator-rebuild.md
+?? .omo/ulw-loop/
+?? .omo/ulw-research/
+?? HANDOFF.md
+?? macos/AppLifecycle.swift
+?? macos/MinibarProjection.swift
+?? macos/MinibarView.swift
+?? macos/MinibarWindowController.swift
+?? macos/NativeSurfaceContract.swift
+?? macos/TransportClient.swift
+?? models/
+?? public/caret-foundation.css
+?? public/caret-operator.css
+?? public/caret-shell.css
+?? public/fonts/
+?? public/generated/
+?? public/transcript-state.ts
+?? public/ui-state-machine.ts
+?? scripts/build-public-modules.ts
+?? tests/fixtures/
+?? tests/helpers/
+?? tests/native-launcher-boundary.test.ts
+?? tests/native-minibar.test.ts
+?? tests/native-surface-contract.test.ts
+?? tests/public-caret-accessibility.test.ts
+?? tests/public-caret-context.test.ts
+?? tests/public-caret-foundation.test.ts
+?? tests/public-caret-harness.test.ts
+?? tests/public-caret-library.test.ts
+?? tests/public-caret-live.test.ts
+?? tests/public-dom-protocol-contract.test.ts
+?? tests/public-harness-baseline.test.ts
+?? tests/transcript-state.test.ts
+?? tests/ui-state-machine.test.ts
+a1ed25f95980980cd958044b90e739ac45e8280d
+/Users/hyunjun/Documents/MUNI/meeting-slides

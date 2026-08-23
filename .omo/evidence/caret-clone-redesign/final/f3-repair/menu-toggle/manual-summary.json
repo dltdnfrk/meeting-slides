@@ -1,0 +1,65 @@
+{
+  "verdict": "PASS",
+  "artifactSHA256": "23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d",
+  "isolatedAdoptedServer": {
+    "port": 54746,
+    "websocketOpens": 1
+  },
+  "offDisplayRestoration": {
+    "seed": [
+      9000,
+      9000,
+      360,
+      56
+    ],
+    "observedBounds": {
+      "Height": 56,
+      "Width": 360,
+      "X": 1136,
+      "Y": 854
+    },
+    "pass": true
+  },
+  "menuToggle": {
+    "initialWindowId": 103634,
+    "firstPressTargetWindowCount": 0,
+    "secondPressWindowId": 103634,
+    "secondPressBounds": {
+      "Height": 56,
+      "Width": 360,
+      "X": 1136,
+      "Y": 854
+    },
+    "pass": true
+  },
+  "disclosure": {
+    "observedBounds": {
+      "Height": 220,
+      "Width": 560,
+      "X": 936,
+      "Y": 690
+    },
+    "pass": true
+  },
+  "openWorkspace": {
+    "workspaceGetCount": 4,
+    "lastHost": "localhost:54746",
+    "pass": true
+  },
+  "stopOnce": {
+    "activations": 5,
+    "commands": [
+      {
+        "sequence": 9,
+        "kind": "client-command",
+        "raw": "{\"action\":\"stopCapture\"}",
+        "parsed": {
+          "action": "stopCapture"
+        }
+      }
+    ],
+    "pass": true
+  },
+  "observation": "direct System Events AXPress; one-shot CGWindowListCopyWindowInfo(.optionOnScreenOnly); fresh screencapture",
+  "timing": "FIFO and kqueue vnode notifications with bounded deadlines; no sleeps or polling"
+}

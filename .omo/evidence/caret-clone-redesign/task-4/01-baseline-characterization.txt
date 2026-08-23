@@ -1,0 +1,13 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-harness-baseline.test.ts:
+(pass) public test harness baseline lifecycle > origin serves the shipped index and rejects traversal names [0.69ms]
+(pass) public test harness baseline lifecycle > clientConnected resolves once a websocket client is accepted [0.03ms]
+(pass) public test harness baseline lifecycle > pushMessage broadcasts the exact JSON payload to connected clients [0.17ms]
+(pass) public test harness baseline lifecycle > nextClientMessage resolves inbound client frames in FIFO order [0.10ms]
+(pass) public test harness baseline lifecycle > disconnectClients closes live sockets without stopping the server [0.43ms]
+
+ 5 pass
+ 0 fail
+ 9 expect() calls
+Ran 5 tests across 1 file. [23.00ms]

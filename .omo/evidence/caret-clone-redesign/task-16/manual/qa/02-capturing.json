@@ -1,0 +1,24 @@
+{
+  "step": "02-capturing",
+  "browser": {
+    "capturePhase": "capturing",
+    "shell": "live",
+    "capturing": true,
+    "timer": "02:05",
+    "transcriptLines": 0,
+    "selectedMeetingIds": [],
+    "connection": "connected"
+  },
+  "native": {
+    "status": "live",
+    "capturePhase": "capturing",
+    "timer": "02:05",
+    "glyph": "●",
+    "title": "녹음 중",
+    "lines": [],
+    "stopEnabled": true,
+    "connection": "online"
+  },
+  "capturePhaseOwnsTimer": true,
+  "timersAgree": true
+}

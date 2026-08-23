@@ -1,0 +1,9 @@
+$ shasum -a 256 installed bundle executable/resources
+ad3c20a34d7ac63497f1f0f79b2e261b22ed4d322d6ac3f8b2fb6d0b62a0c344  /Users/hyunjun/Applications/Meeting Slides.app/Contents/_CodeSignature/CodeResources
+1b22a6d3c58c297be772bc6f122b6e83af39cab03f319bedeb9ca0d0443f6df4  /Users/hyunjun/Applications/Meeting Slides.app/Contents/Info.plist
+f77a58fb22bbe5a63de7ea7fbbfeb79cbbedd12be8674fc78811b8d0fc66b6c2  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+55182b91c2255401a77db395b8b7b97c1dccb482721f890337d584693cc7ae0a  /Users/hyunjun/Applications/Meeting Slides.app/Contents/Resources/project-path.txt
+
+$ repository symlink
+lrwxr-xr-x@ 1 hyunjun  staff  46 Aug 12 13:22 Meeting Slides.app -> /Users/hyunjun/Applications/Meeting Slides.app
+/Users/hyunjun/Applications/Meeting Slides.app

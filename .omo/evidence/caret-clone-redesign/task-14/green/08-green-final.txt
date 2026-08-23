@@ -1,0 +1,13 @@
+== FINAL: native suites after all QA fixes, single run ==
+(pass) native launcher seam: launcher entry point and build wiring > the shipped bundle links the transport into exactly one executable [0.03ms]
+
+ 120 pass
+ 0 fail
+ 299 expect() calls
+Ran 120 tests across 3 files. [7.60s]
+
+== swiftc -typecheck (full native surface) ==
+exit=0
+
+== git diff --check ==
+exit=0

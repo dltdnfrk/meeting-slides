@@ -1,0 +1,26 @@
+{
+  "375": {
+    "shell": "live",
+    "detailTab": "overview",
+    "capturePhase": "capturing",
+    "stageState": "empty",
+    "uiState": "capture-live",
+    "connectionState": "online"
+  },
+  "820": {
+    "shell": "live",
+    "detailTab": "overview",
+    "capturePhase": "capturing",
+    "stageState": "empty",
+    "uiState": "capture-live",
+    "connectionState": "online"
+  },
+  "960": {
+    "shell": "live",
+    "detailTab": "overview",
+    "capturePhase": "capturing",
+    "stageState": "empty",
+    "uiState": "capture-live",
+    "connectionState": "online"
+  }
+}

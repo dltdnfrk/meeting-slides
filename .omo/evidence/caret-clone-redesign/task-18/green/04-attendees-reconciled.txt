@@ -1,0 +1,32 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-attendees.test.ts:
+(pass) pre-capture attendee registration form > the pre-capture shell exposes a keyboard-reachable attendee panel [49.15ms]
+(pass) pre-capture attendee registration form > Enter on the toggle opens the panel and focuses the name field [31.52ms]
+(pass) pre-capture attendee registration form > Escape closes the panel and returns focus to the toggle [34.78ms]
+(pass) pre-capture attendee registration form > a click outside the panel closes it, matching the provider-panel pattern [36.15ms]
+(pass) pre-capture attendee registration form > Enter in the form adds drafts with name and optional crm id, including CJK [54.82ms]
+(pass) pre-capture attendee registration form > an empty or whitespace-only name is rejected without sending anything [38.10ms]
+(pass) pre-capture attendee registration form > a duplicate name is rejected and the existing draft is left untouched [34.68ms]
+(pass) pre-capture attendee registration form > edit loads a draft back into the form and replaces it in place [43.39ms]
+(pass) pre-capture attendee registration form > edit and remove keep the panel open even though they re-render the list [63.18ms]
+(pass) pre-capture attendee registration form > remove drops exactly one draft [40.19ms]
+(pass) pre-capture attendee registration form > submit serializes the exact setAttendees wire payload [51.31ms]
+(pass) pre-capture attendee registration form > submitting an empty roster is blocked and sends nothing [33.71ms]
+(pass) pre-capture attendee registration form > an attendees ack stores meeting_id plus the dropdown source and marks rows saved [60.67ms]
+(pass) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved [47.35ms]
+(pass) pre-capture attendee registration form > capture is never hard-gated on attendees [25.66ms]
+(pass) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture [49.17ms]
+(pass) pre-capture attendee registration form > capture locks and hides the attendee surface, and release restores it [28.78ms]
+(pass) pre-capture attendee registration form > a submit racing a capture transition sends at most one setAttendees [26.36ms]
+(pass) pre-capture attendee registration form > a reconnect asks the server to restore the draft roster [3044.08ms]
+(pass) pre-capture attendee registration form > malformed attendees payloads leave the panel usable and state coherent [29.37ms]
+(pass) pre-capture attendee registration form > untrusted attendee text is rendered as text, never as markup [31.43ms]
+(pass) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id [63.79ms]
+(pass) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches [4163.76ms]
+(pass) pre-capture attendee registration form > existing slide rendering and dock controls survive the new panel [33.27ms]
+
+ 24 pass
+ 0 fail
+ 40 expect() calls
+Ran 24 tests across 1 file. [8.66s]

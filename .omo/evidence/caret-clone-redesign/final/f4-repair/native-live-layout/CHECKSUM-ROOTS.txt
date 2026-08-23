@@ -1,0 +1,2 @@
+8d22ad45199095fe704fbeb5b98b2a465e03766fcadd74ef2c111933f3e82734  SHA256SUMS
+9529ad2ac8aa9dca898ab92bbf57d88ecbbb29585f448201b4ca8e61d05bedb4  checksum-verification.txt

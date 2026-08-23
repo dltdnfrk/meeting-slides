@@ -1,0 +1,119 @@
+{
+  "taskId": "st_019fefad",
+  "plan": "caret-clone-redesign",
+  "checkbox": "10",
+  "title": "Refactor Swift launcher lifecycle and transport boundary",
+  "status": "done",
+  "verifiedBy": "senpi-task-st_019fefad",
+  "worktree": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "baselineHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "committed": false,
+  "commitAuthorized": false,
+
+  "deliverables": {
+    "macos/AppLifecycle.swift": "172fde90302b6d4fe9cac8674f79515b0b21beeebe4593dab1d04892773ee37c",
+    "macos/TransportClient.swift": "110f12cf8fcc2ae913f49f386df1253319aa77f6fc0f88f2ec6b8604bdb60b6f",
+    "macos/launcher.swift": "2fa2f6b581a016314291579e5e46b58e7517c462448a9b9c3b4e0047eeec93a0",
+    "tests/fixtures/native-launcher-driver.swift": "450ad5dff5300d9204c3789cb11905f9df6fc68f9429bbb00070155a59d607c9",
+    "tests/native-launcher-boundary.test.ts": "156ee8167ee92561ac225a145b6953b25451509c0fc2b790a8eb922cb13e239a",
+    "tests/native-surface-contract.test.ts": "689170b16080cf13220549afa347fdae7e85f1062f63a36bbb68a6d152c1b6ea",
+    "scripts/build-app.sh": "e0d263f7d8b73c2ba47d654ea38e0342a01ffddbb99e3de8b36d87365a8602d8",
+    "evidence": ".omo/evidence/caret-clone-redesign/task-10/"
+  },
+
+  "preservedFromTodo5": {
+    "macos/NativeSurfaceContract.swift": "d750cd83253b2e6b46dc6a8172769f2b5f3d5c6c0c298da83965f2228df76721",
+    "note": "byte-identical to the Todo-5 DoneClaim hash; the transport client reuses its decoder and StopCommandGuard instead of duplicating them"
+  },
+
+  "acceptanceCriteria": [
+    { "criterion": "pure Swift/native driver tests pass", "result": "pass", "evidence": "green/08-green-final.txt: 73 pass / 0 fail across the new suite (42) and the Todo-5 suite (31)" },
+    { "criterion": "swiftc -typecheck passes", "result": "pass", "evidence": "green/02-swiftc-typecheck.txt: bundle target and full pure seam both exit 0; manual/00-build.txt swiftc -O exit 0" },
+    { "criterion": "existing launcher behaviors are represented by focused tests", "result": "pass", "evidence": "port parsing (5 cases), bun lookup order, log path, launch plan incl. OPEN_BROWSER/HTTP_PORT, health signature (4 cases), readiness fold, browser URL, auto-capture and mic retained in the entry point" },
+    { "criterion": "fake server fixture proves current-state hydration", "result": "pass", "evidence": "transport-connects-and-hydrates -> online/capturing/startedAt from the server snapshot only" },
+    { "criterion": "reconnect status", "result": "pass", "evidence": "transport-reconnects-retaining-last-state -> reconnecting while capture state is retained; transport-authoritative-snapshot-restores-online -> online after the server snapshot; bounded monotonic backoff" },
+    { "criterion": "capture/caption decode", "result": "pass", "evidence": "capture (phase/mode/startedAt), phase-less compatibility, status text, ignored subset, malformedPayload and unknownPhase typed failures" },
+    { "criterion": "one Stop request under rapid activation", "result": "pass", "evidence": "3 rapid activations -> one {\"action\":\"stopCapture\"}; manual/01 shows 5 activations -> 1 frame; mutation red/05 proves the guard binds" },
+    { "criterion": "process termination without second source of truth", "result": "pass", "evidence": "ServerLifecycle: quit/interrupt terminate once, adopted server never terminated, crash status propagated, readiness failure terminates and exits 1; the startup decision adopts a running Bun instead of duplicating it" },
+    { "criterion": "no source imports WebKit", "result": "pass", "evidence": "test asserts no WebKit/WKWebView in the launcher and no AppKit/EventKit/AVFoundation/Process/URLSession in the pure modules; build script WebKit-linkage rejection passes (manual/04)" },
+    { "criterion": "browser remains the main workspace", "result": "pass", "evidence": "NSWorkspace.shared.open of http://localhost:<port>/ retained; no WKWebView/Electron/Tauri; no new server endpoint or protocol rename" }
+  ],
+
+  "qaScenarios": {
+    "happy": "Compiled the real headless driver with swiftc -O and ran it by hand: open -> capture -> status -> close -> reopen -> idle observed end to end; exit 0, stderr empty, 5 identical runs produce one SHA-256 (manual/00, 01, 03). Real compiled launcher binary adopts a healthy running server, opens the browser once and exits 0 without spawning a second Bun (manual/07).",
+    "failure": "Socket closed mid-capture: native state becomes reconnecting while the known capture phase and startedAt are retained; the authoritative snapshot after reconnect restores state (green suite + manual/01). Real launcher binary against a foreign listener on its port: typed refusal, exit 1, no second server (manual/06)."
+  },
+
+  "redProof": {
+    "missingSeam": "red/01-red-missing-seam.txt -> 37 fail / 3 pass, exit 1. The 3 passes are baseline launcher/build invariants.",
+    "mutations": [
+      "red/02-mutation-adopt.txt: healthy running server started again instead of adopted -> 1 targeted failure",
+      "red/03-mutation-phantom-stop.txt: socket close clears the capture projection -> 1 targeted failure",
+      "red/04-mutation-double-terminate.txt: running-state guard removed -> 1 targeted failure",
+      "red/05-mutation-offline-stop.txt: online check removed from Stop -> 1 targeted failure"
+    ],
+    "restoration": "each module restored from a byte-identical backup after every mutation (hash equality verified in-run)",
+    "designFix": "the double-termination probe exposed two mutually-masking guards; the redundant terminationRequested flag was removed so one mechanism enforces the rule and the mutation kills the test"
+  },
+
+  "verification": {
+    "focused": "bun test tests/native-launcher-boundary.test.ts tests/native-surface-contract.test.ts -> 73 pass / 0 fail, exit 0, single run",
+    "task5Regression": "Todo-5 suite 31/31 pass. One invariant block was relocated, not weakened: Todo 10 is chartered to move the port/readiness/launch rules out of macos/launcher.swift, so those assertions now read macos/AppLifecycle.swift. Coverage and test count are unchanged.",
+    "swift": "swiftc -typecheck of launcher+AppLifecycle and of the four-file pure seam, both exit 0; swiftc -O builds both the driver and the bundle executable",
+    "buildScript": "scripts/build-app.sh run for real into a temp install dir: swiftc, plutil -lint, codesign --force --deep, codesign --verify --deep --strict and the WebKit-linkage rejection all pass, exit 0. Test asserts the build compiles launcher.swift + AppLifecycle.swift and still does NOT wire NativeSurfaceContract.swift / TransportClient.swift.",
+    "malformedPayloads": "typed failures for truncated JSON, HTML body, bare null, bare array, wrong field type, unknown phase, non-JSON stdin batch, empty stdin, unknown scenario/event kind; stderr empty, no crash",
+    "types": "tsc --strict --noEmit exit 0; LSP error diagnostics clean on both test files",
+    "whitespace": "git diff --check -> exit 0",
+    "full": "bun test -> 548 pass / 36 fail. This task's suites are 42/42 and 31/31 inside that run.",
+    "fullFailureAttribution": "PRE-EXISTING / sibling-owned. The 36 failures are Puppeteer browser, LLM transport, scene/PPTX and recorder suites; none loads a macOS Swift source or scripts/build-app.sh (green/05-failure-attribution.txt).",
+    "manual": "Real Swift driver and real launcher binary compiled and executed by hand for happy, port-conflict, adoption, readiness-failure and malformed cases; stdout/exit/stderr captured under manual/. Production UI was not opened."
+  },
+
+  "adversarialProbes": {
+    "port_conflict": "foreign 200 body and 503 on the configured port both yield typed portOccupiedByForeignServer; the real binary refuses and exits 1 without spawning Bun (manual/02, manual/06)",
+    "stale_saved_state": "a stopping/switching-model snapshot never rearms the Stop guard; Stop while offline emits nothing; an adopted server ignores repeated interrupts (terminations=0)",
+    "malformed_input": "truncated JSON, HTML error body, bare null, bare array, wrong field type, unknown phase, non-JSON batch, empty stdin - all typed, stderr clean, projection retained",
+    "repeated_interrupt_shutdown": "interrupt,interrupt,quit,serverExited:9 -> exactly one termination and one exit code; verified in the pure model and by the mutation proof",
+    "child_process_cleanup": "readiness failure terminates the owned server before exiting 1 (observed in a real binary run); no orphan bun process or listener left on 8787/8898/8899 (manual/09). The one live bun server.ts is PID 4380, started 11:19, hours before this task.",
+    "misleading_success": "driver exits 1 on a malformed batch instead of faking success; the suite asserts empty stderr and exit 0; four mutations prove the assertions bind real behavior",
+    "generated_binaries": "suite builds into mkdtemp and removes it in afterAll; both manual build dirs and the temp app bundle deleted; repo-wide search finds no stray binary (manual/10)",
+    "symlink_side_effect": "the temp-dir build repointed the repo 'Meeting Slides.app' symlink; detected and restored to $HOME/Applications/Meeting Slides.app in the same turn (manual/05)",
+    "flaky_tests": "no sleep, poll or timing dependency in the seam; compile and run happen once in beforeAll; async behavior is modeled as ordered event lists; 5 identical driver runs produce one SHA-256",
+    "prompt_injection": "N/A - no untrusted external content is read; all driver input is literal, authored in this task"
+  },
+
+  "scope": {
+    "written": [
+      "macos/AppLifecycle.swift (new)",
+      "macos/TransportClient.swift (new)",
+      "macos/launcher.swift (rewritten as a thin entry point)",
+      "tests/fixtures/native-launcher-driver.swift (new)",
+      "tests/native-launcher-boundary.test.ts (new)",
+      "tests/native-surface-contract.test.ts (one invariant block relocated to AppLifecycle.swift)",
+      "scripts/build-app.sh (compile line now includes macos/AppLifecycle.swift)",
+      ".omo/evidence/caret-clone-redesign/task-10/** (new)"
+    ],
+    "deliberatelyExcluded": [
+      "AppKit menu-bar item and NSPanel minibar - Todo 14",
+      "packaging NativeSurfaceContract.swift / TransportClient.swift and rebuilding the installed app - Todo 17 (a test asserts they are not wired yet)",
+      "wiring the transport client into the launcher runtime - nothing consumes native server state until the minibar exists",
+      "macos/NativeSurfaceContract.swift - preserved byte-identical from Todo 5",
+      "all pre-existing dirty provider/Alibaba/model/handoff work - untouched"
+    ]
+  },
+
+  "cleanup": {
+    "temporaryBinaries": "removed (manual/10-cleanup.txt)",
+    "temporaryAppBundle": "temp install dir deleted; repo symlink restored to $HOME/Applications/Meeting Slides.app (manual/05)",
+    "mutationProbes": "all reverted; module hashes match their backups",
+    "strayArtifacts": "none in the repo or TMPDIR",
+    "processes": "no orphan process or listener attributable to this task (manual/09)"
+  },
+
+  "risks": [
+    "scripts/build-app.sh repoints the repository 'Meeting Slides.app' symlink whenever MEETING_SLIDES_APP_DIR is overridden. It was restored here, but Todo 17 should make that symlink update conditional on building into the canonical install dir.",
+    "The installed $HOME/Applications/Meeting Slides.app was intentionally NOT rebuilt, so the shipped bundle still contains the pre-refactor binary until Todo 17 runs.",
+    "macos/TransportClient.swift is compiled and tested but not yet consumed by any shipped executable; it stays dead weight until Todo 14 wires the minibar.",
+    "resolveProjectDir() still falls back to the binary's parent directory when the bundle marker is absent (pre-existing legacy behavior, unchanged by this task); a launcher run from an arbitrary directory therefore resolves a project dir that may not contain .env."
+  ]
+}

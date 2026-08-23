@@ -1,0 +1,110 @@
+{
+  "codeReview": {
+    "by": "lazycodex-code-reviewer",
+    "recommendation": "APPROVE",
+    "codeQualityStatus": "CLEAR",
+    "reportPath": ".omo/evidence/ulw/session/G001-upgrade-meeting-slides-from-a-title/a1/code-review.md",
+    "evidence": "Focused persist/workspace/security/minibar suites green; tsc clean; persist plan parse-gated; artifact route manifest-bound.",
+    "blockers": []
+  },
+  "manualQa": {
+    "by": "lazycodex-qa-executor",
+    "status": "passed",
+    "evidence": "Chromium 1440x900 and 1180x800 screenshots plus focused CLI regression log.",
+    "artifactRefs": [
+      {
+        "id": "wide",
+        "kind": "screenshot",
+        "description": "1440x900 SlidePlan workspace",
+        "path": ".omo/evidence/ulw/session/G001-upgrade-meeting-slides-from-a-title/a1/qa-wide.png"
+      },
+      {
+        "id": "narrow",
+        "kind": "screenshot",
+        "description": "1180x800 desktop degradation",
+        "path": ".omo/evidence/ulw/session/G001-upgrade-meeting-slides-from-a-title/a1/qa-narrow.png"
+      },
+      {
+        "id": "regression-log",
+        "kind": "log",
+        "description": "Focused regression transcript",
+        "path": ".omo/evidence/ulw/session/G001-upgrade-meeting-slides-from-a-title/a1/focused-regression.log"
+      }
+    ],
+    "surfaceEvidence": [
+      {
+        "id": "browser-wide",
+        "criterionRef": "C001",
+        "surface": "browser",
+        "invocation": "Chromium 1440x900 initialize persisted SlidePlan",
+        "verdict": "passed",
+        "artifactRefs": [
+          "wide"
+        ]
+      },
+      {
+        "id": "browser-narrow",
+        "criterionRef": "C001",
+        "surface": "browser",
+        "invocation": "Chromium 1180x800 hide rail, keep paper above dock",
+        "verdict": "passed",
+        "artifactRefs": [
+          "narrow"
+        ]
+      },
+      {
+        "id": "cli-regression",
+        "criterionRef": "C003",
+        "surface": "cli",
+        "invocation": "bun test focused persist/security/minibar/workspace",
+        "verdict": "passed",
+        "artifactRefs": [
+          "regression-log"
+        ]
+      }
+    ],
+    "adversarialCases": [
+      {
+        "id": "artifact-traversal",
+        "criterionRef": "C002",
+        "surface": "cli",
+        "invocation": "GET /slide-plan-artifacts/plan-safe/%2e%2e/meetings.db",
+        "verdict": "passed",
+        "artifactRefs": [
+          "regression-log"
+        ],
+        "scenario": "Traversal request for meetings.db via encoded .. segments is rejected with 403 and publishes no file bytes.",
+        "expectedBehavior": "Return 403, never leak meetings.db or any file outside the publication manifest."
+      }
+    ]
+  },
+  "gateReview": {
+    "by": "lazycodex-gate-reviewer",
+    "recommendation": "APPROVE",
+    "reportPath": ".omo/evidence/ulw/session/G001-upgrade-meeting-slides-from-a-title/a1/gate-review.md",
+    "evidence": "Essential C001 and C002 pass; C003 pass with documented pre-existing raster env fails.",
+    "blockers": []
+  },
+  "iteration": {
+    "fullRerun": true,
+    "status": "passed",
+    "rerunCommands": [
+      "bun test tests/public-slide-plan-workspace.test.ts tests/slides/server-action.test.ts tests/slide-plan-artifacts.test.ts tests/server-security.test.ts tests/native-minibar.test.ts",
+      "bunx tsc -p tsconfig.json --noEmit"
+    ],
+    "evidence": "Focused regression log and TypeScript noEmit both green after persist-edit and workspace containment fixes."
+  },
+  "criteriaCoverage": {
+    "totalCriteria": 3,
+    "passCount": 3,
+    "originalIntent": "Upgrade Meeting Slides into a production-grade meeting-native slide engine without breaking live capture, Review, or minibar.",
+    "desiredOutcome": "Cited multi-layout SlidePlan decks with tokens, assets, edit/undo, and HTML/PDF/PNG/PPTX exports.",
+    "userOutcomeReview": "Happy-path workspace, edge boundaries, and regression surfaces all have current-tree receipts.",
+    "adversarialClassesCovered": [
+      "path-traversal",
+      "malformed-review-claims",
+      "partial-publication",
+      "missing-asset"
+    ]
+  }
+}

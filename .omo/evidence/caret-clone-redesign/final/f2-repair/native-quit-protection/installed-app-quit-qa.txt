@@ -1,0 +1,5 @@
+Installed-app manual quit QA: NOT RUN (non-blocking feasibility boundary)
+
+The installed launcher cannot be exercised without crossing the requested microphone boundary: macos/launcher.swift calls LauncherIO.requestMicAccess() unconditionally before constructing or connecting MinibarWindowController. The same startup path starts the canonical Bun server when no healthy server is present, which may open the user meeting database. A fake adopted server could avoid the database but cannot bypass the unconditional TCC microphone request, and the TCC database is not readable in this session to prove permission state without prompting.
+
+No installed app process was launched, no microphone permission was requested, no capture was started, and no user database was touched for manual QA. The shipped installed artifact was instead compiled, bundle-verified, and independently codesign-verified. The quit predicate and controller delegation were exercised deterministically at the pure/native seam for all five authoritative phases.

@@ -1,0 +1,113 @@
+{
+  "taskId": "st_019ff1ab",
+  "plan": "caret-clone-redesign",
+  "checkbox": "17",
+  "title": "Rebuild and verify the macOS application bundle",
+  "status": "done",
+  "verifiedBy": "senpi-task-st_019ff1ab",
+  "worktree": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "baselineHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "committed": false,
+  "commitAuthorized": false,
+
+  "resumedFinalization": "second resume pass; evidence + receipts assembled from already captured artifacts; verification completed in this pass (suites, codesign, verifier, protected-state, cleanup)",
+
+  "deliverables": {
+    "scripts/build-app.sh": "e2d907ec5e64ec2f2e334f442e645886ddbb24e8e2dd3cab18053e41778c7c1c",
+    "scripts/verify-app.sh": "7edcd6e0ea5c7fe702360ee19e9c3450b026a57d17f65f86c5906130852eb3cd",
+    "macos/launcher.swift": "c2ac8021d40ef6682919acaa5e2a4832dd8f8a50a3cb72424b8ff7a6b45dced8",
+    "macos/AppLifecycle.swift": "a0f72bb482bec1427ddd75bc59bb974a98ff6cc548f1f8189614c149dfa73a6c",
+    "macos/MinibarWindowController.swift": "6af2816541847b2bb3d44a642f36e810bfac66c70eea7b204e93c9c5b1cbebcc",
+    "tests/app-bundle.test.ts": "071e0119fc49e1c54fa6edd3e7660bfee0511b8d52b44fcba7d4af10f058304a",
+    "tests/fixtures/project-resolution-probe.swift": "1bc2be709e44e6680438c732f7fa901d7fce530da0fe40e4503343b9775ff81b",
+    "evidence": ".omo/evidence/caret-clone-redesign/task-17/"
+  },
+
+  "installedBundle": {
+    "path": "$HOME/Applications/Meeting Slides.app",
+    "Contents/MacOS/meeting-slides": "f77a58fb22bbe5a63de7ea7fbbfeb79cbbedd12be8674fc78811b8d0fc66b6c2",
+    "Contents/Info.plist": "1b22a6d3c58c297be772bc6f122b6e83af39cab03f319bedeb9ca0d0443f6df4",
+    "Contents/Resources/project-path.txt": "55182b91c2255401a77db395b8b7b97c1dccb482721f890337d584693cc7ae0a",
+    "Contents/_CodeSignature/CodeResources": "ad3c20a34d7ac63497f1f0f79b2e261b22ed4d322d6ac3f8b2fb6d0b62a0c344",
+    "codesign": "--verify --deep --strict exit 0; Signature=adhoc; Identifier=com.meetingslides.app; TeamIdentifier=not set; no Developer ID; no notarization",
+    "identityPreserved": "CFBundleName/DisplayName=Meeting Slides, CFBundleExecutable=meeting-slides, version 0.3.0/3, LSMinimumSystemVersion 13.0, LSUIElement=false, NSAllowsLocalNetworking",
+    "usageStrings": "NSMicrophoneUsageDescription (unchanged), NSCalendarsUsageDescription + NSCalendarsFullAccessUsageDescription (added: launcher uses EventKit requestFullAccessToEvents and previously had no calendar usage string)",
+    "projectPathResource": "Contents/Resources/project-path.txt points at this checkout; build refuses to package a dir without server.ts/package.json"
+  },
+
+  "packagingRisksClosed": {
+    "bareBinaryProjectResolution": "AppLifecycle.swift gains pure ProjectResolution.projectDirectory(candidates:hasServerEntryPoint:) — a directory counts only if it holds server.ts; launcher.swift resolveProjectDir() throws and exits 1 with a truthful Korean message instead of silently defaulting the .env/port on a wrong dir. Proven headless by tests/fixtures/project-resolution-probe.swift across 5 scenarios inside tests/app-bundle.test.ts.",
+    "symlinkOverrideBehavior": "build-app.sh now updates the repo symlink only when APP_INSTALL_DIR == $HOME/Applications; MEETING_SLIDES_APP_DIR-redirected builds no longer repoint it. RED proof: baseline/03-probe-build-symlink-defect.log captured the old script repointing the repo link into a temp install dir. GREEN proof: tests/app-bundle.test.ts asserts link identity before/after a redirected real build.",
+    "storedDisplayIdDeadData": "removed. MinibarFrameStore persisted displayId which load() never read and the two delegate call sites hardcoded to 0. save() now stores x/y/width/height only; resolveFrame re-derives the host display from the saved rect. Live receipt: the rebuilt app's com.meetingslides.app minibar.frame.v1 dict contained exactly {x:1136, y:854, width:360, height:56} — no displayId key (manual/12); defaults domain deleted after QA.",
+    "everyNativeModulePackaged": "tests/app-bundle.test.ts compiles the real bundle into temp via the real build script and asserts the packaged executable's Swift reflection metadata contains LauncherEnvironment, ServerLifecycle, NativeSurfaceGeometry, StopCommandGuard, TransportClient, MinibarProjection, MinibarWindowController, MinibarView, MinibarPanel, plus the menu-bar/panel/browser selectors; scripts/verify-app.sh re-checks the same against any bundle artifact."
+  },
+
+  "screenCaptureMatrix": {
+    "method": "public APIs only, automated local probes under capture-matrix/ (capture-matrix.swift, display-capture-leg.swift, tcc-check.swift, real-window-observe.swift) on macOS 26.5.2 arm64",
+    "consultedAppleDocumentation": "macOS SDK 26.5 headers (the shipped canonical copy): NSWindow.sharingType/NSWindowSharingNone is NOT deprecated (only NSWindowSharingReadWrite is, macOS 15); CGWindowListCreateImage obsoleted in macOS 15 ('Please use ScreenCaptureKit instead'); SCK exclusion (initWithDisplay:excludingWindows/excludingApplications) is capturer-side only — a captured app cannot force self-exclusion via SCK.",
+    "results": {
+      "singleWindowPixels_default": "readable; SCScreenshotManager(desktopIndependentWindow) returned 360x56 with the green marker present (luminance 0.639, greenDominant), twice, order-stable",
+      "singleWindowPixels_sharingTypeNone": "not readable; SCK returned a pure-black 180x28 frame, twice, order-stable",
+      "windowEnumeration_CGWindowList": "enumerated in BOTH configurations",
+      "windowEnumeration_SCShareableContent": "offered in BOTH configurations",
+      "fullDisplayPixels": "INCONCLUSIVE — control window was invisible even at default sharing type in this context; validity control (legValid=false) recorded, not reported as exclusion",
+      "screencapture1": "INCONCLUSIVE — 'could not create image from rect', exit 1 (Screen Recording unavailable to this terminal-launched bare binary)",
+      "realShippedPanel": "the live minibar (no exclusion API in shipped source) was enumerated AND pixel-readable via SCK single-window capture: 134/136 sampled pixels lit (manual/07-real-minibar-bounds-capture.json)"
+    },
+    "claimDecision": "Ship NO screen-share/visibility claim and use NO sharingType/ScreenCaptureKit code in product. Rationale: (1) window remains enumerated under .none, so capture pickers still list it; (2) the display-capture leg — the actual share path — produced no valid verdict on this machine; (3) Apple warns .none deprives the window of system services — an unpriced regression for the ambient control; (4) this task is chartered to measure, not to change Apple privacy behavior. Shipped surfaces verified claim-free: no sharingType/ScreenCaptureKit in macos/*.swift; no screen-share wording in README/public. Note for Todo 18: DESIGN.md:196 and DESIGN.md:546 describe NSWindow.SharingType.none as 'legacy and unhonored' — that rationale sentence is factually stale for single-window capture on macOS 26.5 (the no-claim conclusion remains correct); reword when the docs todo runs.",
+    "evidence": ".omo/evidence/caret-clone-redesign/task-17/capture-matrix/ (README.md, CLAIM-DECISION.md, 01-matrix-raw.json, 02-display-leg.json, 03-tcc-status.json)"
+  },
+
+  "qaScenarios": {
+    "happy": "Rebuilt canonical bundle (exit 0, manual/01/01b). Direct launch reached every readiness milestone: project resolve, HTTP_PORT=8789 from .env, server spawn, '웹앱 ready → 브라우저 오픈 http://localhost:8789/', '미니바 준비됨 port=8789' (manual/05/06). Real AX: menu-bar extra present with label 'Meeting Slides — 대기 중' (menu-bar item live, accessibility label correct). CGWindowList: 360x56 collapsed panel at top-left (1136,854) = deterministic 16px gutter of the 1512x910 visible frame. Server HTTP 200 with <title>Meeting Slides + runtime-bootstrap marker; WS upgrade 101; reconnect twice delivered identical authoritative idle snapshot (manual/08b). SIGTERM: dispatch source logs '시그널 받음 sig=15', lifecycle terminates owned bun once, exit 0, port freed, zero orphans (manual/09, manual/10).",
+    "failure": "scripts/verify-app.sh rejects: removed project-path.txt, removed Info.plist, removed executable, truncated binary ('packaged executable is missing LauncherEnvironment/...'), marker dir without server.ts — each exit 1 with a specific message while the intact copy passes (manual/04). Rebuilt app caught two real bugs: (a) SIGTERM orphaned the owned bun server — root cause: AppKit runloop had no signal path to lifecycle.handle(.interrupt); fixed via retained DispatchSourceSignal pair; (b) GUI 'open -a' launch is blocked by this machine's TCC ~/Documents consent for fdma — the privileged dirent read hangs before readiness; with the queue broken the same from shell-inherited context works. Both attitudes recorded honestly."
+  },
+
+  "environmentLimits": [
+    "GUI open -a is TCC-blocked here (~/Documents consent gate): launch stalls before server start; identical for the pre-refactor old bundle, so machine consent state, not a regression. Direct binary execution inherits terminal consent and passes all milestones.",
+    "Synthetic CGEvent clicks do not reach the borderless non-activating panel from this shell despite AXIsProcessTrusted=true; the panel exposes no AX window (window count=0). Disclosure/Stop click surface therefore unobservable by injection here — covered instead by tests/native-minibar.test.ts (headless) and task-14 manual/05, 11 (interactive). Recorded in manual/08.",
+    "Capture start/stop not exercised live: starting capture would open the MacBook mic and write meeting rows — not practical from a non-interactive QA shell; the identical command path (transport Stop guard, one stopCapture, reconnect dedup) is covered by native suites and task-14 manual."
+  ],
+
+  "acceptanceCriteria": [
+    { "criterion": "scripts/build-app.sh exits 0", "result": "pass", "evidence": "manual/01-canonical-build.txt (BUILD_EXIT=0) and manual/01b rebuild with the signal fix" },
+    { "criterion": "codesign --verify --deep --strict on installed app exits 0", "result": "pass", "evidence": "manual/02, manual/11-final-bundle-receipt.txt" },
+    { "criterion": "executable and resources non-empty with recorded SHA-256", "result": "pass", "evidence": "manual/02 postbuild hashes (Mach-O arm64, 401904-> final 404-ish KB), README installedBundle table, non-empty enforced by verify-app.sh" },
+    { "criterion": "Info.plist intended identity/permissions/version", "result": "pass", "evidence": "manual/03 plutil -p dump: identity/version preserved; NSMicrophone + six-key TCC set incl. both calendar usage strings; verify-app.sh checks each key" },
+    { "criterion": "symlink resolves to rebuilt app", "result": "pass", "evidence": "manual/11: repo link -> $HOME/Applications/Meeting Slides.app, same inode as canonical executable; redirected builds no longer repoint it (test + baseline defect log)" },
+    { "criterion": "launch reaches server-ready/menu-bar/panel-ready without orphan process", "result": "pass", "evidence": "manual/05/06/09/10: readiness lines observed, menu-bar extra at AX, minibar panel on CGWindow list, SIGTERM reaps owned server, port 8789 free" },
+    { "criterion": "automated capture matrix and claim decision recorded", "result": "pass", "evidence": "capture-matrix/README.md + CLAIM-DECISION.md; decision: no claim, no API" },
+    { "criterion": "test-first RED for missing packaged module/resource and symlink-override/install safety; smallest fix; GREEN", "result": "pass", "evidence": "red/01 (8 fail incl. missing calendar strings, unconditional symlink repoint, missing verifier); baseline/03 (live symlink defect); green/01, green/03, green/09 (29/29 and 153/153)" },
+    { "criterion": "canonical build includes every native module", "result": "pass", "evidence": "tests/app-bundle.test.ts packaged-executable reflection assertions + verify-app.sh module checks; swiftc -O full surface exit 0 (green/04)" }
+  ],
+
+  "knownTaskEndorsedDeviations": [
+    "Info.plist gained NSCalendarsUsageDescription + NSCalendarsFullAccessUsageDescription — required for the EventKit requestFullAccessToEvents the launcher already ships; no identity/mic string/version changed.",
+    "displayId removed from persisted frame state rather than populated: it was write-only and resolveFrame re-derives the host display; removal is the only fix that leaves no meaningless data."
+  ],
+
+  "cleanup": {
+    "processes": "no launcher or bun process attributable to this task; ports 8787/8789/8899/8901/48988 all free",
+    "backupBundle": "$TMPDIR/ms-task17-backup removed after final verification passed (rollback window closed)",
+    "probeBinaries": "capture-matrix binaries deleted; probe .swift sources retained as reproducibility receipts",
+    "appDefaults": "com.meetingslides.app domain deleted (only minibar.frame.v1 from QA launches); receipt in manual/12",
+    "tmp": "probe build dirs, sample captures, ad-hoc scripts removed; pre-existing /private/tmp/ms-* (Aug 7-10, other work) and meeting-slides-codex-* files untouched",
+    "repo": "no commit/stage/reset; git diff --check exit 0; git status delta vs baseline = two new untracked files only (scripts/verify-app.sh, tests/app-bundle.test.ts)"
+  },
+
+  "protectedState": {
+    "task2ManifestRerun": "green/06/07/08: differences split into (A) 95 ulw-research files that were dataless at the task-2 baseline and have since been hydrated by iCloud — now proving integrity by real content hash; (B) 8 files (DESIGN.md, server.ts, public/app.js, public/index.html, public/style.css, public/caret-shell.css, public/operator-surface.js, plan) whose mtimes all predate this task's window — sibling todos 6/11-16",
+    "notTouched": "models/, provider/Alibaba files, HANDOFF.md, audits, .omo/plans, .omo/boulder.json, .omo/start-work/ledger.jsonl (already M at baseline; untouched here), tests/fixtures existing drivers",
+    "keptByteIdentical": {
+      "macos/NativeSurfaceContract.swift": "d750cd83253b2e6b46dc6a8172769f2b5f3d5c6c0c298da83965f2228df76721 (Todo 5 hash)",
+      "macos/TransportClient.swift": "110f12cf8fcc2ae913f49f386df1253319aa77f6fc0f88f2ec6b8604bdb60b6f (Todo 10 hash)"
+    }
+  },
+
+  "residualRisks": [
+    "F3 (final verification wave) should re-attempt GUI open -a launch after the user grants ~/Documents consent; this task recorded the TCC gate instead of bypassing it.",
+    "DESIGN.md:196/546 rationale wording ('legacy and unhonored') is factually stale per this matrix; Todo 18 owns that edit.",
+    "Full-display capture visibility of the minibar remains unmeasured on this machine (control invalid in this context); if a future task needs the display leg, run it with Screen Recording granted to the QA agent.",
+    "AppIcon.icns is not packaged (never was; build copies it opportunistically from a previous install). No visual regression observed — Dock shows the default app icon. Flagged for F-wave if icon polish is desired."
+  ]
+}

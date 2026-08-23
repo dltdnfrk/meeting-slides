@@ -1,0 +1,8 @@
+{
+  "observer" : "CGWindowListCopyWindowInfo(.optionOnScreenOnly)",
+  "targetPID" : 24435,
+  "targetWindowCount" : 0,
+  "targetWindows" : [
+
+  ]
+}

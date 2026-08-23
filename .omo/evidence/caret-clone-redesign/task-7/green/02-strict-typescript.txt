@@ -1,0 +1,27 @@
+$ bunx tsc -p tsconfig.task7.json   # strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes + noUnusedLocals
+exit=0
+
+== config (archived at green/tsconfig.task7.json; copy to repo root to re-run)
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "types": ["bun", "node"],
+    "strict": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true
+  },
+  "include": ["public/ui-state-machine.ts", "tests/ui-state-machine.test.ts"]
+}

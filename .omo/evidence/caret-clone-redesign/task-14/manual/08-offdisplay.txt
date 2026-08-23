@@ -1,0 +1,22 @@
+== 8. off-display saved frame must fall back deterministically ==
+-- saved frame currently persisted by the running app --
+{
+    displayId = 0;
+    height = 220;
+    width = 560;
+    x = 207;
+    y = 561;
+}
+
+-- quit the app, poison the saved frame far off every display, relaunch --
+{
+    displayId = 0;
+    height = 56;
+    width = 360;
+    x = 90000;
+    y = 90000;
+}
+
+-- panel bounds after relaunch with the off-display saved frame --
+1136, 856, 360, 56
+expected deterministic default: 1136, 856, 360x56 (bottom-trailing of active display, 16px gutter)

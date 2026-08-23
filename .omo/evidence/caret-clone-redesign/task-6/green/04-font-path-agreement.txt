@@ -1,0 +1,26 @@
+# GREEN: shipped font location agrees with the contract
+
+$ ls public/fonts/
+dmmono-400-latin.woff2
+dmmono-500-latin.woff2
+figtree-latin-ext.woff2
+figtree-latin.woff2
+font-manifest.json
+LICENSE-DMMono-OFL.txt
+LICENSE-Figtree-OFL.txt
+LICENSE-Pretendard-OFL.txt
+pretendard-variable.woff2
+
+$ ls public/assets 2>&1  (must not exist)
+ls: public/assets: No such file or directory
+exit=1
+
+$ grep -n 'url("/fonts/' public/caret-foundation.css
+31:  src: url("/fonts/figtree-latin.woff2") format("woff2");
+42:  src: url("/fonts/figtree-latin-ext.woff2") format("woff2");
+54:  src: url("/fonts/dmmono-400-latin.woff2") format("woff2");
+62:  src: url("/fonts/dmmono-500-latin.woff2") format("woff2");
+72:  src: url("/fonts/pretendard-variable.woff2") format("woff2");
+
+$ grep -rn 'assets/fonts' DESIGN.md  (must be empty)
+matches=1(1 = none)

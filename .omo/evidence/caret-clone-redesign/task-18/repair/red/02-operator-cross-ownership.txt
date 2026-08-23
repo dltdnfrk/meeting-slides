@@ -1,0 +1,37 @@
+$ mutation 2: generated slide/review rendering added to caret-operator.css
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.11ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.20ms]
+165 |     const generatedRules = generated.filter((rule) => generatedOwner.test(selectorText(rule)));
+166 |     expect(generatedRules.some((rule) => rule.selectors.some((selector) => selector.includes(".slide__inner--live"))
+167 |       && rule.declarations.has("position"))).toBe(true);
+168 |     expect(generatedRules.some((rule) => rule.selectors.some((selector) => selector === ".review-panel")
+169 |       && rule.declarations.has("position"))).toBe(true);
+170 |     expect(operator.filter((rule) => generatedOwner.test(selectorText(rule))).map(selectorText)).toEqual([]);
+                                                                                                       ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   ".slide__inner--live",
++   ".review-panel",
++ ]
+
+- Expected  - 1
++ Received  + 4
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:170:98)
+(fail) Todo 18 active shell convergence > linked stylesheets enforce selector and declaration ownership [3.66ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.20ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.05ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.08ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.11ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.03ms]
+
+ 8 pass
+ 1 fail
+ 47 expect() calls
+Ran 9 tests across 1 file. [25.00ms]

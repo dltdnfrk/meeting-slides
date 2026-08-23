@@ -1,0 +1,6 @@
+== mutation D: unknown phase coerced to idle ==
+(fail) native surface seam: server payload decode subset > an unknown capture phase yields a typed failure without crashing [0.17ms]
+(fail) native surface seam: server payload decode subset > an unknown capture phase yields a typed failure without crashing [0.17ms]
+ 30 pass
+ 1 fail
+ 67 expect() calls

@@ -1,0 +1,134 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-visual-repair.test.ts:
+428 |         expect(g.island!.w).toBeGreaterThan(0);
+429 |         expect(g.island!.h).toBeGreaterThan(0);
+430 | 
+431 |         // THE DEFECT. The row must fit the pane that owns it. Shipped CSS
+432 |         // yields a 902px island at x=-133.7 inside a 635px stage.
+433 |         expect(g.withinOwner).toBe(true);
+                                    ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:433:31)
+(fail) V1 — the live provisional caption row stays inside the pane that owns it > seam900 — #island fits its pane and never shears across the split [98.32ms]
+428 |         expect(g.island!.w).toBeGreaterThan(0);
+429 |         expect(g.island!.h).toBeGreaterThan(0);
+430 | 
+431 |         // THE DEFECT. The row must fit the pane that owns it. Shipped CSS
+432 |         // yields a 902px island at x=-133.7 inside a 635px stage.
+433 |         expect(g.withinOwner).toBe(true);
+                                    ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:433:31)
+(fail) V1 — the live provisional caption row stays inside the pane that owns it > live960 — #island fits its pane and never shears across the split [97.24ms]
+428 |         expect(g.island!.w).toBeGreaterThan(0);
+429 |         expect(g.island!.h).toBeGreaterThan(0);
+430 | 
+431 |         // THE DEFECT. The row must fit the pane that owns it. Shipped CSS
+432 |         // yields a 902px island at x=-133.7 inside a 635px stage.
+433 |         expect(g.withinOwner).toBe(true);
+                                    ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:433:31)
+(fail) V1 — the live provisional caption row stays inside the pane that owns it > library1244 — #island fits its pane and never shears across the split [92.63ms]
+(pass) V1 — the live provisional caption row stays inside the pane that owns it > reference1440 — #island fits its pane and never shears across the split [102.87ms]
+486 |         // The target-size repair must be preserved.
+487 |         expect(control!.box.w).toBeGreaterThanOrEqual(44);
+488 |         expect(control!.box.h).toBeGreaterThanOrEqual(44);
+489 | 
+490 |         // The actual defect: a 44x44 box with zero rendered content.
+491 |         expect(control!.visibleInkCount).toBeGreaterThan(0);
+                                               ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:491:42)
+(fail) V2 — #btn-review is never a blank control > compact320 — the review control renders visible content and keeps its name [134.60ms]
+486 |         // The target-size repair must be preserved.
+487 |         expect(control!.box.w).toBeGreaterThanOrEqual(44);
+488 |         expect(control!.box.h).toBeGreaterThanOrEqual(44);
+489 | 
+490 |         // The actual defect: a 44x44 box with zero rendered content.
+491 |         expect(control!.visibleInkCount).toBeGreaterThan(0);
+                                               ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:491:42)
+(fail) V2 — #btn-review is never a blank control > narrow375 — the review control renders visible content and keeps its name [125.37ms]
+486 |         // The target-size repair must be preserved.
+487 |         expect(control!.box.w).toBeGreaterThanOrEqual(44);
+488 |         expect(control!.box.h).toBeGreaterThanOrEqual(44);
+489 | 
+490 |         // The actual defect: a 44x44 box with zero rendered content.
+491 |         expect(control!.visibleInkCount).toBeGreaterThan(0);
+                                               ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:491:42)
+(fail) V2 — #btn-review is never a blank control > threshold420 — the review control renders visible content and keeps its name [123.32ms]
+510 |           text: (node.textContent ?? "").trim(),
+511 |           ariaHidden: node.getAttribute("aria-hidden"),
+512 |           box: { w: Math.round(r.width), h: Math.round(r.height) },
+513 |         };
+514 |       });
+515 |       expect(icon).not.toBeNull();
+                             ^
+error: expect(received).not.toBeNull()
+
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:515:24)
+(fail) V2 — #btn-review is never a blank control > the .review-btn__icon selector is not dead — the markup provides the node [120.44ms]
+544 |         // THE DEFECT. Either the head wraps so the commands take their own row,
+545 |         // or the text column keeps at least half the row. The shipped CSS does
+546 |         // neither: `.action-card__actions { flex-shrink: 0 }` holds a single row
+547 |         // and leaves the text column at 81/254 = 32%.
+548 |         if (share!.sameRow) {
+549 |           expect(share!.textShare).toBeGreaterThanOrEqual(0.5);
+                                         ^
+error: expect(received).toBeGreaterThanOrEqual(expected)
+
+Expected: >= 0.5
+Received: 0.320435531496063
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:549:36)
+(fail) V3 — action-card commands stay legible at the narrow floor > compact320 — no action command truncates mid-glyph or renders unlabeled [133.69ms]
+544 |         // THE DEFECT. Either the head wraps so the commands take their own row,
+545 |         // or the text column keeps at least half the row. The shipped CSS does
+546 |         // neither: `.action-card__actions { flex-shrink: 0 }` holds a single row
+547 |         // and leaves the text column at 81/254 = 32%.
+548 |         if (share!.sameRow) {
+549 |           expect(share!.textShare).toBeGreaterThanOrEqual(0.5);
+                                         ^
+error: expect(received).toBeGreaterThanOrEqual(expected)
+
+Expected: >= 0.5
+Received: 0.44139360841423947
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-visual-repair.test.ts:549:36)
+(fail) V3 — action-card commands stay legible at the narrow floor > narrow375 — no action command truncates mid-glyph or renders unlabeled [119.78ms]
+
+ 1 pass
+ 9 fail
+ 53 expect() calls
+Ran 10 tests across 1 file. [1.68s]

@@ -1,0 +1,157 @@
+=== MUTATION 3: removed 'capture' server message type in src/session.ts ===
+(re-run against the FINAL test file, 23 tests)
+--- diff ---
+-  type: "capture";
++  type: "captureState";
+--- bun test tests/public-dom-protocol-contract.test.ts ---
+bun test v1.3.14 (0d9b296a)
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.12ms]
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.07ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.15ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.10ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.03ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.02ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.12ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.30ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.09ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.05ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.09ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.05ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.09ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.03ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.26ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.24ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.15ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.31ms]
+338 |     const findings = protocolContract.serverMessages.map((entry) => ({
+339 |       type: entry.type,
+340 |       declared: declared.has(entry.type),
+341 |       inUnion: union.length > 0,
+342 |     }));
+343 |     expect(findings).toEqual(
+                           ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "slide",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "caption",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "line",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "transcript",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "status",
+    },
+    {
+-     "declared": true,
++     "declared": false,
+      "inUnion": true,
+      "type": "capture",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "detect",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "providers",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "sttModels",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "meetings",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "meeting",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "attendees",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "review",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "saved",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "compile",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "export",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "ask",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "reviewItemUpdated",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "reviewConfirmed",
+    },
+    {
+      "declared": true,
+      "inUnion": true,
+      "type": "meetingConcluded",
+    },
+  ]
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-dom-protocol-contract.test.ts:343:22)
+(fail) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.39ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.31ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.09ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.10ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.10ms]
+
+1 tests failed:
+(fail) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.39ms]
+
+ 22 pass
+ 1 fail
+ 54 expect() calls
+Ran 23 tests across 1 file. [33.00ms]

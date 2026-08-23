@@ -1,0 +1,37 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+1697 |       expect(action).toBe("startCapture");
+1698 | 
+1699 |       const observed = await session.page.evaluate(readStopFocus);
+1700 |       expect(observed.shell).toBe("live");
+1701 |       expect(observed.stopVisible).toBe(true);
+1702 |       expect(observed.stopFocused).toBe(true);
+                                          ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:1702:36)
+(fail) Todo 15 · user-started capture focuses the visible Stop control > clicking Start moves focus to #btn-live-stop once the live shell reveals it [94.61ms]
+211 |       const settled = new Promise<void>((resolve) => waiters.set(token, resolve));
+212 |       await page.evaluate((t: string, p: string) => window.__a11yAwait!(t, p), token, predicate);
+213 |       await trigger();
+214 |       let timer: ReturnType<typeof setTimeout> | undefined;
+215 |       const bounded = new Promise<never>((_r, reject) => {
+216 |         timer = setTimeout(() => reject(new A11yStateTimeoutError(predicate, ms)), ms);
+                                              ^
+A11yStateTimeoutError: accessibility shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "stopping"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:216:41)
+(fail) Todo 15 · user-started capture focuses the visible Stop control > the focused Stop is the control that actually ends the recording [2091.46ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > a server-originated capture (calendar auto-capture) never steals focus [97.15ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > first-load hydration into an already-live capture never steals focus [83.61ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > a reconnect re-asserting the same live capture never re-steals focus [94.63ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > an open dialog keeps focus: the handoff never pulls focus out of a sheet [99.09ms]
+
+ 4 pass
+ 97 filtered out
+ 2 fail
+ 16 expect() calls
+Ran 6 tests across 1 file. [3.11s]

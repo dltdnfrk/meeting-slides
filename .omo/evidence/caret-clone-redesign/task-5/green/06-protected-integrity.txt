@@ -1,0 +1,36 @@
+== protected-path integrity: baseline vs now ==
+(files modified by SIBLING tasks during this run are flagged as such, not touched by me)
+same     .env.example
+same     .omo/start-work/ledger.jsonl
+same     DESIGN.md
+same     README.md
+same     public/app.js
+same     public/index.html
+same     public/operator-surface.js
+same     public/workspace-split.js
+same     server.ts
+same     src/app-settings.ts
+same     src/config.ts
+same     src/llm.ts
+same     src/minutes.ts
+same     src/provider-adapters.ts
+same     src/providers.ts
+same     tests/app-settings.test.ts
+same     tests/providers.test.ts
+same     tests/public-operator-surface.test.ts
+same     tests/public-workspace.test.ts
+changed_count=0
+
+== task-5 write set (the ONLY paths this task wrote) ==
+  macos/NativeSurfaceContract.swift
+  tests/fixtures/native-surface-driver.swift
+  tests/native-surface-contract.test.ts
+  .omo/evidence/caret-clone-redesign/task-5/**
+
+== launcher + build script untouched by this task ==
+265345c61bdba05852e5f59f906f37c7867417270b747ce9786edb13580df6c9  macos/launcher.swift
+dbe1d53412d71a839a6ac53f6e3c6cff812b285e923b3e4ccccc1dad49938e34  scripts/build-app.sh
+baseline was:
+265345c61bdba05852e5f59f906f37c7867417270b747ce9786edb13580df6c9  macos/launcher.swift
+dbe1d53412d71a839a6ac53f6e3c6cff812b285e923b3e4ccccc1dad49938e34  scripts/build-app.sh
+66:swiftc -O -o "$MACOS_DIR/meeting-slides" macos/launcher.swift \

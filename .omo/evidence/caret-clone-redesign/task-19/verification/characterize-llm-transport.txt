@@ -1,0 +1,113 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/llm-transport.test.ts:
+27 |           '{"shouldAdvance":true,"blockTitle":"실제 HTTP","bullets":["원문"]}' } }] });
+28 |       },
+29 |     });
+30 |     try {
+31 |       const client = new LLMClient({ baseURL: server.url.toString(), apiKey: "stub-key", model: "stub-model" });
+32 |       await expect(client.detectBlock(["첫 문장"])).resolves.toEqual({
+                                                              ^
+error: 
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:32:58)
+(fail) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [4.41ms]
+(pass) existing LLM detectBlock transport behavior > HTTP preserves status and response text in rejection [1.46ms]
+62 |   test("CLI sends the unchanged combined prompt and returns parsed stdout", async () => {
+63 |     const capture = join(tempDir, "detect-prompt.txt");
+64 |     const bin = cliStub("detect-ok", `printf '%s' "$2" > "${capture}"\nprintf '%s' '{"shouldAdvance":false,"blockTitle":"실제 CLI","bullets":["원문"]}'`);
+65 |     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 1000 });
+66 | 
+67 |     await expect(client.detectBlock(["CLI 문장"])).resolves.toEqual({
+                                                              ^
+error: 
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:67:58)
+(fail) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [357.91ms]
+73 |   });
+74 | 
+75 |   test("CLI preserves nonzero exit code and stderr in rejection", async () => {
+76 |     const bin = cliStub("detect-error", "printf '%s' 'provider stderr' >&2\nexit 17");
+77 |     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 1000 });
+78 |     await expect(client.detectBlock(["문장"])).rejects.toThrow("종료 코드 17: provider stderr");
+                                                         ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "종료 코드 17: provider stderr"
+Received message: "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-llm-baseline-YwlTKC/detect-error exited with code 17: provider stderr"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:78:53)
+(fail) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [184.93ms]
+(pass) generic chat transport > HTTP returns the provider's raw text [2.13ms]
+103 |       },
+104 |     });
+105 |     try {
+106 |       const client = new LLMClient({ baseURL: server.url.toString(), apiKey: "x", model: "stub-model" });
+107 |       await client.chat("추출 프롬프트");
+108 |       expect(requestBody).toEqual({
+                                ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "max_tokens": 4000,
++   "max_tokens": 6000,
+    "messages": [
+      {
+        "content": "추출 프롬프트",
+        "role": "user",
+      },
+    ],
+    "model": "stub-model",
+-   "temperature": 0.3,
++   "temperature": 0,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:108:27)
+(fail) generic chat transport > HTTP sends user-only message with defaults and no response_format [2.24ms]
+(pass) generic chat transport > HTTP applies system/temperature/maxTokens options [2.01ms]
+(pass) generic chat transport > HTTP chat preserves status and response text in rejection [1.88ms]
+(pass) generic chat transport > HTTP chat falls back to reasoning_content when content is empty [2.07ms]
+(pass) generic chat transport > CLI passes the prompt verbatim (no SYSTEM_PROMPT) and returns raw stdout [390.64ms]
+(pass) generic chat transport > CLI prepends options.system to the prompt [401.30ms]
+184 |   });
+185 | 
+186 |   test("CLI chat preserves nonzero exit code and stderr in rejection", async () => {
+187 |     const bin = cliStub("chat-error", "printf '%s' 'chat stderr' >&2\nexit 9");
+188 |     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 1000 });
+189 |     await expect(client.chat("프롬프트")).rejects.toThrow("종료 코드 9: chat stderr");
+                                                   ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "종료 코드 9: chat stderr"
+Received message: "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-llm-baseline-YwlTKC/chat-error exited with code 9: chat stderr"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:189:46)
+(fail) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection [275.48ms]
+191 | 
+192 |   test("CLI chat honors options.timeoutMs override", async () => {
+193 |     // 타임아웃 자체가 검증 대상: 서버 timeoutMs(10s)보다 짧은 오버라이드가 먼저 발화해야 한다.
+194 |     const bin = cliStub("chat-hang", "sleep 5");
+195 |     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 10_000 });
+196 |     await expect(client.chat("프롬프트", { timeoutMs: 250 })).rejects.toThrow("CLI 타임아웃 (250ms)");
+                                                                       ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "CLI 타임아웃 (250ms)"
+Received message: "CLI timeout (250ms): /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-llm-baseline-YwlTKC/chat-hang"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:196:66)
+(fail) generic chat transport > CLI chat honors options.timeoutMs override [257.75ms]
+
+ 7 pass
+ 6 fail
+ 14 expect() calls
+Ran 13 tests across 1 file. [1.95s]

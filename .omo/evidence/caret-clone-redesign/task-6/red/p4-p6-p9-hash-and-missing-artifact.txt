@@ -1,0 +1,14 @@
+# RED probe: p4 stale reference hash (validator expectation mutated, then restored)
+Mutation: expected task-1 manifest sha256 -> 64 zeros
+Result: evidence/.omo/evidence/caret-clone-redesign/task-1/manifest.json FAILED (hash drift), exit=1
+Restore: validator restored from backup; re-run exit=0, 115/115 pass
+
+# RED probe: p6 missing cited artifact
+Mutation: tests/fixtures/public-dom-contract.json moved aside
+Result: evidence/tests/fixtures/public-dom-contract.json FAILED (missing), exit=1
+Restore: moved back, sha256 1b1707078b2deafd1e12f66d5d9c5a1bdfd1f025cf9e9aa18abde433b0102f57 unchanged, re-run exit=0
+
+# RED probe: p9 missing vendored font manifest
+Mutation: public/fonts/font-manifest.json moved aside
+Result: evidence/public/fonts/font-manifest.json FAILED (missing), exit=1
+Restore: moved back, sha256 d78927aaa4069cc6babd3048839f65489c5659f9eca1954eaffdeb8f389a613c unchanged, re-run exit=0, 115/115

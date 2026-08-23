@@ -1,0 +1,356 @@
+{
+  "stateId": "home-hero",
+  "url": "https://caret.so/en",
+  "finalUrl": "https://caret.so/en",
+  "viewport": {
+    "name": "1440x900",
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-08-11T06:34:27.096Z",
+  "deterministic": {
+    "locale": "ko-KR",
+    "timezone": "Asia/Seoul",
+    "deviceScaleFactor": 1,
+    "colorScheme": "dark",
+    "reducedMotion": "reduce"
+  },
+  "httpStatus": 200,
+  "anchorSelector": "h1.font-display",
+  "stageMarker": null,
+  "failedRequests": [
+    {
+      "url": "https://caret.so/en",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://sr-client-cfg.amplitude.com/config/c66d626fa74aead399cece02de598bbd?config_group=browser",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-PG0W5J5X6E&gtm=45je6871v9222875841z89222872226za20gzb9222872226zd9222872226&_p=1786430064984&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=867183164.1786430066&frm=0&ngs=1&pscdl=noapi&rcb=3&sr=800x600&uaa=&uab=&uafvl=&uam=&uamb=0&uap=&uapv=&uaw=0&ul=ko-kr&_s=1&tag_exp=115938465~115938469~118897920~118897930~119367802~119367810~119527020~119896802&sid=1786430065&sct=1&seg=0&dl=https%3A%2F%2Fcaret.so%2Fen&dt=Caret%20-%20AI%20meeting%20assistant%20that%20makes%20you%20smarter%20%7C%20Caret&en=page_view&_fv=1&_nsi=1&_ss=1&tfd=1782",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://caret.so/en/auth/sign-in?_rsc=ry-B8umWgNEV4JR9",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://caret.so/en/pricing?_rsc=1vwYfVB7_E9t4fEj",
+      "failure": "net::ERR_ABORTED"
+    }
+  ],
+  "record": {
+    "root": {
+      "selector": ":root",
+      "typography": {
+        "fontFamily": "ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(0, 0, 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(2.75381 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 5929.92
+      }
+    },
+    "body": {
+      "selector": "body",
+      "typography": {
+        "fontFamily": "Figtree, \"Figtree Fallback\", \"Pretendard Variable JP\", \"Pretendard Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "lab(98.26 0 0)",
+        "backgroundColor": "lab(2.51107 0.242703 -0.886115)",
+        "borderTopColor": "lab(98.26 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 5930.92
+      }
+    },
+    "heroHeading": {
+      "selector": "h1.font-display",
+      "typography": {
+        "fontFamily": "\"Google Sans Flex\", \"Pretendard Variable JP\", \"Pretendard Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "48px",
+        "fontWeight": "450",
+        "lineHeight": "48px",
+        "letterSpacing": "-1.2px",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "lab(98.26 0 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(98.26 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 464,
+        "y": 104,
+        "width": 512,
+        "height": 96
+      }
+    },
+    "nav": {
+      "selector": "header, nav",
+      "typography": {
+        "fontFamily": "Figtree, \"Figtree Fallback\", \"Pretendard Variable JP\", \"Pretendard Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "lab(98.26 0 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(98.26 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 80,
+        "y": 0,
+        "width": 1280,
+        "height": 56
+      }
+    },
+    "primaryCta": {
+      "selector": "main a[href*='download'], main a[href*='mac'], header a[href*='download']",
+      "typography": {
+        "fontFamily": "Figtree, \"Figtree Fallback\", \"Pretendard Variable JP\", \"Pretendard Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "500",
+        "lineHeight": "24px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "lab(2.51107 0.242703 -0.886115)",
+        "backgroundColor": "lab(90.6853 0.399232 -1.45452)",
+        "borderTopColor": "rgba(0, 0, 0, 0)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0.15s",
+        "transitionTimingFunction": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 709.58,
+        "y": 349,
+        "width": 132.44,
+        "height": 40
+      }
+    },
+    "heroSurface": {
+      "selector": "main section:first-of-type",
+      "typography": {
+        "fontFamily": "Figtree, \"Figtree Fallback\", \"Pretendard Variable JP\", \"Pretendard Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "24px",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "lab(98.26 0 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(98.26 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 56,
+        "width": 1440,
+        "height": 797
+      }
+    },
+    "stateAnchor": {
+      "selector": "h1.font-display",
+      "typography": {
+        "fontFamily": "\"Google Sans Flex\", \"Pretendard Variable JP\", \"Pretendard Variable\", ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+        "fontSize": "48px",
+        "fontWeight": "450",
+        "lineHeight": "48px",
+        "letterSpacing": "-1.2px",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "lab(98.26 0 0)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "lab(98.26 0 0 / 0.1)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 464,
+        "y": 104,
+        "width": 512,
+        "height": 96
+      }
+    }
+  },
+  "missing": [],
+  "documentScrollWidth": 1440,
+  "documentClientWidth": 1440
+}

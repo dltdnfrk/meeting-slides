@@ -1,0 +1,40 @@
+RED-state measurements taken against the shipped tree BEFORE the repair.
+Captured with .omo/.../visual-repair/probe-v1.ts (V1) and an equivalent
+library probe (V2/V3). All values are real Chromium layout, deviceScaleFactor 1,
+ko-KR / Asia/Seoul, frozen clock, fonts awaited.
+
+--- V1: #island at live 960x760, long mixed KO/EN provisional caption ---
+parentChain           : island -> stage-pane -> document-surface -> workspace -> app
+#island               : x=-133.7  w=902.4  right=768.7   (flex: 0 0 auto, min-width: auto)
+#stage-pane           : x=0       w=635    right=635     overflowX=150
+#transcript-pane      : x=640     w=320    right=960
+#caption-text         : x=-47.7   w=800.4  scrollW=1497  overflowX=697
+document root         : rootOverflow=0   <-- why the task-18 harness missed it
+
+The island is 902.4px wide inside a 635px flex container and is centred, so it
+overflows BOTH edges: glyphs are cut at x<0 on the left and the row runs under
+the transcript pane on the right. `flex: none` + the default `min-width: auto`
+prevent it from ever shrinking, so the ellipsis .island__text already declares
+can never engage.
+
+NOTE: the independent review attributed V1 to a missing grid placement on a
+direct child of #document-surface. The runtime parent chain above disproves
+that: #island is a FLEX child of #stage-pane. The repair therefore targets the
+measured flex-shrink failure, not the hypothesised grid placement.
+
+--- V2: #btn-review at library 320x667 / 375x812, meeting selected ---
+#btn-review           : 44x44, hidden=false, aria-label="회의록 검토"
+visible ink inside it : []            <-- zero rendered content
+#btn-review .review-btn__icon : null  <-- selector styled in style.css:1233 matches nothing
+.review-btn__label    : display:none below 620px
+
+--- V3: .action-card__head at library 320x667 ---
+.action-card__head           : w=254   (display:flex, flex-wrap:nowrap)
+  > div:first-child (text)   : w=81.4  textShare=0.3204
+  > .action-card__actions    : w=156.6 (flex-shrink: 0)
+  sameRow                    : true
+"Send follow-up" and "회의가 끝나면 후속 메일 초안이 여기 쌓입니다." are forced to
+fragment across lines inside an 81px column while the command group keeps its
+full intrinsic width.
+
+At 375x812 the same defect is present but milder: textShare=0.4414.

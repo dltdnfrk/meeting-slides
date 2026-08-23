@@ -1,0 +1,20 @@
+{
+  "cycleOne": {
+    "finalizedLines": 16,
+    "nativeCapturePhase": "capturing",
+    "nativeTimer": "00:00"
+  },
+  "cycleTwo": {
+    "finalizedLines": 5,
+    "stopsSent": 1,
+    "sessions": 2
+  },
+  "summary": {
+    "finalSessions": 2,
+    "totalStops": 2,
+    "totalStarts": 2,
+    "consoleErrors": 1,
+    "exportArtifacts": 17,
+    "nativeDropCount": 0
+  }
+}

@@ -1,0 +1,14 @@
+== temporary binary cleanup ==
+manual build dir: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//native-surface-manual.ihxgBl
+removed: OK
+
+-- no stray driver binaries anywhere in the repo --
+none: OK
+
+-- no leftover seam temp dirs in TMPDIR --
+none: OK
+
+-- repo has no compiled artifacts committed/untracked --
+?? macos/NativeSurfaceContract.swift
+?? tests/fixtures/
+?? tests/native-surface-contract.test.ts

@@ -1,0 +1,11 @@
+=== restoration verification ===
+--- expected (pre-mutation) ---
+c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e  public/index.html
+6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad  public/app.js
+710be07ffefa67fa9054c7aba98f4c95319183cd4e390bc52acdae76d2b5e99e  src/session.ts
+--- actual (post-restoration) ---
+c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e  public/index.html
+6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad  public/app.js
+710be07ffefa67fa9054c7aba98f4c95319183cd4e390bc52acdae76d2b5e99e  src/session.ts
+--- diff of hashes ---
+IDENTICAL: all three mutated sources restored byte-for-byte

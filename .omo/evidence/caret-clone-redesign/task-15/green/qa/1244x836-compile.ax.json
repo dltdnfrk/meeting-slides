@@ -1,0 +1,309 @@
+{
+  "role": "RootWebArea",
+  "backendNodeId": 2,
+  "loaderId": "100511A0A068B50B42271479B41283CD",
+  "name": "Meeting Slides — 실시간 회의 슬라이드",
+  "url": "http://localhost:50182/",
+  "children": [
+    {
+      "role": "banner",
+      "backendNodeId": 66,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "",
+      "children": [
+        {
+          "role": "StaticText",
+          "backendNodeId": 377,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "Meeting "
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 378,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "Slides"
+        },
+        {
+          "role": "button",
+          "backendNodeId": 72,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "녹음을 중지한 뒤 사용할 수 있습니다",
+          "description": "녹음을 중지한 뒤 사용할 수 있습니다",
+          "disabled": true,
+          "expanded": false
+        },
+        {
+          "role": "status",
+          "backendNodeId": 83,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "",
+          "atomic": true,
+          "live": "polite",
+          "relevant": "additions text",
+          "children": [
+            {
+              "role": "StaticText",
+              "backendNodeId": 385,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "슬라이드를 만들지 못했습니다: 슬라이드 생성에 실패했습니다"
+            }
+          ]
+        },
+        {
+          "role": "button",
+          "backendNodeId": 84,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "설정 열기",
+          "description": "설정 열기",
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "role": "tabpanel",
+      "backendNodeId": 19,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "Overview",
+      "children": [
+        {
+          "role": "banner",
+          "backendNodeId": 168,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "라이브 녹음 컨트롤",
+          "children": [
+            {
+              "role": "button",
+              "backendNodeId": 171,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "녹음 중지"
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 422,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "02:05"
+            }
+          ]
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 424,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "03"
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 425,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "제품 로드맵"
+        },
+        {
+          "role": "heading",
+          "backendNodeId": 180,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "온보딩 지표 점검과 다음 스프린트 범위 확정",
+          "level": 2
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 427,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "이탈률 12% 감소"
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 428,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "설치 시간 4분 → 2분 30초"
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 429,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "튜토리얼 4단계 축소"
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 430,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "핵심"
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 431,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "결정: 온보딩 튜토리얼을 4단계로 축소한다"
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 441,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "녹음 중 02:05"
+        }
+      ]
+    },
+    {
+      "role": "separator",
+      "backendNodeId": 221,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "전사 패널 너비 조절",
+      "value": 320,
+      "valuetext": "",
+      "valuemax": 734,
+      "valuemin": 240,
+      "orientation": "vertical"
+    },
+    {
+      "role": "tabpanel",
+      "backendNodeId": 222,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "Transcript",
+      "children": [
+        {
+          "role": "StaticText",
+          "backendNodeId": 446,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "실시간 기록"
+        },
+        {
+          "role": "StaticText",
+          "backendNodeId": 447,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "2"
+        },
+        {
+          "role": "log",
+          "backendNodeId": 263,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "확정된 발언 기록",
+          "atomic": false,
+          "live": "polite",
+          "relevant": "additions text",
+          "children": [
+            {
+              "role": "StaticText",
+              "backendNodeId": 456,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "9시 40분 48초"
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 457,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "화자 1"
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 458,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "1번째 확정 문장입니다. 온보딩 이탈률과 설치 시간 지표를 함께 점검하면서 다음 스프린트의 범위를 확정하겠습니다."
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 459,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "9시 40분 51초"
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 460,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "화자 2"
+            },
+            {
+              "role": "StaticText",
+              "backendNodeId": 461,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "2번째 확정 문장입니다. 온보딩 이탈률과 설치 시간 지표를 함께 점검하면서 다음 스프린트의 범위를 확정하겠습니다."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "navigation",
+      "backendNodeId": 279,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "작업 결과 보기",
+      "children": [
+        {
+          "role": "link",
+          "backendNodeId": 28,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "슬라이드",
+          "url": "http://localhost:50182/#stage-pane",
+          "children": [
+            {
+              "role": "StaticText",
+              "backendNodeId": 465,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "슬라이드"
+            }
+          ]
+        },
+        {
+          "role": "link",
+          "backendNodeId": 281,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "전체 전사",
+          "url": "http://localhost:50182/#transcript-pane",
+          "children": [
+            {
+              "role": "StaticText",
+              "backendNodeId": 466,
+              "loaderId": "100511A0A068B50B42271479B41283CD",
+              "name": "전체 전사"
+            }
+          ]
+        },
+        {
+          "role": "button",
+          "backendNodeId": 29,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "회의 결과. 검토할 회의 결과가 필요합니다",
+          "description": "검토할 회의 결과가 필요합니다",
+          "disabled": true
+        }
+      ]
+    },
+    {
+      "role": "button",
+      "backendNodeId": 308,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "왼쪽 히스토리에서 회의를 먼저 선택하세요",
+      "description": "왼쪽 히스토리에서 회의를 먼저 선택하세요",
+      "disabled": true
+    },
+    {
+      "role": "status",
+      "backendNodeId": 309,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "",
+      "atomic": true,
+      "live": "polite",
+      "relevant": "additions text",
+      "children": [
+        {
+          "role": "StaticText",
+          "backendNodeId": 481,
+          "loaderId": "100511A0A068B50B42271479B41283CD",
+          "name": "슬라이드를 만들지 못했습니다: 슬라이드 생성에 실패했습니다"
+        }
+      ]
+    },
+    {
+      "role": "button",
+      "backendNodeId": 310,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "재시도"
+    },
+    {
+      "role": "DisclosureTriangle",
+      "backendNodeId": 316,
+      "loaderId": "100511A0A068B50B42271479B41283CD",
+      "name": "슬라이드 만들기, 저장과 내보내기 더 보기",
+      "description": "만들기·저장·내보내기",
+      "expanded": false
+    }
+  ]
+}

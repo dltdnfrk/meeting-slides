@@ -1,0 +1,27 @@
+EXPECTED_RED active-reference:workspace-shell.css
+EXPECTED_RED active-reference:operational-liquid.css
+EXPECTED_RED active-reference:caret-shell.css
+EXPECTED_RED active-reference:caret-foundation.css
+EXPECTED_RED active-reference:transcript-overlay.js
+EXPECTED_RED deleted-file:public/workspace-shell.css
+EXPECTED_RED deleted-file:public/operational-liquid.css
+EXPECTED_RED deleted-file:public/caret-shell.css
+EXPECTED_RED deleted-file:public/caret-foundation.css
+EXPECTED_RED deleted-file:public/transcript-overlay.css
+EXPECTED_RED deleted-file:public/transcript-overlay.js
+EXPECTED_RED deleted-file:public/transcript-overlay 2.css
+EXPECTED_RED deleted-file:public/transcript-overlay 2.js
+EXPECTED_RED deleted-file:public/review-panel 2.js
+EXPECTED_RED deleted-file:public/review-panel-render 2.js
+EXPECTED_RED duplicate-app-owner
+EXPECTED_RED obsolete-selector
+EXPECTED_RED style-cross-owns-operator
+EXPECTED_RED operator-cross-owns-generated
+EXPECTED_RED remove-target-token
+EXPECTED_RED remove-narrow-status
+EXPECTED_RED remove-reduced-transition
+EXPECTED_RED remove-reduced-animation
+EXPECTED_RED stale-browser-launcher
+EXPECTED_RED stale-privacy-claim
+EXPECTED_RED stale-privacy-rationale
+ALL_ADVERSARIAL_PROBES_RED

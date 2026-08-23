@@ -1,0 +1,360 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-context.test.ts:
+(pass) Todo 13 · every binding ID keeps exactly one home > library: each of the 35 binding IDs resolves to exactly one element [98.97ms]
+(pass) Todo 13 · every binding ID keeps exactly one home > live: each of the 35 binding IDs resolves to exactly one element [96.51ms]
+419 |       const [ask] = await session.page.evaluate(readControls, ["btn-ask"]);
+420 |       // 9.11: "Library, meeting selected | Always visible: ... Ask entry".
+421 |       expect(ask!.closedDisclosure).toBeNull();
+422 |       expect(ask!.painted).toBe(true);
+423 |       expect(ask!.reachable).toBe(true);
+424 |       expect(ask!.focusable).toBe(true);
+                                   ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:424:30)
+(fail) Todo 13 · DESIGN 9.11 capability placement > library with a meeting selected: the Ask entry is open, not buried in a disclosure [101.87ms]
+436 |       ] as const;
+437 |       const rows = await session.page.evaluate(readControls, exportIds);
+438 |       // 9.11: "Library ... | Behind the More menu or a sheet: Export set".
+439 |       // Every one of them sits behind the SAME single disclosure.
+440 |       const owners = new Set(rows.map((row) => row.closedDisclosure));
+441 |       expect([...owners]).toEqual(["dock-more"]);
+                                ^
+error: expect(received).toEqual(expected)
+
+  [
+-   "dock-more",
++   null,
+  ]
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:441:27)
+(fail) Todo 13 · DESIGN 9.11 capability placement > library: the export set is behind ONE disclosure, not a permanent wall [79.56ms]
+452 |         readControls,
+453 |         ["btn-compile-deck", "btn-export-pdf", "btn-live-stop"],
+454 |       );
+455 |       const byId = Object.fromEntries(rows.map((row) => [row.id, row]));
+456 |       // 9.11: "Live | Behind the More menu or a sheet: Compile, export, settings".
+457 |       expect(byId["btn-compile-deck"]!.closedDisclosure).not.toBeNull();
+                                                                   ^
+error: expect(received).not.toBeNull()
+
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:457:62)
+(fail) Todo 13 · DESIGN 9.11 capability placement > live: compile and export are behind a disclosure; Stop and the timer are not [87.78ms]
+476 |         });
+477 |         const rows = await session.page.evaluate(readControls, DOCK_CAPABILITIES);
+478 |         const unreachable = rows.filter((row) => !row.reachable).map((row) => row.id);
+479 |         const unfocusable = rows.filter((row) => !row.focusable).map((row) => row.id);
+480 |         expect({ context, unreachable }).toEqual({ context, unreachable: [] });
+481 |         expect({ context, unfocusable }).toEqual({ context, unfocusable: [] });
+                                               ^
+error: expect(received).toEqual(expected)
+
+  {
+    "context": "library",
+-   "unfocusable": [],
++   "unfocusable": [
++     "btn-ask",
++   ],
+  }
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:481:42)
+(fail) Todo 13 · DESIGN 9.11 capability placement > every capability is reachable once its own disclosure is opened, in both shells [86.65ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 1440x900: library action surface stays under two fifths of the viewport [82.48ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 1244x836: library action surface stays under two fifths of the viewport [86.49ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 1100x800: library action surface stays under two fifths of the viewport [86.62ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 960x760: library action surface stays under two fifths of the viewport [88.62ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 900x760: library action surface stays under two fifths of the viewport [81.35ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 899x760: library action surface stays under two fifths of the viewport [84.43ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 820x900: library action surface stays under two fifths of the viewport [79.61ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.461
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 375x812: library action surface stays under two fifths of the viewport [77.68ms]
+495 |         await session.page.evaluate(() => {
+496 |           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
+497 |         });
+498 |         const surface = await session.page.evaluate(readActionSurface);
+499 |         expect(surface.present).toBe(true);
+500 |         expect(surface.heightShareOfViewport).toBeLessThanOrEqual(MAX_ACTION_SURFACE_VIEWPORT_SHARE);
+                                                    ^
+error: expect(received).toBeLessThanOrEqual(expected)
+
+Expected: <= 0.4
+Received: 0.5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:500:47)
+(fail) Todo 13 · the contextual surface is composed, never a dashboard wall > 320x667: library action surface stays under two fifths of the viewport [69.97ms]
+532 |         'document.querySelector(".app")?.classList.contains("app--capturing") === true',
+533 |         () => harness.pushMessage(CAPTURE_LIVE),
+534 |       );
+535 |       const stillOpen = await session.page.evaluate(() =>
+536 |         (document.getElementById("dock-more") as HTMLDetailsElement | null)?.open ?? null);
+537 |       expect(stillOpen).toBe(true);
+                              ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:537:25)
+(fail) Todo 13 · the disclosure state belongs to the user > a set opened during `starting` is still open after `capturing` arrives [84.98ms]
+(pass) Todo 13 · the disclosure state belongs to the user > a set closed in the library stays closed across repeated meeting selections [87.36ms]
+567 |     const session = await openSession(1244, 836);
+568 |     try {
+569 |       // Library default: the set is collapsed, so the library is not a wall.
+570 |       const libraryDefault = await session.page.evaluate(() =>
+571 |         (document.getElementById("dock-more") as HTMLDetailsElement | null)?.open ?? null);
+572 |       expect(libraryDefault).toBe(false);
+                                   ^
+error: expect(received).toBe(expected)
+
+Expected: false
+Received: true
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:572:30)
+(fail) Todo 13 · the disclosure state belongs to the user > crossing the shell boundary applies the shell's own default exactly once [72.61ms]
+629 |         }, panel));
+630 | 
+631 |         expect(opened.role).toBe("dialog");
+632 |         expect(opened.named).toBe(true);
+633 |         // Focus moves into the panel that just opened (DESIGN 9.12).
+634 |         expect(opened.activeInside).toBe(true);
+                                          ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:634:37)
+(fail) Todo 13 · panels are real dialogs > #provider-panel: dialog role + accessible name, Escape closes, focus returns to #btn-settings [87.94ms]
+(pass) Todo 13 · panels are real dialogs > #attendee-panel: dialog role + accessible name, Escape closes, focus returns to #btn-attendees [89.57ms]
+190 |       const settled = new Promise<void>((resolve) => waiters.set(token, resolve));
+191 |       await page.evaluate((t: string, p: string) => window.__ctxAwait!(t, p), token, predicate);
+192 |       await trigger();
+193 |       let timer: ReturnType<typeof setTimeout> | undefined;
+194 |       const bounded = new Promise<never>((_r, reject) => {
+195 |         timer = setTimeout(() => reject(new ContextStateTimeoutError(predicate, ms)), ms);
+                                              ^
+ContextStateTimeoutError: contextual shell timed out after 2000ms waiting for: document.getElementById("ask-panel")?.hidden === false
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:195:41)
+(fail) Todo 13 · panels are real dialogs > #ask-panel: dialog role + accessible name, Escape closes, focus returns to #btn-ask [2085.88ms]
+664 |       for (const row of rows) {
+665 |         expect({ id: row.id, disabled: row.disabled }).toEqual({ id: row.id, disabled: true });
+666 |         // Disabled is muted, never invisible (DESIGN 9.11).
+667 |         expect({ id: row.id, painted: row.painted }).toEqual({ id: row.id, painted: true });
+668 |         // The exact machine reason, in BOTH places.
+669 |         expect({ id: row.id, title: row.title }).toEqual({ id: row.id, title: row.ariaLabel });
+                                                       ^
+error: expect(received).toEqual(expected)
+
+  {
+    "id": "btn-compile-deck",
+-   "title": "슬라이드 초안 만들기",
++   "title": "지금까지의 대화로 편집 가능한 PowerPoint 초안 만들기",
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:669:50)
+(fail) Todo 13 · disabled controls carry their exact machine reason > a disconnected client disables the gated set and states why in title AND aria-label [77.92ms]
+680 |       await session.page.evaluate(() => {
+681 |         for (const d of document.querySelectorAll<HTMLDetailsElement>("details")) d.open = true;
+682 |       });
+683 |       const [before] = await session.page.evaluate(readControls, ["btn-ask"]);
+684 |       expect(before!.disabled).toBe(true);
+685 |       expect(before!.title).toBe(before!.ariaLabel);
+                                  ^
+error: expect(received).toBe(expected)
+
+Expected: "회의에 질문하기"
+Received: "왼쪽 히스토리에서 회의를 먼저 선택하세요"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:685:29)
+(fail) Todo 13 · disabled controls carry their exact machine reason > Ask states its gate reason in title AND aria-label while no meeting is selected [72.59ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > compile, export, save and reset emit their existing action names [84.74ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > reset emits `reset` from the library, where it is truthfully enabled [87.15ms]
+190 |       const settled = new Promise<void>((resolve) => waiters.set(token, resolve));
+191 |       await page.evaluate((t: string, p: string) => window.__ctxAwait!(t, p), token, predicate);
+192 |       await trigger();
+193 |       let timer: ReturnType<typeof setTimeout> | undefined;
+194 |       const bounded = new Promise<never>((_r, reject) => {
+195 |         timer = setTimeout(() => reject(new ContextStateTimeoutError(predicate, ms)), ms);
+                                              ^
+ContextStateTimeoutError: contextual shell timed out after 2000ms waiting for: document.getElementById("ask-panel")?.hidden === false
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:195:41)
+(fail) Todo 13 · re-homed controls still send their frozen actions > Ask sends `ask` with the frozen `meetingId` payload key [2091.70ms]
+(pass) Todo 13 · re-homed controls still send their frozen actions > repeated compile activation while a job is in flight emits exactly one action [91.46ms]
+836 |         const rows = await session.page.evaluate(readControls, DOCK_CAPABILITIES);
+837 |         const undersized = rows
+838 |           .filter((row) => row.painted && row.box !== null
+839 |             && (row.box.h < MIN_TARGET_PX || row.box.w < MIN_TARGET_PX))
+840 |           .map((row) => `${row.id}:${row.box!.w}x${row.box!.h}`);
+841 |         expect(undersized).toEqual([]);
+                                 ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "btn-compile-deck:217x40",
++   "btn-export-md:94x40",
++   "btn-export-json:102x40",
++   "btn-export-transcript:102x40",
++   "btn-export-deck:102x40",
++   "btn-export-pdf:102x40",
++   "btn-export-png:102x40",
++   "btn-ask:58x40",
++   "btn-reset:102x40",
++ ]
+
+- Expected  - 1
++ Received  + 11
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:841:28)
+(fail) Todo 13 · narrow widths keep real target sizes > 375x812: every painted action meets the 44px target [75.18ms]
+836 |         const rows = await session.page.evaluate(readControls, DOCK_CAPABILITIES);
+837 |         const undersized = rows
+838 |           .filter((row) => row.painted && row.box !== null
+839 |             && (row.box.h < MIN_TARGET_PX || row.box.w < MIN_TARGET_PX))
+840 |           .map((row) => `${row.id}:${row.box!.w}x${row.box!.h}`);
+841 |         expect(undersized).toEqual([]);
+                                 ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "btn-compile-deck:162x40",
++   "btn-export-md:121x40",
++   "btn-export-json:129x40",
++   "btn-export-transcript:129x40",
++   "btn-export-deck:129x40",
++   "btn-export-pdf:129x40",
++   "btn-export-png:129x40",
++   "btn-ask:85x40",
++   "btn-reset:129x40",
++ ]
+
+- Expected  - 1
++ Received  + 11
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-context.test.ts:841:28)
+(fail) Todo 13 · narrow widths keep real target sizes > 320x667: every painted action meets the 44px target [72.64ms]
+(pass) Todo 13 · the output switcher reveals, never duplicates > each switcher item targets a distinct existing surface and creates no second slide [84.06ms]
+
+ 8 pass
+ 22 fail
+ 65 expect() calls
+Ran 30 tests across 1 file. [7.08s]

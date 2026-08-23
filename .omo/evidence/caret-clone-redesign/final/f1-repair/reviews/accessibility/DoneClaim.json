@@ -1,0 +1,64 @@
+{
+  "task": "F1 rejection gap #2 - independent web/native accessibility review",
+  "taskId": "st_019ff3d7",
+  "reviewer": "omo accessibility reviewer",
+  "parentSession": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSession": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "timestamp": "2026-08-12T02:38:34Z",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "status": "FAIL",
+  "verdict": "REJECT",
+  "independent": true,
+  "productFilesEdited": false,
+  "planFilesEdited": false,
+  "ledgerFilesEdited": false,
+  "commitCreated": false,
+  "results": {
+    "keyboardAndFocus": "FAIL: settings sheet and dialog surfaces move/restore focus but do not trap Tab/Shift+Tab as DESIGN 9.12 requires",
+    "semanticsAndAria": "PASS",
+    "webContrast": "PASS",
+    "nativeContrastEvidence": "INCOMPLETE",
+    "reducedMotion": "PASS",
+    "minimum44PxTargets": "PASS",
+    "cjkClippingAndWrapping": "PASS_CURRENT_WEB_BYTES",
+    "nativeAxSourceAndPureSeam": "PASS",
+    "nativeInstalledAxRoleHelpAnnouncementEvidence": "INCOMPLETE",
+    "currentBrowserViewportTests": "PASS",
+    "todo19InstalledViewportMatrix": "FAIL_INCOMPLETE"
+  },
+  "verification": {
+    "publicAccessibilityAndFoundation": "112 pass, 0 fail",
+    "publicLibraryAndLive": "76 pass, 0 fail",
+    "nativeMinibar": "50 pass, 0 fail",
+    "focusTrapSourceSearch": "No Tab/Shift+Tab containment handler or focus-trap helper found under public/"
+  },
+  "blockers": [
+    "No browser focus trap for the settings sheet/modal contract in DESIGN.md:456-457",
+    "Todo 19 installed journey omits canonical 1440x900 and 1244x836 viewport evidence and has no live 320 capture",
+    "Todo 19 native AX receipts are flattened text and do not retain runtime AXRole, AXHelp, focus, or announcement notification fields"
+  ],
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/accessibility/REPORT.md",
+    "sha256": "58884dcf1dc5e86abd9f7131a594309a4d300fae99806cc3b4b9bdfbbbcb65ec"
+  },
+  "inspectedChecksums": {
+    "DESIGN.md": "b6e7d78e4d24b8cc72a774bf0470ec2083eb2d8f279b5974a9685ef4724ff29d",
+    "public/index.html": "56048c545c0d248903930d29d7cb997030e4bfeeffb802904473b95b2302b556",
+    "public/app.js": "8aac593219c7ff40d916846b86720692904264a6bbfff64cfc153ff6420371ed",
+    "public/operator-surface.js": "062e9a32e0dd18f6f0665479f229c4b7655c018b0d638b6140f69712550fa93b",
+    "public/review-panel.js": "d2cfee7e5a06f07b405ab46e52ac5077c58d20a1f7afc8dae112641b168fa4f3",
+    "public/caret-operator.css": "20dab12a9dbcb22b724ba2da3607d48e2d211a59c580771397536ee5ce322918",
+    "macos/MinibarView.swift": "33f53850136754b16d85e7bf8b303a3e88c7eba88b7158d532200ff2e8f98f80",
+    "macos/MinibarProjection.swift": "7847d1d3a3e5970ba0263f8d01317b53776f43dfa058e725eee2154fcd003316",
+    "macos/MinibarWindowController.swift": "6af2816541847b2bb3d44a642f36e810bfac66c70eea7b204e93c9c5b1cbebcc",
+    "tests/public-caret-accessibility.test.ts": "fc6364d5954e6b9a262df42cbb89de6799caeef19e4171166ed6bc58bdf790b6",
+    "tests/public-caret-foundation.test.ts": "4e2cb69171cd80c03d63bea9f14e3d0715c224e41822eaffe0ec6ae3791f575f",
+    "tests/public-caret-library.test.ts": "351f8fda7f1cd484f2ab318c45ec4989426dca6f7460802b7063393b6bec67dd",
+    "tests/public-caret-live.test.ts": "7334d3a1660c3e010275f7bd5466c260765acab0c27233e263690023155d618d",
+    "tests/native-minibar.test.ts": "b8038cc3d62a91cc44a45a7180d3a6c0068d4f445340f0e69c31a486b4c62e50",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/checkpoint.json": "0eed4a737b290267138f20aa560159207d3782fd95d2f7dce8ca2ac2e9417e35",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/native-cycle1-ax.txt": "0f4e301002fc32556480367bf74bd5efaa9f0ac3147134cdd856b76d2eaf4fd9",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/native-cycle2-ax.txt": "7873419bdfe99610780d10d5e1959729c9edd1959c6c6ce6d9924b9055fdd0c3",
+    ".omo/evidence/caret-clone-redesign/task-19/verification/verification-accessibility-targets.txt": "9bd8f706f47973465cb6df09497b699d701e72de76c1e9eef3db1177bc417c48"
+  }
+}

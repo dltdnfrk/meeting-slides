@@ -1,0 +1,76 @@
+{
+  "captionText": "녹음이 끝났습니다",
+  "captureTimerText": "00:00",
+  "capturing": false,
+  "compileStatusHidden": false,
+  "compileStatusState": "success",
+  "connection": "connected",
+  "environment": {
+    "deviceScaleFactor": 1,
+    "fontsReady": true,
+    "locale": "ko-KR",
+    "now": 1710376860000,
+    "timezone": "Asia/Seoul"
+  },
+  "fixtureId": "reference-library",
+  "geometry": {
+    "#current-slide": {
+      "height": 130,
+      "width": 760,
+      "x": 296,
+      "y": 341
+    },
+    "#session-list": {
+      "height": 220,
+      "width": 206,
+      "x": 27,
+      "y": 213
+    },
+    "#stage-pane": {
+      "height": 612,
+      "width": 850,
+      "x": 251,
+      "y": 70
+    },
+    "#transcript-pane": {
+      "height": 612,
+      "width": 320,
+      "x": 1106,
+      "y": 70
+    },
+    "#workspace": {
+      "height": 630,
+      "width": 1440,
+      "x": 0,
+      "y": 60
+    },
+    ".dock": {
+      "height": 210,
+      "width": 1440,
+      "x": 0,
+      "y": 690
+    }
+  },
+  "layout": {
+    "sameColumn": false,
+    "sameRow": true,
+    "stageAboveTranscript": false,
+    "stageVisible": true,
+    "transcriptVisible": true
+  },
+  "meetingTitles": [
+    "제품 로드맵 정렬",
+    "고객 온보딩 리뷰",
+    "분기 회고"
+  ],
+  "recordButtonLabel": "녹음 시작",
+  "rootOverflow": {
+    "horizontal": 0
+  },
+  "selectedMeetingTitle": "제품 로드맵 정렬",
+  "slideIndexLabel": "02",
+  "slideTitle": "온보딩 지표 점검",
+  "thumbnails": 2,
+  "transcriptCountText": "15",
+  "transcriptLines": 15
+}

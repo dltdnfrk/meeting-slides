@@ -1,0 +1,848 @@
+{
+  "1244-library": {
+    "shell": "library",
+    "phase": "idle",
+    "stops": [
+      "btn-record"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": true,
+        "label": "녹음 시작",
+        "disabled": false
+      }
+    ],
+    "timers": [],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": false,
+        "text": "00:00"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "00:00"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 39,
+          "h": 26
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 73,
+          "h": 28
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": true,
+        "box": {
+          "w": 118,
+          "h": 44
+        }
+      }
+    ],
+    "axNamedNodes": 39
+  },
+  "1244-starting": {
+    "shell": "live",
+    "phase": "starting",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 시작",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "00:00"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "00:00"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 28
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 39,
+          "h": 26
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 73,
+          "h": 28
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 30
+  },
+  "1244-capturing": {
+    "shell": "live",
+    "phase": "capturing",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "02:05"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "02:05"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 28
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 39,
+          "h": 26
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 73,
+          "h": 28
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 30
+  },
+  "1244-stopping": {
+    "shell": "live",
+    "phase": "stopping",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "02:05"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "02:05"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 28
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 39,
+          "h": 26
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 73,
+          "h": 28
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 30
+  },
+  "375-library": {
+    "shell": "library",
+    "phase": "idle",
+    "stops": [
+      "btn-record"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": true,
+        "label": "녹음 시작",
+        "disabled": false
+      }
+    ],
+    "timers": [],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": false,
+        "text": "00:00"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "00:00"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 44,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 60,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": true,
+        "box": {
+          "w": 111,
+          "h": 44
+        }
+      }
+    ],
+    "axNamedNodes": 36
+  },
+  "375-starting": {
+    "shell": "live",
+    "phase": "starting",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 시작",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "00:00"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "00:00"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 44,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 60,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 27
+  },
+  "375-capturing": {
+    "shell": "live",
+    "phase": "capturing",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "02:05"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "02:05"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 44,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 60,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 27
+  },
+  "375-stopping": {
+    "shell": "live",
+    "phase": "stopping",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "02:05"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "02:05"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 44,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 60,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 27
+  },
+  "320-library": {
+    "shell": "library",
+    "phase": "idle",
+    "stops": [
+      "btn-record"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": true,
+        "label": "녹음 시작",
+        "disabled": false
+      }
+    ],
+    "timers": [],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": false,
+        "text": "00:00"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "00:00"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 44,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 60,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": true,
+        "box": {
+          "w": 111,
+          "h": 44
+        }
+      }
+    ],
+    "axNamedNodes": 36
+  },
+  "320-starting": {
+    "shell": "live",
+    "phase": "starting",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 시작",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "00:00"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "00:00"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 44,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 60,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 27
+  },
+  "320-capturing": {
+    "shell": "live",
+    "phase": "capturing",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "02:05"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "02:05"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 44,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 60,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 27
+  },
+  "320-stopping": {
+    "shell": "live",
+    "phase": "stopping",
+    "stops": [
+      "btn-live-stop"
+    ],
+    "stopLabels": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "label": "녹음 중지",
+        "disabled": false
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "label": "녹음 중지",
+        "disabled": false
+      }
+    ],
+    "timers": [
+      "live-topbar-timer"
+    ],
+    "timerTexts": [
+      {
+        "id": "live-topbar-timer",
+        "per": true,
+        "text": "02:05"
+      },
+      {
+        "id": "capture-timer",
+        "per": false,
+        "text": "02:05"
+      }
+    ],
+    "targets": [
+      {
+        "id": "btn-live-stop",
+        "per": true,
+        "box": {
+          "w": 66,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-settings",
+        "per": true,
+        "box": {
+          "w": 44,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-attendees",
+        "per": true,
+        "box": {
+          "w": 60,
+          "h": 44
+        }
+      },
+      {
+        "id": "btn-record",
+        "per": false,
+        "box": {
+          "w": 0,
+          "h": 0
+        }
+      }
+    ],
+    "axNamedNodes": 27
+  }
+}

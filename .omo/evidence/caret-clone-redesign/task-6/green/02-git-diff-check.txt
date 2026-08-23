@@ -1,0 +1,2 @@
+# git diff --check -- DESIGN.md
+exit=0

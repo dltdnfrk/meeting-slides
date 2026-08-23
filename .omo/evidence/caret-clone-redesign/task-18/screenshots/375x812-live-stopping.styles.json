@@ -1,0 +1,27 @@
+{
+  "metrics": {
+    "shell": "live",
+    "phase": "stopping",
+    "detail": "overview",
+    "connection": "connected",
+    "rootOverflow": 0,
+    "duplicateIds": [],
+    "minTarget": 44,
+    "narrowTargetFailures": [],
+    "status": {
+      "text": "앱 서버에 연결되었습니다",
+      "display": "block",
+      "color": "rgb(165, 165, 174)",
+      "role": "status"
+    },
+    "activeRemovedReferences": [],
+    "stopVisible": true,
+    "transcriptLines": 1
+  },
+  "focused": {
+    "id": "btn-settings",
+    "outline": "solid",
+    "width": "2px",
+    "shadow": "none"
+  }
+}

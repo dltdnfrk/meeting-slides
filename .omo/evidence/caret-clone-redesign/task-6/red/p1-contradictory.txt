@@ -1,0 +1,19 @@
+# RED probe: p1-contradictory
+{
+  "design": "/tmp/p1-contradictory.md",
+  "designSha256": "764d99b6d83d251d9f0442066e92dee562b651df1f552655cf8afb0b3e9ce669",
+  "checks": 115,
+  "passed": 113,
+  "failed": 2,
+  "failures": [
+    {
+      "id": "forbidden/no-tiro-inspired",
+      "detail": "\"TIRO-inspired\" in: The operator surface is TIRO-inspired and its primary material is Liquid Glass"
+    },
+    {
+      "id": "forbidden/no-liquid-glass-material",
+      "detail": "\"Liquid Glass\" in: The operator surface is TIRO-inspired and its primary material is Liquid Glass"
+    }
+  ]
+}
+exit=1

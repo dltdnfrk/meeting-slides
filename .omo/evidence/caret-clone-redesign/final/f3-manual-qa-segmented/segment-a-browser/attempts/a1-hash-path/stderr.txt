@@ -1,0 +1,11 @@
+23 | function armTextChange(selector:string,before:string,label:string,ms=120000){(evidence.deadlines as unknown[]).push({label,ms,subscribedBeforeTrigger:true});return bounded(page!.evaluate(({selector,before})=>new Promise<string>((resolve,reject)=>{const e=document.querySelector(selector);if(!e){reject(new Error(`missing ${selector}`));return}const done=()=>{const v=(e.textContent||"").trim();if(v&&v!==before){observer.disconnect();resolve(v)}};const observer=new MutationObserver(done);observer.observe(e,{attributes:true,childList:true,characterData:true,subtree:true});done()}),{selector,before}),label,ms)}
+24 | function bindPage(p:Page){p.on("console",m=>{if(m.type()==="error")consoleErrors.push(m.text())});p.on("pageerror",e=>consoleErrors.push(`pageerror:${e.message}`));}
+25 | 
+26 | try {
+27 |   mkdirSync(E,{recursive:true}); writeWhisperFixture(runtime,lines); markerBefore=takeMarker(runtime.project);
+28 |   app=await launchApp(runtime); const actualHash=shell(`shasum -a 256 '$HOME/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides' | awk '{print $1}'`); if(actualHash!==expectedHash)throw new Error(`artifact hash drift ${actualHash}`); evidence.installed={pid:app.child.pid,actualHash,isolatedProject:runtime.project,database:runtime.databasePath,exports:runtime.exportsDir};
+                                                                                                                                                                                                              ^
+error: artifact hash drift 
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-a-browser.ts:28:202
+
+Bun v1.3.14 (macOS arm64)

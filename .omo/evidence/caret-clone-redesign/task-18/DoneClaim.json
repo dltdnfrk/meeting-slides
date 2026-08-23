@@ -1,0 +1,202 @@
+{
+  "taskId": "st_019ff230",
+  "plan": "caret-clone-redesign",
+  "checkbox": "18",
+  "title": "Remove obsolete shells and reconcile documentation",
+  "status": "done",
+  "verifiedBy": "senpi-task-st_019ff230",
+  "worktree": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "baselineHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "committed": false,
+  "commitAuthorized": false,
+  "deliverables": {
+    "README.md": "f75a2fca9e702d568cde9f0cac1d998d44c33ae0bd4fca12fbce6d4f4b535d39",
+    "DESIGN.md": "b6e7d78e4d24b8cc72a774bf0470ec2083eb2d8f279b5974a9685ef4724ff29d",
+    "public/index.html": "56048c545c0d248903930d29d7cb997030e4bfeeffb802904473b95b2302b556",
+    "public/style.css": "a410a85a695e2cc25ca8a8e00d602542485f82d0e635fad917e4511f5b78b4b7",
+    "public/caret-operator.css": "20dab12a9dbcb22b724ba2da3607d48e2d211a59c580771397536ee5ce322918",
+    "scripts/verify-app.sh": "7a62a03eaed5c734a8f44e6b60a48f1864b781f0e7bbd71815b749adaf92c110",
+    "tests/public-active-shell.test.ts": "06e1faedbe5c84e97b5ac1f51a0cfc7f671789eb061b44d0489b6c2fb7983393",
+    "evidence": ".omo/evidence/caret-clone-redesign/task-18/"
+  },
+  "activeOwnership": {
+    "generatedSlideSource": "public/style.css",
+    "operatorStylesheetSource": "public/caret-operator.css",
+    "operatorStateSource": "public/operator-surface.js",
+    "activeStylesheetReferences": [
+      "/style.css",
+      "/caret-operator.css"
+    ],
+    "activeShellCount": 1,
+    "duplicateOwnerCount": 0,
+    "ownershipModel": {
+      "generatedRenderer": "style.css exclusively owns parsed selector roots .slide__inner--* and .review-panel* with their declarations",
+      "operatorHierarchy": "caret-operator.css exclusively owns authoritative data-shell/data-capture-phase/data-stage-state/data-ui-state selectors and shell grid geometry",
+      "parser": "selector-root exclusive: parse selector-bearing rule preludes and @scope only; declaration bodies opaque; mask comments and quoted/url/data strings; decode CSS simple/hex escapes; compare normalized class identifiers to exact/prefix ownership roots",
+      "styleCss": "zero operator-owned class selector roots, including workspace/state/grid and canonical hierarchy roots",
+      "operatorCss": "zero slide__inner--* or review-panel* class selector roots"
+    }
+  },
+  "deleted": [
+    "public/workspace-shell.css",
+    "public/operational-liquid.css",
+    "public/caret-shell.css",
+    "public/caret-foundation.css",
+    "public/transcript-overlay.css",
+    "public/transcript-overlay.js",
+    "public/transcript-overlay 2.css",
+    "public/transcript-overlay 2.js",
+    "public/review-panel 2.js",
+    "public/review-panel-render 2.js"
+  ],
+  "verification": {
+    "initialRed": "7 fail / 1 pass",
+    "adversarial": "26/26 independent mutations produced RED, including both cross-ownership directions; bytes restored",
+    "requiredSuites": "602 pass / 0 fail across the same 28 claimed files (requested 600 baseline plus two selector-only tests)",
+    "activeShellFinal": "12 pass / 0 fail",
+    "typescriptProject": "exit 0 after final Repair 3 change",
+    "typescriptStrict": "exit 0 after final Repair 3 change",
+    "swiftTypecheck": "exit 0",
+    "generatedDrift": "ui-state-machine.js ok; transcript-state.js ok",
+    "installedBundleVerifier": "exit 0",
+    "codesignStrict": "exit 0",
+    "diffCheck": "exit 0",
+    "changedTypeScriptLsp": "completed 50-file LSP scan reports no diagnostic for changed file; direct final fresh requests hit fixed 3000 ms tool timeout; earlier Repair 3 direct request clean",
+    "cssHtmlShellMarkdownLsp": "configured executables unavailable; Chromium/bash/compiler substitutes passed"
+  },
+  "browserQa": {
+    "engine": "fresh real Chromium, DPR 1, ko-KR, Asia/Seoul, frozen epoch 1710376860000",
+    "viewports": [
+      "1280x800",
+      "960x760",
+      "820x900",
+      "375x812",
+      "320x667"
+    ],
+    "states": [
+      "library-empty",
+      "library-populated",
+      "library-notes",
+      "library-transcript",
+      "live-starting",
+      "live-capturing",
+      "live-disconnected",
+      "live-stopping",
+      "live-error"
+    ],
+    "captures": 45,
+    "screenshotAxStyleTriplets": 45,
+    "validationBadCount": 0,
+    "checked": "overflow, duplicate IDs, removed references, enabled 44px narrow targets, keyboard focus paint, status ownership, shell/phase/detail projection",
+    "errorReceipt": "canonical capture-error DOM projection applied directly for visual capture because no wire message names capture failure; reducer behavior independently green",
+    "repairRerun": "not run: public/style.css and public/caret-operator.css remained byte-identical (a410a85a... and 20dab12a...); existing 45 product captures preserved",
+    "repair2Rerun": "not run: product and docs remained byte-identical; existing 45 product captures preserved",
+    "repair3Rerun": "not run: product and docs remained byte-identical; existing 45 product captures preserved"
+  },
+  "installedExecutableQa": {
+    "path": "$HOME/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides",
+    "directLaunch": "readiness observed by pre-armed launcher-log subscription on port 8789",
+    "http": "200 and runtime-bootstrap health signature",
+    "styles": [
+      "/style.css",
+      "/caret-operator.css"
+    ],
+    "removedReferences": 0,
+    "shellCount": 1,
+    "websocket": "opened; first frame type=status",
+    "meetingRows": "count=60,maxId=60 before and after",
+    "micOrCaptureCommands": 0,
+    "cleanup": "ports 8787/8789 free; no task listener/temp remains; unrelated PID 32804 remains PPID-1 in uninterruptible macOS U state after TERM+KILL, with no listener"
+  },
+  "privacyWording": {
+    "singleWindow": ".sharingType = .none suppressed SCK pixels on the tested macOS configuration",
+    "enumeration": "window remained enumerated; application-side exclusion unsupported",
+    "fullDisplay": "inconclusive",
+    "shippedClaim": "none; no privacy, screen-share invisibility, or exclusion claim"
+  },
+  "protectedState": {
+    "notEdited": "plans, ledger, Boulder, HANDOFF, audits, research, historical evidence, models, provider/Alibaba work, deck sources, NativeSurfaceContract.swift, TransportClient.swift, installed symlink",
+    "headIndex": "no commit/stage/reset/restore",
+    "protocols": "DOM and wire manifest suite green; generated reducers non-drifting",
+    "historicalEvidence": "retained; root evidence index updated additively"
+  },
+  "evidence": {
+    "index": ".omo/evidence/caret-clone-redesign/task-18/README.md",
+    "checksums": ".omo/evidence/caret-clone-redesign/task-18/CHECKSUMS.txt",
+    "red": ".omo/evidence/caret-clone-redesign/task-18/red/01-active-shell-red.txt",
+    "green": ".omo/evidence/caret-clone-redesign/task-18/green/05-required-suites-final.txt",
+    "adversarial": ".omo/evidence/caret-clone-redesign/task-18/adversarial-probes.txt",
+    "browser": ".omo/evidence/caret-clone-redesign/task-18/browser-qa-summary.json",
+    "installed": ".omo/evidence/caret-clone-redesign/task-18/direct-launch-qa.json",
+    "deletions": ".omo/evidence/caret-clone-redesign/task-18/deletion-retention-manifest.txt",
+    "sourceHashes": ".omo/evidence/caret-clone-redesign/task-18/source-hashes.txt",
+    "cleanup": ".omo/evidence/caret-clone-redesign/task-18/cleanup.txt",
+    "repair": ".omo/evidence/caret-clone-redesign/task-18/repair/",
+    "repair2": ".omo/evidence/caret-clone-redesign/task-18/repair-2/",
+    "repair3": ".omo/evidence/caret-clone-redesign/task-18/repair-3/"
+  },
+  "nextTodoEntered": false,
+  "repair": {
+    "status": "done",
+    "defect": "cross-ownership additions to either linked stylesheet previously stayed GREEN",
+    "red": [
+      "repair/red/01-style-cross-ownership.txt",
+      "repair/red/02-operator-cross-ownership.txt"
+    ],
+    "redResults": "each supplied mutation: 8 pass / 1 fail at linked stylesheet ownership guard",
+    "productHashesBefore": "repair/product-hashes-before.txt",
+    "productHashesRestored": "repair/product-hashes-restored.txt",
+    "productBytesChanged": false,
+    "green": "repair/green/01-active-shell.txt (9/9); repair/green/02-claimed-suites.txt (599/599)",
+    "cleanup": "repair/pid-32804-cleanup.txt"
+  },
+  "repair2": {
+    "status": "done",
+    "defect": "a leading declaration comment hid shell geometry property extraction",
+    "exactMutation": ".workspace { /* valid comment */ grid-template-columns: 1fr; }",
+    "fixtureRed": "repair-2/red/01-parser-comment-fixture.txt (9 pass / 1 fail)",
+    "exactMutationRed": "repair-2/red/02-exact-leading-comment-mutation.txt (9 pass / 1 fail)",
+    "fix": "quote-aware comment scanner replaces only real CSS comments with token-separating whitespace before declaration parsing",
+    "coverage": [
+      "leading/interleaved/trailing/value-leading declaration comments",
+      "operator geometry",
+      "generated slide/review declarations",
+      "quoted comment markers and braces",
+      "nested layer/media/supports",
+      "comma selectors and :is comma",
+      "custom-property quoted values",
+      "quoted url/data strings"
+    ],
+    "productBytesChanged": false,
+    "docsBytesChanged": false,
+    "productHashes": "a410a85a... style.css; 20dab12a... caret-operator.css",
+    "green": "repair-2/green/02-active-shell-final.txt (10/10); repair-2/green/03-claimed-suites.txt (600/600)",
+    "pid32804": "independently classified non-blocking kernel U-state residue; not inspected or polled in Repair 2"
+  },
+  "repair3": {
+    "status": "done",
+    "materiallyDifferent": true,
+    "removedHeuristic": "all declaration/property-based ownership extraction and geometry inference",
+    "ownershipUnit": "decoded class token from parsed selector or @scope prelude only",
+    "lexicalBehavior": [
+      "comments masked as selector-token separators",
+      "quoted strings masked",
+      "url()/data payloads masked",
+      "class identifiers extracted after dot anywhere in selector functions",
+      "simple CSS escapes decoded",
+      "1-6 digit hexadecimal CSS escapes decoded with optional terminator whitespace",
+      "declaration and custom-property values never scanned"
+    ],
+    "styleCssForbidden": "all normalized exact/prefix operator roots, including workspace/state/grid roots",
+    "operatorCssForbidden": "slide__inner--* and review-panel* roots",
+    "fourIsRed": "repair-3/red/01-four-is-mutations.txt (4/4 EXPECTED_RED)",
+    "adversarialRed": "repair-3/red/02-adversarial-selector-mutations.txt (7/7 EXPECTED_RED)",
+    "benignGreen": "repair-3/green/01-benign-lookalikes.txt (12/12)",
+    "productBytesChanged": false,
+    "docsBytesChanged": false,
+    "chromiumRerun": false,
+    "pid32804Polled": false,
+    "todo19Entered": false,
+    "green": "repair-3/green/04-active-shell-post-url-mask.txt (12/12); repair-3/green/05-claimed-suites-final.txt (602/602)"
+  }
+}

@@ -1,0 +1,38 @@
+=== PROBE: repeated_interruptions — mutation restoration is idempotent and verified ===
+Intent: prove no temporary mutation can survive an interrupted run.
+
+--- restoration receipts: expected vs actual for all three mutated sources ---
+expected (pre-mutation baseline):
+c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e  public/index.html
+6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad  public/app.js
+710be07ffefa67fa9054c7aba98f4c95319183cd4e390bc52acdae76d2b5e99e  src/session.ts
+actual (now):
+c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e  public/index.html
+6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad  public/app.js
+710be07ffefa67fa9054c7aba98f4c95319183cd4e390bc52acdae76d2b5e99e  src/session.ts
+
+RESULT: byte-identical — zero mutation residue
+
+--- residual mutation-marker scan across the whole shipped surface ---
+current-slide-renamed     hit(s)
+captureState             14 hit(s)
+ghost-pane                hit(s)
+phantomAction             hit(s)
+nonexistent-root          hit(s)
+
+--- duplicate #current-slide count in shipped HTML (must be 1) ---
+1
+
+--- meeting_id spelling intact in shipped client (must be present) ---
+1
+
+--- capture message type intact in src/session.ts (must be present) ---
+1
+
+--- 'captureState' hit clarification ---
+All 14 hits are a captureState() driver METHOD in tests/helpers/caret-browser-driver.ts and
+tests/public-caret-harness.test.ts, authored by the concurrent task-4 agent. Unrelated to this task.
+src/session.ts (the file mutation 3 touched) contains 0 occurrences => mutation fully reverted:
+  src/session.ts: 0
+Files owned by this task contain 0 occurrences:
+  0 in all three

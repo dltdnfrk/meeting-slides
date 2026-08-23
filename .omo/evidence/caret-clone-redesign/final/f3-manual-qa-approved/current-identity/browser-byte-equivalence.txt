@@ -1,0 +1,25 @@
+basis=Segment A behavior was captured from the canonical repository browser bytes; the intervening menu-toggle repair changed only native presentation contract/controller and their native tests/fixture, as recorded by the repair source manifest. The installed app marker still resolves to this canonical repository, and verify-app validates this active browser graph.
+canonical_root=/Users/hyunjun/Documents/MUNI/meeting-slides
+installed_project_marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+installed_executable_sha256=23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d
+
+current_active_browser_bytes:
+b08d066a8c4395df980d1b4caa698ca42361aa34fb9a90aa09126b0ff88022e9  public/index.html
+d433375487cfae2ec0e6347efd966d27105ffddb0f5d2495641b89884a45fb25  public/style.css
+5c2ef5f75aa6d781f07e90c7a59dd87bf00025e7db0cbf28313ec4dd236fb145  public/caret-operator.css
+2acec90237ea08f9a3998070f347417701ac1b99887b323dde0298f592a42db1  public/operator-surface.js
+c35aff4a2799398d87d00e27870b4e15eb428b412d363656624109f354da2401  public/app.js
+b2d0580b79e41fa845497cad2e3c6418189313867c147edccd95fde8e6bb3f94  public/review-panel.js
+b44ecbc2ad43002e816444149350132baebf447ee7be16d228ed013ce6ec0a3e  public/review-panel-render.js
+ce5b33e747269f43ab611eb574b17fbcf83d01e0b9737f3444b2ab6f8a584599  public/workspace-split.js
+0c706e13cf47afee5643e26283303e3888acda6d11e8d5f0f660cec8c961dc19  public/focus-trap.js
+d15bca001bc7596f4f3e38158688420f2c54682c09456c34f27a08cd0e406ca7  public/generated/module-manifest.json
+9c72629a134f95576950d925cd9fb47ffa32a6b5640afa1af6ab10131eb5ffc8  server.ts
+
+intervening_repair_scope_manifest:
+c73a70ae74f9d8dfa0847d4493d14320729bf7585d4a1cf899ba168baf7ac9f4  macos/NativeSurfaceContract.swift
+a9ce72ff87a0106e5aa7c24b4c0409cb03cf7125b58922df1aaffaa6ff69fc56  macos/MinibarWindowController.swift
+78c91662fda3586b167032f778e13c9da7366d1f3b799765a8939f6ce96e1c24  tests/native-surface-contract.test.ts
+308150b3805e1f04e7caccbc8e2b4825827a2334f8a8aec7188b3c373257156c  tests/fixtures/native-surface-driver.swift
+
+conclusion=A behavior remains valid because no browser/server product byte was in the intervening repair scope; current installed app resolves and verifies the same canonical active browser graph. Only A artifact identity was refreshed.

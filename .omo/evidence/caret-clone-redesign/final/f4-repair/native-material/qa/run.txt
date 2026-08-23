@@ -1,0 +1,1 @@
+169:177: execution error: System Events에 오류 발생: window 1 of application process 1 whose unix id = 34545을(를) 가져올 수 없습니다. 유효하지 않은 인덱스. (-1719)

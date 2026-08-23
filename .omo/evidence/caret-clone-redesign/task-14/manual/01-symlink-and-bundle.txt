@@ -1,0 +1,14 @@
+== repo symlink right after temp build (known build-app.sh side effect, Todo-10 risk) ==
+lrwxr-xr-x@ 1 hyunjun  staff  86 Aug 11 18:16 Meeting Slides.app -> /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-tempapp.7r4mwW/Meeting Slides.app
+
+== restore canonical symlink ==
+lrwxr-xr-x@ 1 hyunjun  staff  46 Aug 11 18:16 Meeting Slides.app -> /Users/hyunjun/Applications/Meeting Slides.app
+
+== canonical installed app untouched (byte-identical to baseline) ==
+7173f815172d5e32045c35e3621062e9508af0f6a50f01b88264de6fa0186744  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+baseline: 7173f815172d5e32045c35e3621062e9508af0f6a50f01b88264de6fa0186744
+
+== temp bundle facts ==
+WebKit linkage: 0
+codesign verify: ok
+6b93ebd7a1d0a14f9ff783306e509c4e9ff923320fdacc07cb0446141b803448  /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-tempapp.7r4mwW/Meeting Slides.app/Contents/MacOS/meeting-slides

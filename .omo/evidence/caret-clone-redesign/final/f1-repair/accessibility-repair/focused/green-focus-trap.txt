@@ -1,0 +1,23 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > settings sheet wraps Tab from its last control back to its first [97.43ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > settings sheet wraps Shift+Tab from its first control back to its last [86.97ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > settings sheet releases the trap on Escape and restores the trigger [87.97ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > attendee sheet wraps Tab from its last control back to its first [83.40ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > attendee sheet wraps Shift+Tab from its first control back to its last [93.78ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > attendee sheet releases the trap on Escape and restores the trigger [98.63ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > review dialog wraps Tab from its last control back to its first [122.37ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > review dialog wraps Shift+Tab from its first control back to its last [96.24ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > review dialog releases the trap on Escape and restores the trigger [111.47ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > Ask dialog wraps Tab from its last control back to its first [107.06ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > Ask dialog wraps Shift+Tab from its first control back to its last [102.89ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > Ask dialog releases the trap on Escape and restores the trigger [106.93ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > a closed dialog contributes nothing to the shell tab order [106.54ms]
+(pass) Todo 15 · every shipped dialog traps Tab and Shift+Tab > an open dialog leaves no inert or aria-hidden residue behind after it closes [91.08ms]
+
+ 14 pass
+ 83 filtered out
+ 0 fail
+ 60 expect() calls
+Ran 14 tests across 1 file. [2.14s]

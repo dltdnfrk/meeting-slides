@@ -1,0 +1,14 @@
+== canonical installed app + repo symlink BEFORE temp build ==
+lrwxr-xr-x@ 1 hyunjun  staff  46 Aug 11 16:40 Meeting Slides.app -> /Users/hyunjun/Applications/Meeting Slides.app
+7173f815172d5e32045c35e3621062e9508af0f6a50f01b88264de6fa0186744  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+
+== TEMP build: MEETING_SLIDES_APP_DIR=/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-tempapp.7r4mwW scripts/build-app.sh ==
+compile browser webapp launcher…
+/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-tempapp.7r4mwW/Meeting Slides.app: replacing existing signature
+
+OK webapp launcher: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-tempapp.7r4mwW/Meeting Slides.app
+mode: default browser -> http://localhost (not WKWebView/Tauri)
+project: /Users/hyunjun/Documents/MUNI/meeting-slides
+run: open "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-tempapp.7r4mwW/Meeting Slides.app"
+log: ~/Library/Logs/Meeting Slides/launcher.log
+exit=0

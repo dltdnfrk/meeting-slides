@@ -1,0 +1,24 @@
+{
+  "step": "01-idle-hydrated",
+  "browser": {
+    "capturePhase": "idle",
+    "shell": "library",
+    "capturing": false,
+    "timer": "00:00",
+    "transcriptLines": 0,
+    "selectedMeetingIds": [],
+    "connection": "connected"
+  },
+  "native": {
+    "status": "idle",
+    "capturePhase": "idle",
+    "timer": null,
+    "glyph": "○",
+    "title": "대기 중",
+    "lines": [],
+    "stopEnabled": false,
+    "connection": "online"
+  },
+  "capturePhaseOwnsTimer": false,
+  "timersAgree": false
+}

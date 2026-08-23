@@ -1,0 +1,37 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/app-bundle.test.ts:
+(pass) app bundle: build > scripts/build-app.sh builds into the requested install dir and exits 0 [0.10ms]
+(pass) app bundle: build > the executable and every packaged resource is non-empty [3.34ms]
+(pass) app bundle: packaged native modules > the packaged executable contains LauncherEnvironment [0.04ms]
+(pass) app bundle: packaged native modules > the packaged executable contains ServerLifecycle
+(pass) app bundle: packaged native modules > the packaged executable contains NativeSurfaceGeometry
+(pass) app bundle: packaged native modules > the packaged executable contains StopCommandGuard
+(pass) app bundle: packaged native modules > the packaged executable contains TransportClient
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarProjection
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarWindowController
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarView
+(pass) app bundle: packaged native modules > the build compiles every macos/*.swift source in one invocation [2.68ms]
+(pass) app bundle: packaged native modules > the menu-bar item, panel and browser workspace action are packaged [0.04ms]
+(pass) app bundle: packaged native modules > the packaged executable links no WebKit and stays one binary [12.43ms]
+(pass) app bundle: Info.plist identity and permissions > plutil lints the generated Info.plist [3.21ms]
+(pass) app bundle: Info.plist identity and permissions > app identity and version metadata are preserved [22.34ms]
+(pass) app bundle: Info.plist identity and permissions > every TCC facility the launcher actually uses declares a usage string [7.79ms]
+(pass) app bundle: Info.plist identity and permissions > the bundle claims no screen recording capability it does not use [2.11ms]
+(pass) app bundle: resources > the project-path resource points at this checkout [0.06ms]
+(pass) app bundle: resources > the packaged project path resolves the runtime contract the launcher needs [0.03ms]
+(pass) app bundle: resources > the build refuses to package a project path without the server entry point [0.01ms]
+(pass) app bundle: resources > the pure project-resolution rule rejects a directory that cannot serve [0.07ms]
+(pass) app bundle: resources > project resolution accepts only a directory that can actually serve [0.09ms]
+(pass) app bundle: signing > codesign --verify --deep --strict passes on the built bundle [5.39ms]
+(pass) app bundle: signing > the bundle is ad-hoc signed under the product identifier [4.06ms]
+(pass) app bundle: install safety > a redirected build never repoints the repository symlink [0.03ms]
+(pass) app bundle: install safety > a redirected build never touches the canonical installed app [10.00ms]
+(pass) app bundle: install safety > the build script updates the repo symlink only for the canonical install dir [0.07ms]
+(pass) app bundle: verifier rejects an incomplete bundle > removing the project-path resource fails verification [2.30ms]
+(pass) app bundle: verifier rejects an incomplete bundle > the intact bundle passes the same verifier [107.11ms]
+
+ 29 pass
+ 0 fail
+ 101 expect() calls
+Ran 29 tests across 1 file. [4.93s]

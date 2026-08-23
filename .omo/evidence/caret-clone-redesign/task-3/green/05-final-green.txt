@@ -1,0 +1,35 @@
+=== FINAL GREEN (single deterministic run, post-restoration, post-cleanup) ===
+date: 2026-08-11T06:43:05Z
+
+bun test v1.3.14 (0d9b296a)
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.14ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.11ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.09ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.04ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.02ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.11ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.21ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.08ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.04ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.09ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.04ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.08ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.06ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.14ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.12ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.27ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.07ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.10ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.06ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.04ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.05ms]
+
+ 21 pass
+ 0 fail
+ 52 expect() calls
+Ran 21 tests across 1 file. [40.00ms]
+
+=== git diff --check ===
+git diff --check exit: 0

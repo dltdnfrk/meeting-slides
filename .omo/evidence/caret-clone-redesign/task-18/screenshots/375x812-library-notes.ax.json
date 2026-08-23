@@ -1,0 +1,1056 @@
+{
+  "role": "RootWebArea",
+  "backendNodeId": 12,
+  "loaderId": "20A20A458F67A865D4751E410787311E",
+  "name": "Meeting Slides — 실시간 회의 슬라이드",
+  "url": "http://localhost:61155/",
+  "children": [
+    {
+      "role": "none",
+      "backendNodeId": 22,
+      "loaderId": "20A20A458F67A865D4751E410787311E",
+      "children": [
+        {
+          "role": "none",
+          "backendNodeId": 33,
+          "loaderId": "20A20A458F67A865D4751E410787311E",
+          "children": [
+            {
+              "role": "generic",
+              "backendNodeId": 47,
+              "loaderId": "20A20A458F67A865D4751E410787311E",
+              "name": "",
+              "children": [
+                {
+                  "role": "banner",
+                  "backendNodeId": 48,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "name": "",
+                  "children": [
+                    {
+                      "role": "none",
+                      "backendNodeId": 49,
+                      "loaderId": "20A20A458F67A865D4751E410787311E"
+                    },
+                    {
+                      "role": "none",
+                      "backendNodeId": 53,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "button",
+                          "backendNodeId": 54,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "name": "참석자 지정",
+                          "description": "참석자 지정",
+                          "expanded": false
+                        }
+                      ]
+                    },
+                    {
+                      "role": "none",
+                      "backendNodeId": 61,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "none",
+                          "backendNodeId": 15,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "children": [
+                            {
+                              "role": "status",
+                              "backendNodeId": 16,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "",
+                              "atomic": true,
+                              "live": "polite",
+                              "relevant": "additions text",
+                              "children": [
+                                {
+                                  "role": "StaticText",
+                                  "backendNodeId": 374,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "제품 로드맵 정렬 기록을 불러왔습니다",
+                                  "children": [
+                                    {
+                                      "role": "InlineTextBox",
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "제품 로드맵 정렬 기록을 불러왔습니다"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "role": "button",
+                              "backendNodeId": 66,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "설정 열기",
+                              "description": "설정 열기",
+                              "expanded": false,
+                              "children": [
+                                {
+                                  "role": "StaticText",
+                                  "backendNodeId": 375,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "설정",
+                                  "children": [
+                                    {
+                                      "role": "InlineTextBox",
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "설정"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "none",
+                  "backendNodeId": 70,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "children": [
+                    {
+                      "role": "none",
+                      "backendNodeId": 376,
+                      "loaderId": "20A20A458F67A865D4751E410787311E"
+                    }
+                  ]
+                },
+                {
+                  "role": "none",
+                  "backendNodeId": 76,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "children": [
+                    {
+                      "role": "none",
+                      "backendNodeId": 379,
+                      "loaderId": "20A20A458F67A865D4751E410787311E"
+                    },
+                    {
+                      "role": "none",
+                      "backendNodeId": 5,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "none",
+                          "backendNodeId": 79,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "children": [
+                            {
+                              "role": "none",
+                              "backendNodeId": 80,
+                              "loaderId": "20A20A458F67A865D4751E410787311E"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "none",
+                  "backendNodeId": 83,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "children": [
+                    {
+                      "role": "none",
+                      "backendNodeId": 380,
+                      "loaderId": "20A20A458F67A865D4751E410787311E"
+                    },
+                    {
+                      "role": "none",
+                      "backendNodeId": 6,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "none",
+                          "backendNodeId": 86,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "children": [
+                            {
+                              "role": "none",
+                              "backendNodeId": 87,
+                              "loaderId": "20A20A458F67A865D4751E410787311E"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "none",
+                  "backendNodeId": 93,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "children": [
+                    {
+                      "role": "none",
+                      "backendNodeId": 382,
+                      "loaderId": "20A20A458F67A865D4751E410787311E"
+                    }
+                  ]
+                },
+                {
+                  "role": "none",
+                  "backendNodeId": 99,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "children": [
+                    {
+                      "role": "none",
+                      "backendNodeId": 100,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "none",
+                          "backendNodeId": 386,
+                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                        }
+                      ]
+                    },
+                    {
+                      "role": "none",
+                      "backendNodeId": 3,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "none",
+                          "backendNodeId": 101,
+                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                        },
+                        {
+                          "role": "none",
+                          "backendNodeId": 102,
+                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "none",
+                  "backendNodeId": 103,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "children": [
+                    {
+                      "role": "none",
+                      "backendNodeId": 104,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "none",
+                          "backendNodeId": 387,
+                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                        }
+                      ]
+                    },
+                    {
+                      "role": "none",
+                      "backendNodeId": 4,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "none",
+                          "backendNodeId": 105,
+                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                        },
+                        {
+                          "role": "none",
+                          "backendNodeId": 106,
+                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "none",
+                  "backendNodeId": 108,
+                  "loaderId": "20A20A458F67A865D4751E410787311E"
+                },
+                {
+                  "role": "generic",
+                  "backendNodeId": 129,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "name": "",
+                  "children": [
+                    {
+                      "role": "complementary",
+                      "backendNodeId": 130,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "name": "회의 기록",
+                      "children": [
+                        {
+                          "role": "none",
+                          "backendNodeId": 131,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "children": [
+                            {
+                              "role": "none",
+                              "backendNodeId": 132,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "children": [
+                                {
+                                  "role": "StaticText",
+                                  "backendNodeId": 400,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "Meetings",
+                                  "children": [
+                                    {
+                                      "role": "InlineTextBox",
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "Meetings"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "role": "generic",
+                              "backendNodeId": 133,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "",
+                              "children": [
+                                {
+                                  "role": "StaticText",
+                                  "backendNodeId": 401,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "1",
+                                  "children": [
+                                    {
+                                      "role": "InlineTextBox",
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "1"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "none",
+                          "backendNodeId": 134,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "children": [
+                            {
+                              "role": "list",
+                              "backendNodeId": 135,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "",
+                              "children": [
+                                {
+                                  "role": "listitem",
+                                  "backendNodeId": 136,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "",
+                                  "level": 1,
+                                  "children": [
+                                    {
+                                      "role": "button",
+                                      "backendNodeId": 137,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "제품 로드맵 정렬 3월 13일 오전 9:41 종료",
+                                      "pressed": true,
+                                      "children": [
+                                        {
+                                          "role": "none",
+                                          "backendNodeId": 138,
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "children": [
+                                            {
+                                              "role": "StaticText",
+                                              "backendNodeId": 402,
+                                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                                              "name": "제품 로드맵 정렬",
+                                              "children": [
+                                                {
+                                                  "role": "InlineTextBox",
+                                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                                  "name": "제품 로드맵 정렬"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "role": "none",
+                                          "backendNodeId": 139,
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "children": [
+                                            {
+                                              "role": "none",
+                                              "backendNodeId": 140,
+                                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                                              "children": [
+                                                {
+                                                  "role": "StaticText",
+                                                  "backendNodeId": 403,
+                                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                                  "name": "3월 13일 오전 9:41",
+                                                  "children": [
+                                                    {
+                                                      "role": "InlineTextBox",
+                                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                                      "name": "3월 13일 오전 9:41"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "role": "none",
+                                              "backendNodeId": 141,
+                                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                                              "children": [
+                                                {
+                                                  "role": "StaticText",
+                                                  "backendNodeId": 404,
+                                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                                  "name": "종료",
+                                                  "children": [
+                                                    {
+                                                      "role": "InlineTextBox",
+                                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                                      "name": "종료"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "role": "button",
+                                      "backendNodeId": 142,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "제품 로드맵 정렬 삭제",
+                                      "description": "회의 기록 삭제"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "generic",
+                      "backendNodeId": 147,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "name": "",
+                      "children": [
+                        {
+                          "role": "generic",
+                          "backendNodeId": 148,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "name": "",
+                          "children": [
+                            {
+                              "role": "none",
+                              "backendNodeId": 149,
+                              "loaderId": "20A20A458F67A865D4751E410787311E"
+                            },
+                            {
+                              "role": "none",
+                              "backendNodeId": 151,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "children": [
+                                {
+                                  "role": "heading",
+                                  "backendNodeId": 152,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "제품 로드맵 정렬",
+                                  "level": 1,
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 407,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "제품 로드맵 정렬",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "제품 로드맵 정렬"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "paragraph",
+                                  "backendNodeId": 153,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "",
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 408,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "09:40 · 1문장 · 슬라이드 1장",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "09:40 · 1문장 · 슬라이드 1장"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "role": "generic",
+                              "backendNodeId": 154,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "회의 속성",
+                              "children": [
+                                {
+                                  "role": "generic",
+                                  "backendNodeId": 155,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "",
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 409,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "2024/03/14",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "2024/03/14"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "role": "tablist",
+                              "backendNodeId": 156,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "회의 상세 보기",
+                              "multiselectable": false,
+                              "orientation": "horizontal",
+                              "children": [
+                                {
+                                  "role": "tab",
+                                  "backendNodeId": 157,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "Overview",
+                                  "selected": false,
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 410,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "Overview",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "Overview"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "tab",
+                                  "backendNodeId": 19,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "Notes",
+                                  "selected": true,
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 411,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "Notes",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "Notes"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "tab",
+                                  "backendNodeId": 158,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "Transcript",
+                                  "selected": false,
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 412,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "Transcript",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "Transcript"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "tabpanel",
+                          "backendNodeId": 202,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "name": "Notes",
+                          "children": [
+                            {
+                              "role": "group",
+                              "backendNodeId": 203,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "",
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 204,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "children": [
+                                    {
+                                      "role": "DisclosureTriangle",
+                                      "backendNodeId": 208,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "회의 메모 · AI 정리에 반영",
+                                      "expanded": true,
+                                      "focused": true,
+                                      "children": [
+                                        {
+                                          "role": "StaticText",
+                                          "backendNodeId": 432,
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "회의 메모 · AI 정리에 반영",
+                                          "children": [
+                                            {
+                                              "role": "InlineTextBox",
+                                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                                              "name": "회의 메모 · AI 정리에 반영"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 206,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "children": [
+                                    {
+                                      "role": "textbox",
+                                      "backendNodeId": 9,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "회의 중 떠오른 결정, 액션, 맥락을 적어두세요 — 회의록 정리 시 전사와 함께 사용됩니다",
+                                      "multiline": true,
+                                      "readonly": false,
+                                      "required": false,
+                                      "children": [
+                                        {
+                                          "role": "none",
+                                          "backendNodeId": 209,
+                                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                                        },
+                                        {
+                                          "role": "generic",
+                                          "backendNodeId": 210,
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": ""
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "role": "none",
+                              "backendNodeId": 211,
+                              "loaderId": "20A20A458F67A865D4751E410787311E"
+                            },
+                            {
+                              "role": "none",
+                              "backendNodeId": 212,
+                              "loaderId": "20A20A458F67A865D4751E410787311E"
+                            },
+                            {
+                              "role": "paragraph",
+                              "backendNodeId": 213,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "",
+                              "children": [
+                                {
+                                  "role": "StaticText",
+                                  "backendNodeId": 433,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "메모는 회의록을 정리할 때 전사와 함께 사용됩니다.",
+                                  "children": [
+                                    {
+                                      "role": "InlineTextBox",
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "메모는 회의록을 정리할 때 전사와 함께 사용됩니다."
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "none",
+                          "backendNodeId": 223,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "children": [
+                            {
+                              "role": "none",
+                              "backendNodeId": 224,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 437,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E"
+                                }
+                              ]
+                            },
+                            {
+                              "role": "none",
+                              "backendNodeId": 7,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 227,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "children": [
+                                    {
+                                      "role": "none",
+                                      "backendNodeId": 228,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "children": [
+                                        {
+                                          "role": "none",
+                                          "backendNodeId": 231,
+                                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "none",
+                          "backendNodeId": 237,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "children": [
+                            {
+                              "role": "none",
+                              "backendNodeId": 238,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 438,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E"
+                                }
+                              ]
+                            },
+                            {
+                              "role": "none",
+                              "backendNodeId": 8,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 241,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "children": [
+                                    {
+                                      "role": "none",
+                                      "backendNodeId": 242,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "children": [
+                                        {
+                                          "role": "none",
+                                          "backendNodeId": 245,
+                                          "loaderId": "20A20A458F67A865D4751E410787311E"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "generic",
+                  "backendNodeId": 20,
+                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                  "name": "",
+                  "children": [
+                    {
+                      "role": "none",
+                      "backendNodeId": 267,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "navigation",
+                          "backendNodeId": 268,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "name": "작업 결과 보기",
+                          "children": [
+                            {
+                              "role": "link",
+                              "backendNodeId": 269,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "슬라이드",
+                              "url": "http://localhost:61155/#stage-pane",
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 270,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 451,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "슬라이드",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "슬라이드"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "role": "link",
+                              "backendNodeId": 271,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "전체 전사",
+                              "url": "http://localhost:61155/#transcript-pane",
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 272,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 452,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "전체 전사",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "전체 전사"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "role": "button",
+                              "backendNodeId": 273,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "회의 결과. 검토할 회의 결과가 필요합니다",
+                              "description": "검토할 회의 결과가 필요합니다",
+                              "disabled": true,
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 274,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 453,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "회의 결과",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "회의 결과"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "generic",
+                          "backendNodeId": 276,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "name": "녹음 제어",
+                          "children": [
+                            {
+                              "role": "button",
+                              "backendNodeId": 18,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "녹음 시작",
+                              "pressed": false,
+                              "children": [
+                                {
+                                  "role": "none",
+                                  "backendNodeId": 279,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 456,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "녹음 시작",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "녹음 시작"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "none",
+                      "backendNodeId": 295,
+                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                      "children": [
+                        {
+                          "role": "button",
+                          "backendNodeId": 299,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "name": "선택한 회의의 전사에 질문하기",
+                          "description": "선택한 회의의 전사에 질문하기",
+                          "children": [
+                            {
+                              "role": "StaticText",
+                              "backendNodeId": 465,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "name": "Ask",
+                              "children": [
+                                {
+                                  "role": "InlineTextBox",
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "Ask"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "backendNodeId": 301,
+                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                          "name": "",
+                          "children": [
+                            {
+                              "role": "none",
+                              "backendNodeId": 302,
+                              "loaderId": "20A20A458F67A865D4751E410787311E",
+                              "children": [
+                                {
+                                  "role": "DisclosureTriangle",
+                                  "backendNodeId": 306,
+                                  "loaderId": "20A20A458F67A865D4751E410787311E",
+                                  "name": "슬라이드 만들기, 저장과 내보내기 더 보기",
+                                  "description": "만들기·저장·내보내기",
+                                  "expanded": false,
+                                  "children": [
+                                    {
+                                      "role": "StaticText",
+                                      "backendNodeId": 466,
+                                      "loaderId": "20A20A458F67A865D4751E410787311E",
+                                      "name": "만들기·저장·내보내기",
+                                      "children": [
+                                        {
+                                          "role": "InlineTextBox",
+                                          "loaderId": "20A20A458F67A865D4751E410787311E",
+                                          "name": "만들기·저장·내보내기"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "role": "none",
+                              "backendNodeId": 304,
+                              "loaderId": "20A20A458F67A865D4751E410787311E"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "none",
+              "backendNodeId": 350,
+              "loaderId": "20A20A458F67A865D4751E410787311E"
+            },
+            {
+              "role": "none",
+              "backendNodeId": 351,
+              "loaderId": "20A20A458F67A865D4751E410787311E"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

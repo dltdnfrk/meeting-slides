@@ -1,0 +1,5 @@
+diff exit = 0
+
+SCOPE OF THIS CLAIM: machine JSON (canonically key-sorted) and rounded geometry for
+all 16 fixtures are byte-identical across two SEPARATE browser+harness processes.
+Screenshot PNG bytes are NOT part of this claim — see 13-screenshot-determinism.txt.

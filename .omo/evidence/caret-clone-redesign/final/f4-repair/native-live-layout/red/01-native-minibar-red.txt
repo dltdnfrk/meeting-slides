@@ -1,0 +1,610 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/native-minibar.test.ts:
+(pass) native minibar seam: sources and compilation > the projection module, AppKit shell and fixture driver exist [0.15ms]
+663 |     expect(existsSync(VIEW_SWIFT)).toBe(true);
+664 |     expect(existsSync(DRIVER_SWIFT)).toBe(true);
+665 |   });
+666 | 
+667 |   test("swiftc compiles the pure modules with the fixture driver", () => {
+668 |     expect(compileLog).not.toMatch(/error:/);
+                                 ^
+error: expect(received).not.toMatch(expected)
+
+Expected substring or pattern: not /error:/
+Received: "/Users/hyunjun/Documents/MUNI/meeting-slides/tests/fixtures/native-minibar-driver.swift:212:18: error: cannot find 'MinibarLayout' in scope\n210 | \n211 | func runExpandedLayout(_: [String: Any]) throws -> Any {\n212 |     let layout = MinibarLayout.expanded\n    |                  `- error: cannot find 'MinibarLayout' in scope\n213 |     return [\n214 |         \"surface\": rectJSON(layout.surface),\n"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:668:28)
+(fail) native minibar seam: sources and compilation > swiftc compiles the pure modules with the fixture driver [0.21ms]
+(pass) native minibar seam: sources and compilation > swiftc typechecks the AppKit shell against the pure modules [0.01ms]
+674 |     expect(shellTypecheckExit).toBe(0);
+675 |   });
+676 | 
+677 |   test("the driver runs once, exits 0 and emits machine-readable JSON", () => {
+678 |     expect(driverStderr).toBe("");
+679 |     expect(driverExit).toBe(0);
+                             ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: -1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:679:24)
+(fail) native minibar seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.06ms]
+(pass) native minibar seam: sources and compilation > the projection module stays pure: no AppKit, window, socket or clock [0.42ms]
+(pass) native minibar seam: sources and compilation > the AppKit shell imports no WebKit and hosts no second engine [0.25ms]
+(pass) native minibar seam: sources and compilation > the panel frame is authoritative so content cannot grow past the contract size [0.18ms]
+(pass) native minibar seam: sources and compilation > the AppKit shell stays thin: geometry and status come from the pure modules [0.07ms]
+(pass) native minibar seam: sources and compilation > no native source advertises Pause, share or screen-share exclusion [0.26ms]
+(pass) native minibar seam: sources and compilation > the bundle build compiles the minibar sources into the app executable [0.06ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "collapsed-size"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:745:12)
+(fail) native minibar seam: geometry > collapsed is exactly 360x56 and expanded exactly 560x220 [0.07ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "expanded-layout"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:750:20)
+(fail) native minibar seam: geometry > expanded uses balanced status and transcript columns inside bounded content [0.06ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "frame-default-when-nothing-saved"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:779:12)
+(fail) native minibar seam: geometry > the deterministic default frame honours the 16px gutter on the active display [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "frame-off-display-falls-back-deterministically"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:790:12)
+(fail) native minibar seam: geometry > a saved frame that no longer intersects a display falls back deterministically [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "frame-expand-keeps-saved-anchor-inside-gutters"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:801:12)
+(fail) native minibar seam: geometry > expanding a restored frame keeps the anchor and clamps into the gutter [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "quit-protection-idle"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:823:14)
+(fail) native minibar seam: launcher quit protection > idle quit protection is false [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "quit-protection-starting"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:823:14)
+(fail) native minibar seam: launcher quit protection > starting quit protection is true [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "quit-protection-capturing"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:823:14)
+(fail) native minibar seam: launcher quit protection > capturing quit protection is true [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "quit-protection-stopping"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:823:14)
+(fail) native minibar seam: launcher quit protection > stopping quit protection is true [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "quit-protection-switching-model"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:823:14)
+(fail) native minibar seam: launcher quit protection > switching-model quit protection is true [0.02ms]
+(pass) native minibar seam: launcher quit protection > the AppKit controller delegates quit protection to the pure phase seam [0.07ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "status-idle"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:838:12)
+(fail) native minibar seam: explicit status projection > idle, starting, live, stopping and switching-model are distinct explicit states [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "collapsed-live-render-contract"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:846:12)
+(fail) native minibar seam: explicit status projection > collapsed live projection paints server semantics and enables Stop [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "status-connecting-before-any-snapshot"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:859:12)
+(fail) native minibar seam: explicit status projection > before any snapshot the surface says connecting rather than idle [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "status-reconnecting-retains-capture-truth"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:863:18)
+(fail) native minibar seam: explicit status projection > a lost socket becomes reconnecting while the known capture truth is retained [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "status-error-from-decode-failure"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:870:18)
+(fail) native minibar seam: explicit status projection > a malformed payload surfaces error without discarding the known capture phase [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "status-idle"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:890:20)
+(fail) native minibar seam: explicit status projection > every status carries a non-color glyph and a distinct title [0.08ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "timer-from-server-started-at"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:906:12)
+(fail) native minibar seam: timer derives from server startedAt > elapsed time is computed from the server timestamp and the injected clock [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "timer-never-negative-on-clock-skew"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:911:12)
+(fail) native minibar seam: timer derives from server startedAt > a clock skew never renders a negative timer [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "timer-absent-without-started-at"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:915:12)
+(fail) native minibar seam: timer derives from server startedAt > a capture without startedAt shows no invented timer [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "timer-frozen-while-reconnecting"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:919:12)
+(fail) native minibar seam: timer derives from server startedAt > reconnecting keeps the last known timer basis rather than resetting it [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "collapsed-shows-one-latest-line"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:925:12)
+(fail) native minibar seam: bounded transcript projection > collapsed shows exactly one line: the latest finalized sentence [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "collapsed-prefers-provisional-caption"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:931:12)
+(fail) native minibar seam: bounded transcript projection > collapsed prefers the provisional caption when one is live [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "expanded-shows-at-most-three-finals-plus-provisional"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:937:12)
+(fail) native minibar seam: bounded transcript projection > expanded shows at most three finalized lines plus one provisional row [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "caption-is-replaced-by-its-finalized-line"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:946:12)
+(fail) native minibar seam: bounded transcript projection > a finalized line replaces its provisional caption instead of duplicating it [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "idle-clears-provisional-and-keeps-no-history"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:952:12)
+(fail) native minibar seam: bounded transcript projection > an authoritative idle snapshot clears the surface instead of keeping meeting content [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "malformed-line-payload-retains-last-known-lines"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:956:18)
+(fail) native minibar seam: bounded transcript projection > a malformed transcript payload retains the last known lines [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "reconnect-snapshot-replaces-lines-without-duplicates"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:967:12)
+(fail) native minibar seam: bounded transcript projection > a reconnect snapshot replaces the projected lines without duplicating them [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "controls-live"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:977:12)
+(fail) native minibar seam: truthful controls > collapsed exposes a persistent Stop plus a disclosure and nothing else [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "controls-idle"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:986:12)
+(fail) native minibar seam: truthful controls > Stop stays visible and truthfully disabled when there is nothing to stop [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "controls-expanded"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:995:12)
+(fail) native minibar seam: truthful controls > expanded adds Open Workspace and keeps the same Stop control [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "controls-reconnecting"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1005:22)
+(fail) native minibar seam: truthful controls > Stop stays reachable while reconnecting but refuses to lie about being sent [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "controls-vocabulary-is-closed"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1012:12)
+(fail) native minibar seam: truthful controls > the control vocabulary is closed: no Pause, no share, no second engine [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "stop-spam-emits-one-command"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1021:12)
+(fail) native minibar seam: Stop emits exactly one existing command > five rapid Stop activations emit exactly one stopCapture [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "stop-across-reconnect-emits-one-command"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1028:12)
+(fail) native minibar seam: Stop emits exactly one existing command > Stop spam across a reconnect still emits exactly one stopCapture [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "stop-while-idle-emits-nothing"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1035:12)
+(fail) native minibar seam: Stop emits exactly one existing command > Stop while idle emits nothing at all [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "activation-user-started-capture"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1041:12)
+(fail) native minibar seam: activation policy > user-started capture shows the surface and focuses the visible Stop [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "activation-automatic-capture"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1049:12)
+(fail) native minibar seam: activation policy > automatic calendar capture shows the surface without stealing OS focus [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "activation-automatic-then-user-stop"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1057:12)
+(fail) native minibar seam: activation policy > a later user interaction on an automatic capture may take focus [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "mode-escape-collapses-expanded"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1067:12)
+(fail) native minibar seam: mode and Escape > Escape collapses an expanded panel and never stops a recording [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "mode-escape-collapsed-is-noop"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1071:12)
+(fail) native minibar seam: mode and Escape > Escape on a collapsed panel is a no-op [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "mode-toggle-expands"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1075:12)
+(fail) native minibar seam: mode and Escape > the disclosure toggles between the two contract sizes [0.02ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "window-policy"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1082:12)
+(fail) native minibar seam: window policy > the panel is a borderless floating non-activating ambient surface [0.03ms]
+(pass) native minibar seam: window policy > the shipping view uses a readable layered native HUD material, never an opaque utility fill [0.27ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "accessibility-live"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1123:16)
+(fail) native minibar seam: accessibility > the surface publishes a labelled group, status text and target sizes [0.04ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "accessibility-reduced-motion"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1135:12)
+(fail) native minibar seam: accessibility > reduced motion removes the transition entirely rather than shortening it [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "announce-sequence"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1152:19)
+(fail) native minibar seam: announcement discipline (Todo 15) > a status announces once and never repeats on a timer tick [0.05ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "announce-error-reason"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1179:19)
+(fail) native minibar seam: announcement discipline (Todo 15) > an error announces its machine reason once, and recovery announces once [0.03ms]
+637 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+638 | });
+639 | 
+640 | function result(name: string): DriverResult {
+641 |   const found = byName.get(name);
+642 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "control-accessibility-live"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:642:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:647:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:1203:24)
+(fail) native minibar seam: announcement discipline (Todo 15) > every painted control carries a name, a value and a truthful help string [0.08ms]
+
+ 10 pass
+ 49 fail
+ 53 expect() calls
+Ran 59 tests across 1 file. [3.14s]

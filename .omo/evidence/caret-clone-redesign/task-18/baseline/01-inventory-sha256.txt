@@ -1,0 +1,164 @@
+# baseline active graph
+2026-08-11T18:59:52Z
+a1ed25f95980980cd958044b90e739ac45e8280d
+
+## index refs
+9:  <link rel="preload" href="/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
+10:  <link rel="preload" href="/fonts/pretendard-variable.woff2" as="font" type="font/woff2" crossorigin>
+11:  <script id="runtime-bootstrap">
+30:  <link rel="stylesheet" href="/style.css">
+31:  <link rel="stylesheet" href="/workspace-shell.css">
+32:  <link rel="stylesheet" href="/operational-liquid.css">
+33:  <link rel="stylesheet" href="/caret-shell.css">
+36:  <link rel="stylesheet" href="/caret-foundation.css">
+40:  <link rel="stylesheet" href="/caret-operator.css">
+521:  <script src="/workspace-split.js"></script>
+522:  <script src="/transcript-resize.js"></script>
+526:  <script type="module" src="/operator-surface.js"></script>
+527:  <script src="/review-panel-render.js"></script>
+528:  <script src="/review-panel.js"></script>
+529:  <script defer src="/app.js"></script>
+
+## inventory
+7164fb770ca2d6b0520e1bcca75002cb17b436ec7a5c9d6b0a379f2225e2ad47  public/app.js
+dc64ce2f5c6bd0bad43bab789b915c14cb8a12e1604634ca2418df2a4b7417d0  public/caret-foundation.css
+455501fa4ef62da82fc9e21bb88aa84865a45803b50417c56e5f831fa3005251  public/caret-operator.css
+06162da1a4ac5adaa6eddec039c9003117b64c1d83bee1561a2e91d1832b4686  public/caret-shell.css
+fd7521f3531a5ccfc655b25c4f22e9871df3ec141ad79bb27fde20d0df347b6d  public/fonts/dmmono-400-latin.woff2
+0e263db52797086e763679c54f84ded8cc1249879bc27dca2bd5dd446f6d9f36  public/fonts/dmmono-500-latin.woff2
+f153aa07c1b16fbb12391c2512860c97819a0a9fd014f338b2b3f12496479d13  public/fonts/figtree-latin-ext.woff2
+8330490a01c60c196eae00b823de8102275aaa5862e7b76a7af21b8745338928  public/fonts/figtree-latin.woff2
+d78927aaa4069cc6babd3048839f65489c5659f9eca1954eaffdeb8f389a613c  public/fonts/font-manifest.json
+2bada5ea45c3c63b7f1ea1f88ce9672c9e4f0c42b2c3b7378949084fe55a3066  public/fonts/LICENSE-DMMono-OFL.txt
+140d37233e7f3ce7313798befa9600893bcceaf41a55fa0fa5ad52f7f657a268  public/fonts/LICENSE-Figtree-OFL.txt
+d31ddd9f2bed32fd7e302a205cf2380ba0de6529152d239ef99cfb6f261bfc04  public/fonts/LICENSE-Pretendard-OFL.txt
+9599f12fd42fc0bce1cd50b47a0c022e108d7aa64dd0d1bb0ed44f3282d900b4  public/fonts/pretendard-variable.woff2
+d15bca001bc7596f4f3e38158688420f2c54682c09456c34f27a08cd0e406ca7  public/generated/module-manifest.json
+17ff9b54dc49c6a657a5271e780daf9f912c7fa710966ebd4302d391608006ee  public/generated/transcript-state.js
+a3f03ee02df4aa104a56703bb8491828c29ce06d727a0e55641ba53a2e16953f  public/generated/ui-state-machine.js
+5410a953e095369e25c041975396a24ccdccd2b02389dbe6f04ed427a2b66f3e  public/index.html
+49ba380018173480c2224914f2c8be208705f89793e27ac6497b7aacdaca7bde  public/operational-liquid.css
+062e9a32e0dd18f6f0665479f229c4b7655c018b0d638b6140f69712550fa93b  public/operator-surface.js
+b1e81df1b247532e56de478076f910b87c7695dbdf1098188c9b16180a9e5e92  public/review-panel 2.js
+2b26b65ae3a4da7948db68f72b115662ee7a15b6dac44d41d673e4b928548793  public/review-panel-render 2.js
+b44ecbc2ad43002e816444149350132baebf447ee7be16d228ed013ce6ec0a3e  public/review-panel-render.js
+6d71c1cd0476b89b9c78d11b2e43881fa036de11fa9aab1fa4e64d7d2fc9897d  public/review-panel.js
+4f6df810ff2d43a820695d7ff8498d79dd1da65d9490418d3c74f8fe057e1a4c  public/style.css
+c69a8250188ade79b97ad932b5ff2e298cccfb8a58e8e9494d73c037241bdf1d  public/transcript-overlay 2.css
+00c1de7da19bb8433334c6ae959ae9f17abc2dac9d98fd771782771159231a11  public/transcript-overlay 2.js
+c69a8250188ade79b97ad932b5ff2e298cccfb8a58e8e9494d73c037241bdf1d  public/transcript-overlay.css
+00c1de7da19bb8433334c6ae959ae9f17abc2dac9d98fd771782771159231a11  public/transcript-overlay.js
+c99bc091ac7ae392636d842d2f71600685210d3ee95e1c97c9d656e80b7ce535  public/transcript-resize.js
+a940c77f517f0bb755a4eb67b4e3275fe44c3fd6c11c1acfa7ec80cfdda7c695  public/transcript-state.ts
+8e524df24d13d5187ad81aa3263fc02042526af0159c811ebe9d1de5cee356f1  public/ui-state-machine.ts
+9c1c1cd7fea8e250d3e8668cd79107e74e736dd796e626c9d7be8e3d15b4ae65  public/workspace-shell.css
+ce5b33e747269f43ab611eb574b17fbcf83d01e0b9737f3444b2ab6f8a584599  public/workspace-split.js
+e2d907ec5e64ec2f2e334f442e645886ddbb24e8e2dd3cab18053e41778c7c1c  scripts/build-app.sh
+45e56537a4d5964f764566142fb1a1c66b9e2af38233226908cd31abe1d18236  scripts/build-public-modules.ts
+b4cc3d905655bb3adcfe8a8b5b9a9ffa15a86017d9ec03a0c99f6098eba7e24a  scripts/download-tdrz.sh
+6cbc98a667f7ec4ebd36b1e3dc48fc5b9d688f8c27f5b15fbcdd13054425cd33  scripts/restart-default-port.sh
+7edcd6e0ea5c7fe702360ee19e9c3450b026a57d17f65f86c5906130852eb3cd  scripts/verify-app.sh
+071e0119fc49e1c54fa6edd3e7660bfee0511b8d52b44fcba7d4af10f058304a  tests/app-bundle.test.ts
+2e8ec7b84774a973e9263932c83390b8fec00f8389b6a19fad9c6787b211b5a7  tests/app-settings.test.ts
+7a233bc66b0691ef6ab681a85814d4fb6b76e5f172fcaa3146a36d6b77eee677  tests/attendees-action.test 2.ts
+a0c2eadb94c8962fbb3d20926e340f33841da9521ac694fb10da29727c039a94  tests/attendees-action.test.ts
+6aa5d1be3239f335576a7132c7f4bd28a61b8e87a549bd87b3ed70f5a92c1946  tests/bundle.test 2.ts
+7262ece2cfdf0bcb17f47830949275c1e1d693e354fdcf2bb63f3c3110d7d18e  tests/bundle.test.ts
+6995e1514288b576836bd5add105681fd1c7c049caee6e2713cbb15520654a1f  tests/caret-dual-surface.test.ts
+23cb6652e9a181912dea4073987c814e1eb3f21f22f4f111ca428debc8154da3  tests/conclusion.test 2.ts
+23cb6652e9a181912dea4073987c814e1eb3f21f22f4f111ca428debc8154da3  tests/conclusion.test.ts
+4baee5d21b1d87db2f9074f3270183dffe94507228f28a39beed8baa9faeef3c  tests/deck-compile-action.test.ts
+551a49d08ed3c7d8bd8bf879eafab1670e13cf2569884b257fa7a0e70b779d8f  tests/deck-compiler.test.ts
+8429c1caa8718ed84244e20e945eb1d4bdb5c187c5be34762a2bfd88c0466a51  tests/deck-export.test.ts
+f1cd44ab569046b38fc6a3ce47254ae9e10f90fc9ec0289b6494a5e673b768fb  tests/deck.test.ts
+0a1f4de320f2a51a3f3b1fc2ee5cc334044b2673b07fd6eb622f1eae65ac6646  tests/extract.test 2.ts
+0a1f4de320f2a51a3f3b1fc2ee5cc334044b2673b07fd6eb622f1eae65ac6646  tests/extract.test.ts
+bee0936f135d476577b3fd8ea1d51d3aab07ee19b67cdd7969878efb47f04c81  tests/fixtures/caret-ui-states.ts
+889d6708922e644f6c9f4f004f0dd2a12afe253e9b96ea5e9a8c39781459aae8  tests/fixtures/native-dual-surface-driver.swift
+450ad5dff5300d9204c3789cb11905f9df6fc68f9429bbb00070155a59d607c9  tests/fixtures/native-launcher-driver.swift
+66e743d2c6ae144acf8d3830e1239b88e1e3dc3d746e2bef533c8176e8f33115  tests/fixtures/native-minibar-driver.swift
+9f472a6165a9977859c3ba6a5616c34fdd25100a36d73b9d19f0327e1bca0f97  tests/fixtures/native-surface-driver.swift
+1bc2be709e44e6680438c732f7fa901d7fce530da0fe40e4503343b9775ff81b  tests/fixtures/project-resolution-probe.swift
+1b1707078b2deafd1e12f66d5d9c5a1bdfd1f025cf9e9aa18abde433b0102f57  tests/fixtures/public-dom-contract.json
+2c999d76e5e5ae309f563252e64e4921e65a0749530e472c71fa9e82d5642bd7  tests/fixtures/public-protocol-contract.json
+bc3444468073043b148b798a9294ede9ad4a0e4996230c6c1de3a441e5ce860c  tests/grab.test.ts
+d37b3b8b6fbff989d42e7050b6bbf10a116fa21d5cd8da9d307bc4a0ac68306d  tests/helpers/browser-dual-surface-client.ts
+11e3c882694fb7019e4f10f20fc83a6719f5e6277de8297b54f04998207dcac4  tests/helpers/caret-browser-driver.ts
+9bed0ac7554a4b7d8462ed3ffa98df38726743087b74587aeb5028cb6bf9cb21  tests/helpers/caret-foundation-probe.ts
+9ee4647b8708b2a737319975c722043b7de1b4ee5e67ea95f39e35405efd4950  tests/helpers/dual-surface-session.ts
+1a09cc0bb3d145d741fe27f0e385afdfea5dee3f9579a4c0550f4b80663d219d  tests/helpers/native-dual-surface-client.ts
+3178cc3de14fc90eae4e7ad50695a59792153df3759320ca04fe8dde4f551d13  tests/hybrid-path.e2e.test.ts
+acda5abeab949cc77619ad58699ace354398f935b83ca86cf1733e2edc4ed003  tests/llm-cli.test.ts
+1fe48f1520829864b1618f53d595af98df4998915f9b396b971bff4f68412b86  tests/llm-runtime-routing.test.ts
+ff9b1fad85488afea2f9c237c458568d887516f3f8fe4d6880f146da5bf817c2  tests/llm-transport.test 2.ts
+ff9b1fad85488afea2f9c237c458568d887516f3f8fe4d6880f146da5bf817c2  tests/llm-transport.test.ts
+595028b691ae1cb32dfc19739aea8c1db5abeb341786a89f227403ca75dab867  tests/meeting-conclusion.test 2.ts
+595028b691ae1cb32dfc19739aea8c1db5abeb341786a89f227403ca75dab867  tests/meeting-conclusion.test.ts
+8626f1c0b0f765148bf39a304a238e4aee7644a405d883d93c70a03d6b2e999a  tests/meeting-deletion.test.ts
+0b29988f5670464d4bf270f4af3c6520e5e694dd562f98e008d71517c24e6384  tests/minutes-store.test 2.ts
+0b29988f5670464d4bf270f4af3c6520e5e694dd562f98e008d71517c24e6384  tests/minutes-store.test.ts
+92508a6e1b177de1a4ae634d9deb7a4c1758ec980c004a775b5904a183dc13aa  tests/minutes.test 2.ts
+758005294e122dbfff33acfb0a03f9053c796799b36ce1a878d209ca370d8dab  tests/minutes.test.ts
+15e602754245bcbc0b65221ec998a1e6fb0815335cc037f7c024b6f3674377e2  tests/native-launcher-boundary.test.ts
+b8038cc3d62a91cc44a45a7180d3a6c0068d4f445340f0e69c31a486b4c62e50  tests/native-minibar.test.ts
+4dd3cbdbd29562b70bb1d228c4861a47b3d0e95abd23b6e60f645c622f3ce1ff  tests/native-surface-contract.test.ts
+2ec00b429fade95ea1b1252dfaefda651c9389d4c6847d9658c46e3f8ac19f19  tests/pdf.test 2.ts
+2ec00b429fade95ea1b1252dfaefda651c9389d4c6847d9658c46e3f8ac19f19  tests/pdf.test.ts
+be0c5c27cadd33632b970ceecf372948902f73222a772a8deef77786b1c28e8a  tests/provider-platform.test.ts
+73d9c3d62bdaab1bcb2acec8ce0aa845e893b0567ebed82995570e70fb4402c5  tests/providers.test.ts
+8e21d1440d8e6c2b6c00e2bd7deddb865b4498f845d3e4fdaa10c73f50d23a80  tests/public-active-shell.test.ts
+23e12015226f58fdd9a6b10c09c9110ba3c18ae6b5a9f86557639f08208ae94d  tests/public-attendees.test 2.ts
+3ec8fddc5c23e5f04a8140f0824ebf5f9297c1eade40bf49fc37be87bc90636e  tests/public-attendees.test.ts
+fc6364d5954e6b9a262df42cbb89de6799caeef19e4171166ed6bc58bdf790b6  tests/public-caret-accessibility.test.ts
+47af6d62bd082b8fe690aa3df089319f70ead6e7e9013db42e3f91b5c255f69f  tests/public-caret-context.test.ts
+9105d66a7ff10bc8bcc8b49254f6176b0d5d5c3478ec19f2d4ca5c9c1437c459  tests/public-caret-foundation.test.ts
+4b2f7fa111e5d15d26bc2c582269fb1aedc458dbe20689c6b57fbd85ea53f20c  tests/public-caret-harness.test.ts
+351f8fda7f1cd484f2ab318c45ec4989426dca6f7460802b7063393b6bec67dd  tests/public-caret-library.test.ts
+7334d3a1660c3e010275f7bd5466c260765acab0c27233e263690023155d618d  tests/public-caret-live.test.ts
+eeacb73337ae9110efbbfefcacc9c1e67563a1981d8eda3e0563b076125a9fe9  tests/public-compile-control.test.ts
+890f9bdd4fae159a8cad0a110fd0af8813610ded994702321355c0691071002f  tests/public-dom-protocol-contract.test.ts
+a1ca60e02f79505a0122a77ac5a27203dc5e9e1b4dc69ec9d466558248737c6d  tests/public-fresh-workspace.test.ts
+9f307efef16ada32ac41f6bf5aafcbf1cfbf9a27dd624ccdcc923c9ecfc1cab7  tests/public-harness-baseline.test.ts
+248acd0299888c61f469ce39e8d534eb2813f7651a292fe8c2ce6b5c456a419c  tests/public-live-kind.test.ts
+b363f604761d61438d9325d629e856be74a58a23979e7bbff0fd2cfa96017089  tests/public-operator-surface.test.ts
+73ed8160e91804576e2316abf8a7a0e6aa4bdf3d34aabd8fd5c7ac2e94557614  tests/public-protocol-reliability.test.ts
+f5f0caabd1ea3a65a108f82f7f1b258a583102d15018f77c51c29f68a42f27c4  tests/public-review.test 2.ts
+1024b4d026f40073e73c1322bc596bdac564fba2c1a3bde77edbf1560123eddf  tests/public-review.test.ts
+cda2c86850ad2f13db7132ad5fb368092b98d66faff6a055349279b3c25b6aaf  tests/public-runtime-guard.test.ts
+98bde4034a71cbc64176e0cb76fc8aad25862da3eab63d37c97c24db4ace4ee4  tests/public-sessions.test.ts
+b051270a65609b6e76783b9fb1b0cff3343f9f9c14895da72ca4dcf4cd0a99bb  tests/public-settings-panel.test.ts
+5d0222882918fb9547ada9d92f7496bd693bff2212d75d71bf727a7865e2476c  tests/public-shell.test.ts
+cdb5d8379cae4e176aee604ae0a2be8538e5972eec2fd92606c2e10ccf0a89f9  tests/public-test-harness.ts
+7ef19061f0c6690b6333e8e9df1f43e07f2b9efb69561a05f70578f917e51251  tests/public-transcript-dock.test.ts
+ab4ddcce53906c70b5d1d81d7ed0ae45c14d3f9cc5ed6e9c22728916645723d8  tests/public-transcript-feed.test.ts
+3042d0548cd697af2121f3f882f67dc3406a0fd1032184592fb0f6bd82a2c92b  tests/public-workspace.test.ts
+241e9fe0344a809d84a7942021f3d6e0937de18a992d46c87b62fd01f08aafe9  tests/review-actions.test 2.ts
+241e9fe0344a809d84a7942021f3d6e0937de18a992d46c87b62fd01f08aafe9  tests/review-actions.test.ts
+4913ced5b8357f5a1e8bf35c0c6d7f84620f6f3b75abf0def95d47eb17428c3b  tests/scene-compile-action.test.ts
+2e70a5c4a65d87d6fdda7c4ed336133f2052c124d680456e49b984d548402b35  tests/scene-graph.test.ts
+093e5c412aced5ae77e7c4e1aad9e90f3a3ec46a2a7bc5fabab294c716239d45  tests/scene-pptx.test.ts
+6d7c205794e7cff19e889cb26884aff899cd900ff57d5f0bf07ca0a01426b27b  tests/sentence-assembler.test.ts
+adcb21b7f5ecf8f95de643a6969cb612abeba69755040565cf7b478089c90a77  tests/server-handler-map.test 2.ts
+a1b6a2eecfcc82badab5a4f0d953dbf1cec055bf513340e6956780c0ef0ac223  tests/server-handler-map.test.ts
+ce40a3f44fcc42ecdb5aa674aada3733de790b9ef122ea51cc934e15219a3b8e  tests/server-recorder-startup.test 2.ts
+ce40a3f44fcc42ecdb5aa674aada3733de790b9ef122ea51cc934e15219a3b8e  tests/server-recorder-startup.test.ts
+1c96328a173da121fd490caaa724f079d7726f1a85057da787e95677e1cc59c3  tests/server-ws-dispatch.test 2.ts
+a8282758c23758c02dbee297685b579fc04e2050db330c88fff4e8aa64336700  tests/server-ws-dispatch.test.ts
+703b5aba614515e2c914c00d430ab8289b08749bdd1b8748e29cf03558f787d0  tests/session.test.ts
+9270ea7914b176e879427fa53bcd6dad8dde6074d93bde525928611fe53c5e70  tests/slide-persist.test.ts
+dda1cb58682137c6d533df39d8f41f75b6f829e8bd85c9069cffc928b2f669c3  tests/slide-spec.test.ts
+5bfdac595a6a27faffd435c2a0e378254376a555273129b610873bc14bd6df26  tests/start-review-action.test 2.ts
+5bfdac595a6a27faffd435c2a0e378254376a555273129b610873bc14bd6df26  tests/start-review-action.test.ts
+d94c187fb5c9c00a848c8f5cbd224656eaf3d09001d28e58bc7a2faae9a7c3df  tests/start-review.test 2.ts
+4b45cdd174bb3b3ff69b2b2007291f0018fe1a3149c065895db1930cb148a4e9  tests/start-review.test.ts
+3084ca5bc1aafcdaa5db5899df87dac77f553f4435fc1f45b1760b33cb07e7b4  tests/store.test.ts
+5e4368ca259fbffb8070f3156b41e22443312e1316606b424aecb3520daf8d47  tests/stt-model-manager.test.ts
+00a485560a14451827c0fda1c19441b241904aff87ce7370e6575be7c2918aa4  tests/stt-model-protocol.test.ts
+debf778e7f5ab72f4b1ae70c9c6e298015698762312c2af357585aacb09b7735  tests/stt-model-selection.test.ts
+e9cc4841fa9982cab38a9d78bbdccc4dcd0a51ac142ec0025d4479dc59bfc52d  tests/transcript-state.test.ts
+58cba885deaa3eadc4585008ccdaec0e447b2bd5a5c57abbd074a6bb8519ba0c  tests/transcript-versioning.test 2.ts
+58cba885deaa3eadc4585008ccdaec0e447b2bd5a5c57abbd074a6bb8519ba0c  tests/transcript-versioning.test.ts
+6536f7d5705a3d4ecf0e811c90ee846f044a93689870a07cb56782cea34eea4d  tests/ui-state-machine.test.ts
+e9bd4c034bd18ba24e08e5f947c402538b85ee3e874e781e0a0d3be7021e7bf3  tests/whisper-artifact-filter.test.ts
+4d0464067d30fd73ac6adc7853e5ef61efb03ff5e9746396428d3bff3f7f6465  tests/whisper-dedupe.test.ts
+802fe0cc843cc0cfbdb6e9c5f7b002c953fb3f8fb6520515da3f93acf8e60488  tests/whisper-speaker.test.ts

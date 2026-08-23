@@ -1,0 +1,12 @@
+{
+  "state": "ready",
+  "hidden": false,
+  "items": 0,
+  "confirmDisabled": false,
+  "confirmed": {
+    "type": "reviewConfirmed",
+    "reviewId": "3de5271a-fb35-473a-90fe-4355d1a98647",
+    "transcriptVersionId": "f8f77add-db1a-40cf-bdf4-3e72be75fedb",
+    "confirmedAt": 1786501682595
+  }
+}

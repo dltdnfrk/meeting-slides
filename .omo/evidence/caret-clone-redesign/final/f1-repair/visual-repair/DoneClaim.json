@@ -1,0 +1,163 @@
+{
+  "task_id": "st_019ff400",
+  "task_name": "F1 repair - visual-fidelity repair of V1, V2, V3",
+  "parent_session": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "root_session": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "depth": 1,
+  "timestamp_utc": "2026-08-12T03:44:05Z",
+  "head": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "working_tree": "dirty (pre-existing unrelated work preserved; shipped public/ repaired on disk)",
+  "verdict": "PASS",
+  "contract": {
+    "file": "DESIGN.md",
+    "section": "9",
+    "contract_id": "operator-contract-v2-caret-grade",
+    "modified": false
+  },
+  "input_under_repair": ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/visual/REPORT.md",
+
+  "defects_closed": [
+    {
+      "id": "V1",
+      "summary": "Live provisional caption row sheared across the stage/transcript split at widths >= 900px with a long provisional caption.",
+      "contract_refs": ["9.9 (no partial glyph)", "9.4 rank 3/5 (supporting content must not collide with the document surface)"],
+      "review_attributed_cause": "#island is a direct child of #document-surface with no grid-row/grid-column in the >=900px media block.",
+      "measured_actual_cause": "#island is a FLEX child of #stage-pane (runtime parent chain: island -> stage-pane -> document-surface -> workspace -> app). With flex:none and the default min-width:auto it could not shrink, measuring 902.4px wide at x=-133.7 inside a 635px stage, overflowing both edges and forcing stage overflowX=150.",
+      "attribution_corrected": true,
+      "fix": {
+        "file": "public/caret-operator.css",
+        "selectors": [".app[data-shell=\"live\"] #island", ".app[data-shell=\"live\"] #island .island__text"],
+        "change": "flex:none -> flex:0 1 auto with align-self:stretch, min-inline-size:0, max-inline-size:100%; .island__text gains flex:0 1 auto and min-inline-size:0 so its already-declared ellipsis can engage.",
+        "grid_placement_added": false
+      },
+      "red_evidence": "red/red-root-cause-geometry.txt",
+      "green_evidence": ["geometry.json", "screenshots/live-900x760-seam.png", "screenshots/live-960x760.png", "screenshots/live-1244x836.png", "screenshots/live-1440x900.png"]
+    },
+    {
+      "id": "V2",
+      "summary": "#btn-review rendered as a blank 44x44 control at <= 420px: its only visible child was hidden by media query and the styled .review-btn__icon node did not exist.",
+      "contract_refs": ["9.12 (icon-only controls keep an accessible name)", "9.11 (disabled is muted, never invisible)"],
+      "fix": {
+        "file": "public/index.html",
+        "change": "Added <span class=\"review-btn__icon\" aria-hidden=\"true\">check</span>, the node public/style.css:1233 has always targeted. Resolves the review's residual risk #4 (dead selector).",
+        "style_css_modified": false,
+        "accessible_name_preserved": "회의록 검토"
+      },
+      "green_evidence": ["screenshots/review-control-320.png", "screenshots/review-control-375.png", "screenshots/library-320x667-topbar.png"]
+    },
+    {
+      "id": "V3",
+      "summary": "Action card text column crushed at the narrow floor: title and Korean description fragmented while the command group kept its full intrinsic width.",
+      "contract_refs": ["9.9 (no partial glyph at 375/320)", "9.13 (a real capability must be legible where the action lives)"],
+      "review_attributed_cause": ".action-card__btn label truncation from missing min-inline-size / text-overflow.",
+      "measured_actual_cause": "Button labels always fit (overflowX=0 in RED and GREEN). The failure was a share-of-width collapse: .action-card__actions is flex-shrink:0 in a non-wrapping row, so the text column was squeezed to 81.4px of 254px (textShare=0.3204) at 320 and 0.4414 at 375. The two 'unlabeled siblings' were the same commands at opacity 0.45 in :disabled state.",
+      "attribution_corrected": true,
+      "fix": {
+        "file": "public/caret-operator.css",
+        "selectors": [".app[data-shell=\"library\"] .action-card__head", ".app[data-shell=\"library\"] .action-card__head > :first-child"],
+        "change": "Added flex-wrap:wrap so the command group takes its own row; text column gains flex:1 1 auto and min-inline-size:0 to claim the full measure."
+      },
+      "red_evidence": ["red/red-root-cause-geometry.txt", "red/red-320-action-card.png"],
+      "green_evidence": ["screenshots/action-card-320.png", "screenshots/action-card-375.png"]
+    }
+  ],
+
+  "tdd": {
+    "suite": "tests/public-caret-visual-repair.test.ts",
+    "pins_prose": false,
+    "pins_accessible_names": true,
+    "red": { "pass": 1, "fail": 9, "assertions": 53, "artifact": "tdd/red-visual-repair.txt" },
+    "green": { "pass": 10, "fail": 0, "assertions": 120, "artifact": "tdd/green-visual-repair.txt" },
+    "red_pass_explained": "reference1440 for V1: at 1440 the stage is wide enough that this caption does not yet overflow. V1 is a width x content-length interaction; 900/960/1244 all failed RED.",
+    "v3_reader_corrected_and_reproven_red": true,
+    "determinism": "Every awaited client state armed with a MutationObserver before its trigger frame and bounded by a named timeout. No sleep, no polling delay, no waitForTimeout in the suite or any capture tool."
+  },
+
+  "browser_qa": {
+    "engine": "real Chromium via puppeteer 25.3.0",
+    "conditions": "deviceScaleFactor 1 (geometry) / 2-3 (screenshots), ko-KR, Asia/Seoul, frozen clock, document.fonts.ready awaited",
+    "caption": "long mixed Korean/English provisional caption",
+    "live_viewports": ["900x760", "960x760", "1244x836", "1440x900"],
+    "library_viewports": ["375x812", "320x667"],
+    "root_overflow_all_viewports": 0,
+    "clipped_text_nodes_all_viewports": 0,
+    "island_within_owner_all_live_viewports": true,
+    "island_right_edge_left_of_transcript_all_live_viewports": true,
+    "stage_pane_overflow_960": { "red": 150, "green": 0 },
+    "review_control": { "box": "44x44", "icon": "7.7x14", "visible_ink": 1, "accessible_name": "회의록 검토" },
+    "action_head_text_share": { "320": 1.0, "375": 1.0 },
+    "action_commands_own_row": true,
+    "action_title_line_boxes": 1,
+    "screenshots_inspected_personally": true
+  },
+
+  "verification": {
+    "focused_suite": "10 pass / 0 fail (120 assertions)",
+    "related_browser_suites": "230 pass / 0 fail (1225 assertions) across caret-live, caret-library, caret-accessibility, review, shell, visual-repair",
+    "git_diff_check": { "exit": 0, "whitespace_errors": 0 },
+    "lsp_diagnostics_typescript": "No diagnostics found",
+    "lsp_diagnostics_css_html": "unavailable - configured biome server not installed; not installed unasked. Integrity verified structurally: CSS brace balance 0 (min depth 0), HTML span 81/81, button 34/34, id=btn-review appears exactly once.",
+    "design_token_discipline": "every added declaration uses an existing --cf-* token; zero magic numbers, zero new tokens"
+  },
+
+  "preexisting_failures_not_caused_by_this_repair": {
+    "count": 8,
+    "tests": [
+      "startReview is ended-only, requester-scoped, and single-flight for one canonical version",
+      "existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content",
+      "existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout",
+      "existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection",
+      "generic chat transport > HTTP sends user-only message with defaults and no response_format",
+      "generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection",
+      "generic chat transport > CLI chat honors options.timeoutMs override",
+      "setAttendees replaces a prepared roster and rejects capturing or ended meetings"
+    ],
+    "rationale": "All live in src/llm.ts transport and server WS dispatch. None loads any public/ asset or the browser harness (verified by grep for public-test-harness, public/, caret-operator, index.html).",
+    "flake_observed": {
+      "test": "Todo 15 - a reconnect re-asserting the same live capture never re-steals focus",
+      "not_a_regression_because": "passes standalone 3/3, passes with its whole suite (103 pass / 0 fail), passed in the 230-test related-suite run, and a concurrent sibling session was editing that exact file and public/operator-surface.js at 12:38-12:41, after this repair's edits at 12:31. This repair touched neither file."
+    }
+  },
+
+  "files_changed": {
+    "product": [
+      { "path": "public/caret-operator.css", "sha256": "4d0c317fb655f9f2484fdb160195432e69b4a038332fd421ed441dbc608425dd", "defects": ["V1", "V3"] },
+      { "path": "public/index.html", "sha256": "b08d066a8c4395df980d1b4caa698ca42361aa34fb9a90aa09126b0ff88022e9", "defects": ["V2"] }
+    ],
+    "tests": [
+      { "path": "tests/public-caret-visual-repair.test.ts", "sha256": "1fc0028dc5b2d0a6bca8dc17221a497944fe3fb0e2eacacff52320e01bc167a3", "new": true }
+    ],
+    "deliberately_unchanged": [
+      { "path": "public/style.css", "sha256": "d433375487cfae2ec0e6347efd966d27105ffddb0f5d2495641b89884a45fb25", "note": "byte-identical to the hash recorded by the independent visual review; proves V2 was closed in markup, not by mutating the audited stylesheet" }
+    ]
+  },
+
+  "boundaries_respected": {
+    "design_md_section_9_modified": false,
+    "plan_modified": false,
+    "ledger_modified": false,
+    "f1_checkbox_touched": false,
+    "f2_f4_started": false,
+    "commit_created": false,
+    "product_protocol_boundaries_preserved": true,
+    "unrelated_dirty_work_preserved": true,
+    "mtime_proof": {
+      "DESIGN.md": "2026-08-12 04:33:28",
+      ".omo/plans/caret-clone-redesign.md": "2026-08-12 11:29:18",
+      ".omo/start-work/ledger.jsonl": "2026-08-12 11:29:32",
+      "this_session_edits": "2026-08-12 12:31+"
+    }
+  },
+
+  "concurrency_note": "Tree shared with at least one concurrent sibling repair session. Files observed modified by that session and explicitly not touched here: public/operator-surface.js, tests/public-caret-accessibility.test.ts, final/f1-repair/start-focus-repair/.",
+
+  "residual_risks_from_review_closed": [
+    { "id": "1", "was": "no current 1440x900 or 1244x836 capture in live shell with a long provisional caption", "now": "both captured, inspected, clean" },
+    { "id": "2", "was": "overflow harness cannot detect intra-grid shear (rootOverflow only)", "now": "the new suite and qa-sweep assert per-element scrollWidth-clientWidth and containment within the owning pane" },
+    { "id": "3", "was": "content-length dependence could let a short synthetic caption falsely confirm a fix", "now": "the long mixed KO/EN caption is the fixture in both the suite and the QA sweep" },
+    { "id": "4", "was": ".review-btn__icon is a dead selector", "now": "markup and CSS reconciled; the node exists and is asserted present, aria-hidden, and non-zero sized" }
+  ],
+
+  "evidence_root": ".omo/evidence/caret-clone-redesign/final/f1-repair/visual-repair/",
+  "checksums": "CHECKSUMS.txt"
+}

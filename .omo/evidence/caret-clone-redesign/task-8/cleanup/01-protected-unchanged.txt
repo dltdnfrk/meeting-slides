@@ -1,0 +1,7 @@
+public/app.js: OK
+public/transcript-overlay.js: OK
+src/session.ts: OK
+tests/fixtures/public-protocol-contract.json: OK
+public/ui-state-machine.ts: FAILED
+shasum: WARNING: 1 computed checksum did NOT match
+note: ui-state-machine.ts is task-7 owned; changed by the parallel sibling after my baseline snapshot, never written by task-8

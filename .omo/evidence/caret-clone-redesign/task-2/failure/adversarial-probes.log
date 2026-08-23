@@ -1,0 +1,186 @@
+### PROBE 5 — misleading_success_output: fabricated empty-string digest
+A dataless file yields exit 0 and a well-formed digest for content never read.
+$ stat -f '%Sf %z' .omo/ulw-research/20260809-065345/final-report.md
+hidden,compressed,dataless 14600
+$ head -c 64 <file> | od -c | head -2   (expect: no bytes)
+$ shasum -a 256 <file>   (WRONG: empty-string digest)
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  .omo/ulw-research/20260809-065345/final-report.md
+$ printf '' | shasum -a 256   (proof it is the empty digest)
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
+-> table row now records identity_kind=size+mtime(dataless), not a fake sha256:
+.omo/ulw-research/20260809-065345/final-report.md	size+mtime(dataless)	bytes=14600;mtime=2026-08-08T23:00:27Z
+-> fabricated digests remaining in table: 0
+
+### PROBE 6 — generated_artifacts: table must be reproducible, not hand-written
+PASS two independent regenerations byte-identical
+PASS committed table reproduces exactly from the script
+
+### PROBE 7 — stale_state: validator must FAIL on a mutated protected file
+validator exit=1 (expect 1)
+== 6. protected content unchanged (before vs after) ==
+  FAIL  protected paths changed; see .omo/evidence/caret-clone-redesign/task-2/green/protected-hashes-diff.txt
+--- .omo/evidence/caret-clone-redesign/task-2/green/protected-hashes-before.tsv	2026-08-11 15:41:59
++++ .omo/evidence/caret-clone-redesign/task-2/green/protected-hashes-after.tsv	2026-08-11 15:44:03
+@@ -193,7 +193,7 @@
+ .omo/ulw-loop/ppt-engine-research-20260809-205918/goals.json	research-artifact	25366	2026-08-09T12:17:52Z	sha256	e0866c73812e24e6e29ba61afed3ec78d9630db03fc25178d811d7041436a035
+ .omo/ulw-loop/ppt-engine-research-20260809-205918/ledger.jsonl	research-artifact	8058	2026-08-09T12:17:52Z	sha256	0ba45e0b6cad39065a38afbab368319bce6d9eb9649fd53bd2a75f3c409da6a9
+ public/index.html	product-surface	27675	2026-08-11T06:32:47Z	sha256	c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e
+restored -> validator exit=0 (expect 0)
+### PROBE 8 — dirty_worktree: pre-existing dirt must be preserved, not cleaned
+tracked-modified files at task end (must equal the pre-work set):
+18a19
+>  M tests/public-test-harness.ts
+
+staged changes (must be none):
+PASS index is empty
+
+HEAD unchanged (no commit created):
+  pre-work head: a1ed25f95980980cd958044b90e739ac45e8280d
+  now:           a1ed25f95980980cd958044b90e739ac45e8280d
+
+### PROBE 9 — writes confined to task-2
+files modified in the last 30 minutes, excluding my evidence dir and volatile agent state:
+./.omo/boulder.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/library-1244x836.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/library-1440x900.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/library-320x667.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/library-375x812.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/library-820x900.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/library-960x760.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/live-1244x836.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/live-1440x900.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/live-320x667.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/live-375x812.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/live-820x900.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/computed/live-960x760.json
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/library-1244x836.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/library-1440x900.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/library-320x667.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/library-375x812.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/library-820x900.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/library-960x760.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/live-1244x836.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/live-1440x900.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/live-320x667.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/live-375x812.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/live-820x900.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/screens/live-960x760.png
+./.omo/evidence/caret-clone-redesign/task-1/baseline/states.json
+./.omo/evidence/caret-clone-redesign/task-1/driver/baseline-fixture.mjs
+./.omo/evidence/caret-clone-redesign/task-1/driver/build-manifest.mjs
+./.omo/evidence/caret-clone-redesign/task-1/driver/capture-baseline.mjs
+./.omo/evidence/caret-clone-redesign/task-1/driver/capture-lib.mjs
+./.omo/evidence/caret-clone-redesign/task-1/driver/capture-reference.mjs
+./.omo/evidence/caret-clone-redesign/task-1/driver/extract-reference-tokens.mjs
+./.omo/evidence/caret-clone-redesign/task-1/driver/failure-blocked-network.mjs
+./.omo/evidence/caret-clone-redesign/task-1/driver/harness.mjs
+./.omo/evidence/caret-clone-redesign/task-1/failure.json
+./.omo/evidence/caret-clone-redesign/task-1/logs/baseline-capture.log
+./.omo/evidence/caret-clone-redesign/task-1/logs/reference-capture.log
+./.omo/evidence/caret-clone-redesign/task-1/reference/computed/changelog-index.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/computed/changelog-mini-recording-popup.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/computed/changelog-new-ui.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/computed/home-after-the-call.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/computed/home-before-the-call.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/computed/home-hero.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/computed/home-live-suggestion.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/computed/home-narrow.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/screens/changelog-index.png
+./.omo/evidence/caret-clone-redesign/task-1/reference/screens/changelog-mini-recording-popup.png
+./.omo/evidence/caret-clone-redesign/task-1/reference/screens/changelog-new-ui.png
+./.omo/evidence/caret-clone-redesign/task-1/reference/screens/home-after-the-call.png
+./.omo/evidence/caret-clone-redesign/task-1/reference/screens/home-before-the-call.png
+./.omo/evidence/caret-clone-redesign/task-1/reference/screens/home-hero.png
+./.omo/evidence/caret-clone-redesign/task-1/reference/screens/home-live-suggestion.png
+./.omo/evidence/caret-clone-redesign/task-1/reference/screens/home-narrow.png
+./.omo/evidence/caret-clone-redesign/task-1/reference/states.json
+./.omo/evidence/caret-clone-redesign/task-1/reference/tokens.json
+./.omo/evidence/caret-clone-redesign/task-3/baseline/00-boundary.txt
+./.omo/evidence/caret-clone-redesign/task-3/baseline/01-current-spellings.json
+./.omo/evidence/caret-clone-redesign/task-3/cleanup/01-source-restoration.txt
+./.omo/evidence/caret-clone-redesign/task-3/green/01-green-four-suites.txt
+./.omo/evidence/caret-clone-redesign/task-3/green/02-preexisting-failures.txt
+./.omo/evidence/caret-clone-redesign/task-3/green/03-server-suite-isolated.txt
+./.omo/evidence/caret-clone-redesign/task-3/green/04-typecheck.txt
+./.omo/evidence/caret-clone-redesign/task-3/green/05-final-green.txt
+./.omo/evidence/caret-clone-redesign/task-3/manual/01-manifest-inspection.txt
+./.omo/evidence/caret-clone-redesign/task-3/red/01-duplicate-current-slide.txt
+./.omo/evidence/caret-clone-redesign/task-3/red/02-renamed-meeting-id.txt
+./.omo/evidence/caret-clone-redesign/task-3/red/03-removed-capture-message.txt
+./.omo/evidence/caret-clone-redesign/task-3/red/04-probe-malformed-input.txt
+./.omo/evidence/caret-clone-redesign/task-3/red/05-probe-stale-state.txt
+./.omo/evidence/caret-clone-redesign/task-4/00-baseline-source-hashes.txt
+./.omo/evidence/caret-clone-redesign/task-4/01-baseline-characterization.txt
+./.omo/evidence/caret-clone-redesign/task-4/02-red-initial.txt
+./.omo/evidence/caret-clone-redesign/task-4/green/library-overview-1244x836.png
+./.omo/evidence/caret-clone-redesign/task-4/green/library-overview-machine-state.json
+./.omo/evidence/caret-clone-redesign/task-4/green/library-overview-timeline.json
+./.omo/evidence/caret-clone-redesign/task-4/green/live-capturing-960x760.png
+./.omo/evidence/caret-clone-redesign/task-4/green/live-capturing-machine-state.json
+./.omo/evidence/caret-clone-redesign/task-4/green/live-capturing-timeline.json
+./.omo/evidence/caret-clone-redesign/task-4/green/manual-qa-receipts.json
+./.omo/evidence/caret-clone-redesign/task-5/baseline/00-boundary.txt
+./.omo/evidence/caret-clone-redesign/task-5/baseline/01-launcher-build-invariants.txt
+./.omo/evidence/caret-clone-redesign/task-5/green/01-green-focused.txt
+./.omo/evidence/caret-clone-redesign/task-5/green/02-swiftc-typecheck.txt
+./.omo/evidence/caret-clone-redesign/task-5/green/03-full-bun-test.txt
+./.omo/evidence/caret-clone-redesign/task-5/green/04-diff-check.txt
+./.omo/evidence/caret-clone-redesign/task-5/green/05-failure-attribution.txt
+./.omo/evidence/caret-clone-redesign/task-5/green/06-protected-integrity.txt
+./.omo/evidence/caret-clone-redesign/task-5/green/07-green-final.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/00-build.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/01-happy-exit.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/01-happy-stderr.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/01-happy-stdout.json
+./.omo/evidence/caret-clone-redesign/task-5/manual/02-bad-json-exit.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/02-bad-json-stderr.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/02-bad-json-stdout.json
+./.omo/evidence/caret-clone-redesign/task-5/manual/03-bad-bounds-exit.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/03-bad-bounds-stderr.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/03-bad-bounds-stdout.json
+./.omo/evidence/caret-clone-redesign/task-5/manual/04-malformed-batch-exit.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/04-malformed-batch-stderr.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/04-malformed-batch-stdout.json
+./.omo/evidence/caret-clone-redesign/task-5/manual/05-empty-stdin-exit.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/05-empty-stdin-stdout.json
+./.omo/evidence/caret-clone-redesign/task-5/manual/06-stale-state-and-repeat.txt
+./.omo/evidence/caret-clone-redesign/task-5/manual/07-cleanup.txt
+./.omo/evidence/caret-clone-redesign/task-5/red/01-red-missing-seam.txt
+./.omo/evidence/caret-clone-redesign/task-5/red/02-mutation-gutter.txt
+./.omo/evidence/caret-clone-redesign/task-5/red/03-mutation-visibility.txt
+./.omo/evidence/caret-clone-redesign/task-5/red/04-mutation-stop-guard.txt
+./.omo/evidence/caret-clone-redesign/task-5/red/05-mutation-unknown-phase.txt
+./.omo/qa/caret-fixture-sweep.ts
+./.omo/qa/caret-task4-manual-qa.ts
+./.omo/qa/tsconfig.caret-task4.json
+./.omo/start-work/ledger.jsonl
+./macos/NativeSurfaceContract.swift
+./public/app.js
+./public/index.html
+./src/session.ts
+./tests/fixtures/caret-ui-states.ts
+./tests/fixtures/native-surface-driver.swift
+./tests/fixtures/public-dom-contract.json
+./tests/fixtures/public-protocol-contract.json
+./tests/helpers/caret-browser-driver.ts
+./tests/native-surface-contract.test.ts
+./tests/public-caret-harness.test.ts
+./tests/public-dom-protocol-contract.test.ts
+./tests/public-harness-baseline.test.ts
+./tests/public-test-harness.ts
+(entries above are sibling wave-1 tasks and agent state, not task-2 writes)
+### PROBE 10 — concurrent sibling writers (moving-target worktree)
+Wave-1 todos 1/3/4/5 execute in parallel and write product files during
+their RED/GREEN mutation cycles. Task 2 must distinguish 'content changed'
+from 'mtime moved by a sibling that restored the file'.
+
+Observed: public/index.html mtime advanced 06:32:47Z -> 06:44:12Z
+          while SHA-256 stayed c375457e...420e and size stayed 27675.
+Interpretation: a sibling mutated and restored it (task-3 mutation proofs).
+This is why the unchanged claim is asserted on CONTENT (sha256), not mtime.
+
+$ content-only comparison of all product-surface + provider rows:
+content-mismatches: 0
+
+$ dataless rows compared on size only (mtime is sibling-volatile):
+size-mismatches: 0

@@ -1,0 +1,22 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-foundation.test.ts:
+64 | 
+65 | let probe: FoundationProbe;
+66 | let manifest: FontManifest;
+67 | 
+68 | beforeAll(async () => {
+69 |   manifest = JSON.parse(await readFile(manifestPath, "utf-8")) as FontManifest;
+                                   ^
+ENOENT: no such file or directory, open '/Users/hyunjun/Documents/MUNI/meeting-slides/public/fonts/font-manifest.json'
+    path: "/Users/hyunjun/Documents/MUNI/meeting-slides/public/fonts/font-manifest.json",
+ syscall: "open",
+   errno: -2,
+    code: "ENOENT"
+
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-foundation.test.ts:69:31)
+(fail) (unnamed) [0.25ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [73.00ms]

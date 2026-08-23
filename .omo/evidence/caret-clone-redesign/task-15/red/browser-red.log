@@ -1,0 +1,290 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+472 |       await enterLive(session, { lines: 0 });
+473 |       const after = await session.page.evaluate(readLiveRegions);
+474 |       // DESIGN 9.12: "The timer and the provisional caption are never live
+475 |       // regions." A per-second timer inside a polite region floods the
+476 |       // screen-reader queue and drowns the transcript it sits beside.
+477 |       expect(after.liveAncestorOf["live-topbar-timer"]).toBeNull();
+                                                              ^
+error: expect(received).toBeNull()
+
+Received: {
+  id: "live-topbar-timer",
+  value: "polite",
+}
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:477:57)
+(fail) Todo 15 · announcements fire once and never for the wrong thing > the timer is not a live region, in either shell [89.87ms]
+(pass) Todo 15 · announcements fire once and never for the wrong thing > the provisional caption is not a live region [87.61ms]
+508 |       // them for one unrelated event: the duplicate-noise defect in 9.12.
+509 |       const noisy = ["glance-slide", "glance-lines", "glance-provider",
+510 |         "history-count", "transcript-count", "session-count"]
+511 |         .filter((id) => regions.liveAncestorOf[id] !== null)
+512 |         .map((id) => `${id}<-${regions.liveAncestorOf[id]!.id}`);
+513 |       expect(noisy).toEqual([]);
+                          ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "glance-slide<-div.glance",
++   "glance-lines<-div.glance",
++   "glance-provider<-div.glance",
++ ]
+
+- Expected  - 1
++ Received  + 5
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:513:21)
+(fail) Todo 15 · announcements fire once and never for the wrong thing > ambient counters and the provider name are not live regions [89.69ms]
+522 |       const regions = await session.page.evaluate(readLiveRegions);
+523 |       const owner = regions.liveAncestorOf["status-text"];
+524 |       // `renderStatus()` is the only surface carrying connection loss, capture
+525 |       // failure and export failure. Silent here means a screen-reader user is
+526 |       // never told the recording failed (DESIGN 9.13).
+527 |       expect(owner).not.toBeNull();
+                              ^
+error: expect(received).not.toBeNull()
+
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:527:25)
+(fail) Todo 15 · announcements fire once and never for the wrong thing > the status channel IS a polite live region, so failures are not silent [68.23ms]
+547 |         }
+548 |         return chain;
+549 |       });
+550 |       // Zero means finals are silent; two or more means one line is announced
+551 |       // by two nested regions - the "no announcement fires twice" rule.
+552 |       expect(owners.length).toBe(1);
+                                  ^
+error: expect(received).toBe(expected)
+
+Expected: 1
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:552:29)
+(fail) Todo 15 · announcements fire once and never for the wrong thing > a finalized transcript line announces through exactly one live region [93.09ms]
+(pass) Todo 15 · announcements fire once and never for the wrong thing > no live region is assertive, so nothing interrupts the operator [88.77ms]
+582 |         if (shell === "live") await enterLive(session, { lines: 2 });
+583 |         else await selectMeeting(session);
+584 |         const motion = await session.page.evaluate(readMotion);
+585 |         const offenders = motion.moving
+586 |           .map((m) => `${m.id}:t=${m.transition}s,a=${m.animation}s(${m.name})`);
+587 |         expect({ shell, offenders }).toEqual({ shell, offenders: [] });
+                                           ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "offenders": [],
++   "offenders": [
++     "div.app:t=0.00001s,a=0s(none)",
++   ],
+    "shell": "library",
+  }
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:587:38)
+(fail) Todo 15 · reduced motion collapses travel without hiding state > library: no painted element keeps a transition or a running animation [80.79ms]
+582 |         if (shell === "live") await enterLive(session, { lines: 2 });
+583 |         else await selectMeeting(session);
+584 |         const motion = await session.page.evaluate(readMotion);
+585 |         const offenders = motion.moving
+586 |           .map((m) => `${m.id}:t=${m.transition}s,a=${m.animation}s(${m.name})`);
+587 |         expect({ shell, offenders }).toEqual({ shell, offenders: [] });
+                                           ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "offenders": [],
++   "offenders": [
++     "div.ambient:t=0.00001s,a=0s(none)",
++     "div.ambient__grid:t=0.00001s,a=0s(none)",
++     "div.app:t=0.00001s,a=0s(none)",
++     "header.topbar:t=0.00001s,a=0s(none)",
++     "div.topbar__brand:t=0.00001s,a=0s(none)",
++     "span.brand__mark:t=0.00001s,a=0s(none)",
++     "span.brand__name:t=0.00001s,a=0s(none)",
++     "em.anon:t=0.00001s,a=0s(none)",
++     "div.topbar__center:t=0.00001s,a=0s(none)",
++     "btn-attendees:t=0.00001s,a=0s(none)",
++     "span.attendee-btn__icon:t=0.00001s,a=0s(none)",
++     "span.attendee-btn__label:t=0.00001s,a=0s(none)",
++     "div.topbar__right:t=0.00001s,a=0s(none)",
++     "div.topbar__status:t=0.00001s,a=0s(none)",
++     "status-indicator:t=0.00001s,a=0s(none)",
++     "status-text:t=0.00001s,a=0s(none)",
++     "btn-settings:t=0.00001s,a=0s(none)",
++     "workspace:t=0.00001s,a=0s(none)",
++     "document-surface:t=0.00001s,a=0s(none)",
++     "stage-pane:t=0.00001s,a=0s(none)",
++     "live-topbar:t=0.00001s,a=0s(none)",
++     "div.live-topbar__capsule:t=0.00001s,a=0s(none)",
++     "btn-live-stop:t=0.00001s,a=0s(none)",
++     "span.live-topbar__stop-dot:t=0.00001s,a=0s(none)",
++     "span.live-topbar__sep:t=0.00001s,a=0s(none)",
++     "live-topbar-timer:t=0.00001s,a=0s(none)",
++     "current-slide:t=0.00001s,a=0s(none)",
++     "div.slide__inner:t=0.00001s,a=0s(none)",
++     "div.slide__topic-main:t=0.00001s,a=0s(none)",
++     "div.slide__meta:t=0.00001s,a=0s(none)",
++     "span.slide__index:t=0.00001s,a=0s(none)",
++     "span.slide__kicker:t=0.00001s,a=0s(none)",
++     "h2.slide__title:t=0.00001s,a=0s(none)",
++     "ul.slide__bullets:t=0.00001s,a=0s(none)",
++     "li.anon:t=0.00001s,a=0s(none)",
++     "li.anon:t=0.00001s,a=0s(none)",
++     "li.anon:t=0.00001s,a=0s(none)",
++     "p.slide__emphasis:t=0.00001s,a=0s(none)",
++     "span.slide__emphasis-label:t=0.00001s,a=0s(none)",
++     "island:t=0.00001s,a=0s(none)",
++     "span.island__dot:t=0.00001s,a=0s(none)",
++     "caption-text:t=0.00001s,a=0s(none)",
++     "splitter-transcript:t=0.00001s,a=0s(none)",
++     "transcript-pane:t=0.00001s,a=0s(none)",
++     "transcript-card:t=0.00001s,a=0s(none)",
++     "div.pane__head:t=0.00001s,a=0s(none)",
++     "span.anon:t=0.00001s,a=0s(none)",
++     "span.pane__title:t=0.00001s,a=0s(none)",
++     "transcript-count:t=0.00001s,a=0s(none)",
++     "transcript-body:t=0.00001s,a=0s(none)",
++     "transcript-stream:t=0.00001s,a=0s(none)",
++     "div.feed-line:t=0.00001s,a=0s(none)",
++     "span.feed-line__meta:t=0.00001s,a=0s(none)",
++     "span.feed-line__time:t=0.00001s,a=0s(none)",
++     "span.speaker-chip:t=0.00001s,a=0s(none)",
++     "span.feed-line__text:t=0.00001s,a=0s(none)",
++     "div.feed-line:t=0.00001s,a=0s(none)",
++     "span.feed-line__meta:t=0.00001s,a=0s(none)",
++     "span.feed-line__time:t=0.00001s,a=0s(none)",
++     "span.speaker-chip:t=0.00001s,a=0s(none)",
++     "span.feed-line__text:t=0.00001s,a=0s(none)",
++     "div.dock:t=0.00001s,a=0s(none)",
++     "div.dock__commandbar:t=0.00001s,a=0s(none)",
++     "nav.output-switcher:t=0.00001s,a=0s(none)",
++     "a.output-switcher__item:t=0.00001s,a=0s(none)",
++     "span.output-switcher__label:t=0.00001s,a=0s(none)",
++     "a.output-switcher__item:t=0.00001s,a=0s(none)",
++     "span.output-switcher__label:t=0.00001s,a=0s(none)",
++     "button.output-switcher__item:t=0.00001s,a=0s(none)",
++     "span.output-switcher__label:t=0.00001s,a=0s(none)",
++     "span.output-switcher__reason:t=0.00001s,a=0s(none)",
++     "div.dock__tabs:t=0.00001s,a=0s(none)",
++     "btn-ask:t=0.00001s,a=0s(none)",
++     "dock-more:t=0.00001s,a=0s(none)",
++     "summary.dock__more-summary:t=0.00001s,a=0s(none)",
++     "div.dock__more-set:t=0.00001s,a=0s(none)",
++     "btn-compile-deck:t=0.00001s,a=0s(none)",
++     "btn-export-md:t=0.00001s,a=0s(none)",
++     "btn-export-json:t=0.00001s,a=0s(none)",
++     "btn-export-transcript:t=0.00001s,a=0s(none)",
++     "btn-export-deck:t=0.00001s,a=0s(none)",
++     "btn-export-pdf:t=0.00001s,a=0s(none)",
++     "btn-export-png:t=0.00001s,a=0s(none)",
++     "btn-reset:t=0.00001s,a=0s(none)",
++   ],
+    "shell": "live",
+  }
+
+- Expected  - 1
++ Received  + 86
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:587:38)
+(fail) Todo 15 · reduced motion collapses travel without hiding state > live: no painted element keeps a transition or a running animation [89.72ms]
+(pass) Todo 15 · reduced motion collapses travel without hiding state > reduced motion still shows the live capture state, timer and transcript [88.64ms]
+(pass) Todo 15 · reduced motion collapses travel without hiding state > reduced motion keeps a visible focus ring on the keyboard-focused control [82.06ms]
+662 |       // is not a 200ms transition. The bound below therefore governs the
+663 |       // TRANSITIONS, which is what the budget is about.
+664 |       const overBudget = motion.moving
+665 |         .filter((m) => m.transition > 0.2 + 1e-6)
+666 |         .map((m) => `${m.id}:${m.transition}s`);
+667 |       expect(overBudget).toEqual([]);
+                               ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "status-indicator:0.3s",
++   "island:0.3s",
++   "a.output-switcher__item:0.22s",
++   "a.output-switcher__item:0.22s",
++   "button.output-switcher__item:0.22s",
++ ]
+
+- Expected  - 1
++ Received  + 7
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:667:26)
+(fail) Todo 15 · reduced motion collapses travel without hiding state > normal motion stays inside the approved 200ms budget [93.48ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 375x812 library: scrolled-into-view controls meet 44px [83.60ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 375x812 live: scrolled-into-view controls meet 44px [88.88ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 320x667 library: scrolled-into-view controls meet 44px [82.24ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 320x667 live: scrolled-into-view controls meet 44px [87.95ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1440x900: zero root overflow in the live shell [90.85ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1440x900 reduced: zero root overflow in the live shell [91.82ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1244x836: zero root overflow in the live shell [87.39ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1244x836 reduced: zero root overflow in the live shell [87.54ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1100x800: zero root overflow in the live shell [87.61ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1100x800 reduced: zero root overflow in the live shell [88.12ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 960x760: zero root overflow in the live shell [88.19ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 960x760 reduced: zero root overflow in the live shell [92.01ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 900x760: zero root overflow in the live shell [84.64ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 900x760 reduced: zero root overflow in the live shell [86.58ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 899x760: zero root overflow in the live shell [85.54ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 899x760 reduced: zero root overflow in the live shell [83.86ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 820x900: zero root overflow in the live shell [87.15ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 820x900 reduced: zero root overflow in the live shell [91.38ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 375x812: zero root overflow in the live shell [91.82ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 375x812 reduced: zero root overflow in the live shell [98.96ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 320x667: zero root overflow in the live shell [88.07ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 320x667 reduced: zero root overflow in the live shell [85.44ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > a malformed slide frame drops silently and keeps the last good slide [91.39ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > unparseable JSON leaves every projection untouched [82.10ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > a transport drop reports reconnecting and keeps Stop, timer and content [83.13ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > a compile failure states its reason next to the control and keeps Stop enabled [84.96ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > the empty library and the empty transcript both explain themselves [69.37ms]
+(pass) Todo 15 · keyboard operation and Escape priority > Escape closes the open sheet and restores focus to its trigger [70.67ms]
+(pass) Todo 15 · keyboard operation and Escape priority > Escape never stops a live recording [91.79ms]
+(pass) Todo 15 · keyboard operation and Escape priority > every focusable control in the tab order has an accessible name [82.04ms]
+(pass) Todo 15 · keyboard operation and Escape priority > no positive tabindex hijacks the DOM tab order [85.80ms]
+(pass) Todo 15 · keyboard operation and Escape priority > the detail tabs implement roving tabindex with Arrow, Home and End [75.84ms]
+1008 |         });
+1009 |       });
+1010 |       const colorOnly = indicators
+1011 |         .filter((i) => i.present && i.painted && i.text === 0)
+1012 |         .map((i) => i.id);
+1013 |       expect(colorOnly).toEqual([]);
+                               ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "status-indicator",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:1013:25)
+(fail) Todo 15 · contrast and non-color status > every visible status indicator carries text or a shape, never color alone [84.19ms]
+(pass) Todo 15 · contrast and non-color status > primary body text meets WCAG AA 4.5:1 against its own painted background [82.92ms]
+(pass) Todo 15 · determinism > this suite contains no sleep or polling wait [0.64ms]
+(pass) Todo 15 · determinism > the accessibility run issues no off-origin request [83.63ms]
+
+8 tests failed:
+(fail) Todo 15 · announcements fire once and never for the wrong thing > the timer is not a live region, in either shell [89.87ms]
+(fail) Todo 15 · announcements fire once and never for the wrong thing > ambient counters and the provider name are not live regions [89.69ms]
+(fail) Todo 15 · announcements fire once and never for the wrong thing > the status channel IS a polite live region, so failures are not silent [68.23ms]
+(fail) Todo 15 · announcements fire once and never for the wrong thing > a finalized transcript line announces through exactly one live region [93.09ms]
+(fail) Todo 15 · reduced motion collapses travel without hiding state > library: no painted element keeps a transition or a running animation [80.79ms]
+(fail) Todo 15 · reduced motion collapses travel without hiding state > live: no painted element keeps a transition or a running animation [89.72ms]
+(fail) Todo 15 · reduced motion collapses travel without hiding state > normal motion stays inside the approved 200ms budget [93.48ms]
+(fail) Todo 15 · contrast and non-color status > every visible status indicator carries text or a shape, never color alone [84.19ms]
+
+ 39 pass
+ 8 fail
+ 104 expect() calls
+Ran 47 tests across 1 file. [4.43s]

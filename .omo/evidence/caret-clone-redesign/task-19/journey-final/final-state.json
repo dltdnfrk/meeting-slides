@@ -1,0 +1,12 @@
+{
+  "finalStatus": "회의 #2 기록을 불러왔습니다",
+  "finalState": {
+    "shell": "library",
+    "detailTab": "overview",
+    "capturePhase": "idle",
+    "stageState": "empty",
+    "uiState": "idle-library",
+    "connectionState": "online"
+  },
+  "statusLog": []
+}

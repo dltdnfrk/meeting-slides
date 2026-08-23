@@ -1,0 +1,62 @@
+{
+  "task": "F1 rejection gap #2 - independent functional capability review",
+  "taskId": "st_019ff3d6",
+  "reviewerName": "omo / functional-capability reviewer",
+  "reviewedAt": "2026-08-12T02:40:00Z",
+  "status": "PASS",
+  "verdict": "PASS",
+  "readOnlyReview": true,
+  "productFilesEdited": false,
+  "planLedgerGovernanceFilesEdited": false,
+  "commitCreated": false,
+  "independentOfPriorCombinedConclusion": true,
+  "scope": {
+    "browserOnlyStart": "PASS",
+    "nativeProjection": "PASS",
+    "nativeOpenWorkspace": "PASS",
+    "nativeExactlyOnceStop": "PASS",
+    "twoCycles": "PASS",
+    "compileExport": "PASS",
+    "reconnectHistory": "PASS",
+    "reviewAsk": "PASS",
+    "failureState": "PASS"
+  },
+  "evidenceIntegrity": {
+    "todo19ChecksumValidation": "71/71 PASS",
+    "report": {
+      "path": ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/functional/REPORT.md",
+      "sha256": "a0e9584d2923bd6515e4969b0a716e1ec1db925f23932a08a86c8a7295cb3feb"
+    },
+    "reviewedArtifacts": {
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/02-live-960.png": "43fe64c09fc31b570a386f3ade9d8bdcd7da0a15dc936d23a2edc7fcb4a97e6c",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/02-live-375.png": "116d72dc4d09c1c4dfc7b759f77cf7ce591f0b4161c6d1924f8bce3b73a38b6a",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/03-live-compiled-history.png": "86452ca73b782bf7223e41ae803ba4fa1d9abf5ca12a900b87fe56daf571bacb",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/native-cycle1-ax.txt": "0f4e301002fc32556480367bf74bd5efaa9f0ac3147134cdd856b76d2eaf4fd9",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/native-cycle2-ax.txt": "7873419bdfe99610780d10d5e1959729c9edd1959c6c6ce6d9924b9055fdd0c3",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/wire-actions.json": "d2305489ebe9a88d45e4f26e6b0312330a183b293a644e4637cb60394d9c4954",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/reconnect.json": "a404aa1df1cea86c35e7d72ac2d5e71e0cafbc82f10f0674f33efea829adfe5a",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/review.json": "a66352d9107f0386e28f1ca3a5cc85359ce19684047a1d28e696a043d7a3274f",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/ask.json": "0edbb0063bc2c08b42f18fd4af8f26348f4d8de7e57ca0a7294d1298c49b5caa",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/failure-state.json": "593f387bba85273a8a576c1f95effa6c4058ffd14ed38eba4184321e51fe73f5",
+      ".omo/evidence/caret-clone-redesign/task-19/journey-final/journey-report.json": "f34c81faa46ff0d7986cdd2acac2034ded35c48faae4a3dbb6c84f90ecf9a7ba"
+    },
+    "currentSource": {
+      "DESIGN.md": "b6e7d78e4d24b8cc72a774bf0470ec2083eb2d8f279b5974a9685ef4724ff29d",
+      ".omo/plans/caret-clone-redesign.md": "d7814098b3844e7e11df636800fe0118793108c116759b9a969bada76cd0255f",
+      "public/app.js": "8aac593219c7ff40d916846b86720692904264a6bbfff64cfc153ff6420371ed",
+      "public/operator-surface.js": "062e9a32e0dd18f6f0665479f229c4b7655c018b0d638b6140f69712550fa93b",
+      "public/index.html": "56048c545c0d248903930d29d7cb997030e4bfeeffb802904473b95b2302b556",
+      "macos/TransportClient.swift": "110f12cf8fcc2ae913f49f386df1253319aa77f6fc0f88f2ec6b8604bdb60b6f",
+      "macos/NativeSurfaceContract.swift": "d750cd83253b2e6b46dc6a8172769f2b5f3d5c6c0c298da83965f2228df76721",
+      "macos/MinibarView.swift": "33f53850136754b16d85e7bf8b303a3e88c7eba88b7158d532200ff2e8f98f80",
+      "macos/MinibarWindowController.swift": "6af2816541847b2bb3d44a642f36e810bfac66c70eea7b204e93c9c5b1cbebcc",
+      "server.ts": "9c72629a134f95576950d925cd9fb47ffa32a6b5640afa1af6ab10131eb5ffc8"
+    }
+  },
+  "risks": [
+    "Native visual capture was unsupported; functional native proof is AX plus wire evidence.",
+    "Cycle 2 exactly-once attribution is aggregated in journey-report/checkpoint plus the full wire log rather than a dedicated cycle-2 Stop receipt.",
+    "StopCommandGuard can rearm on a repeated non-stopping capture snapshot; the retained rapid/reconnect scenarios pass but do not directly exercise every out-of-order snapshot interleaving.",
+    "Todo 19 source-hashes does not enumerate every native source; this reviewer independently hashed and read current native files."
+  ]
+}

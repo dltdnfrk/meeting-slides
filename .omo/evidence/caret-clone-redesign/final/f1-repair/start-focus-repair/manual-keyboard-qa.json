@@ -1,0 +1,42 @@
+{
+  "steps": [
+    {
+      "step": "hydrated idle",
+      "ok": true
+    },
+    {
+      "step": "tabbed to Start with real Tab keys",
+      "tabPresses": 7,
+      "reachedStart": true
+    }
+  ],
+  "startFocusVisible": {
+    "matchesFocusVisible": true,
+    "outlineWidth": "2px",
+    "boxShadow": false
+  },
+  "outboundCommand": {
+    "action": "startCapture"
+  },
+  "afterStart": {
+    "activeTag": "BUTTON",
+    "activeId": "btn-live-stop",
+    "stopVisible": true,
+    "stopFocused": true,
+    "stopFocusVisible": true,
+    "stopAccessibleName": "녹음 중지",
+    "stopTargetPx": {
+      "w": 66,
+      "h": 28
+    },
+    "focusRing": {
+      "outlineWidth": "2px",
+      "boxShadow": false
+    },
+    "shell": "live"
+  },
+  "stopCommand": {
+    "action": "stopCapture"
+  },
+  "verdict": "PASS"
+}

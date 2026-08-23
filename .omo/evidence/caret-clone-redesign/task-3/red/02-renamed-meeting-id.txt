@@ -1,0 +1,102 @@
+=== MUTATION 2: startCapture payload key meeting_id -> meetingId in public/app.js ===
+(re-run against the FINAL test file, 23 tests)
+--- diff ---
+-  alibaba: { name: "Alibaba GLM", detail: "Alibaba Cloud API 키" },
+-    const keyBased = p.id === "openai" || p.id === "alibaba";
++    const keyBased = p.id === "openai";
+-    : { action: "startCapture", meeting_id: attendeeState.meetingId }));
++    : { action: "startCapture", meetingId: attendeeState.meetingId }));
+--- bun test tests/public-dom-protocol-contract.test.ts ---
+bun test v1.3.14 (0d9b296a)
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.14ms]
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.08ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.13ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.09ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.04ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.02ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.12ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.28ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.09ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.07ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.10ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.05ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.13ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.03ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.21ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.18ms]
+272 |     const startCapture = protocolContract.clientActions
+273 |       .find((entry) => entry.action === "startCapture")!;
+274 |     expect(startCapture.payloadKeys).toEqual(["meeting_id"]);
+275 |     const appJs = read("public/app.js");
+276 |     const emitted = /\{\s*action:\s*"startCapture",\s*([A-Za-z_]+):/.exec(appJs)?.[1];
+277 |     expect(emitted).toBe("meeting_id");
+                          ^
+error: expect(received).toBe(expected)
+
+Expected: "meeting_id"
+Received: "meetingId"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-dom-protocol-contract.test.ts:277:21)
+(fail) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.21ms]
+316 |       const emitsKey = sites.some((site) => asKey(entry.key).test(site));
+317 |       const emitsAlias = entry.mustNotUse.filter((alias) =>
+318 |         sites.some((site) => asKey(alias).test(site)));
+319 |       return { action: entry.action, emitsKey, emitsAlias };
+320 |     });
+321 |     expect(findings).toEqual(
+                           ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "action": "startCapture",
+-     "emitsAlias": [],
+-     "emitsKey": true,
++     "emitsAlias": [
++       "meetingId",
++     ],
++     "emitsKey": false,
+    },
+    {
+      "action": "selectMeeting",
+      "emitsAlias": [],
+      "emitsKey": true,
+    },
+    {
+      "action": "deleteMeeting",
+      "emitsAlias": [],
+      "emitsKey": true,
+    },
+    {
+      "action": "ask",
+      "emitsAlias": [],
+      "emitsKey": true,
+    },
+    {
+      "action": "installSttModel",
+      "emitsAlias": [],
+      "emitsKey": true,
+    },
+  ]
+
+- Expected  - 2
++ Received  + 4
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-dom-protocol-contract.test.ts:321:22)
+(fail) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.38ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.08ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.10ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.06ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.04ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.06ms]
+
+2 tests failed:
+(fail) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.21ms]
+(fail) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.38ms]
+
+ 21 pass
+ 2 fail
+ 52 expect() calls
+Ran 23 tests across 1 file. [34.00ms]

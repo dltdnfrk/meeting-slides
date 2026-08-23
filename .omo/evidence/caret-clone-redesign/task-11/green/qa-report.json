@@ -1,0 +1,2406 @@
+{
+  "1440x900-reference": {
+    "overview": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 694
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1203,
+          "h": 694
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 1203,
+          "h": 496
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 754,
+          "w": 1440,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "notes": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "notes",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": true,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 694
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1203,
+          "h": 694
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 754,
+          "w": 1440,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "notes-panel"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "transcript": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "transcript",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": false,
+        "transcript": true
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 694
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1203,
+          "h": 694
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 237,
+          "y": 258,
+          "w": 1203,
+          "h": 496
+        },
+        "dock": {
+          "x": 0,
+          "y": 754,
+          "w": 1440,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "transcript-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "afterHome": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 694
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1203,
+          "h": 694
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 1203,
+          "h": 496
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 754,
+          "w": 1440,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    }
+  },
+  "1244x836-library": {
+    "overview": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 630
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1007,
+          "h": 630
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 1007,
+          "h": 432
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 690,
+          "w": 1244,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "notes": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "notes",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": true,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 630
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1007,
+          "h": 630
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 690,
+          "w": 1244,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "notes-panel"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "transcript": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "transcript",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": false,
+        "transcript": true
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 630
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1007,
+          "h": 630
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 237,
+          "y": 258,
+          "w": 1007,
+          "h": 432
+        },
+        "dock": {
+          "x": 0,
+          "y": 690,
+          "w": 1244,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "transcript-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "afterHome": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 630
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1007,
+          "h": 630
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 1007,
+          "h": 432
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 690,
+          "w": 1244,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    }
+  },
+  "1100x800-seam": {
+    "overview": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 594
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 863,
+          "h": 594
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 863,
+          "h": 396
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 654,
+          "w": 1100,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "notes": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "notes",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": true,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 594
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 863,
+          "h": 594
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 654,
+          "w": 1100,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "notes-panel"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "transcript": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "transcript",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": false,
+        "transcript": true
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 594
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 863,
+          "h": 594
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 237,
+          "y": 258,
+          "w": 863,
+          "h": 396
+        },
+        "dock": {
+          "x": 0,
+          "y": 654,
+          "w": 1100,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "transcript-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "afterHome": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 594
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 863,
+          "h": 594
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 863,
+          "h": 396
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 654,
+          "w": 1100,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    }
+  },
+  "960x760-live": {
+    "overview": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 554
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 723,
+          "h": 554
+        },
+        "stage": {
+          "x": 237,
+          "y": 250,
+          "w": 723,
+          "h": 364
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 614,
+          "w": 960,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "notes": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "notes",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": true,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 554
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 723,
+          "h": 554
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 614,
+          "w": 960,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "notes-panel"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "transcript": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "transcript",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": false,
+        "transcript": true
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 554
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 723,
+          "h": 554
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 237,
+          "y": 250,
+          "w": 723,
+          "h": 364
+        },
+        "dock": {
+          "x": 0,
+          "y": 614,
+          "w": 960,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "transcript-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "afterHome": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 554
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 723,
+          "h": 554
+        },
+        "stage": {
+          "x": 237,
+          "y": 250,
+          "w": 723,
+          "h": 364
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 614,
+          "w": 960,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    }
+  },
+  "820x900-stacked": {
+    "overview": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 208,
+          "h": 404
+        },
+        "document": {
+          "x": 213,
+          "y": 60,
+          "w": 607,
+          "h": 404
+        },
+        "stage": {
+          "x": 213,
+          "y": 250,
+          "w": 607,
+          "h": 214
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 714,
+          "w": 820,
+          "h": 186
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "notes": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "notes",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": true,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 208,
+          "h": 404
+        },
+        "document": {
+          "x": 213,
+          "y": 60,
+          "w": 607,
+          "h": 404
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 714,
+          "w": 820,
+          "h": 186
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "notes-panel"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "transcript": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "transcript",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": false,
+        "transcript": true
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 208,
+          "h": 404
+        },
+        "document": {
+          "x": 213,
+          "y": 60,
+          "w": 607,
+          "h": 404
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 213,
+          "y": 250,
+          "w": 607,
+          "h": 214
+        },
+        "dock": {
+          "x": 0,
+          "y": 714,
+          "w": 820,
+          "h": 186
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "transcript-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "afterHome": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 208,
+          "h": 404
+        },
+        "document": {
+          "x": 213,
+          "y": 60,
+          "w": 607,
+          "h": 404
+        },
+        "stage": {
+          "x": 213,
+          "y": 250,
+          "w": 607,
+          "h": 214
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 714,
+          "w": 820,
+          "h": 186
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    }
+  },
+  "375x812-narrow": {
+    "overview": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 56,
+          "w": 375,
+          "h": 276
+        },
+        "document": {
+          "x": 0,
+          "y": 332,
+          "w": 375,
+          "h": 146
+        },
+        "stage": {
+          "x": 0,
+          "y": 522,
+          "w": 375,
+          "h": 36
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 478,
+          "w": 375,
+          "h": 334
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "notes": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "notes",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": true,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": -24,
+          "w": 375,
+          "h": 276
+        },
+        "document": {
+          "x": 0,
+          "y": 252,
+          "w": 375,
+          "h": 146
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 478,
+          "w": 375,
+          "h": 334
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "notes-panel"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "transcript": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "transcript",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": false,
+        "transcript": true
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": -24,
+          "w": 375,
+          "h": 276
+        },
+        "document": {
+          "x": 0,
+          "y": 252,
+          "w": 375,
+          "h": 146
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 442,
+          "w": 375,
+          "h": 36
+        },
+        "dock": {
+          "x": 0,
+          "y": 478,
+          "w": 375,
+          "h": 334
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "transcript-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "afterHome": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": -24,
+          "w": 375,
+          "h": 276
+        },
+        "document": {
+          "x": 0,
+          "y": 252,
+          "w": 375,
+          "h": 146
+        },
+        "stage": {
+          "x": 0,
+          "y": 442,
+          "w": 375,
+          "h": 36
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 478,
+          "w": 375,
+          "h": 334
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    }
+  },
+  "320x667-compact": {
+    "overview": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 56,
+          "w": 320,
+          "h": 227
+        },
+        "document": {
+          "x": 0,
+          "y": 283,
+          "w": 320,
+          "h": 2
+        },
+        "stage": {
+          "x": 0,
+          "y": 473,
+          "w": 320,
+          "h": 36
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 285,
+          "w": 320,
+          "h": 382
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "notes": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "notes",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": true,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": -168,
+          "w": 320,
+          "h": 227
+        },
+        "document": {
+          "x": 0,
+          "y": 59,
+          "w": 320,
+          "h": 2
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 285,
+          "w": 320,
+          "h": 382
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "notes-panel"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "transcript": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "transcript",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": false,
+        "notes": false,
+        "transcript": true
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": -168,
+          "w": 320,
+          "h": 227
+        },
+        "document": {
+          "x": 0,
+          "y": 59,
+          "w": 320,
+          "h": 2
+        },
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "transcript": {
+          "x": 0,
+          "y": 249,
+          "w": 320,
+          "h": 36
+        },
+        "dock": {
+          "x": 0,
+          "y": 285,
+          "w": 320,
+          "h": 382
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "transcript-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "afterHome": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": -168,
+          "w": 320,
+          "h": 227
+        },
+        "document": {
+          "x": 0,
+          "y": 59,
+          "w": 320,
+          "h": 2
+        },
+        "stage": {
+          "x": 0,
+          "y": 249,
+          "w": 320,
+          "h": 36
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 285,
+          "w": 320,
+          "h": 382
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    }
+  },
+  "states": {
+    "empty": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "empty",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 630
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1007,
+          "h": 630
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 1007,
+          "h": 432
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 690,
+          "w": 1244,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 0,
+      "duplicateIds": []
+    },
+    "afterMalformed": {
+      "state": {
+        "connection": "connected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "idle-library"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 630
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1007,
+          "h": 630
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 1007,
+          "h": 432
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 690,
+          "w": 1244,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    },
+    "reconnecting": {
+      "state": {
+        "connection": "disconnected",
+        "shell": "library",
+        "capturePhase": "idle",
+        "detailTab": "overview",
+        "stageState": "slide",
+        "uiState": "reconnect"
+      },
+      "visible": {
+        "rail": true,
+        "stage": true,
+        "notes": false,
+        "transcript": false
+      },
+      "geometry": {
+        "rail": {
+          "x": 0,
+          "y": 60,
+          "w": 232,
+          "h": 630
+        },
+        "document": {
+          "x": 237,
+          "y": 60,
+          "w": 1007,
+          "h": 630
+        },
+        "stage": {
+          "x": 237,
+          "y": 258,
+          "w": 1007,
+          "h": 432
+        },
+        "transcript": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "dock": {
+          "x": 0,
+          "y": 690,
+          "w": 1244,
+          "h": 146
+        }
+      },
+      "aria": {
+        "tablists": 1,
+        "tabs": [
+          {
+            "id": "detail-tab-overview",
+            "selected": "true",
+            "tabindex": "0",
+            "controls": "stage-pane"
+          },
+          {
+            "id": "detail-tab-notes",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "notes-panel"
+          },
+          {
+            "id": "detail-tab-transcript",
+            "selected": "false",
+            "tabindex": "-1",
+            "controls": "transcript-pane"
+          }
+        ],
+        "visiblePanels": [
+          "stage-pane"
+        ]
+      },
+      "rootOverflow": 0,
+      "transcriptLines": 15,
+      "duplicateIds": []
+    }
+  },
+  "offOriginRequests": []
+}

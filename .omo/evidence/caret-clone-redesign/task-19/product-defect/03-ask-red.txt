@@ -1,0 +1,18 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/server-ask-dispatch.test.ts:
+13 | let port: number;
+14 | const messages: Record<string, unknown>[] = [];
+15 | 
+16 | function bounded<T>(subscribe: (resolve: (value: T) => void, reject: (error: Error) => void) => void): Promise<T> {
+17 |   return new Promise<T>((resolve, reject) => {
+18 |     const timer = setTimeout(() => reject(new Error(`timed out after ${deadlineMs}ms`)), deadlineMs);
+                                                   ^
+error: timed out after 15000ms
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/server-ask-dispatch.test.ts:18:47)
+(fail) real WebSocket ask dispatch invokes transport and returns exactly one terminal response [15001.23ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [17.11s]
+exit=1

@@ -1,0 +1,10 @@
+{"sequence":1,"kind":"server-ready","port":54831}
+{"sequence":2,"kind":"workspace-get","host":"127.0.0.1:54831"}
+{"sequence":3,"kind":"workspace-get","host":"127.0.0.1:54831"}
+{"sequence":4,"kind":"workspace-get","host":"localhost:54831"}
+{"sequence":5,"kind":"websocket-open","clients":1}
+{"sequence":6,"kind":"broadcast","frame":{"type":"capture","capturing":true,"mode":"mic","phase":"capturing","startedAt":1786515989808}}
+{"sequence":7,"kind":"broadcast","frame":{"type":"line","text":"핵심 결정 사항을 확정했습니다.","ts":1786515990808,"speaker":1}}
+{"sequence":8,"kind":"broadcast","frame":{"type":"line","text":"다음 단계와 담당자를 확인합니다.","ts":1786515991808,"speaker":2}}
+{"sequence":9,"kind":"broadcast","frame":{"type":"line","text":"발표 자료 구조를 정리했습니다.","ts":1786515992808,"speaker":1}}
+{"sequence":10,"kind":"broadcast","frame":{"type":"caption","text":"현재 논의를 기록하고 있습니다","ts":1786515993808}}

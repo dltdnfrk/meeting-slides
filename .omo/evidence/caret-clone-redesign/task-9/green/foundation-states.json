@@ -1,0 +1,508 @@
+{
+  "capturedFor": "caret-clone-redesign todo 9",
+  "note": "Screenshots are visual-inspection artifacts only; no byte-level golden assertion exists for them anywhere in this task.",
+  "states": [
+    {
+      "viewport": {
+        "name": "reference",
+        "width": 1440,
+        "height": 900
+      },
+      "fontsReady": true,
+      "externalRequests": [],
+      "fontRequests": [
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2",
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2"
+      ],
+      "loadedFamilies": [
+        "DM Mono",
+        "Figtree",
+        "Pretendard Variable"
+      ],
+      "renderedFamilies": {
+        "latinBody": [
+          {
+            "family": "Figtree",
+            "glyphs": 31,
+            "bundled": true
+          }
+        ],
+        "hangulBody": [
+          {
+            "family": "Pretendard Variable",
+            "glyphs": 9,
+            "bundled": true
+          },
+          {
+            "family": "Figtree",
+            "glyphs": 3,
+            "bundled": true
+          }
+        ],
+        "telemetry": [
+          {
+            "family": "DM Mono",
+            "glyphs": 16,
+            "bundled": true
+          }
+        ]
+      },
+      "computedFamilies": {
+        "body": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "display": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      },
+      "backdropFilters": {
+        "main": {
+          "html": "none",
+          ".cf-rail": "none",
+          ".cf-surface": "none",
+          ".cf-raised": "none"
+        },
+        "overlay": "blur(24px) saturate(1.1)"
+      },
+      "focus": {
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(125, 211, 252)"
+      },
+      "motion": {
+        "transitionDuration": "0.2s",
+        "animationDuration": "0s"
+      },
+      "rootOverflow": {
+        "horizontal": 0
+      },
+      "screenshot": {
+        "path": "green/screens/foundation-reference-1440x900.png",
+        "bytes": 44099,
+        "sha256": "076a0862d6eb62384db070ed469c231819ffc401883d0fb9a7c79ae4ed772478"
+      }
+    },
+    {
+      "viewport": {
+        "name": "library",
+        "width": 1244,
+        "height": 836
+      },
+      "fontsReady": true,
+      "externalRequests": [],
+      "fontRequests": [
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2",
+        "/fonts/figtree-latin.woff2"
+      ],
+      "loadedFamilies": [
+        "DM Mono",
+        "Figtree",
+        "Pretendard Variable"
+      ],
+      "renderedFamilies": {
+        "latinBody": [
+          {
+            "family": "Figtree",
+            "glyphs": 31,
+            "bundled": true
+          }
+        ],
+        "hangulBody": [
+          {
+            "family": "Pretendard Variable",
+            "glyphs": 9,
+            "bundled": true
+          },
+          {
+            "family": "Figtree",
+            "glyphs": 3,
+            "bundled": true
+          }
+        ],
+        "telemetry": [
+          {
+            "family": "DM Mono",
+            "glyphs": 16,
+            "bundled": true
+          }
+        ]
+      },
+      "computedFamilies": {
+        "body": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "display": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      },
+      "backdropFilters": {
+        "main": {
+          "html": "none",
+          ".cf-rail": "none",
+          ".cf-surface": "none",
+          ".cf-raised": "none"
+        },
+        "overlay": "blur(24px) saturate(1.1)"
+      },
+      "focus": {
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(125, 211, 252)"
+      },
+      "motion": {
+        "transitionDuration": "0.2s",
+        "animationDuration": "0s"
+      },
+      "rootOverflow": {
+        "horizontal": 0
+      },
+      "screenshot": {
+        "path": "green/screens/foundation-library-1244x836.png",
+        "bytes": 42116,
+        "sha256": "9e83c1004814dcf5027752d8f9726470986f7377359d93ee30dce284a83d756b"
+      }
+    },
+    {
+      "viewport": {
+        "name": "live",
+        "width": 960,
+        "height": 760
+      },
+      "fontsReady": true,
+      "externalRequests": [],
+      "fontRequests": [
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2",
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2"
+      ],
+      "loadedFamilies": [
+        "DM Mono",
+        "Figtree",
+        "Pretendard Variable"
+      ],
+      "renderedFamilies": {
+        "latinBody": [
+          {
+            "family": "Figtree",
+            "glyphs": 31,
+            "bundled": true
+          }
+        ],
+        "hangulBody": [
+          {
+            "family": "Pretendard Variable",
+            "glyphs": 9,
+            "bundled": true
+          },
+          {
+            "family": "Figtree",
+            "glyphs": 3,
+            "bundled": true
+          }
+        ],
+        "telemetry": [
+          {
+            "family": "DM Mono",
+            "glyphs": 16,
+            "bundled": true
+          }
+        ]
+      },
+      "computedFamilies": {
+        "body": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "display": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      },
+      "backdropFilters": {
+        "main": {
+          "html": "none",
+          ".cf-rail": "none",
+          ".cf-surface": "none",
+          ".cf-raised": "none"
+        },
+        "overlay": "blur(24px) saturate(1.1)"
+      },
+      "focus": {
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(125, 211, 252)"
+      },
+      "motion": {
+        "transitionDuration": "0.2s",
+        "animationDuration": "0s"
+      },
+      "rootOverflow": {
+        "horizontal": 0
+      },
+      "screenshot": {
+        "path": "green/screens/foundation-live-960x760.png",
+        "bytes": 40537,
+        "sha256": "f4ba509f96986b0f927d19d1591c8191aa7df26d1f040d847d0b40c9635508c9"
+      }
+    },
+    {
+      "viewport": {
+        "name": "stacked",
+        "width": 820,
+        "height": 900
+      },
+      "fontsReady": true,
+      "externalRequests": [],
+      "fontRequests": [
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2",
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2"
+      ],
+      "loadedFamilies": [
+        "DM Mono",
+        "Figtree",
+        "Pretendard Variable"
+      ],
+      "renderedFamilies": {
+        "latinBody": [
+          {
+            "family": "Figtree",
+            "glyphs": 31,
+            "bundled": true
+          }
+        ],
+        "hangulBody": [
+          {
+            "family": "Pretendard Variable",
+            "glyphs": 9,
+            "bundled": true
+          },
+          {
+            "family": "Figtree",
+            "glyphs": 3,
+            "bundled": true
+          }
+        ],
+        "telemetry": [
+          {
+            "family": "DM Mono",
+            "glyphs": 16,
+            "bundled": true
+          }
+        ]
+      },
+      "computedFamilies": {
+        "body": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "display": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      },
+      "backdropFilters": {
+        "main": {
+          "html": "none",
+          ".cf-rail": "none",
+          ".cf-surface": "none",
+          ".cf-raised": "none"
+        },
+        "overlay": "blur(24px) saturate(1.1)"
+      },
+      "focus": {
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(125, 211, 252)"
+      },
+      "motion": {
+        "transitionDuration": "0.2s",
+        "animationDuration": "0s"
+      },
+      "rootOverflow": {
+        "horizontal": 0
+      },
+      "screenshot": {
+        "path": "green/screens/foundation-stacked-820x900.png",
+        "bytes": 40675,
+        "sha256": "31126b429942372eb760bdbf23423f751b43b9de7eda827445da9d75961a1d7a"
+      }
+    },
+    {
+      "viewport": {
+        "name": "narrow",
+        "width": 375,
+        "height": 812
+      },
+      "fontsReady": true,
+      "externalRequests": [],
+      "fontRequests": [
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2",
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2"
+      ],
+      "loadedFamilies": [
+        "DM Mono",
+        "Figtree",
+        "Pretendard Variable"
+      ],
+      "renderedFamilies": {
+        "latinBody": [
+          {
+            "family": "Figtree",
+            "glyphs": 31,
+            "bundled": true
+          }
+        ],
+        "hangulBody": [
+          {
+            "family": "Pretendard Variable",
+            "glyphs": 9,
+            "bundled": true
+          },
+          {
+            "family": "Figtree",
+            "glyphs": 3,
+            "bundled": true
+          }
+        ],
+        "telemetry": [
+          {
+            "family": "DM Mono",
+            "glyphs": 16,
+            "bundled": true
+          }
+        ]
+      },
+      "computedFamilies": {
+        "body": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "display": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      },
+      "backdropFilters": {
+        "main": {
+          "html": "none",
+          ".cf-rail": "none",
+          ".cf-surface": "none",
+          ".cf-raised": "none"
+        },
+        "overlay": "blur(24px) saturate(1.1)"
+      },
+      "focus": {
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(125, 211, 252)"
+      },
+      "motion": {
+        "transitionDuration": "0.2s",
+        "animationDuration": "0s"
+      },
+      "rootOverflow": {
+        "horizontal": 0
+      },
+      "screenshot": {
+        "path": "green/screens/foundation-narrow-375x812.png",
+        "bytes": 33074,
+        "sha256": "41bf953a6b3c3e03a3c581b31a86b27eedd35a5c81d823960a3acd190b8f0361"
+      }
+    },
+    {
+      "viewport": {
+        "name": "compact",
+        "width": 320,
+        "height": 667
+      },
+      "fontsReady": true,
+      "externalRequests": [],
+      "fontRequests": [
+        "/fonts/figtree-latin.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/pretendard-variable.woff2",
+        "/fonts/dmmono-500-latin.woff2",
+        "/fonts/figtree-latin.woff2",
+        "/fonts/pretendard-variable.woff2"
+      ],
+      "loadedFamilies": [
+        "DM Mono",
+        "Figtree",
+        "Pretendard Variable"
+      ],
+      "renderedFamilies": {
+        "latinBody": [
+          {
+            "family": "Figtree",
+            "glyphs": 31,
+            "bundled": true
+          }
+        ],
+        "hangulBody": [
+          {
+            "family": "Pretendard Variable",
+            "glyphs": 9,
+            "bundled": true
+          },
+          {
+            "family": "Figtree",
+            "glyphs": 3,
+            "bundled": true
+          }
+        ],
+        "telemetry": [
+          {
+            "family": "DM Mono",
+            "glyphs": 16,
+            "bundled": true
+          }
+        ]
+      },
+      "computedFamilies": {
+        "body": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "display": "Figtree, \"Pretendard Variable\", -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", system-ui, sans-serif",
+        "mono": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      },
+      "backdropFilters": {
+        "main": {
+          "html": "none",
+          ".cf-rail": "none",
+          ".cf-surface": "none",
+          ".cf-raised": "none"
+        },
+        "overlay": "blur(24px) saturate(1.1)"
+      },
+      "focus": {
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(125, 211, 252)"
+      },
+      "motion": {
+        "transitionDuration": "0.2s",
+        "animationDuration": "0s"
+      },
+      "rootOverflow": {
+        "horizontal": 0
+      },
+      "screenshot": {
+        "path": "green/screens/foundation-compact-320x667.png",
+        "bytes": 26709,
+        "sha256": "ee5832c5fb317b97aff4e973155757283a744428f24bb2356a84c9bd92a2be75"
+      }
+    }
+  ],
+  "reducedMotion": {
+    "tokens": {
+      "--cf-motion-quick": "0ms",
+      "--cf-motion-state": "0ms"
+    },
+    "computed": {
+      "transitionDuration": "0s",
+      "animationDuration": "0s"
+    },
+    "canvasUnchanged": "#09090b",
+    "screenshot": {
+      "path": "green/screens/foundation-reduced-motion-1244x836.png",
+      "bytes": 42116,
+      "sha256": "9e83c1004814dcf5027752d8f9726470986f7377359d93ee30dce284a83d756b"
+    }
+  }
+}

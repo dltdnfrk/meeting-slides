@@ -1,0 +1,2 @@
+AXWindow, AXSystemDialog, Meeting Slides 미니바, 1136, 854, 360, 56
+group 1 of window 1 of application process meeting-slides, static text ○ of group 1 of window 1 of application process meeting-slides, static text 대기 중 of group 1 of window 1 of application process meeting-slides, static text 3 of group 1 of window 1 of application process meeting-slides, button 녹음 중지 of group 1 of window 1 of application process meeting-slides, button 미니바 펼치기 of group 1 of window 1 of application process meeting-slides

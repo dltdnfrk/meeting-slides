@@ -1,0 +1,21 @@
+{
+  "first": {
+    "snapshot": {
+      "type": "capture",
+      "capturing": false,
+      "mode": "mic",
+      "phase": "idle"
+    },
+    "count": 4
+  },
+  "second": {
+    "snapshot": {
+      "type": "capture",
+      "capturing": false,
+      "mode": "mic",
+      "phase": "idle"
+    },
+    "count": 4
+  },
+  "reconnectConsistent": true
+}

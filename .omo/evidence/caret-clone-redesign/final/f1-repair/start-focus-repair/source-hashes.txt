@@ -1,0 +1,2 @@
+2acec90237ea08f9a3998070f347417701ac1b99887b323dde0298f592a42db1  public/operator-surface.js
+45025893e542302dfe95a401e70294200e1b9569b23c1f51b7f9b65dc3dac450  tests/public-caret-accessibility.test.ts

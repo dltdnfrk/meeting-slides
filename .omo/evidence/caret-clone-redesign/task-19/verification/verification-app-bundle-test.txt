@@ -1,0 +1,38 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/app-bundle.test.ts:
+(pass) app bundle: build > scripts/build-app.sh builds into the requested install dir and exits 0 [0.21ms]
+(pass) app bundle: build > the executable and every packaged resource is non-empty [3.92ms]
+(pass) app bundle: packaged native modules > the packaged executable contains LauncherEnvironment [0.03ms]
+(pass) app bundle: packaged native modules > the packaged executable contains ServerLifecycle
+(pass) app bundle: packaged native modules > the packaged executable contains NativeSurfaceGeometry
+(pass) app bundle: packaged native modules > the packaged executable contains StopCommandGuard
+(pass) app bundle: packaged native modules > the packaged executable contains TransportClient
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarProjection
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarWindowController
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarView
+(pass) app bundle: packaged native modules > the build compiles every macos/*.swift source in one invocation [3.33ms]
+(pass) app bundle: packaged native modules > the menu-bar item, panel and browser workspace action are packaged [0.06ms]
+(pass) app bundle: packaged native modules > the packaged executable links no WebKit and stays one binary [20.05ms]
+(pass) app bundle: Info.plist identity and permissions > plutil lints the generated Info.plist [4.51ms]
+(pass) app bundle: Info.plist identity and permissions > app identity and version metadata are preserved [34.31ms]
+(pass) app bundle: Info.plist identity and permissions > every TCC facility the launcher actually uses declares a usage string [12.27ms]
+(pass) app bundle: Info.plist identity and permissions > the bundle claims no screen recording capability it does not use [3.78ms]
+(pass) app bundle: resources > the project-path resource points at this checkout [0.11ms]
+(pass) app bundle: resources > the launcher reaps its owned server on a raw signal, never orphaning it [0.11ms]
+(pass) app bundle: resources > the packaged project path resolves the runtime contract the launcher needs [0.10ms]
+(pass) app bundle: resources > the build refuses to package a project path without the server entry point [0.02ms]
+(pass) app bundle: resources > the pure project-resolution rule rejects a directory that cannot serve [0.12ms]
+(pass) app bundle: resources > project resolution accepts only a directory that can actually serve [0.14ms]
+(pass) app bundle: signing > codesign --verify --deep --strict passes on the built bundle [8.39ms]
+(pass) app bundle: signing > the bundle is ad-hoc signed under the product identifier [5.52ms]
+(pass) app bundle: install safety > a redirected build never repoints the repository symlink [0.05ms]
+(pass) app bundle: install safety > a redirected build never touches the canonical installed app [22.77ms]
+(pass) app bundle: install safety > the build script updates the repo symlink only for the canonical install dir [0.09ms]
+(pass) app bundle: verifier rejects an incomplete bundle > removing the project-path resource fails verification [4.00ms]
+(pass) app bundle: verifier rejects an incomplete bundle > the intact bundle passes the same verifier [185.66ms]
+
+ 30 pass
+ 0 fail
+ 104 expect() calls
+Ran 30 tests across 1 file. [7.46s]

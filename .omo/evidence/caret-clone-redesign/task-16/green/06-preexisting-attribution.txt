@@ -1,0 +1,14 @@
+PRE-EXISTING FAILURE ATTRIBUTION — tests/public-transcript-dock.test.ts
+
+6 failures, all in the '전사 패널 다중 모서리 리사이즈' describe block.
+Subject: transcript panel resize grips (public/transcript-resize.js, workspace.transcript.v1).
+
+Proof of attribution:
+  1. Todo 16 touched public/app.js, server.ts, tests/server-ws-dispatch.test.ts only.
+  2. With the task-16 app.js Stop hunk reverted in place, the SAME 6 tests fail:
+     9 pass / 6 fail before and after.
+  3. public/transcript-resize.js is clean in the worktree (last commit bcf5c7a, pre-plan).
+  4. Task 15 recorded its own pre-existing set in tests/public-attendees.test.ts;
+     this dock set is likewise untouched by this task.
+
+Action: recorded, NOT chased (plan: 'Reproduce/attribute pre-existing failures rather than chasing them').

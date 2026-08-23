@@ -1,0 +1,99 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-transcript-dock.test.ts:
+(pass) 전사 도킹 > 라이브 전사 줄이 우측 .transcript-pane 안에 쌓인다 [87.27ms]
+(pass) 전사 도킹 > transcript 스냅샷이 패널을 백로그로 다시 채운다 [78.18ms]
+(pass) 전사 도킹 > 전사가 쌓여도 중앙 무대는 가려지지 않고 넓이를 지킨다 [78.40ms]
+301 | describe("전사 패널 다중 모서리 리사이즈", () => {
+302 |   beforeEach(resetWorkspace);
+303 | 
+304 |   test("기본 상태에서는 카드가 패널 전체 높이를 쓴다", async () => {
+305 |     const geo = await geometry(page);
+306 |     expect(geo.cardH).toBeCloseTo(geo.paneH, 0);
+                            ^
+error: expect(received).toBeCloseTo(expected, precision)
+
+Expected: 657
+Received: 629
+
+Expected precision: 0
+Expected difference: < 0.5
+Received difference: 28
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:306:23)
+(fail) 전사 패널 다중 모서리 리사이즈 > 기본 상태에서는 카드가 패널 전체 높이를 쓴다 [68.23ms]
+330 |     );
+331 | 
+332 |     for (const value of aria) {
+333 |       expect(value.orientation).toBe("horizontal");
+334 |       expect(value.min).toBe(160);
+335 |       expect(value.max).toBeGreaterThan(value.min);
+                              ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 160
+Received: 160
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:335:25)
+(fail) 전사 패널 다중 모서리 리사이즈 > 높이 그립이 방향과 현재·최소·최대 높이를 노출한다 [65.76ms]
+error: separator value did not change: #transcript-grip-s
+      at evaluate (evaluate at pressHeightSeparatorKey (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:157:16), <anonymous>:5:15)
+      at #evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:388:19)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:404:32)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:131:26)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:720:38)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:826:43)
+      at processTicksAndRejections (native:7:39)
+(fail) 전사 패널 다중 모서리 리사이즈 > 키보드 Arrow/Home/End가 두 높이 그립과 ARIA 현재값을 동기화한다 [2083.38ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 서(W) 드래그: 스플리터가 전사 폭을 넓힌다 [150.29ms]
+368 |   test("남(S) 드래그: 카드 높이만 줄고 폭은 그대로다", async () => {
+369 |     const before = await geometry(page);
+370 |     await dragFrom(page, "#transcript-grip-s", 0, -240);
+371 |     const after = await geometry(page);
+372 | 
+373 |     expect(before.cardH - after.cardH).toBeGreaterThan(200);
+                                             ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 200
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:373:40)
+(fail) 전사 패널 다중 모서리 리사이즈 > 남(S) 드래그: 카드 높이만 줄고 폭은 그대로다 [125.74ms]
+386 |     const before = await geometry(page);
+387 | 
+388 |     await dragFrom(page, "#transcript-grip-sw", -140, 120);
+389 |     const after = await geometry(page);
+390 | 
+391 |     expect(after.cardH - before.cardH).toBeGreaterThan(80);
+                                             ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 80
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:391:40)
+(fail) 전사 패널 다중 모서리 리사이즈 > 남서(SW) 드래그: 높이와 폭이 함께 바뀐다 [182.41ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 높이 하한과 상한을 넘지 않는다 [183.20ms]
+409 |     const stored = await page.evaluate(
+410 |       (key: string) => JSON.parse(localStorage.getItem(key) ?? "null") as { heightPx: number } | null,
+411 |       TRANSCRIPT_KEY,
+412 |     );
+413 | 
+414 |     expect(stored).not.toBeNull();
+                             ^
+error: expect(received).not.toBeNull()
+
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:414:24)
+(fail) 전사 패널 다중 모서리 리사이즈 > 높이가 workspace.transcript.v1에 남고 새로고침 후 복원된다 [125.59ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 저장값이 손상돼도 카드가 패널을 꽉 채운 기본으로 뜬다 [116.62ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 상태가 어떻든 전사 본문은 카드 안쪽에 머무른다 [125.92ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 높이를 줄여도 전사 줄은 계속 쌓이고 스크롤로 읽힌다 [138.49ms]
+(pass) 좁은 화면 > 좌우 분할이 무리면 전사는 숨지 않고 무대 아래로 쌓인다 [78.53ms]
+
+ 9 pass
+ 6 fail
+ 34 expect() calls
+Ran 15 tests across 1 file. [4.34s]

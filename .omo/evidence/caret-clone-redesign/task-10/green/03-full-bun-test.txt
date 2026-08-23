@@ -1,0 +1,1336 @@
+bun test v1.3.14 (0d9b296a)
+
+src/ask.test.ts:
+(pass) extractQueryTerms > 한국어/영어 토큰을 추출하고 불용어를 제거한다 [0.35ms]
+(pass) extractQueryTerms > 2자 미만 토큰과 불용어만 있으면 빈 배열을 반환한다 [0.03ms]
+(pass) searchTranscriptSegments > 질문 용어와 일치하는 라인 주변을 윈도우로 묶는다 [10.10ms]
+(pass) searchTranscriptSegments > 검색어가 없으면 마지막 라인을 컨텍스트로 쓴다 [6.94ms]
+(pass) searchTranscriptSegments > canonical 전사가 없으면 빈 배열을 반환한다 [6.25ms]
+(pass) askMeeting > 관련 구간과 함께 질문을 LLM에 전달해 답변을 받는다 [6.95ms]
+(pass) askMeeting > 관련 구간이 없어도 질문을 전달한다 [6.88ms]
+
+tests/meeting-conclusion.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+16 |   return to;
+17 | };
+18 | var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+19 | var jsHandleDispatcher_exports = {};
+20 | __export(jsHandleDispatcher_exports, {
+21 |   JSHandleDispatcher: () => JSHandleDispatcher,
+                                 ^
+ReferenceError: Cannot access 'JSHandleDispatcher' before initialization.
+      at JSHandleDispatcher (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:21:29)
+      at get (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:14:41)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/elementHandlerDispatcher.js:27:39)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:28:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/electronDispatcher.js:27:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:31:5)
+-------------------------------
+
+
+tests/store.test.ts:
+(pass) MeetingStore > 회의 목록은 빈 저장소에서 비어 있다 [1.43ms]
+(pass) MeetingStore > 회의 목록은 첫 슬라이드 제목과 시작/종료 상태를 노출한다 [0.43ms]
+(pass) MeetingStore > 회의 라이프사이클: 시작 → 라인/슬라이드 → 종료 [0.36ms]
+(pass) MeetingStore > 회의가 열려있지 않으면 라인/슬라이드 무시 [0.18ms]
+(pass) MeetingStore > Markdown export: 헤더 + 슬라이드 + 전사본 [1.41ms]
+(pass) MeetingStore > 전사 전용 export는 노트의 슬라이드 요약과 구별되고 지정 회의만 대상으로 한다 [0.40ms]
+(pass) MeetingStore > meeting detail은 마지막 슬라이드를 current로, 나머지를 history로 hydrate한다 [0.42ms]
+(pass) MeetingStore > 같은 idx 슬라이드 갱신은 upsert되어 export에 최신 불렛이 남는다 [0.26ms]
+
+tests/sentence-assembler.test.ts:
+(pass) SentenceAssembler > 완결 구두점이면 즉시 방출 [0.06ms]
+(pass) SentenceAssembler > 미완결 조각은 보류 후 다음 조각과 병합 [0.02ms]
+(pass) SentenceAssembler > 구두점으로 끝난 뒤에는 새 문장 시작 [0.01ms]
+(pass) SentenceAssembler > 길이 상한을 넘으면 구두점 없이도 강제 방출 (실시간성 하한) [0.01ms]
+(pass) SentenceAssembler > 화자 전환/종료 시 flush로 보류분 방출
+
+tests/app-settings.test.ts:
+(pass) AppSettingsStore > persists provider, model, and effort under the project only [0.74ms]
+(pass) AppSettingsStore > rejects corrupt files and invalid registry selections [0.14ms]
+
+tests/public-runtime-guard.test.ts:
+(pass) operator runtime bootstrap > health signature and static shell assets are present [1.42ms]
+(pass) operator runtime bootstrap > bootstrap sets file/server runtime flag [0.41ms]
+
+tests/deck.test.ts:
+(pass) linesForSlide > 블록 시작 시각 구간으로 라인 배정 [0.02ms]
+(pass) buildDeckHtml > 타이틀/본문/마무리 섹션 구성 [0.03ms]
+(pass) buildDeckHtml > 불렛과 발표자 노트(전사) 포함 [0.02ms]
+(pass) buildDeckHtml > HTML 이스케이프 [0.11ms]
+(pass) buildDeckHtml > Given different meeting content, When reveal decks are built, Then decorative visuals derive from that content [0.25ms]
+(pass) buildSlideFiles (slides-grab 계약) > 타이틀+블록+마무리 개별 파일 생성 [0.03ms]
+(pass) buildSlideFiles (slides-grab 계약) > legacy cover/topic/closing files are produced by the SlideSpec template registry [0.09ms]
+(pass) buildSlideFiles (slides-grab 계약) > all compiled SlideSpec kinds render through first-class templates [0.10ms]
+(pass) buildSlideFiles (slides-grab 계약) > unregistered runtime kinds fail with a typed error before producing a file [0.04ms]
+(pass) buildSlideFiles (slides-grab 계약) > 16:9 고정 프레임과 로컬 테마 링크
+(pass) buildSlideFiles (slides-grab 계약) > Given standalone slide files, When normal and empty decks are built, Then every page delegates styling and geometry to the shared theme [0.12ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given slides-grab's 960x540 presentation viewport, When standalone slide files are built, Then the shared frame adapter preserves the 1280x720 design surface [0.03ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given topic slide pages, When standalone files are built, Then each decorative visual is generated from its slide content [0.06ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given the shared deck theme, When a slide is rendered, Then the paper design system replaces the legacy dark grid [0.02ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given six product-limit Korean bullets, When a dense topic is built, Then both outputs use the compact presentation contract without losing text [0.25ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given a long Korean cover title, When deck outputs are built, Then both cover surfaces use the readable long-title contract without deleting text [0.09ms]
+
+tests/public-shell.test.ts:
+(pass) 라이브 MeetingCard 렌더 > 슬라이드가 없으면 플레이스홀더를 유지한다 [10.90ms]
+(pass) 라이브 MeetingCard 렌더 > kicker/emphasis 포함 카드가 모두 렌더된다 [4.66ms]
+(pass) 라이브 MeetingCard 렌더 > 375px 폭에서 가로 오버플로가 없다 [4.41ms]
+(pass) 라이브 MeetingCard 렌더 > 한국어 제목과 불릿은 단어를 보존하고 예외적으로 긴 토큰만 줄바꿈한다 [2.29ms]
+(pass) 라이브 MeetingCard 렌더 > kicker/emphasis 없는 레거시 슬라이드도 제목/불릿만으로 렌더된다 [1.30ms]
+(pass) 라이브 MeetingCard 렌더 > 불릿이 비어도 제목 카드가 깨지지 않는다 [0.90ms]
+687 |          * Returns the middle point within an element unless a specific offset is provided.
+688 |          */
+689 |         async clickablePoint(offset) {
+690 |             const box = await this.#clickableBox();
+691 |             if (!box) {
+692 |                 throw new Error('Node is either not clickable or not an Element');
+                                ^
+error: Node is either not clickable or not an Element
+      at clickablePoint (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:692:27)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:118:33)
+      at async click (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:722:41)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:129:37)
+      at async click (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:749:30)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-shell.test.ts:260:16)
+(fail) 라이브 MeetingCard 렌더 > 히스토리 미리보기에서도 같은 카드 레이아웃을 쓴다 [13.05ms]
+(pass) HTML 이스케이프 > 모델 텍스트의 마크업이 실행되지 않는다 [1.46ms]
+
+tests/scene-compile-action.test.ts:
+25 |  * @param {Object} options to generate the zip file.
+26 |  * @param {String} comment the comment to use.
+27 |  */
+28 | exports.generateWorker = function (zip, options, comment) {
+29 | 
+30 |     var zipFileWorker = new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName);
+                                 ^
+TypeError: Module is not a constructor (evaluating 'new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName)')
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/generate/index.js:30:29
+      at generateInternalStream (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:358:31)
+      at generateAsync (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:370:21)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:6918:90
+      at step (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:54:24)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:41:91
+      at Promise (unknown:1:11)
+      at __awaiter (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:40:97)
+      at processTicksAndRejections (unknown:7:39)
+(fail) semantic scene compile action > publishes HTML, Scene JSON, and native PPTX from one narrative plan [7.17ms]
+70 |       meetingId,
+71 |       exportsDirectory: join(root, "exports"),
+72 |       send: (message) => messages.push(message),
+73 |     });
+74 | 
+75 |     expect(result).not.toBeNull();
+                            ^
+error: expect(received).not.toBeNull()
+
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/scene-compile-action.test.ts:75:24)
+(fail) semantic scene compile action > success message includes the generated scene so the app can preview every slide [5.16ms]
+[deck-planner] attempt 1 failed: deck.slides[0].bullets is a removed legacy field
+[deck-planner] attempt 2 failed: deck.slides[0].bullets is a removed legacy field
+[deck-planner] using fallback narrative for meeting 1
+25 |  * @param {Object} options to generate the zip file.
+26 |  * @param {String} comment the comment to use.
+27 |  */
+28 | exports.generateWorker = function (zip, options, comment) {
+29 | 
+30 |     var zipFileWorker = new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName);
+                             ^
+TypeError: Module is not a constructor (evaluating 'new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName)')
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/generate/index.js:30:25)
+      at generateInternalStream (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:358:31)
+      at generateAsync (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:370:21)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:6918:90)
+      at step (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:68:23)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:42:71)
+      at new Promise (1:11)
+      at __awaiter (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:38:12)
+(fail) semantic scene compile action > invalid planner output falls back to prose scenes instead of bullet slides [3.25ms]
+[deck-planner] attempt 1 failed: planner did not return a JSON object
+[deck-planner] attempt 2 failed: planner did not return a JSON object
+[deck-planner] using fallback narrative for meeting 1
+25 |  * @param {Object} options to generate the zip file.
+26 |  * @param {String} comment the comment to use.
+27 |  */
+28 | exports.generateWorker = function (zip, options, comment) {
+29 | 
+30 |     var zipFileWorker = new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName);
+                             ^
+TypeError: Module is not a constructor (evaluating 'new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName)')
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/generate/index.js:30:25)
+      at generateInternalStream (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:358:31)
+      at generateAsync (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:370:21)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:6918:90)
+      at step (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:68:23)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:42:71)
+      at new Promise (1:11)
+      at __awaiter (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:38:12)
+(fail) semantic scene compile action > compile uses the exact transcript snapshot captured before planning starts [3.34ms]
+[deck-planner] attempt 1 failed: planner did not return a JSON object
+[deck-planner] attempt 2 failed: planner did not return a JSON object
+[deck-planner] using fallback narrative for meeting 1
+25 |  * @param {Object} options to generate the zip file.
+26 |  * @param {String} comment the comment to use.
+27 |  */
+28 | exports.generateWorker = function (zip, options, comment) {
+29 | 
+30 |     var zipFileWorker = new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName);
+                             ^
+TypeError: Module is not a constructor (evaluating 'new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName)')
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/generate/index.js:30:25)
+      at generateInternalStream (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:358:31)
+      at generateAsync (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:370:21)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:6918:90)
+      at step (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:68:23)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:42:71)
+      at new Promise (1:11)
+      at __awaiter (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:38:12)
+(fail) fallback narrative drops trailing chatter and caps slide count [3.07ms]
+
+tests/scene-graph.test.ts:
+(pass) semantic slide scene graph > narrative input rejects the legacy bullet contract [0.06ms]
+(pass) semantic slide scene graph > semantic intents compose into positioned editable scene elements [0.17ms]
+(pass) semantic slide scene graph > HTML renderer draws the scene without list markup [0.07ms]
+
+tests/whisper-artifact-filter.test.ts:
+(pass) existing Whisper artifact filters > metadata and runtime banners never become transcript chunks [0.28ms]
+(pass) existing Whisper artifact filters > timestamp wrappers are stripped while actual speech remains [0.21ms]
+
+tests/public-live-kind.test.ts:
+(pass) live multi-kind design > 기본 주제 카드는 topic 레이아웃(비주얼 밴드)으로 렌더된다 [4.41ms]
+(pass) live multi-kind design > 결정 emphasis는 decision 레이아웃으로 전환된다 [7.05ms]
+(pass) live multi-kind design > 액션 불릿 다수는 actions 레이아웃으로 전환된다 [5.00ms]
+(pass) LLM kind가 휴리스틱보다 우선한다 [1.94ms]
+
+tests/ui-state-machine.test.ts:
+(pass) current public/app.js visible state seams > capture visibility is a bare mutable boolean, not a named state [0.12ms]
+(pass) current public/app.js visible state seams > hydration, selection, preview and job seams are separate mutable flags [0.09ms]
+(pass) current public/app.js visible state seams > connection is projected onto a data attribute with four literal values [0.09ms]
+(pass) current public/app.js visible state seams > stale job and stale meeting responses are dropped inline, per call site [0.05ms]
+(pass) current public/app.js visible state seams > malformed frames are swallowed by a catch that only logs [0.06ms]
+(pass) reducer purity > uses no DOM, clock, network, storage or global ambient value [0.12ms]
+(pass) reducer purity > declares no `any` and no unsafe cast [0.25ms]
+(pass) reducer purity > does not mutate the state it is given [0.23ms]
+(pass) reducer purity > initial state is startup and is a fresh value each call [0.02ms]
+(pass) parse boundary > accepts every server message type the protocol declares [0.17ms]
+(pass) parse boundary > rejects null as a typed failure [0.02ms]
+(pass) parse boundary > rejects undefined as a typed failure
+(pass) parse boundary > rejects string as a typed failure
+(pass) parse boundary > rejects number as a typed failure
+(pass) parse boundary > rejects array as a typed failure
+(pass) parse boundary > rejects missing type as a typed failure
+(pass) parse boundary > rejects numeric type as a typed failure
+(pass) parse boundary > rejects unknown type as a typed failure
+(pass) parse boundary > rejects capture without capturing as a typed failure
+(pass) parse boundary > rejects capture with non-boolean capturing as a typed failure
+(pass) parse boundary > rejects capture with unknown phase as a typed failure
+(pass) parse boundary > rejects meeting without meetingId as a typed failure
+(pass) parse boundary > rejects meetings without items as a typed failure
+(pass) parse boundary > rejects compile without status as a typed failure
+(pass) parse boundary > rejects compile with unknown status as a typed failure
+(pass) parse boundary > a rejected frame never reaches the reducer and never changes state [0.03ms]
+(pass) canonical states > every state in the contract is reachable from startup [0.28ms]
+(pass) canonical states > state name is always consistent with the capture and shell projection [0.07ms]
+(pass) canonical states > reduce is exhaustive: every event kind is handled from every state [0.32ms]
+(pass) capture lifecycle > happy path: activate → starting → live → stop → stopping → idle [0.04ms]
+(pass) capture lifecycle > start emits exactly one startCapture no matter how often it is activated [0.09ms]
+(pass) capture lifecycle > stop emits exactly one stopCapture from every server-confirmed capture substate [0.08ms]
+(pass) capture lifecycle > a start the server has not confirmed can neither restart nor stop [0.03ms]
+(pass) capture lifecycle > startCapture carries the wire spelling meeting_id and nothing else [0.01ms]
+(pass) capture lifecycle > startCapture omits meeting_id when no meeting is prepared [0.01ms]
+(pass) capture lifecycle > stopCapture carries no payload
+(pass) capture lifecycle > Stop stays truthful: a stop request alone never claims capture ended [0.02ms]
+(pass) capture lifecycle > start failure moves to capture-error and clears the pending request [0.11ms]
+(pass) capture lifecycle > a stale capture error is cleared by the next authoritative capture snapshot [0.05ms]
+(pass) capture lifecycle > capture-error is also clearable by an explicit dismissal [0.02ms]
+(pass) capture lifecycle > activating capture from capture-error retries once and clears the error [0.02ms]
+(pass) capture lifecycle > phase-less capture messages map compatibly [0.03ms]
+(pass) capture lifecycle > capture timer origin comes only from the server startedAt payload [0.01ms]
+(pass) capture lifecycle > switching-model is a capture phase, not a hidden idle [0.01ms]
+(pass) connection and restore > startup hydrates only after the first authoritative capture snapshot [0.02ms]
+(pass) connection and restore > pre-hydration slide and transcript frames are ignored [0.01ms]
+(pass) connection and restore > transport loss during capture enters reconnect and preserves capture [0.01ms]
+(pass) connection and restore > reconnect restores the exact capture substate the server reports [0.02ms]
+(pass) connection and restore > reconnect that returns an idle server is honoured, not overridden by the old capture [0.01ms]
+(pass) connection and restore > reconnect during a pending stop keeps the stop pending and re-sends it once [0.02ms]
+(pass) connection and restore > reconnect from every capture substate is deterministic [0.06ms]
+(pass) connection and restore > capture activation is refused while the transport is not online [0.03ms]
+(pass) connection and restore > transport error surfaces a typed error without inventing an idle capture [0.01ms]
+(pass) connection and restore > no state below `online` is ever named as a settled surface [0.05ms]
+(pass) connection and restore > an authoritative snapshot after a transport error restores the online surface [0.01ms]
+(pass) connection and restore > a transport error is cleared once the socket is online again [0.01ms]
+(pass) meeting selection and preview > selecting a meeting enters meeting-switching and emits selectMeeting [0.01ms]
+(pass) meeting selection and preview > the matching detail resolves the switch, an out-of-order one does not [0.02ms]
+(pass) meeting selection and preview > rapid selection keeps only the newest request and one action per selection [0.11ms]
+(pass) meeting selection and preview > re-selecting the meeting already in flight does not re-emit [0.02ms]
+(pass) meeting selection and preview > returning to the library clears the selection [0.02ms]
+(pass) meeting selection and preview > history preview suspends live follow and exits back to the live state [0.02ms]
+(pass) meeting selection and preview > preview survives live slide traffic and ends on authoritative idle [0.02ms]
+(pass) meeting selection and preview > idle-live is the just-ended meeting shell, distinct from the library [0.01ms]
+(pass) compile jobs > started → progress → success walks compile-running to compile-complete [0.03ms]
+(pass) compile jobs > a compile answer for a superseded job is ignored [0.02ms]
+(pass) compile jobs > compile failure records a typed error and releases the job [0.02ms]
+(pass) compile jobs > compile never blocks Stop [0.02ms]
+(pass) compile jobs > a compile job started before a reconnect is dropped, not left spinning [0.02ms]
+(pass) determinism > the same sequence yields byte-identical state five times [0.09ms]
+(pass) determinism > the visited state names are stable [0.05ms]
+(pass) determinism > reduceAll equals a manual fold [0.04ms]
+
+tests/meeting-deletion.test.ts:
+(pass) 회의 삭제는 해당 히스토리와 연결된 로컬 기록을 원자적으로 제거한다 [1.37ms]
+
+tests/minutes-store.test.ts:
+(pass) MinutesStore SQLite contracts > rejects an attendee for a meeting that does not exist [0.85ms]
+(pass) MinutesStore SQLite contracts > creates and activates one prepared legacy-compatible meeting [0.84ms]
+(pass) MinutesStore SQLite contracts > stores local attendee keys independently from optional CRM ids [0.68ms]
+(pass) MinutesStore SQLite contracts > replaces prepared attendees and locks the roster after review confirmation [1.26ms]
+(pass) MinutesStore SQLite contracts > versions immutable transcript lines, finalizes, and selects canonical [0.78ms]
+(pass) MinutesStore SQLite contracts > saves sourced candidates and confirms only fully reviewed items [1.17ms]
+(pass) MinutesStore SQLite contracts > rejects endpoint-valid but interior-missing ranges and rolls back the whole review [1.25ms]
+(pass) MinutesStore SQLite contracts > revalidates source interiors during confirmation in the same transaction [0.92ms]
+(pass) MinutesStore SQLite contracts > enforces attendee provenance and successful-audio hash semantics [0.76ms]
+(pass) MinutesStore SQLite contracts > creates the complete additive minutes schema without changing legacy tables [0.62ms]
+
+tests/public-operator-surface.test.ts:
+(pass) TIRO 기반 오퍼레이터 표면 > 중앙 슬라이드 계약과 필수 DOM ID를 한 번씩만 보존한다 [8.31ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 플로팅 도크가 녹음·파형·타이머와 3-way 출력을 품는다 [1.19ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 번역과 전사 편집은 서버 계약 사유를 노출한 채 비활성화된다 [1.17ms]
+(pass) TIRO 기반 오퍼레이터 표면 > capture 메시지가 녹음 버튼을 파형 상태로 전환한다 [7.78ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 3-way 출력에서 전체 전사를 선택하면 패널로 이동하고 현재 상태를 갱신한다 [114.92ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 1280·768·375에서 셸이 가로로 넘치지 않는다 [23.82ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 비활성 사유와 모바일 전사 본문이 잘리지 않는다 [5.80ms]
+(pass) TIRO 기반 오퍼레이터 표면 > caret dual shell exposes detail tabs and live compact mode [70.92ms]
+
+tests/public-review.test.ts:
+(pass) review panel shell > the panel mounts hidden and leaves the slide shell intact [248.50ms]
+(pass) review panel shell > capture is not hard-gated by the review panel [60.30ms]
+(pass) candidate cards > a review message renders one card per candidate with quote and version-scoped coordinates [43.83ms]
+(pass) candidate cards > every candidate carries the immutable transcript version id, not just a seq [64.65ms]
+(pass) candidate cards > a multi-line segment shows the joined evidence text of the whole range [77.73ms]
+(pass) candidate cards > action items surface deadline text alongside the normalized deadline [81.88ms]
+(pass) candidate cards > decisions and open items have no assignee control — only action items do [259.45ms]
+(pass) attendee dropdown attribution > attribution options come only from the review attendees, never free text [54.39ms]
+(pass) attendee dropdown attribution > the suggested attribution is preselected and a change sends updateItem [61.54ms]
+(pass) attendee dropdown attribution > assigning an action item sends updateItem with the assignee patch [72.12ms]
+(pass) attendee dropdown attribution > with no attendees the dropdowns are disabled and explain why [68.32ms]
+(pass) edit and drop controls > editing a description sends updateItem with the trimmed text [118.37ms]
+(pass) edit and drop controls > an empty edit is rejected without sending anything [123.30ms]
+(pass) edit and drop controls > dropping a candidate marks it rejected and sends the review_state patch [100.42ms]
+(pass) edit and drop controls > a dropped candidate can be restored to candidate state [108.78ms]
+(pass) confirm action > the actual browser flow confirms complete candidates, corrects an action deadline, then confirms the review [156.37ms]
+(pass) confirm action > the confirm button reports how many candidates will be kept [136.21ms]
+(pass) confirm action > a review with every candidate rejected remains confirmable [130.38ms]
+(pass) empty, error, and loading states > an empty candidate list shows the no-candidates notice and no cards [100.22ms]
+(pass) empty, error, and loading states > the extraction status message drives a loading state before the payload lands [125.28ms]
+(pass) empty, error, and loading states > an extraction failure status shows a retry affordance instead of stale cards [821.71ms]
+(pass) keyboard accessibility > Escape closes the panel and the toggle reopens it without refetching [100.31ms]
+(pass) keyboard accessibility > opening the panel moves focus into it and the toggle reflects expansion [69.32ms]
+(pass) keyboard accessibility > every control is reachable and labelled for assistive tech [73.47ms]
+(pass) keyboard accessibility > Enter on the drop control toggles it, so the panel is operable keyboard-only [85.75ms]
+(pass) reconnect and update handling > a second review message replaces the previous candidates rather than appending [102.37ms]
+(pass) reconnect and update handling > a dropped socket disables confirm and reconnect restores it [3134.37ms]
+(pass) reconnect and update handling > local edits survive a re-render triggered by an unrelated message [112.18ms]
+(pass) hostile payloads > markup in descriptions, quotes, and attendee names is escaped as text [109.63ms]
+(pass) hostile payloads > a malformed review payload is ignored without tearing down the shell [120.45ms]
+(pass) hostile payloads > a kind outside the updateItem wire contract is refused, not rendered as an actionable card [148.58ms]
+(pass) hostile payloads > items missing required evidence or source coordinates are refused rather than rendered uncited [131.58ms]
+
+tests/public-harness-baseline.test.ts:
+(pass) public test harness baseline lifecycle > origin serves the shipped index and rejects traversal names [0.96ms]
+(pass) public test harness baseline lifecycle > clientConnected resolves once a websocket client is accepted [0.07ms]
+(pass) public test harness baseline lifecycle > pushMessage broadcasts the exact JSON payload to connected clients [0.17ms]
+(pass) public test harness baseline lifecycle > nextClientMessage resolves inbound client frames in FIFO order [0.17ms]
+(pass) public test harness baseline lifecycle > disconnectClients closes live sockets without stopping the server [1.41ms]
+
+tests/public-transcript-dock.test.ts:
+(pass) 전사 도킹 > 라이브 전사 줄이 우측 .transcript-pane 안에 쌓인다 [109.77ms]
+(pass) 전사 도킹 > transcript 스냅샷이 패널을 백로그로 다시 채운다 [82.39ms]
+(pass) 전사 도킹 > 전사가 쌓여도 중앙 무대는 가려지지 않고 넓이를 지킨다 [106.30ms]
+301 | describe("전사 패널 다중 모서리 리사이즈", () => {
+302 |   beforeEach(resetWorkspace);
+303 | 
+304 |   test("기본 상태에서는 카드가 패널 전체 높이를 쓴다", async () => {
+305 |     const geo = await geometry(page);
+306 |     expect(geo.cardH).toBeCloseTo(geo.paneH, 0);
+                            ^
+error: expect(received).toBeCloseTo(expected, precision)
+
+Expected: 726
+Received: 708
+
+Expected precision: 0
+Expected difference: < 0.5
+Received difference: 18
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:306:23)
+(fail) 전사 패널 다중 모서리 리사이즈 > 기본 상태에서는 카드가 패널 전체 높이를 쓴다 [99.79ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 높이 그립이 방향과 현재·최소·최대 높이를 노출한다 [114.59ms]
+error: separator value did not change: #transcript-grip-s
+      at evaluate (evaluate at pressHeightSeparatorKey (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:157:16), <anonymous>:5:15)
+      at #evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:388:19)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:404:32)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:131:26)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:720:38)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:826:43)
+      at processTicksAndRejections (native:7:39)
+(fail) 전사 패널 다중 모서리 리사이즈 > 키보드 Arrow/Home/End가 두 높이 그립과 ARIA 현재값을 동기화한다 [2125.01ms]
+358 |   test("서(W) 드래그: 스플리터가 전사 폭을 넓힌다", async () => {
+359 |     const before = await geometry(page);
+360 |     await dragFrom(page, "#splitter-transcript", -160, 0);
+361 |     const after = await geometry(page);
+362 | 
+363 |     expect(after.paneW - before.paneW).toBeGreaterThan(20);
+                                             ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 20
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:363:40)
+(fail) 전사 패널 다중 모서리 리사이즈 > 서(W) 드래그: 스플리터가 전사 폭을 넓힌다 [129.80ms]
+368 |   test("남(S) 드래그: 카드 높이만 줄고 폭은 그대로다", async () => {
+369 |     const before = await geometry(page);
+370 |     await dragFrom(page, "#transcript-grip-s", 0, -240);
+371 |     const after = await geometry(page);
+372 | 
+373 |     expect(before.cardH - after.cardH).toBeGreaterThan(200);
+                                             ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 200
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:373:40)
+(fail) 전사 패널 다중 모서리 리사이즈 > 남(S) 드래그: 카드 높이만 줄고 폭은 그대로다 [132.51ms]
+386 |     const before = await geometry(page);
+387 | 
+388 |     await dragFrom(page, "#transcript-grip-sw", -140, 120);
+389 |     const after = await geometry(page);
+390 | 
+391 |     expect(after.cardH - before.cardH).toBeGreaterThan(80);
+                                             ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 80
+Received: 0
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:391:40)
+(fail) 전사 패널 다중 모서리 리사이즈 > 남서(SW) 드래그: 높이와 폭이 함께 바뀐다 [191.41ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 높이 하한과 상한을 넘지 않는다 [200.17ms]
+409 |     const stored = await page.evaluate(
+410 |       (key: string) => JSON.parse(localStorage.getItem(key) ?? "null") as { heightPx: number } | null,
+411 |       TRANSCRIPT_KEY,
+412 |     );
+413 | 
+414 |     expect(stored).not.toBeNull();
+                             ^
+error: expect(received).not.toBeNull()
+
+Received: null
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:414:24)
+(fail) 전사 패널 다중 모서리 리사이즈 > 높이가 workspace.transcript.v1에 남고 새로고침 후 복원된다 [142.39ms]
+424 |     await page.evaluate((key: string) => localStorage.setItem(key, "{not json"), TRANSCRIPT_KEY);
+425 |     await page.reload({ waitUntil: "load" });
+426 |     await waitForStableLayout(page);
+427 | 
+428 |     const geo = await geometry(page);
+429 |     expect(geo.cardH).toBeCloseTo(geo.paneH, 0);
+                            ^
+error: expect(received).toBeCloseTo(expected, precision)
+
+Expected: 612
+Received: 610
+
+Expected precision: 0
+Expected difference: < 0.5
+Received difference: 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-transcript-dock.test.ts:429:23)
+(fail) 전사 패널 다중 모서리 리사이즈 > 저장값이 손상돼도 카드가 패널을 꽉 채운 기본으로 뜬다 [199.97ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 상태가 어떻든 전사 본문은 카드 안쪽에 머무른다 [177.08ms]
+(pass) 전사 패널 다중 모서리 리사이즈 > 높이를 줄여도 전사 줄은 계속 쌓이고 스크롤로 읽힌다 [180.31ms]
+(pass) 좁은 화면 > 좌우 분할이 무리면 전사는 숨지 않고 무대 아래로 쌓인다 [527.98ms]
+
+tests/public-protocol-reliability.test.ts:
+(pass) public meeting/export protocol reliability > transcript uses its dedicated action and selected meeting target [75.74ms]
+(pass) public meeting/export protocol reliability > historical payload hydrates transcript, current/history slides and compiled selection [45.94ms]
+(pass) public meeting/export protocol reliability > typed progress disables conflicts and terminal error restores controls with retry [21.41ms]
+
+tests/public-caret-harness.test.ts:
+(pass) canonical fixture catalogue > covers every state named in the plan with unique ids [0.20ms]
+(pass) canonical fixture catalogue > every canonical viewport in the plan matrix is exercised by a real fixture [0.06ms]
+(pass) canonical fixture catalogue > every fixture step is a real trigger: a server message or a user interaction [0.21ms]
+(pass) canonical fixture catalogue > every fixture pins a canonical viewport, locale, timezone and fixed clock [0.08ms]
+(pass) canonical fixture catalogue > canonical viewports include the plan's browser matrix at deviceScaleFactor 1 [0.03ms]
+(pass) canonical fixture catalogue > fixture events are frozen server messages, never mutable current time [0.44ms]
+(pass) deterministic browser state capture > 1244x836 library fixture yields byte-identical machine JSON twice [468.95ms]
+(pass) deterministic browser state capture > 960x760 live fixture yields byte-identical machine JSON twice with a fixed timer [361.39ms]
+(pass) deterministic browser state capture > 1440x900 reference fixture yields byte-identical machine JSON and geometry twice [436.69ms]
+(pass) deterministic browser state capture > 820x900 stacked fixture yields byte-identical machine JSON and the stacked-state contract [300.16ms]
+(pass) deterministic browser state capture > locale, timezone, fonts and clock are pinned inside the page [183.98ms]
+(pass) deterministic browser state capture > no fixture reaches the network beyond the local harness origin [154.66ms]
+(pass) deterministic browser state capture > geometry is the deterministic artifact; screenshots are visual artifacts only [369.94ms]
+(pass) deterministic browser state capture > transcript, meetings, slides and job fixtures land deterministically [214.82ms]
+(pass) event-before-trigger synchronization > the driver subscribes before every message trigger [101.61ms]
+(pass) event-before-trigger synchronization > click-driven steps prove ordering with an in-page observable counter [107.59ms]
+(pass) event-before-trigger synchronization > a slide emitted before the subscribed capture state fails with a named bounded timeout [1586.53ms]
+(pass) event-before-trigger synchronization > the default state deadline stays below Bun's default test timeout [0.04ms]
+(pass) static determinism guards > harness, fixtures and driver never use sleep or polling wait APIs [1.20ms]
+(pass) static determinism guards > no QA driver under tests/helpers reintroduces a polling delay [0.46ms]
+
+tests/whisper-speaker.test.ts:
+(pass) extractSpeakerTurn > 마커가 있으면 turn=true + 텍스트에서 제거 [0.35ms]
+(pass) extractSpeakerTurn > 마커가 없으면 원문 유지 [0.02ms]
+(pass) extractSpeakerTurn > 마커만 있는 라인은 빈 텍스트 [0.01ms]
+(pass) isHallucinationLoop > 토큰 4회 이상 연속 반복은 환각 루프 [0.04ms]
+(pass) isHallucinationLoop > 실제 강조(3회 이하)와 정상 문장은 통과 [0.01ms]
+
+tests/public-workspace.test.ts:
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 좌/중앙/우 세 패널을 담는다 [1.39ms]
+(pass) 워크스페이스 셸 구조 > 중앙 패널이 기존 시각 자료 무대를 그대로 품는다 [0.60ms]
+(pass) 워크스페이스 셸 구조 > 세 패널이 가로로 나란히 놓이고 하단 도크가 보존된다 [36.64ms]
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 가로 오버플로 없이 뷰포트에 맞는다 [0.52ms]
+(pass) 워크스페이스 스플리터 > 두 스플리터가 패널 사이 DOM 순서에 놓인다 [107.49ms]
+(pass) 워크스페이스 스플리터 > 포커스 가능한 스플리터가 방향과 현재·최소·최대 폭을 노출한다 [108.66ms]
+(pass) 워크스페이스 스플리터 > 키보드 Arrow/Home/End가 양쪽 스플리터 폭과 ARIA 현재값을 동기화한다 [123.23ms]
+(pass) 워크스페이스 스플리터 > 좌 스플리터를 끌면 레일이 넓어지고 무대가 그만큼 줄어든다 [178.64ms]
+(pass) 워크스페이스 스플리터 > 우 스플리터를 왼쪽으로 끌면 전사 패널이 넓어진다 [164.17ms]
+(pass) 워크스페이스 스플리터 > 최소 폭 밑으로는 접히지 않는다 [405.81ms]
+(pass) 워크스페이스 스플리터 > 드래그 결과가 workspace.layout.v1에 JSON으로 남는다 [169.47ms]
+(pass) 워크스페이스 스플리터 > 새로고침 후 저장된 폭이 복원된다 [299.59ms]
+(pass) 워크스페이스 스플리터 > 저장값이 손상돼도 기본 레이아웃으로 뜬다 [224.99ms]
+(pass) 중앙 무대 잠금과 반응형 > MeetingCard가 .stage-pane 안에만 렌더되고 무대 중앙 hit가 stage다 [96.90ms]
+(pass) 중앙 무대 잠금과 반응형 > 820px에서 레일은 접히고 무대/전사는 살아 있으며 문서 가로 스크롤이 없다 [111.38ms]
+(pass) 중앙 무대 잠금과 반응형 > 375px에서 도크 액션이 내부 스크롤되고 문서는 가로로 넘치지 않는다 [142.07ms]
+(pass) 헤르메틱 워크스페이스 E2E > 세 패널·스플리터·전사 줄·MeetingCard·레이아웃 복원을 한 흐름으로 통과한다 [799.88ms]
+
+tests/slide-spec.test.ts:
+(pass) SlideSpec > all six slide kinds parse in one valid outline [0.42ms]
+(pass) SlideSpec > rejects an unknown kind [0.06ms]
+(pass) SlideSpec > rejects a missing title [0.02ms]
+(pass) SlideSpec > rejects too many bullets instead of truncating [0.03ms]
+(pass) SlideSpec > rejects over-limit strings and malformed JSON [0.05ms]
+(pass) SlideSpec > enforces kind-specific required and empty-array rules [0.04ms]
+(pass) SlideSpec > does not coerce field types [0.04ms]
+(pass) SlideSpec > maps a legacy slide to a detached live meeting card [0.05ms]
+
+tests/stt-model-manager.test.ts:
+(pass) STT model catalog > contains the exact whisper.cpp and transcribe.cpp payloads [0.06ms]
+(pass) STT model catalog > tags whisper artifacts and transcribe artifacts with their backends [0.06ms]
+(pass) STT model downloader > streams progress, follows redirects, verifies the LFS SHA-256, and atomically installs [2.83ms]
+(pass) STT model downloader > rejects a wrong payload checksum without replacing an installed file or retaining partials [2.39ms]
+(pass) STT model lifecycle > derives install state from disk, emits progress, and persists selection across managers [2.64ms]
+(pass) STT model lifecycle > rechecks disk after model files are added or removed externally [0.89ms]
+(pass) STT model lifecycle > cancels from the subscribed progress event and removes every partial file [1.10ms]
+
+tests/server-ws-dispatch.test.ts:
+killed 1 dangling process
+(fail) (unnamed) [5001.05ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+
+tests/public-attendees.test.ts:
+(pass) pre-capture attendee registration form > the pre-capture shell exposes a keyboard-reachable attendee panel [253.95ms]
+(pass) pre-capture attendee registration form > Enter on the toggle opens the panel and focuses the name field [38.82ms]
+(pass) pre-capture attendee registration form > Escape closes the panel and returns focus to the toggle [47.29ms]
+(pass) pre-capture attendee registration form > a click outside the panel closes it, matching the provider-panel pattern [95.42ms]
+(pass) pre-capture attendee registration form > Enter in the form adds drafts with name and optional crm id, including CJK [93.11ms]
+(pass) pre-capture attendee registration form > an empty or whitespace-only name is rejected without sending anything [73.56ms]
+(pass) pre-capture attendee registration form > a duplicate name is rejected and the existing draft is left untouched [96.21ms]
+(pass) pre-capture attendee registration form > edit loads a draft back into the form and replaces it in place [107.35ms]
+(pass) pre-capture attendee registration form > edit and remove keep the panel open even though they re-render the list [104.23ms]
+(pass) pre-capture attendee registration form > remove drops exactly one draft [116.80ms]
+(pass) pre-capture attendee registration form > submit serializes the exact setAttendees wire payload [109.16ms]
+(pass) pre-capture attendee registration form > submitting an empty roster is blocked and sends nothing [116.32ms]
+(pass) pre-capture attendee registration form > an attendees ack stores meeting_id plus the dropdown source and marks rows saved [151.15ms]
+315 |       attendees: [{ attendee_id: "a-1", display_name: "김현준", crm_person_entity_id: null }],
+316 |     });
+317 |     await page.waitForFunction(() => window.__attendeeState.meetingId === 77);
+318 |     await clearSent();
+319 |     await page.click("#btn-record");
+320 |     expect(await sent()).toEqual([{ action: "startCapture", meeting_id: 77 }]);
+                               ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "action": "startCapture",
+      "meeting_id": 77,
+    },
++   {
++     "action": "listMeetings",
++   },
+  ]
+
+- Expected  - 0
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:320:26)
+(fail) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved [137.43ms]
+321 |   });
+322 | 
+323 |   test("capture is never hard-gated on attendees", async () => {
+324 |     await clearSent();
+325 |     await page.click("#btn-record");
+326 |     expect(await sent()).toEqual([{ action: "startCapture" }]);
+                               ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "action": "startCapture",
+    },
++   {
++     "action": "listMeetings",
++   },
+  ]
+
+- Expected  - 0
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:326:26)
+(fail) pre-capture attendee registration form > capture is never hard-gated on attendees [100.82ms]
+329 |   test("an unsaved roster surfaces an error but still starts capture", async () => {
+330 |     await page.click("#btn-attendees");
+331 |     await addAttendee("김현준");
+332 |     await clearSent();
+333 |     await page.click("#btn-record");
+334 |     expect(await sent()).toEqual([{ action: "startCapture" }]);
+                               ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "action": "startCapture",
+    },
++   {
++     "action": "listMeetings",
++   },
+  ]
+
+- Expected  - 0
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:334:26)
+(fail) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture [647.50ms]
+(pass) pre-capture attendee registration form > capture locks and hides the attendee surface, and release restores it [64.80ms]
+(pass) pre-capture attendee registration form > a submit racing a capture transition sends at most one setAttendees [74.94ms]
+(pass) pre-capture attendee registration form > a reconnect asks the server to restore the draft roster [3086.46ms]
+(pass) pre-capture attendee registration form > malformed attendees payloads leave the panel usable and state coherent [79.59ms]
+(pass) pre-capture attendee registration form > untrusted attendee text is rendered as text, never as markup [78.52ms]
+438 |     await page.click("#btn-reset");
+439 |     await page.waitForFunction(() => window.__attendeeState.meetingId === null);
+440 | 
+441 |     await clearSent();
+442 |     await page.click("#btn-record");
+443 |     expect(await sent()).toEqual([{ action: "startCapture" }]);
+                               ^
+error: expect(received).toEqual(expected)
+
+  [
+    {
+      "action": "startCapture",
+    },
++   {
++     "action": "listMeetings",
++   },
+  ]
+
+- Expected  - 0
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:443:26)
+(fail) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id [165.10ms]
+471 |         LLM_CLI_BIN: "/usr/bin/true",
+472 |         LLM_CLI_PRESET: "claude",
+473 |         WHISPER_INPUT_MODE: "mic",
+474 |       },
+475 |     });
+476 |     expect(result.status, result.stderr).toBe(0);
+                                               ^
+error: 16 |   return to;
+17 | };
+18 | var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+19 | var jsHandleDispatcher_exports = {};
+20 | __export(jsHandleDispatcher_exports, {
+21 |   JSHandleDispatcher: () => JSHandleDispatcher,
+                                 ^
+ReferenceError: Cannot access 'JSHandleDispatcher' before initialization.
+      at JSHandleDispatcher (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:21:29)
+      at get (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:14:41)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/elementHandlerDispatcher.js:27:39)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:28:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/electronDispatcher.js:27:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:31:5)
+
+Bun v1.3.14 (macOS arm64)
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-attendees.test.ts:476:42)
+(fail) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches [6673.60ms]
+(pass) pre-capture attendee registration form > existing slide rendering and dock controls survive the new panel [90.16ms]
+
+tests/server-handler-map.test.ts:
+48 |       LLM_CLI_PRESET: "claude",
+49 |       WHISPER_INPUT_MODE: "mic",
+50 |     },
+51 |   });
+52 | 
+53 |   expect(result.status, result.stderr).toBe(0);
+                                            ^
+error: 16 |   return to;
+17 | };
+18 | var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+19 | var jsHandleDispatcher_exports = {};
+20 | __export(jsHandleDispatcher_exports, {
+21 |   JSHandleDispatcher: () => JSHandleDispatcher,
+                                 ^
+ReferenceError: Cannot access 'JSHandleDispatcher' before initialization.
+      at JSHandleDispatcher (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:21:29)
+      at get (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:14:41)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/elementHandlerDispatcher.js:27:39)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:28:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/electronDispatcher.js:27:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:31:5)
+
+Bun v1.3.14 (macOS arm64)
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/server-handler-map.test.ts:53:40)
+(fail) the real WS registry contains executable handlers for every existing action [3238.95ms]
+
+tests/start-review.test.ts:
+(pass) startReview > extracts canonical version lines, persists the exact candidate IDs, and returns a self-contained review payload [1.86ms]
+(pass) startReview > passes user notes through to the extractor request [1.25ms]
+(pass) startReview > creates an empty version-scoped review for an empty canonical transcript [0.87ms]
+(pass) startReview > rejects extraction failures and wrong-version results without persisting a review [1.56ms]
+
+tests/extract.test.ts:
+(pass) parseMinutesExtractionJson > accepts grounded candidates, assigns local ids, and preserves valid siblings [0.39ms]
+(pass) parseMinutesExtractionJson > normalizes deadlines only from explicit source text, never model inference [0.07ms]
+(pass) parseMinutesExtractionJson > diagnoses every provenance rejection without keeping invalid candidates [0.10ms]
+(pass) parseMinutesExtractionJson > empty/non-JSON and top-level version mismatch mark the whole batch for fallback [0.07ms]
+(pass) parseMinutesExtractionJson > does not extract JSON from prose or coerce malformed candidate fields [0.03ms]
+(pass) precision local-rule fallback > copies only explicit ending lines verbatim with single-line provenance [0.11ms]
+(pass) precision local-rule fallback > never joins lines, resolves pronouns, maps speaker turns, or infers relative dates [0.04ms]
+(pass) MinutesExtractor > round-trips through chat with the provenance prompt [0.15ms]
+(pass) MinutesExtractor > falls back on transport failure and batch failure, while valid empty JSON succeeds [0.12ms]
+
+tests/server-recorder-startup.test.ts:
+31 |       resolve();
+32 |     };
+33 |     child.stdout.on("data", receive);
+34 |     child.stderr.on("data", receive);
+35 |     child.once("error", reject);
+36 |     child.once("exit", (code) => reject(new Error(`server exited before ready (${code}): ${output}`)));
+                                                 ^
+error: server exited before ready (1): 16 |   return to;
+17 | };
+18 | var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+19 | var jsHandleDispatcher_exports = {};
+20 | __export(jsHandleDispatcher_exports, {
+21 |   JSHandleDispatcher: () => JSHandleDispatcher,
+                                 ^
+ReferenceError: Cannot access 'JSHandleDispatcher' before initialization.
+      at JSHandleDispatcher (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:21:29)
+      at get (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:14:41)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/elementHandlerDispatcher.js:27:39)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:28:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/electronDispatcher.js:27:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:31:5)
+
+Bun v1.3.14 (macOS arm64)
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/server-recorder-startup.test.ts:36:45)
+      at emit (node:events:98:22)
+      at #handleOnExit (node:child_process:520:14)
+(fail) recorder startup failure leaves capture stopped and never launches whisper [3574.48ms]
+
+tests/llm-runtime-routing.test.ts:
+(pass) Codex runtime routing > GUI PATH에서도 Codex 경로와 GPT-5.6을 명시한다 [767.56ms]
+(pass) Codex runtime routing > Codex 호출은 사용자 플러그인과 세션 기록을 격리한다 [0.09ms]
+(pass) Codex runtime routing > LLM 실행 실패를 가짜 로컬 슬라이드로 숨기지 않는다 [51.36ms]
+
+tests/stt-model-selection.test.ts:
+(pass) STT selection controller > serializes concurrent selects, persists the installed model, and restarts active capture once per change [1.63ms]
+
+tests/providers.test.ts:
+(pass) buildProviderEntries > 구독 CLI 가용성은 주입된 탐지 결과를 따른다 [0.65ms]
+(pass) buildProviderEntries > 설치된 CLI 는 auth unknown 이어도 선택 가능하다 [0.07ms]
+(pass) buildProviderEntries > HTTP 프로바이더는 OpenAI와 로컬만 노출한다 [0.02ms]
+(pass) buildProviderEntries > 6개 카드를 순서대로 제공 (구독 4 + API 2) [0.02ms]
+(pass) buildProviderEntries > 모델/effort 옵션 목록 제공 [0.04ms]
+(pass) upsertEnvText > 기존 키는 값만 교체하고 다른 줄은 보존 [0.07ms]
+(pass) upsertEnvText > 없는 키는 끝에 추가 [0.01ms]
+(pass) upsertEnvText > 여러 키 동시 upsert
+(pass) upsertEnvText > 키 주변 공백이 있어도 매칭
+(pass) createDetector > cli 프리셋은 API 키 없이 생성 [1.38ms]
+(pass) createDetector > 알 수 없는 id는 null [0.05ms]
+
+tests/review-actions.test.ts:
+(fail) (unnamed) [5000.45ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+
+tests/deck-export.test.ts:
+(pass) export deck source preference > without a successful compile it explicitly exports legacy live history [1.47ms]
+(pass) export deck source preference > after successful publish export lists registry-rendered compiled kinds [0.50ms]
+
+tests/hybrid-path.e2e.test.ts:
+(pass) Hybrid live -> compile -> export hermetic path > renders a detected MeetingCard, persists and publishes kinded registry slides, then prefers compiled export [29.71ms]
+(pass) Hybrid live -> compile -> export hermetic path > rejects invalid planner output without a fake deck and blocks export while compiling [6.38ms]
+
+tests/native-surface-contract.test.ts:
+(pass) native surface seam: sources and compilation > the pure module and fixture driver exist [0.05ms]
+(pass) native surface seam: sources and compilation > swiftc compiles the pure module with the fixture driver [0.04ms]
+(pass) native surface seam: sources and compilation > the pure module imports no AppKit and creates no window [0.10ms]
+(pass) native surface seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.01ms]
+(pass) native surface seam: minibar geometry > collapsed bounds are exactly 360x56 [0.04ms]
+(pass) native surface seam: minibar geometry > expanded bounds are exactly 560x220
+(pass) native surface seam: minibar geometry > with no saved frame the default sits inside the 16px active-display gutter [0.01ms]
+(pass) native surface seam: minibar geometry > a fully on-display saved frame is restored verbatim
+(pass) native surface seam: minibar geometry > a saved frame entirely off-display falls back to the deterministic default
+(pass) native surface seam: minibar geometry > a saved frame with less than 50% display intersection returns the default frame
+(pass) native surface seam: minibar geometry > a mostly-visible saved frame is clamped into the 16px gutters, not discarded
+(pass) native surface seam: minibar geometry > a saved frame on a secondary display stays on that display
+(pass) native surface seam: minibar geometry > expanding keeps the surface on the saved display with expanded bounds
+(pass) native surface seam: minibar geometry > impossible display bounds yield a typed failure instead of a crash
+(pass) native surface seam: minibar geometry > an empty display list yields a typed failure instead of a crash
+(pass) native surface seam: server payload decode subset > a capture update decodes phase, mode and startedAt
+(pass) native surface seam: server payload decode subset > a phase-less capturing update maps compatibly to capturing
+(pass) native surface seam: server payload decode subset > a phase-less idle update maps compatibly to idle
+(pass) native surface seam: server payload decode subset > a status update decodes as transport status
+(pass) native surface seam: server payload decode subset > a message outside the observed subset is ignored, not an error
+(pass) native surface seam: server payload decode subset > malformed JSON yields a typed failure without crashing
+(pass) native surface seam: server payload decode subset > a wrongly typed field yields a typed failure without crashing
+(pass) native surface seam: server payload decode subset > an unknown capture phase yields a typed failure without crashing
+(pass) native surface seam: one-command guards > a single Stop activation while capturing emits one stopCapture
+(pass) native surface seam: one-command guards > rapid duplicate Stop activations emit exactly one stopCapture
+(pass) native surface seam: one-command guards > Stop while idle emits nothing
+(pass) native surface seam: one-command guards > the guard rearms only after an authoritative idle snapshot
+(pass) native surface seam: launcher and build invariants > the launcher keeps the browser workspace and never imports WebKit [0.24ms]
+(pass) native surface seam: launcher and build invariants > the launcher keeps its port, readiness and auto-capture contract [0.30ms]
+(pass) native surface seam: launcher and build invariants > the build script compiles the launcher and rejects WebKit linkage [0.15ms]
+(pass) native surface seam: launcher and build invariants > the pure module is not wired into the shipped bundle build yet [0.02ms]
+
+tests/native-launcher-boundary.test.ts:
+(pass) native launcher seam: sources and compilation > the lifecycle module, transport module and fixture driver exist [0.06ms]
+(pass) native launcher seam: sources and compilation > swiftc compiles the pure modules with the fixture driver [0.02ms]
+(pass) native launcher seam: sources and compilation > the pure modules stay free of AppKit, EventKit and window/process APIs [0.33ms]
+(pass) native launcher seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.01ms]
+(pass) native launcher seam: project and port resolution > HTTP_PORT in .env wins [0.04ms]
+(pass) native launcher seam: project and port resolution > a missing key, out-of-range value, unparsable value or missing file falls back to 8787 [0.01ms]
+(pass) native launcher seam: project and port resolution > the bun lookup order is preserved [0.01ms]
+(pass) native launcher seam: project and port resolution > the launcher log stays at the documented user log path
+(pass) native launcher seam: Bun launch plan > the launch plan reproduces the existing bun invocation and environment [0.01ms]
+(pass) native launcher seam: Bun launch plan > a missing bun binary is a typed failure, not a crash
+(pass) native launcher seam: startup decision uses one Bun session > an unreachable port starts a server owned by the launcher
+(pass) native launcher seam: startup decision uses one Bun session > an already-running healthy Bun session is adopted instead of duplicated
+(pass) native launcher seam: startup decision uses one Bun session > a foreign listener on the port is a typed port conflict, never a second server
+(pass) native launcher seam: health signature > the existing title + runtime-bootstrap signature marks the webapp healthy
+(pass) native launcher seam: health signature > a non-200 status, foreign body or unreachable port is unhealthy with a machine reason [0.01ms]
+(pass) native launcher seam: readiness without sleeps > readiness resolves on the first healthy attempt and reports the attempt index
+(pass) native launcher seam: readiness without sleeps > an exhausted attempt sequence reports not-ready instead of hanging
+(pass) native launcher seam: process ownership and shutdown > a clean server exit propagates its status without terminating twice
+(pass) native launcher seam: process ownership and shutdown > quitting terminates the launcher-owned server exactly once
+(pass) native launcher seam: process ownership and shutdown > an adopted server is never terminated by this launcher
+(pass) native launcher seam: process ownership and shutdown > repeated interrupts terminate the child exactly once
+(pass) native launcher seam: process ownership and shutdown > a crashed server propagates its non-zero status
+(pass) native launcher seam: process ownership and shutdown > a readiness failure terminates the owned server and exits non-zero
+(pass) native launcher seam: transport boundary > the transport targets the existing local /ws endpoint
+(pass) native launcher seam: transport boundary > an open socket plus a capture snapshot hydrates online state
+(pass) native launcher seam: transport boundary > a dropped socket becomes reconnecting while retaining the last known capture state
+(pass) native launcher seam: transport boundary > an authoritative snapshot after reconnect restores online state
+(pass) native launcher seam: transport boundary > a malformed payload is counted as a typed decode failure and never clears state
+(pass) native launcher seam: transport boundary > an unknown capture phase is a typed decode failure, not a crash or a guess
+(pass) native launcher seam: transport boundary > messages outside the observed subset leave the projection untouched
+(pass) native launcher seam: transport boundary > a status message updates transport status text only
+(pass) native launcher seam: transport boundary > reconnect backoff is monotonic and bounded [0.03ms]
+(pass) native launcher seam: outbound command emission > rapid Stop activations emit exactly one existing stopCapture action
+(pass) native launcher seam: outbound command emission > Stop while the socket is down emits nothing
+(pass) native launcher seam: outbound command emission > the Stop guard rearms only after an authoritative capture snapshot
+(pass) native launcher seam: outbound command emission > the native surface invents no protocol spelling
+(pass) native launcher seam: launcher entry point and build wiring > the launcher keeps the browser workspace and never imports WebKit [0.06ms]
+(pass) native launcher seam: launcher entry point and build wiring > the launcher keeps mic permission, calendar auto-capture and bun supervision [0.07ms]
+(pass) native launcher seam: launcher entry point and build wiring > the launcher delegates decisions to the pure modules instead of re-deriving them [0.05ms]
+(pass) native launcher seam: launcher entry point and build wiring > the entry point holds side effects only, never lifecycle rules [0.05ms]
+(pass) native launcher seam: launcher entry point and build wiring > the build script compiles every native source the entry point needs [0.04ms]
+(pass) native launcher seam: launcher entry point and build wiring > minibar-only modules are still not wired into the shipped bundle [0.03ms]
+
+tests/public-transcript-feed.test.ts:
+(pass) 전사 피드 다줄 표시 > 15개 line 이벤트가 모두 .transcript-stream에 남는다 [12.93ms]
+(pass) 전사 피드 다줄 표시 > status 텍스트가 매우 길어도 160자 내로 잘린다 [1.59ms]
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.09ms]
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.06ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.07ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.09ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.02ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.02ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.09ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.22ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.07ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.04ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.08ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.04ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.09ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.03ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.10ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.13ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.10ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.24ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.07ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.10ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.05ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.03ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.05ms]
+
+tests/public-sessions.test.ts:
+(pass) 세션 레일 listMeetings > 빈 목록이면 empty state 를 보여준다 [4.29ms]
+(pass) 세션 레일 listMeetings > 회의 목록을 렌더하고 클릭 시 선택 하이라이트한다 [21.65ms]
+(pass) 세션 레일 listMeetings > 히스토리 삭제 버튼은 선택과 분리된 삭제 명령을 보낸다 [49.35ms]
+(pass) 세션 레일 listMeetings > malformed meetings payload 도 빈 목록으로 복구된다 [1.38ms]
+
+tests/slide-persist.test.ts:
+(pass) same-topic slide persistence end-to-end > 세션 같은 토픽 갱신 → SQLite → deck export에 최신 불렛 [104.00ms]
+
+tests/whisper-dedupe.test.ts:
+(pass) bigramSimilarity > 완전히 같은 문장은 1 [0.09ms]
+(pass) bigramSimilarity > 띄어쓰기·대소문자 차이는 정규화로 흡수 [0.02ms]
+(pass) bigramSimilarity > 같은 발화의 부분 수정(리비전)은 높은 유사도 [0.04ms]
+(pass) bigramSimilarity > 공통 어미(습니다)만 같은 무관한 문장은 낮은 유사도 [0.01ms]
+(pass) bigramSimilarity > 같은 글자를 어순만 바꾼 문장은 중복이 아님
+(pass) bigramSimilarity > 빈 문자열·한 글자는 0
+
+tests/public-settings-panel.test.ts:
+(pass) AI 모델 설정 UI > 설치와 로그인 상태를 사용자 언어로 구분해 표시한다 [23.23ms]
+(pass) AI 모델 설정 UI > 연결·재검사·프로바이더/모델 선택 액션을 프로토콜대로 보낸다 [67.81ms]
+(pass) STT 모델 설정 UI > 카탈로그 네 모델을 크기·라이선스와 함께 렌더한다 [24.57ms]
+(pass) STT 모델 설정 UI > absent→downloading→installed→selected 상태와 진행률을 반영한다 [14.43ms]
+(pass) STT 모델 설정 UI > 실패 상태는 오류와 재시도를 노출한다 [1.83ms]
+(pass) STT 모델 설정 UI > install/cancel/select/recheck 액션을 modelId와 함께 보낸다 [106.58ms]
+(pass) 설정 패널 접근성 > 좁은 폭에서도 잘리지 않고 키보드로 열고 닫을 수 있다 [37.30ms]
+
+tests/provider-platform.test.ts:
+(pass) subscription provider registry > contains one strict adapter for every supported subscription CLI [0.04ms]
+(pass) subscription provider registry > projects installed and authenticated state without conflating them [0.08ms]
+(pass) subscription provider registry > connect descriptors use the vendor-supported interactive flows [1.02ms]
+(pass) subscription provider registry > Finder-like PATH discovers executables and never guesses unverifiable auth [1074.96ms]
+(pass) provider CLI contracts > builds exact noninteractive argv [0.07ms]
+(pass) provider CLI contracts > parses Grok ACP streaming JSON and Gemini JSON without leaking envelopes [0.22ms]
+(pass) provider CLI contracts > runs every adapter through hermetic fake CLIs with GUI-safe PATH [1331.63ms]
+
+tests/stt-model-protocol.test.ts:
+(pass) STT protocol > projects model manager states into a deterministic typed payload [0.20ms]
+(pass) STT protocol > emits null selectedModelId when nothing is selected [0.03ms]
+
+tests/public-compile-control.test.ts:
+(pass) 컴파일 컨트롤 > PowerPoint 생성은 하나의 명확한 주 버튼으로 제공한다 [9.32ms]
+(pass) 컴파일 컨트롤 > 요청을 보내고 진행·완료·실패 상태와 생성 결과를 사용자에게 표시한다 [64.37ms]
+
+tests/scene-pptx.test.ts:
+25 |  * @param {Object} options to generate the zip file.
+26 |  * @param {String} comment the comment to use.
+27 |  */
+28 | exports.generateWorker = function (zip, options, comment) {
+29 | 
+30 |     var zipFileWorker = new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName);
+                             ^
+TypeError: Module is not a constructor (evaluating 'new ZipFileWorker(options.streamFiles, comment, options.platform, options.encodeFileName)')
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/generate/index.js:30:25)
+      at generateInternalStream (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:358:31)
+      at generateAsync (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/jszip/lib/object.js:370:21)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:6918:90)
+      at step (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:68:23)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:42:71)
+      at new Promise (1:11)
+      at __awaiter (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/pptxgenjs/dist/pptxgen.cjs.js:38:12)
+(fail) native PPTX scene renderer > writes editable OOXML text and shapes from the shared scene [1.66ms]
+
+tests/session.test.ts:
+(pass) MeetingSession > production-style manual mode records transcript without automatic LLM detection [0.16ms]
+(pass) MeetingSession > 첫 감지에서 MeetingCard 슬라이드 생성 [0.23ms]
+(pass) MeetingSession > hysteresis: 같은 pending 후보 2회만 advance하고 첫 신호는 현재 카드를 오염시키지 않음 [0.21ms]
+(pass) MeetingSession > A→B→C 단일 신호는 A를 archive하지 않고 후보별 streak를 격리 [0.11ms]
+(pass) MeetingSession > advance 시그널이 끊기면 후보 streak 리셋 [0.09ms]
+(pass) MeetingSession > reset()은 진행 중이던 감지 결과를 폐기 (epoch 무효화) [0.06ms]
+(pass) MeetingSession > detectInterval 문장이 쌓여야 LLM 호출 [0.05ms]
+(pass) MeetingSession > 자막은 디바운스 후 정확한 caption 이벤트로 브로드캐스트 [200.48ms]
+(pass) MeetingSession > LLM 실패는 가짜 MeetingCard 없이 detecting을 안전하게 해제 [0.20ms]
+(pass) MeetingSession > setDetector로 런타임 LLM 교체 — 다음 감지부터 새 백엔드 사용 [0.12ms]
+(pass) MeetingSession > 전사 로그는 문장+시각+화자를 전부 보관하고 reset에서 비움 [0.03ms]
+(pass) MeetingSession > 화자 번호가 캡션에 실리고, 화자 변경 시 버퍼 즉시 플러시 [201.23ms]
+(pass) MeetingSession > 같은 토픽 MeetingCard 갱신도 sink.onSlide로 영속화 [0.40ms]
+(pass) meta card rejection > LLM이 회의 종료 카드를 내도 스테이지에 올리지 않는다 [0.06ms]
+(pass) meta card rejection > fallback 경로의 메타성 문장도 슬라이드를 만들지 않는다 [0.08ms]
+(pass) meta card rejection > 음성 인식 테스트 자체가 회의 주제이면 실제 논의 카드를 생성한다 [51.80ms]
+
+tests/minutes.test.ts:
+(pass) buildMinutesHtml > keeps metadata, every decision, and every action in the first-page section, including empty states [0.37ms]
+(pass) buildMinutesHtml > starts appendix content after a forced page break [0.56ms]
+(pass) buildMinutesHtml > keeps immutable provenance in data attributes while showing readable sentence positions [0.11ms]
+(pass) buildMinutesHtml > displays the canonical transcript version independently of item coordinates [0.03ms]
+(pass) buildMinutesHtml > escapes all untrusted text and attribute values [0.11ms]
+
+tests/pdf.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+16 |   return to;
+17 | };
+18 | var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+19 | var jsHandleDispatcher_exports = {};
+20 | __export(jsHandleDispatcher_exports, {
+21 |   JSHandleDispatcher: () => JSHandleDispatcher,
+                                 ^
+ReferenceError: Cannot access 'JSHandleDispatcher' before initialization.
+      at JSHandleDispatcher (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:21:29)
+      at get (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:13:37)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/elementHandlerDispatcher.js:26:5
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:27:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/electronDispatcher.js:26:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:30:1
+      at anonymous (unknown:1:1)
+-------------------------------
+
+
+tests/deck-compiler.test.ts:
+(pass) deck outline planner > passes the full transcript and live anchors to a hermetic fake planner [7.26ms]
+(pass) deck outline planner > retries once with the validation error and accepts a repaired outline [5.75ms]
+(pass) deck outline planner > two invalid responses fail without persisting a fake deck [0.94ms]
+(pass) deck outline planner > rejects invalid narrative shape and model HTML before persistence [0.22ms]
+(pass) deck outline persistence > round-trips outline metadata and canonical specs after reopening SQLite [11.08ms]
+
+tests/transcript-versioning.test.ts:
+(pass) canonical transcript versioning > live capture dual-writes, finalizes a content hash, and makes canonical lines immutable [2.49ms]
+(pass) canonical transcript versioning > retranscription creates a new immutable coordinate space without changing canonical automatically [1.80ms]
+(pass) canonical transcript versioning > an interrupted retranscription leaves the previous canonical version intact [1.34ms]
+(pass) canonical transcript versioning > legacy snapshot rejects duplicate coordinates instead of guessing [1.09ms]
+(pass) raw audio hash and recorder contract > file audio claims reject same bytes without duplicate persistence and allow different bytes [2.32ms]
+(pass) raw audio hash and recorder contract > capture finalization stops the recorder exactly once on success and failure [2.65ms]
+194 |     chmodSync(fake, 0o755);
+195 | 
+196 |     await expect(RawAudioRecorder.start({
+197 |       bin: fake, captureId: 3, outputPath: output, startupTimeoutMs: 500,
+198 |     })).rejects.toThrow(/did not create output/);
+199 |     expect(readFileSync(signals, "utf8").trim().split("\n")).toEqual(["TERM"]);
+                 ^
+ENOENT: no such file or directory, open '/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-recorder-startup-tIsUkz/signals.txt'
+    path: "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-recorder-startup-tIsUkz/signals.txt",
+ syscall: "open",
+   errno: -2,
+    code: "ENOENT"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/transcript-versioning.test.ts:199:12)
+(fail) raw audio hash and recorder contract > recorder startup timeout terminates and awaits the child exactly once [506.94ms]
+(pass) raw audio hash and recorder contract > recorder waits for closure, hashes a valid WAV, and removes failed partial output [710.21ms]
+
+tests/public-fresh-workspace.test.ts:
+(pass) 비캡처 재접속은 이전 라이브 화면 대신 빈 작업면을 유지한다 [19.78ms]
+(pass) WebSocket 종료는 로컬 앱 서버 연결 상태로 노출된다 [2.47ms]
+
+tests/start-review-action.test.ts:
+(fail) (unnamed) [5001.38ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+
+tests/deck-compile-action.test.ts:
+(pass) compiled deck disk action > fake planner output is persisted with content-derived visuals and no copied image bundle [3.72ms]
+(pass) compiled deck disk action > WebSocket action reports started then success with outline metadata [2.74ms]
+(pass) compiled deck disk action > invalid outlines are rejected before rendering [0.04ms]
+(pass) compiled deck disk action > unknown meeting IDs return a clean terminal error without planner calls or files [0.56ms]
+
+tests/llm-transport.test.ts:
+27 |           '{"shouldAdvance":true,"blockTitle":"실제 HTTP","bullets":["원문"]}' } }] });
+28 |       },
+29 |     });
+30 |     try {
+31 |       const client = new LLMClient({ baseURL: server.url.toString(), apiKey: "stub-key", model: "stub-model" });
+32 |       await expect(client.detectBlock(["첫 문장"])).resolves.toEqual({
+                                                              ^
+error: 
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:32:58)
+(fail) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [2.56ms]
+(pass) existing LLM detectBlock transport behavior > HTTP preserves status and response text in rejection [0.88ms]
+62 |   test("CLI sends the unchanged combined prompt and returns parsed stdout", async () => {
+63 |     const capture = join(tempDir, "detect-prompt.txt");
+64 |     const bin = cliStub("detect-ok", `printf '%s' "$2" > "${capture}"\nprintf '%s' '{"shouldAdvance":false,"blockTitle":"실제 CLI","bullets":["원문"]}'`);
+65 |     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 1000 });
+66 | 
+67 |     await expect(client.detectBlock(["CLI 문장"])).resolves.toEqual({
+                                                              ^
+error: 
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:67:58)
+(fail) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [327.19ms]
+73 |   });
+74 | 
+75 |   test("CLI preserves nonzero exit code and stderr in rejection", async () => {
+76 |     const bin = cliStub("detect-error", "printf '%s' 'provider stderr' >&2\nexit 17");
+77 |     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 1000 });
+78 |     await expect(client.detectBlock(["문장"])).rejects.toThrow("종료 코드 17: provider stderr");
+                                                         ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "종료 코드 17: provider stderr"
+Received message: "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-llm-baseline-GkXQku/detect-error exited with code 17: provider stderr"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:78:53)
+(fail) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [322.38ms]
+(pass) generic chat transport > HTTP returns the provider's raw text [2.88ms]
+103 |       },
+104 |     });
+105 |     try {
+106 |       const client = new LLMClient({ baseURL: server.url.toString(), apiKey: "x", model: "stub-model" });
+107 |       await client.chat("추출 프롬프트");
+108 |       expect(requestBody).toEqual({
+                                ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "max_tokens": 4000,
++   "max_tokens": 6000,
+    "messages": [
+      {
+        "content": "추출 프롬프트",
+        "role": "user",
+      },
+    ],
+    "model": "stub-model",
+-   "temperature": 0.3,
++   "temperature": 0,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:108:27)
+(fail) generic chat transport > HTTP sends user-only message with defaults and no response_format [1.67ms]
+(pass) generic chat transport > HTTP applies system/temperature/maxTokens options [2.16ms]
+(pass) generic chat transport > HTTP chat preserves status and response text in rejection [1.29ms]
+(pass) generic chat transport > HTTP chat falls back to reasoning_content when content is empty [1.88ms]
+(pass) generic chat transport > CLI passes the prompt verbatim (no SYSTEM_PROMPT) and returns raw stdout [314.05ms]
+(pass) generic chat transport > CLI prepends options.system to the prompt [312.04ms]
+184 |   });
+185 | 
+186 |   test("CLI chat preserves nonzero exit code and stderr in rejection", async () => {
+187 |     const bin = cliStub("chat-error", "printf '%s' 'chat stderr' >&2\nexit 9");
+188 |     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 1000 });
+189 |     await expect(client.chat("프롬프트")).rejects.toThrow("종료 코드 9: chat stderr");
+                                                   ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "종료 코드 9: chat stderr"
+Received message: "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-llm-baseline-GkXQku/chat-error exited with code 9: chat stderr"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:189:46)
+(fail) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection [313.86ms]
+191 | 
+192 |   test("CLI chat honors options.timeoutMs override", async () => {
+193 |     // 타임아웃 자체가 검증 대상: 서버 timeoutMs(10s)보다 짧은 오버라이드가 먼저 발화해야 한다.
+194 |     const bin = cliStub("chat-hang", "sleep 5");
+195 |     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 10_000 });
+196 |     await expect(client.chat("프롬프트", { timeoutMs: 250 })).rejects.toThrow("CLI 타임아웃 (250ms)");
+                                                                       ^
+error: expect(received).toThrow(expected)
+
+Expected substring: "CLI 타임아웃 (250ms)"
+Received message: "CLI timeout (250ms): /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/meeting-slides-llm-baseline-GkXQku/chat-hang"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/llm-transport.test.ts:196:66)
+(fail) generic chat transport > CLI chat honors options.timeoutMs override [252.09ms]
+
+tests/attendees-action.test.ts:
+(fail) (unnamed) [5001.49ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+
+tests/bundle.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+16 |   return to;
+17 | };
+18 | var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+19 | var jsHandleDispatcher_exports = {};
+20 | __export(jsHandleDispatcher_exports, {
+21 |   JSHandleDispatcher: () => JSHandleDispatcher,
+                                 ^
+ReferenceError: Cannot access 'JSHandleDispatcher' before initialization.
+      at JSHandleDispatcher (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:21:29)
+      at get (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:13:37)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/elementHandlerDispatcher.js:26:5
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:27:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/electronDispatcher.js:26:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:30:1
+      at anonymous (unknown:1:1)
+-------------------------------
+
+
+tests/grab.test.ts:
+(pass) grab design-gate helpers > reviewed=false면 proceed 리포트 생성 거부 [0.12ms]
+(pass) grab design-gate helpers > reviewed=true면 계약 문구를 포함한 마크다운 생성 [0.08ms]
+
+tests/conclusion.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+16 |   return to;
+17 | };
+18 | var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+19 | var jsHandleDispatcher_exports = {};
+20 | __export(jsHandleDispatcher_exports, {
+21 |   JSHandleDispatcher: () => JSHandleDispatcher,
+                                 ^
+ReferenceError: Cannot access 'JSHandleDispatcher' before initialization.
+      at JSHandleDispatcher (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:21:29)
+      at get (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:13:37)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/elementHandlerDispatcher.js:26:5
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:27:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/electronDispatcher.js:26:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:30:1
+      at anonymous (unknown:1:1)
+-------------------------------
+
+
+tests/transcript-state.test.ts:
+(pass) transcript projection — finalized lines > Korean multiline finals keep arrival order and speaker metadata [0.25ms]
+(pass) transcript projection — finalized lines > multiline text collapses interior whitespace without losing content [0.02ms]
+(pass) transcript projection — finalized lines > blank finalized text is ignored instead of creating an empty row [0.01ms]
+(pass) transcript projection — finalized lines > a speaker-less final carries a null speaker, not a fabricated one [0.01ms]
+(pass) transcript projection — duplicate suppression > the same finalized line delivered twice appears once [0.02ms]
+(pass) transcript projection — duplicate suppression > duplicate detection normalizes whitespace but respects ts and speaker [0.04ms]
+(pass) transcript projection — duplicate suppression > a duplicate arriving after later lines does not reorder the projection [0.02ms]
+(pass) transcript projection — provisional captions > a caption is provisional only and never enters the finalized list [0.05ms]
+(pass) transcript projection — provisional captions > each caption replaces the previous provisional row [0.03ms]
+(pass) transcript projection — provisional captions > an empty caption clears the provisional row [0.01ms]
+(pass) transcript projection — provisional captions > the matching final replaces its provisional caption [0.03ms]
+(pass) transcript projection — provisional captions > a corrected final replaces the provisional caption it supersedes [0.02ms]
+(pass) transcript projection — provisional captions > a final for a different speaker leaves another speaker's caption standing [0.02ms]
+(pass) transcript projection — out-of-order delivery > an interim caption arriving after its final does not resurrect it [0.03ms]
+(pass) transcript projection — out-of-order delivery > a late final older than the newest line is inserted, not appended [0.02ms]
+(pass) transcript projection — out-of-order delivery > equal timestamps keep arrival order (stable ordering) [0.01ms]
+(pass) transcript projection — snapshots > a snapshot replaces the projection instead of appending [0.09ms]
+(pass) transcript projection — snapshots > a repeated snapshot is idempotent [0.02ms]
+(pass) transcript projection — snapshots > a snapshot clears the provisional caption and carries truncation [0.01ms]
+(pass) transcript projection — snapshots > a snapshot sorts out-of-order entries and drops in-snapshot duplicates [0.02ms]
+(pass) transcript projection — snapshots > an export-reason transcript never touches the projection [0.02ms]
+(pass) transcript projection — snapshots > an empty snapshot clears the projection [0.02ms]
+(pass) transcript projection — meeting boundaries > live lines are rejected while a history meeting is active [0.02ms]
+(pass) transcript projection — meeting boundaries > a live snapshot is rejected while a history meeting is active [0.01ms]
+(pass) transcript projection — meeting boundaries > meeting detail for the active meeting replaces the projection [0.02ms]
+(pass) transcript projection — meeting boundaries > stale meeting detail for a superseded selection is rejected [0.01ms]
+(pass) transcript projection — meeting boundaries > switching meetings isolates projections and clears the provisional row [0.02ms]
+(pass) transcript projection — meeting boundaries > returning to live clears history content [0.01ms]
+(pass) transcript projection — meeting boundaries > re-activating the same meeting is a no-op on content [0.02ms]
+(pass) transcript projection — reset and empty > reset clears finalized, provisional, truncation and counters [0.03ms]
+(pass) transcript projection — reset and empty > the initial state is empty and live
+(pass) transcript projection — reset and empty > reducing an empty event sequence returns the same projection
+(pass) transcript projection — purity > the reducer never mutates the state it was given [0.03ms]
+(pass) transcript projection — purity > the returned projection is frozen [0.02ms]
+(pass) transcript projection — purity > the same event sequence produces an identical projection twice [0.05ms]
+(pass) transcript projection — minibar > the minibar shows at most three finals plus one provisional [0.07ms]
+(pass) transcript projection — minibar > the minibar derives from the same store, with no duplicate rows [0.01ms]
+(pass) transcript projection — minibar > an empty projection yields no minibar rows
+(pass) transcript parse boundary > a well-formed line frame parses into a typed event [0.08ms]
+(pass) transcript parse boundary > an absent speaker parses to null rather than undefined [0.01ms]
+(pass) transcript parse boundary > a transcript frame keeps its declared reason and truncation flag [0.03ms]
+(pass) transcript parse boundary > a reason-less transcript frame defaults to the export reason
+(pass) transcript parse boundary > meeting detail parses meetingId and its transcript entries [0.01ms]
+(pass) transcript parse boundary > a non-object frame is a typed failure, not an exception [0.01ms]
+(pass) transcript parse boundary > a frame with no type is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a non-string text is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a non-numeric ts is a typed failure, not an exception
+(pass) transcript parse boundary > a line with a NaN ts is a typed failure, not an exception
+(pass) transcript parse boundary > a caption with a non-numeric speaker is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with non-array entries is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with an undeclared reason is a typed failure, not an exception
+(pass) transcript parse boundary > a transcript with a malformed entry is a typed failure, not an exception
+(pass) transcript parse boundary > a meeting with a non-numeric meetingId is a typed failure, not an exception
+(pass) transcript parse boundary > an unrelated declared message parses to an ignorable event [0.01ms]
+(pass) transcript parse boundary > an ignorable event leaves the projection untouched [0.02ms]
+(pass) transcript parse boundary > a rejected frame is recorded without disturbing content [0.01ms]
+
+tests/llm-cli.test.ts:
+(pass) buildCliArgs > claude 프리셋: -p + text 출력 [0.02ms]
+(pass) buildCliArgs > codex 프리셋: exec + 최종 메시지 파일 [0.02ms]
+(pass) buildCliArgs > claude가 아닌 프리셋은 -p text 출력을 쓴다
+(pass) parseBlockDetectionJson > 정상 MeetingCard JSON [0.07ms]
+(pass) parseBlockDetectionJson > 앞뒤 잡음이 있어도 JSON 객체를 추출한다 [0.02ms]
+(pass) parseBlockDetectionJson > 문자열 boolean 은 failure 경로로 예외 [0.03ms]
+(pass) parseBlockDetectionJson > 알 수 없는 키 은 failure 경로로 예외
+(pass) parseBlockDetectionJson > 빈 bullets는 품질 게이트에서 no-op으로 폐기한다 [0.02ms]
+(pass) parseBlockDetectionJson > SYSTEM_PROMPT는 shouldAdvance 스키마와 메타 금지를 명시한다 [0.01ms]
+(pass) parseBlockDetectionJson > 회의 종료 메타 카드는 파서에서 폐기한다 [0.01ms]
+(pass) parseBlockDetectionJson > isNewBlock 별칭을 shouldAdvance로 수용한다 [0.02ms]
+(pass) parseBlockDetectionJson > isLowQualityMeetingCard 직접 판정 [0.01ms]
+(pass) kind 필드를 파싱해 카드에 실어 보낸다 [0.03ms]
+(pass) SYSTEM_PROMPT는 kind 스키마를 포함한다
+
+36 tests failed:
+(fail) 라이브 MeetingCard 렌더 > 히스토리 미리보기에서도 같은 카드 레이아웃을 쓴다 [13.05ms]
+(fail) semantic scene compile action > publishes HTML, Scene JSON, and native PPTX from one narrative plan [7.17ms]
+(fail) semantic scene compile action > success message includes the generated scene so the app can preview every slide [5.16ms]
+(fail) semantic scene compile action > invalid planner output falls back to prose scenes instead of bullet slides [3.25ms]
+(fail) semantic scene compile action > compile uses the exact transcript snapshot captured before planning starts [3.34ms]
+(fail) fallback narrative drops trailing chatter and caps slide count [3.07ms]
+(fail) 전사 패널 다중 모서리 리사이즈 > 기본 상태에서는 카드가 패널 전체 높이를 쓴다 [99.79ms]
+(fail) 전사 패널 다중 모서리 리사이즈 > 키보드 Arrow/Home/End가 두 높이 그립과 ARIA 현재값을 동기화한다 [2125.01ms]
+(fail) 전사 패널 다중 모서리 리사이즈 > 서(W) 드래그: 스플리터가 전사 폭을 넓힌다 [129.80ms]
+(fail) 전사 패널 다중 모서리 리사이즈 > 남(S) 드래그: 카드 높이만 줄고 폭은 그대로다 [132.51ms]
+(fail) 전사 패널 다중 모서리 리사이즈 > 남서(SW) 드래그: 높이와 폭이 함께 바뀐다 [191.41ms]
+(fail) 전사 패널 다중 모서리 리사이즈 > 높이가 workspace.transcript.v1에 남고 새로고침 후 복원된다 [142.39ms]
+(fail) 전사 패널 다중 모서리 리사이즈 > 저장값이 손상돼도 카드가 패널을 꽉 채운 기본으로 뜬다 [199.97ms]
+(fail) (unnamed) [5001.05ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+(fail) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved [137.43ms]
+(fail) pre-capture attendee registration form > capture is never hard-gated on attendees [100.82ms]
+(fail) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture [647.50ms]
+(fail) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id [165.10ms]
+(fail) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches [6673.60ms]
+(fail) the real WS registry contains executable handlers for every existing action [3238.95ms]
+(fail) recorder startup failure leaves capture stopped and never launches whisper [3574.48ms]
+(fail) (unnamed) [5000.45ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+(fail) native PPTX scene renderer > writes editable OOXML text and shapes from the shared scene [1.66ms]
+(fail) raw audio hash and recorder contract > recorder startup timeout terminates and awaits the child exactly once [506.94ms]
+(fail) (unnamed) [5001.38ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+(fail) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [2.56ms]
+(fail) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [327.19ms]
+(fail) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [322.38ms]
+(fail) generic chat transport > HTTP sends user-only message with defaults and no response_format [1.67ms]
+(fail) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection [313.86ms]
+(fail) generic chat transport > CLI chat honors options.timeoutMs override [252.09ms]
+(fail) (unnamed) [5001.49ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+
+ 548 pass
+ 36 fail
+ 4 errors
+ 2529 expect() calls
+Ran 584 tests across 64 files. [291.95s]
+exit=1

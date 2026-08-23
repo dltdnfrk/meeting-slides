@@ -1,0 +1,6 @@
+segment=C
+expected_hash=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+actual_hash=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+shipping_pure_state_seam=0
+shipping_process_ownership=0
+result=PASS

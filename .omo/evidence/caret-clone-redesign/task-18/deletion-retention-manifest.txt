@@ -1,0 +1,36 @@
+# no active obsolete references
+scripts/verify-app.sh:66:if grep -Eq 'workspace-shell\.css|operational-liquid\.css|caret-shell\.css|caret-foundation\.css|transcript-overlay' "$index"; then
+# active refs
+9:  <link rel="preload" href="/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
+10:  <link rel="preload" href="/fonts/pretendard-variable.woff2" as="font" type="font/woff2" crossorigin>
+11:  <script id="runtime-bootstrap">
+31:  <link rel="stylesheet" href="/style.css">
+32:  <link rel="stylesheet" href="/caret-operator.css">
+513:  <script src="/workspace-split.js"></script>
+514:  <script src="/transcript-resize.js"></script>
+518:  <script type="module" src="/operator-surface.js"></script>
+519:  <script src="/review-panel-render.js"></script>
+520:  <script src="/review-panel.js"></script>
+521:  <script defer src="/app.js"></script>
+# retained active ownership
+RETAIN public/style.css generated-slide/review source
+RETAIN public/caret-operator.css single operator token/geometry/component source
+RETAIN public/operator-surface.js single operator state projection source
+RETAIN public/app.js product behavior and wire owner
+RETAIN public/workspace-split.js preserved workspace.layout.v1 owner
+RETAIN public/transcript-resize.js preserved workspace.transcript.v1 compatibility owner
+RETAIN public/review-panel.js and public/review-panel-render.js canonical review owners
+RETAIN public/generated/ generated reducer artifacts
+RETAIN public/fonts/ open-licensed deterministic fonts
+
+# obsolete files
+DELETED public/workspace-shell.css
+DELETED public/operational-liquid.css
+DELETED public/caret-shell.css
+DELETED public/caret-foundation.css
+DELETED public/transcript-overlay.css
+DELETED public/transcript-overlay.js
+DELETED public/transcript-overlay 2.css
+DELETED public/transcript-overlay 2.js
+DELETED public/review-panel 2.js
+DELETED public/review-panel-render 2.js

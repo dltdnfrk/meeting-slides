@@ -1,0 +1,37 @@
+{
+  "step": "08-trailing-line",
+  "browser": {
+    "capturePhase": "stopping",
+    "shell": "live",
+    "capturing": true,
+    "timer": "02:05",
+    "transcriptLines": 4,
+    "selectedMeetingIds": [],
+    "connection": "connected"
+  },
+  "native": {
+    "status": "stopping",
+    "capturePhase": "stopping",
+    "timer": "02:05",
+    "glyph": "◼",
+    "title": "녹음 종료 중",
+    "lines": [
+      {
+        "text": "두 번째 문장입니다",
+        "provisional": false
+      },
+      {
+        "text": "세 번째 문장입니다",
+        "provisional": false
+      },
+      {
+        "text": "마지막 정리 문장입니다",
+        "provisional": false
+      }
+    ],
+    "stopEnabled": false,
+    "connection": "online"
+  },
+  "capturePhaseOwnsTimer": true,
+  "timersAgree": true
+}

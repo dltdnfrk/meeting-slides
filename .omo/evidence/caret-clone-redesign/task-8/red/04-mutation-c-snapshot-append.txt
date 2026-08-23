@@ -1,0 +1,4 @@
+ 2 fail
+ 54 pass
+(fail) transcript projection — snapshots > a snapshot replaces the projection instead of appending [0.33ms]
+(fail) transcript projection — snapshots > an empty snapshot clears the projection [0.08ms]

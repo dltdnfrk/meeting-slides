@@ -1,0 +1,1531 @@
+{
+  "validator": "task-1 acceptance gate",
+  "ranAt": "2026-08-12T06:57:27.828Z",
+  "manifestSha256": "95b8246a0afaf64ac87d7567278358ba9f1cc8ca5e0c3e2e06b78b0a502dcfd9",
+  "totalChecks": 304,
+  "failed": 0,
+  "result": "PASS",
+  "failures": [],
+  "checks": [
+    {
+      "name": "state:home-hero/url",
+      "pass": true,
+      "detail": "https://caret.so/en"
+    },
+    {
+      "name": "state:home-hero/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:home-hero/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:34:27.096Z"
+    },
+    {
+      "name": "state:home-hero/screenshot-exists",
+      "pass": true,
+      "detail": "reference/screens/home-hero.png"
+    },
+    {
+      "name": "state:home-hero/screenshot-nonzero",
+      "pass": true,
+      "detail": "923516 bytes"
+    },
+    {
+      "name": "state:home-hero/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:home-hero/screenshot-sha256",
+      "pass": true,
+      "detail": "7b82494375bbb535a91482a55ddb0b9feadeaeadca73b4c46ef9051f2bc5bd8d"
+    },
+    {
+      "name": "state:home-hero/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:home-hero/computed-exists",
+      "pass": true,
+      "detail": "reference/computed/home-hero.json"
+    },
+    {
+      "name": "state:home-hero/computed-sha256",
+      "pass": true,
+      "detail": "d271145a0e625fab47fd8b6b54431d61cd3f6f3f0c0cf8c79a329e11e4f84107"
+    },
+    {
+      "name": "state:home-hero/computed-nonempty",
+      "pass": true,
+      "detail": "7 nodes"
+    },
+    {
+      "name": "state:home-hero/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:home-hero/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:home-live-suggestion/url",
+      "pass": true,
+      "detail": "https://caret.so/en"
+    },
+    {
+      "name": "state:home-live-suggestion/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:home-live-suggestion/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:34:30.128Z"
+    },
+    {
+      "name": "state:home-live-suggestion/screenshot-exists",
+      "pass": true,
+      "detail": "reference/screens/home-live-suggestion.png"
+    },
+    {
+      "name": "state:home-live-suggestion/screenshot-nonzero",
+      "pass": true,
+      "detail": "221891 bytes"
+    },
+    {
+      "name": "state:home-live-suggestion/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:home-live-suggestion/screenshot-sha256",
+      "pass": true,
+      "detail": "a53aa37eb3f772f1caa87095046a9cfd079d50e08b6cfc4e3537816aa2addd7c"
+    },
+    {
+      "name": "state:home-live-suggestion/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:home-live-suggestion/computed-exists",
+      "pass": true,
+      "detail": "reference/computed/home-live-suggestion.json"
+    },
+    {
+      "name": "state:home-live-suggestion/computed-sha256",
+      "pass": true,
+      "detail": "f6038a0a3433a985ccfcab36a1b31383e1ca5e3610076c2249b5024621c4b302"
+    },
+    {
+      "name": "state:home-live-suggestion/computed-nonempty",
+      "pass": true,
+      "detail": "2 nodes"
+    },
+    {
+      "name": "state:home-live-suggestion/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:home-live-suggestion/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:home-before-the-call/url",
+      "pass": true,
+      "detail": "https://caret.so/en"
+    },
+    {
+      "name": "state:home-before-the-call/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:home-before-the-call/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:34:32.597Z"
+    },
+    {
+      "name": "state:home-before-the-call/screenshot-exists",
+      "pass": true,
+      "detail": "reference/screens/home-before-the-call.png"
+    },
+    {
+      "name": "state:home-before-the-call/screenshot-nonzero",
+      "pass": true,
+      "detail": "503433 bytes"
+    },
+    {
+      "name": "state:home-before-the-call/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:home-before-the-call/screenshot-sha256",
+      "pass": true,
+      "detail": "88a10749acf5a1a2139100493300fdea404c6b8612ec65b555c5d73df13676ed"
+    },
+    {
+      "name": "state:home-before-the-call/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:home-before-the-call/computed-exists",
+      "pass": true,
+      "detail": "reference/computed/home-before-the-call.json"
+    },
+    {
+      "name": "state:home-before-the-call/computed-sha256",
+      "pass": true,
+      "detail": "be27f34569b5dea9c1695f53357e32b1de3b9e6e6dfba7be0481588867c0ca50"
+    },
+    {
+      "name": "state:home-before-the-call/computed-nonempty",
+      "pass": true,
+      "detail": "2 nodes"
+    },
+    {
+      "name": "state:home-before-the-call/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:home-before-the-call/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:home-after-the-call/url",
+      "pass": true,
+      "detail": "https://caret.so/en"
+    },
+    {
+      "name": "state:home-after-the-call/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:home-after-the-call/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:34:34.813Z"
+    },
+    {
+      "name": "state:home-after-the-call/screenshot-exists",
+      "pass": true,
+      "detail": "reference/screens/home-after-the-call.png"
+    },
+    {
+      "name": "state:home-after-the-call/screenshot-nonzero",
+      "pass": true,
+      "detail": "370116 bytes"
+    },
+    {
+      "name": "state:home-after-the-call/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:home-after-the-call/screenshot-sha256",
+      "pass": true,
+      "detail": "617c31f850336238936ffd8e2361f9d425de44a3888b43424a00c1b6a2a205e5"
+    },
+    {
+      "name": "state:home-after-the-call/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:home-after-the-call/computed-exists",
+      "pass": true,
+      "detail": "reference/computed/home-after-the-call.json"
+    },
+    {
+      "name": "state:home-after-the-call/computed-sha256",
+      "pass": true,
+      "detail": "1d6445d936729c9619b595a83ce8ee3cffcfbf60096b454385097a4706a1dbbd"
+    },
+    {
+      "name": "state:home-after-the-call/computed-nonempty",
+      "pass": true,
+      "detail": "2 nodes"
+    },
+    {
+      "name": "state:home-after-the-call/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:home-after-the-call/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:home-narrow/url",
+      "pass": true,
+      "detail": "https://caret.so/en"
+    },
+    {
+      "name": "state:home-narrow/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"375x812\",\"width\":375,\"height\":812}"
+    },
+    {
+      "name": "state:home-narrow/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:34:36.401Z"
+    },
+    {
+      "name": "state:home-narrow/screenshot-exists",
+      "pass": true,
+      "detail": "reference/screens/home-narrow.png"
+    },
+    {
+      "name": "state:home-narrow/screenshot-nonzero",
+      "pass": true,
+      "detail": "218593 bytes"
+    },
+    {
+      "name": "state:home-narrow/dimensions",
+      "pass": true,
+      "detail": "375x812 vs manifest 375x812"
+    },
+    {
+      "name": "state:home-narrow/screenshot-sha256",
+      "pass": true,
+      "detail": "a7237c9935a81fcbb1618e3864f876dcd701bdc81174720d3fc9ca4f6fd91656"
+    },
+    {
+      "name": "state:home-narrow/viewport-matches-image",
+      "pass": true,
+      "detail": "375x812 vs viewport 375x812"
+    },
+    {
+      "name": "state:home-narrow/computed-exists",
+      "pass": true,
+      "detail": "reference/computed/home-narrow.json"
+    },
+    {
+      "name": "state:home-narrow/computed-sha256",
+      "pass": true,
+      "detail": "78ed7daafb35e2bb581191209285aa41ef526efbbfa377473842a82a1de9166d"
+    },
+    {
+      "name": "state:home-narrow/computed-nonempty",
+      "pass": true,
+      "detail": "4 nodes"
+    },
+    {
+      "name": "state:home-narrow/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:home-narrow/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:changelog-index/url",
+      "pass": true,
+      "detail": "https://caret.so/en/changelog"
+    },
+    {
+      "name": "state:changelog-index/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:changelog-index/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:34:39.050Z"
+    },
+    {
+      "name": "state:changelog-index/screenshot-exists",
+      "pass": true,
+      "detail": "reference/screens/changelog-index.png"
+    },
+    {
+      "name": "state:changelog-index/screenshot-nonzero",
+      "pass": true,
+      "detail": "176187 bytes"
+    },
+    {
+      "name": "state:changelog-index/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:changelog-index/screenshot-sha256",
+      "pass": true,
+      "detail": "9d8eb7f0e438df2a2b7a4b9048c83f8ef25b8b8066803e18efc57a6589854696"
+    },
+    {
+      "name": "state:changelog-index/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:changelog-index/computed-exists",
+      "pass": true,
+      "detail": "reference/computed/changelog-index.json"
+    },
+    {
+      "name": "state:changelog-index/computed-sha256",
+      "pass": true,
+      "detail": "689d66c129e770c2debd102af57f397ed82c10a7160064a076492c1142586cc8"
+    },
+    {
+      "name": "state:changelog-index/computed-nonempty",
+      "pass": true,
+      "detail": "6 nodes"
+    },
+    {
+      "name": "state:changelog-index/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:changelog-index/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/url",
+      "pass": true,
+      "detail": "https://caret.so/en/changelog"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:34:40.802Z"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/screenshot-exists",
+      "pass": true,
+      "detail": "reference/screens/changelog-mini-recording-popup.png"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/screenshot-nonzero",
+      "pass": true,
+      "detail": "177023 bytes"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/screenshot-sha256",
+      "pass": true,
+      "detail": "cae60507ce5230d87a2e3fd71a1290f7383f61a135464b7bc1b891bcc335a441"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/computed-exists",
+      "pass": true,
+      "detail": "reference/computed/changelog-mini-recording-popup.json"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/computed-sha256",
+      "pass": true,
+      "detail": "d1f98973cf167444d9952a0ff4d1b64f95ba1f4795bd140bf61ba9ad187f1bd8"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/computed-nonempty",
+      "pass": true,
+      "detail": "4 nodes"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:changelog-mini-recording-popup/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:changelog-new-ui/url",
+      "pass": true,
+      "detail": "https://caret.so/en/changelog"
+    },
+    {
+      "name": "state:changelog-new-ui/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:changelog-new-ui/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:34:42.939Z"
+    },
+    {
+      "name": "state:changelog-new-ui/screenshot-exists",
+      "pass": true,
+      "detail": "reference/screens/changelog-new-ui.png"
+    },
+    {
+      "name": "state:changelog-new-ui/screenshot-nonzero",
+      "pass": true,
+      "detail": "165156 bytes"
+    },
+    {
+      "name": "state:changelog-new-ui/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:changelog-new-ui/screenshot-sha256",
+      "pass": true,
+      "detail": "5322f905bf2900a9ed2c53e5108f98dec0579b5c2bda6bd474b38598be0d307a"
+    },
+    {
+      "name": "state:changelog-new-ui/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:changelog-new-ui/computed-exists",
+      "pass": true,
+      "detail": "reference/computed/changelog-new-ui.json"
+    },
+    {
+      "name": "state:changelog-new-ui/computed-sha256",
+      "pass": true,
+      "detail": "dd68fe89f0256c049a683d424840bd8bf8e408a3eb63aadc002ec43f5ab57224"
+    },
+    {
+      "name": "state:changelog-new-ui/computed-nonempty",
+      "pass": true,
+      "detail": "3 nodes"
+    },
+    {
+      "name": "state:changelog-new-ui/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:changelog-new-ui/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:library-1440x900/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:library-1440x900/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:library-1440x900/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:40.213Z"
+    },
+    {
+      "name": "state:library-1440x900/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/library-1440x900.png"
+    },
+    {
+      "name": "state:library-1440x900/screenshot-nonzero",
+      "pass": true,
+      "detail": "150711 bytes"
+    },
+    {
+      "name": "state:library-1440x900/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:library-1440x900/screenshot-sha256",
+      "pass": true,
+      "detail": "3dfd46720b9d08f8a8d50e8d8b389975f6e92b2523c31dbc3d2cc6032834a828"
+    },
+    {
+      "name": "state:library-1440x900/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:library-1440x900/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/library-1440x900.json"
+    },
+    {
+      "name": "state:library-1440x900/computed-sha256",
+      "pass": true,
+      "detail": "5e9f9bb9f9293f673fac3f734ca46b8eabe80f5b1d246a8c90343a222739ffc3"
+    },
+    {
+      "name": "state:library-1440x900/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:library-1440x900/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:library-1440x900/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:live-1440x900/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:live-1440x900/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1440x900\",\"width\":1440,\"height\":900}"
+    },
+    {
+      "name": "state:live-1440x900/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:40.281Z"
+    },
+    {
+      "name": "state:live-1440x900/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/live-1440x900.png"
+    },
+    {
+      "name": "state:live-1440x900/screenshot-nonzero",
+      "pass": true,
+      "detail": "194370 bytes"
+    },
+    {
+      "name": "state:live-1440x900/dimensions",
+      "pass": true,
+      "detail": "1440x900 vs manifest 1440x900"
+    },
+    {
+      "name": "state:live-1440x900/screenshot-sha256",
+      "pass": true,
+      "detail": "26569c7f2ab51b711ef4819346c5d54c83d6feece13a6655360e347021fae1fc"
+    },
+    {
+      "name": "state:live-1440x900/viewport-matches-image",
+      "pass": true,
+      "detail": "1440x900 vs viewport 1440x900"
+    },
+    {
+      "name": "state:live-1440x900/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/live-1440x900.json"
+    },
+    {
+      "name": "state:live-1440x900/computed-sha256",
+      "pass": true,
+      "detail": "b27863171294f26f2e2fe0f5c77ad78bed704d6617a549feb78a3d1b95677065"
+    },
+    {
+      "name": "state:live-1440x900/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:live-1440x900/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:live-1440x900/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:library-1244x836/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:library-1244x836/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1244x836\",\"width\":1244,\"height\":836}"
+    },
+    {
+      "name": "state:library-1244x836/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:40.474Z"
+    },
+    {
+      "name": "state:library-1244x836/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/library-1244x836.png"
+    },
+    {
+      "name": "state:library-1244x836/screenshot-nonzero",
+      "pass": true,
+      "detail": "143452 bytes"
+    },
+    {
+      "name": "state:library-1244x836/dimensions",
+      "pass": true,
+      "detail": "1244x836 vs manifest 1244x836"
+    },
+    {
+      "name": "state:library-1244x836/screenshot-sha256",
+      "pass": true,
+      "detail": "3287747b653756dc1a33950bd4f0c188aa810d55eabc4561bcf67b17344836b2"
+    },
+    {
+      "name": "state:library-1244x836/viewport-matches-image",
+      "pass": true,
+      "detail": "1244x836 vs viewport 1244x836"
+    },
+    {
+      "name": "state:library-1244x836/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/library-1244x836.json"
+    },
+    {
+      "name": "state:library-1244x836/computed-sha256",
+      "pass": true,
+      "detail": "d7e26f6c159a6015095066e0454f0b7ac8d54ec7257d96251c330ba000b33f42"
+    },
+    {
+      "name": "state:library-1244x836/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:library-1244x836/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:library-1244x836/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:live-1244x836/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:live-1244x836/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"1244x836\",\"width\":1244,\"height\":836}"
+    },
+    {
+      "name": "state:live-1244x836/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:40.548Z"
+    },
+    {
+      "name": "state:live-1244x836/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/live-1244x836.png"
+    },
+    {
+      "name": "state:live-1244x836/screenshot-nonzero",
+      "pass": true,
+      "detail": "162409 bytes"
+    },
+    {
+      "name": "state:live-1244x836/dimensions",
+      "pass": true,
+      "detail": "1244x836 vs manifest 1244x836"
+    },
+    {
+      "name": "state:live-1244x836/screenshot-sha256",
+      "pass": true,
+      "detail": "ba70fee22139e2d424438163cad1082ea4d1be16ac02725eeb5b85bf0f2ba2e9"
+    },
+    {
+      "name": "state:live-1244x836/viewport-matches-image",
+      "pass": true,
+      "detail": "1244x836 vs viewport 1244x836"
+    },
+    {
+      "name": "state:live-1244x836/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/live-1244x836.json"
+    },
+    {
+      "name": "state:live-1244x836/computed-sha256",
+      "pass": true,
+      "detail": "950058f1136b80bf181fc9e9ab1ffd04e24ec3424a1f0d81c0e29e004ef52ae0"
+    },
+    {
+      "name": "state:live-1244x836/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:live-1244x836/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:live-1244x836/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:library-960x760/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:library-960x760/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"960x760\",\"width\":960,\"height\":760}"
+    },
+    {
+      "name": "state:library-960x760/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:40.701Z"
+    },
+    {
+      "name": "state:library-960x760/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/library-960x760.png"
+    },
+    {
+      "name": "state:library-960x760/screenshot-nonzero",
+      "pass": true,
+      "detail": "118425 bytes"
+    },
+    {
+      "name": "state:library-960x760/dimensions",
+      "pass": true,
+      "detail": "960x760 vs manifest 960x760"
+    },
+    {
+      "name": "state:library-960x760/screenshot-sha256",
+      "pass": true,
+      "detail": "77c4d56ebc4d0458f64d3e819f390bce67c53fd8aa44044ed0cd3efd730b892b"
+    },
+    {
+      "name": "state:library-960x760/viewport-matches-image",
+      "pass": true,
+      "detail": "960x760 vs viewport 960x760"
+    },
+    {
+      "name": "state:library-960x760/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/library-960x760.json"
+    },
+    {
+      "name": "state:library-960x760/computed-sha256",
+      "pass": true,
+      "detail": "ad21c73d9b9b296de28aff86ebaadc0125b929df2947426082ed967c1a20c5e9"
+    },
+    {
+      "name": "state:library-960x760/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:library-960x760/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:library-960x760/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:live-960x760/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:live-960x760/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"960x760\",\"width\":960,\"height\":760}"
+    },
+    {
+      "name": "state:live-960x760/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:40.761Z"
+    },
+    {
+      "name": "state:live-960x760/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/live-960x760.png"
+    },
+    {
+      "name": "state:live-960x760/screenshot-nonzero",
+      "pass": true,
+      "detail": "132000 bytes"
+    },
+    {
+      "name": "state:live-960x760/dimensions",
+      "pass": true,
+      "detail": "960x760 vs manifest 960x760"
+    },
+    {
+      "name": "state:live-960x760/screenshot-sha256",
+      "pass": true,
+      "detail": "b802c2026baded23b4579f03b014d698962bae1cbee829f7d7bac7e8f0578b20"
+    },
+    {
+      "name": "state:live-960x760/viewport-matches-image",
+      "pass": true,
+      "detail": "960x760 vs viewport 960x760"
+    },
+    {
+      "name": "state:live-960x760/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/live-960x760.json"
+    },
+    {
+      "name": "state:live-960x760/computed-sha256",
+      "pass": true,
+      "detail": "9583e7c51ec7ed1f34c18edccae7811a2d6371eed90dd5cfa53802fdf3599789"
+    },
+    {
+      "name": "state:live-960x760/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:live-960x760/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:live-960x760/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:library-820x900/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:library-820x900/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"820x900\",\"width\":820,\"height\":900}"
+    },
+    {
+      "name": "state:library-820x900/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:40.950Z"
+    },
+    {
+      "name": "state:library-820x900/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/library-820x900.png"
+    },
+    {
+      "name": "state:library-820x900/screenshot-nonzero",
+      "pass": true,
+      "detail": "99102 bytes"
+    },
+    {
+      "name": "state:library-820x900/dimensions",
+      "pass": true,
+      "detail": "820x900 vs manifest 820x900"
+    },
+    {
+      "name": "state:library-820x900/screenshot-sha256",
+      "pass": true,
+      "detail": "c4d1c214059567fe02855c2ddd8880635abc8096bbf125cf8270b0583e182bbf"
+    },
+    {
+      "name": "state:library-820x900/viewport-matches-image",
+      "pass": true,
+      "detail": "820x900 vs viewport 820x900"
+    },
+    {
+      "name": "state:library-820x900/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/library-820x900.json"
+    },
+    {
+      "name": "state:library-820x900/computed-sha256",
+      "pass": true,
+      "detail": "f47055c0a6cc82e7cc4e601c773df698dc92d5eb9b8ef1ff95dee5e37f80bb30"
+    },
+    {
+      "name": "state:library-820x900/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:library-820x900/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:library-820x900/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:live-820x900/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:live-820x900/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"820x900\",\"width\":820,\"height\":900}"
+    },
+    {
+      "name": "state:live-820x900/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:41.013Z"
+    },
+    {
+      "name": "state:live-820x900/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/live-820x900.png"
+    },
+    {
+      "name": "state:live-820x900/screenshot-nonzero",
+      "pass": true,
+      "detail": "94255 bytes"
+    },
+    {
+      "name": "state:live-820x900/dimensions",
+      "pass": true,
+      "detail": "820x900 vs manifest 820x900"
+    },
+    {
+      "name": "state:live-820x900/screenshot-sha256",
+      "pass": true,
+      "detail": "3b49419d51047c6966cc261cb510ebed6585bf2432f59ad7d129cb28362eb911"
+    },
+    {
+      "name": "state:live-820x900/viewport-matches-image",
+      "pass": true,
+      "detail": "820x900 vs viewport 820x900"
+    },
+    {
+      "name": "state:live-820x900/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/live-820x900.json"
+    },
+    {
+      "name": "state:live-820x900/computed-sha256",
+      "pass": true,
+      "detail": "afc1bdb16b608a389a60a99aeec7b8d6d1fe6115dc4f1a24283f8c30ae3a76ba"
+    },
+    {
+      "name": "state:live-820x900/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:live-820x900/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:live-820x900/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:library-375x812/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:library-375x812/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"375x812\",\"width\":375,\"height\":812}"
+    },
+    {
+      "name": "state:library-375x812/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:41.183Z"
+    },
+    {
+      "name": "state:library-375x812/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/library-375x812.png"
+    },
+    {
+      "name": "state:library-375x812/screenshot-nonzero",
+      "pass": true,
+      "detail": "76657 bytes"
+    },
+    {
+      "name": "state:library-375x812/dimensions",
+      "pass": true,
+      "detail": "375x812 vs manifest 375x812"
+    },
+    {
+      "name": "state:library-375x812/screenshot-sha256",
+      "pass": true,
+      "detail": "9620dd5a85869a5f59b06a39dac4d743868f4a926c4727906c9dd30d53d92190"
+    },
+    {
+      "name": "state:library-375x812/viewport-matches-image",
+      "pass": true,
+      "detail": "375x812 vs viewport 375x812"
+    },
+    {
+      "name": "state:library-375x812/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/library-375x812.json"
+    },
+    {
+      "name": "state:library-375x812/computed-sha256",
+      "pass": true,
+      "detail": "5d0c8c84ce6cd7d58487e5a5b30572fe01efb9de6a30d4318fadd352fb0630ae"
+    },
+    {
+      "name": "state:library-375x812/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:library-375x812/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:library-375x812/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:live-375x812/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:live-375x812/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"375x812\",\"width\":375,\"height\":812}"
+    },
+    {
+      "name": "state:live-375x812/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:41.240Z"
+    },
+    {
+      "name": "state:live-375x812/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/live-375x812.png"
+    },
+    {
+      "name": "state:live-375x812/screenshot-nonzero",
+      "pass": true,
+      "detail": "68828 bytes"
+    },
+    {
+      "name": "state:live-375x812/dimensions",
+      "pass": true,
+      "detail": "375x812 vs manifest 375x812"
+    },
+    {
+      "name": "state:live-375x812/screenshot-sha256",
+      "pass": true,
+      "detail": "7ec8405405676a9558686ccec282c3c9b9fa85e6ce22fec274f3068f0b38989c"
+    },
+    {
+      "name": "state:live-375x812/viewport-matches-image",
+      "pass": true,
+      "detail": "375x812 vs viewport 375x812"
+    },
+    {
+      "name": "state:live-375x812/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/live-375x812.json"
+    },
+    {
+      "name": "state:live-375x812/computed-sha256",
+      "pass": true,
+      "detail": "3ba77a0cbc874227607c654c8e25f30cb3860963c6c62e9697854060441ad65b"
+    },
+    {
+      "name": "state:live-375x812/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:live-375x812/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:live-375x812/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:library-320x667/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:library-320x667/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"320x667\",\"width\":320,\"height\":667}"
+    },
+    {
+      "name": "state:library-320x667/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:41.401Z"
+    },
+    {
+      "name": "state:library-320x667/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/library-320x667.png"
+    },
+    {
+      "name": "state:library-320x667/screenshot-nonzero",
+      "pass": true,
+      "detail": "66842 bytes"
+    },
+    {
+      "name": "state:library-320x667/dimensions",
+      "pass": true,
+      "detail": "320x667 vs manifest 320x667"
+    },
+    {
+      "name": "state:library-320x667/screenshot-sha256",
+      "pass": true,
+      "detail": "65da05db23f5dc8d121c037cfad1ed10c7f5608296ddbe2041c847bc88afc7ba"
+    },
+    {
+      "name": "state:library-320x667/viewport-matches-image",
+      "pass": true,
+      "detail": "320x667 vs viewport 320x667"
+    },
+    {
+      "name": "state:library-320x667/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/library-320x667.json"
+    },
+    {
+      "name": "state:library-320x667/computed-sha256",
+      "pass": true,
+      "detail": "236f5b6fa33b8088055cc6551396619adda859b51f14f75bfce4def8d8c01ac2"
+    },
+    {
+      "name": "state:library-320x667/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:library-320x667/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:library-320x667/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "state:live-320x667/url",
+      "pass": true,
+      "detail": "http://127.0.0.1:51122"
+    },
+    {
+      "name": "state:live-320x667/viewport",
+      "pass": true,
+      "detail": "{\"name\":\"320x667\",\"width\":320,\"height\":667}"
+    },
+    {
+      "name": "state:live-320x667/timestamp",
+      "pass": true,
+      "detail": "2026-08-11T06:42:41.456Z"
+    },
+    {
+      "name": "state:live-320x667/screenshot-exists",
+      "pass": true,
+      "detail": "baseline/screens/live-320x667.png"
+    },
+    {
+      "name": "state:live-320x667/screenshot-nonzero",
+      "pass": true,
+      "detail": "52281 bytes"
+    },
+    {
+      "name": "state:live-320x667/dimensions",
+      "pass": true,
+      "detail": "320x667 vs manifest 320x667"
+    },
+    {
+      "name": "state:live-320x667/screenshot-sha256",
+      "pass": true,
+      "detail": "5d7ecffdb93dd8e6cb601eae6d1cd146ee699f2b9092099e633aa30e1aea3f19"
+    },
+    {
+      "name": "state:live-320x667/viewport-matches-image",
+      "pass": true,
+      "detail": "320x667 vs viewport 320x667"
+    },
+    {
+      "name": "state:live-320x667/computed-exists",
+      "pass": true,
+      "detail": "baseline/computed/live-320x667.json"
+    },
+    {
+      "name": "state:live-320x667/computed-sha256",
+      "pass": true,
+      "detail": "16a6fbffa02a6f965c95264c32410c798b86687bb5b1507cddb30db7bca1fd32"
+    },
+    {
+      "name": "state:live-320x667/computed-nonempty",
+      "pass": true,
+      "detail": "13 nodes"
+    },
+    {
+      "name": "state:live-320x667/computed-complete",
+      "pass": true,
+      "detail": "typography+color+radius+material+motion"
+    },
+    {
+      "name": "state:live-320x667/no-missing-selector",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "name": "reference/only-official-sources",
+      "pass": true,
+      "detail": "https://caret.so/en, https://caret.so/en/changelog"
+    },
+    {
+      "name": "reference/has-home-hero",
+      "pass": true,
+      "detail": "required official state"
+    },
+    {
+      "name": "reference/has-home-live-suggestion",
+      "pass": true,
+      "detail": "required official state"
+    },
+    {
+      "name": "reference/has-home-before-the-call",
+      "pass": true,
+      "detail": "required official state"
+    },
+    {
+      "name": "reference/has-home-after-the-call",
+      "pass": true,
+      "detail": "required official state"
+    },
+    {
+      "name": "reference/has-changelog-index",
+      "pass": true,
+      "detail": "required official state"
+    },
+    {
+      "name": "reference/has-changelog-mini-recording-popup",
+      "pass": true,
+      "detail": "required official state"
+    },
+    {
+      "name": "reference/http-200",
+      "pass": true,
+      "detail": "home-hero:200 home-live-suggestion:200 home-before-the-call:200 home-after-the-call:200 home-narrow:200 changelog-index:200 changelog-mini-recording-popup:200 changelog-new-ui:200"
+    },
+    {
+      "name": "baseline/covers-1440x900",
+      "pass": true,
+      "detail": "2 states"
+    },
+    {
+      "name": "baseline/1440x900-library+live",
+      "pass": true,
+      "detail": "library,live"
+    },
+    {
+      "name": "baseline/covers-1244x836",
+      "pass": true,
+      "detail": "2 states"
+    },
+    {
+      "name": "baseline/1244x836-library+live",
+      "pass": true,
+      "detail": "library,live"
+    },
+    {
+      "name": "baseline/covers-960x760",
+      "pass": true,
+      "detail": "2 states"
+    },
+    {
+      "name": "baseline/960x760-library+live",
+      "pass": true,
+      "detail": "library,live"
+    },
+    {
+      "name": "baseline/covers-820x900",
+      "pass": true,
+      "detail": "2 states"
+    },
+    {
+      "name": "baseline/820x900-library+live",
+      "pass": true,
+      "detail": "library,live"
+    },
+    {
+      "name": "baseline/covers-375x812",
+      "pass": true,
+      "detail": "2 states"
+    },
+    {
+      "name": "baseline/375x812-library+live",
+      "pass": true,
+      "detail": "library,live"
+    },
+    {
+      "name": "baseline/covers-320x667",
+      "pass": true,
+      "detail": "2 states"
+    },
+    {
+      "name": "baseline/320x667-library+live",
+      "pass": true,
+      "detail": "library,live"
+    },
+    {
+      "name": "tokens/surface-resolved-to-srgb",
+      "pass": true,
+      "detail": "#09090b"
+    },
+    {
+      "name": "tokens/contrast-measured",
+      "pass": true,
+      "detail": "19.06"
+    },
+    {
+      "name": "tokens/emerald-identity-measured",
+      "pass": true,
+      "detail": "4 candidates"
+    },
+    {
+      "name": "tokens/motion-measured",
+      "pass": true,
+      "detail": "durations"
+    },
+    {
+      "name": "tokens/radius-measured",
+      "pass": true,
+      "detail": "radii"
+    },
+    {
+      "name": "tokens/mono-measured",
+      "pass": true,
+      "detail": "mono stacks"
+    },
+    {
+      "name": "public/no-new-evidence-image",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "public/no-evidence-hash-copied",
+      "pass": true,
+      "detail": "0 images under public/"
+    },
+    {
+      "name": "failure/receipt-exists",
+      "pass": true,
+      "detail": "failure.json"
+    },
+    {
+      "name": "failure/result-pass",
+      "pass": true,
+      "detail": "PASS"
+    },
+    {
+      "name": "failure/names-missing-state",
+      "pass": true,
+      "detail": "missing state: changelog-mini-recording-popup (h3#mini-recording-popup-invisible-during-screen-sharing)"
+    },
+    {
+      "name": "failure/no-silent-fallback",
+      "pass": true,
+      "detail": "false"
+    },
+    {
+      "name": "failure/no-fallback-artifact",
+      "pass": true,
+      "detail": "false"
+    },
+    {
+      "name": "freshness/no-stale-state",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "driver/driver/adversarial-probes.mjs-sha256",
+      "pass": true,
+      "detail": "baba7dcdd5587188a23be84ed1c75b6114cecb66b7955f0f63eccec831d63058"
+    },
+    {
+      "name": "driver/driver/baseline-fixture.mjs-sha256",
+      "pass": true,
+      "detail": "d2fd6494582bbbb3e2c9aa0ed7a35c62e45ee2d64c0bac3ede5073e337c1ba0b"
+    },
+    {
+      "name": "driver/driver/build-manifest.mjs-sha256",
+      "pass": true,
+      "detail": "809f0b4dab0c53b726392832159789699cc8860fe3e54941c8493a40a804db55"
+    },
+    {
+      "name": "driver/driver/capture-baseline.mjs-sha256",
+      "pass": true,
+      "detail": "2a315de3ae6365b5bf7bba53799db4767b55bff6ab7f7ee89c967b8acb4e6952"
+    },
+    {
+      "name": "driver/driver/capture-lib.mjs-sha256",
+      "pass": true,
+      "detail": "bea3f5259ea7cae61c1633104abdbc2a24e95ae7374b3fcc4ffaec06c4ea169a"
+    },
+    {
+      "name": "driver/driver/capture-reference.mjs-sha256",
+      "pass": true,
+      "detail": "57ec1905a044ea0180cb89f6b7bd0d2dded6fca118fccc0590e21b372ec5af29"
+    },
+    {
+      "name": "driver/driver/extract-reference-tokens.mjs-sha256",
+      "pass": true,
+      "detail": "dd2603d060daaf7725da15da4d9d76215dc25f76fe0b11b5f68ac00d81f9d8b0"
+    },
+    {
+      "name": "driver/driver/failure-blocked-network.mjs-sha256",
+      "pass": true,
+      "detail": "8e4817decbd92db71ea7c5b721fdf9ea257b11dd366f70a0bf94cda8c3b15313"
+    },
+    {
+      "name": "driver/driver/harness.mjs-sha256",
+      "pass": true,
+      "detail": "bdd14efc4183cf0b4af92f7372095d008409cc254ef7ef3e9d2d6484e1d69f7d"
+    },
+    {
+      "name": "driver/driver/validate-manifest.mjs-sha256",
+      "pass": true,
+      "detail": "b4ca0770e91164c65a37c8886b757fa4c28366e6917609ec463c845ddd039ae6"
+    }
+  ]
+}

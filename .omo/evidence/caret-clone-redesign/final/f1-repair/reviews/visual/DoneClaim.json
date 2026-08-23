@@ -1,0 +1,147 @@
+{
+  "task": "F1 repair gap #2 - independent visual fidelity review",
+  "taskId": "st_019ff3d5",
+  "sessionId": "019ff3d4-5bb8-7220-8d81-dfb5f3d0f13c",
+  "parentSession": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSession": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "depth": 1,
+  "timestampUtc": "2026-08-12T03:20:48Z",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "reviewedHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "workingTreeDirty": true,
+  "contract": "DESIGN.md Section 9 (OMO-CONTRACT-ID: operator-contract-v2-caret-grade), lines 153-547",
+  "independence": {
+    "priorReviewProseCopied": false,
+    "priorReviewTreatedAs": "claim under test",
+    "priorReviewPath": ".omo/evidence/caret-clone-redesign/task-19/visual-reviews.md"
+  },
+  "status": "FAIL",
+  "verdict": "REJECT",
+  "commitCreated": false,
+  "productFilesEdited": false,
+  "governanceFilesEdited": false,
+  "planFilesEdited": false,
+  "ledgerFilesEdited": false,
+  "f2ToF4Entered": false,
+  "findings": [
+    {
+      "id": "FAIL-V1",
+      "result": "FAIL",
+      "severity": "high",
+      "title": "Provisional caption row overflows its grid area at live widths >= 900px",
+      "viewports": ["960x760 live (observed)", "1244x836 live (inferred from rule)", "1440x900 live (inferred from rule)"],
+      "observedIn": ".omo/evidence/caret-clone-redesign/task-19/journey-final/02-live-960.png",
+      "contraViewports": [
+        ".omo/evidence/caret-clone-redesign/task-19/journey-final/02-live-820.png",
+        ".omo/evidence/caret-clone-redesign/task-19/journey-final/02-live-375.png"
+      ],
+      "sources": [
+        "public/index.html:292",
+        "public/index.html:203",
+        "public/caret-operator.css:2284-2292",
+        "public/caret-operator.css:2311-2329",
+        "public/caret-operator.css:2797-2804",
+        "public/caret-operator.css:3025-3044"
+      ],
+      "rootCause": "#island is a direct child of the #document-surface grid but receives no grid-row/grid-column at any width; at >=900px the explicit three-column live layout auto-places it into a mismatched implicit track, and #island .island__text has word-break:keep-all with no min-inline-size:0, overflow, or text-overflow, so long provisional Korean text shears mid-glyph at both edges.",
+      "designViolations": ["9.9 partial-glyph rule", "9.8 provisional caption containment", "9.4 hierarchy rank 3/5"],
+      "whyMissed": "task-18/capture-qa.ts:101 measures rootOverflow as documentElement.scrollWidth - clientWidth only; intra-grid overflow is invisible to it. task-18/screenshots/1280x800-live-capturing.png renders the same island cleanly because its caption text is short."
+    },
+    {
+      "id": "FAIL-V2",
+      "result": "FAIL",
+      "severity": "high",
+      "title": "#btn-review renders as a completely empty control at <= 420px",
+      "viewports": ["320x667 library", "375x812 library"],
+      "observedIn": [
+        ".omo/evidence/caret-clone-redesign/task-19/journey-final/05-viewport-320.png",
+        ".omo/evidence/caret-clone-redesign/task-19/journey-final/05-viewport-375.png"
+      ],
+      "sources": [
+        "public/index.html:69-72",
+        "public/style.css:1254-1259",
+        "public/style.css:1233",
+        "public/style.css:967"
+      ],
+      "rootCause": "#btn-review markup contains only a label span and a hidden count span with no icon element. .review-btn__label{display:none} at <=420px hides the sole visible child while min-width/min-height 44px keeps the box, producing a blank 44x44 control. .review-btn__icon at public/style.css:1233 is a dead selector matching no element; the sibling .attendee-btn__icon has real markup at public/index.html:66 and degrades correctly.",
+      "designViolations": ["9.12 icon-only controls keep an accessible name", "9.4 typography carries hierarchy", "9.11 disabled is muted never invisible"],
+      "whyMissed": "#btn-review ships hidden (public/index.html:69) and is absent from task-18/screenshots/320x667-library-populated.ax.json, so the task-18 narrow sweep never rendered it. Todo 19 product defect fix 2 first made it reachable; fix 4 corrected its target size to 44px without restoring visible content."
+    },
+    {
+      "id": "FAIL-V3",
+      "result": "FAIL",
+      "severity": "medium",
+      "title": ".action-card__btn label truncated mid-word at 320px",
+      "viewports": ["320x667 library overview ACTIONS"],
+      "observedIn": ".omo/evidence/caret-clone-redesign/task-19/journey-final/05-viewport-320.png",
+      "detail": "First action button renders 'Send follow-' cut mid-word with no ellipsis; two adjacent action buttons render with no legible label.",
+      "sources": [
+        "public/caret-operator.css:598-601",
+        "public/caret-operator.css:603-616",
+        "public/caret-operator.css:3194-3198"
+      ],
+      "rootCause": ".action-card__btn has fixed padding 0 12px and no min-inline-size:0, overflow, or text-overflow inside a wrapping flex row; the <=375px media rule enforces 44px box minimums but does nothing for text handling.",
+      "designViolations": ["9.9 partial-glyph rule at 375px and 320px", "9.13 capability legible where the action lives"]
+    }
+  ],
+  "passedChecks": [
+    {"item": "Live stage containment and provisional ellipsis at 820 and 375", "evidence": ["task-19/journey-final/02-live-820.png", "task-19/journey-final/02-live-375.png"], "contract": "9.8, 9.9"},
+    {"item": "Exactly one dominant coral primary action per shell per viewport", "evidence": ["task-19/journey-final/05-viewport-1280.png", "task-19/journey-final/05-viewport-375.png", "task-19/journey-final/05-viewport-320.png"], "contract": "9.4"},
+    {"item": "Tonal matte elevation, no glass or blur on the main pane", "evidence": ["task-19/journey-final/05-viewport-1280.png", "task-18/screenshots/1280x800-live-capturing.png"], "contract": "9.4, 9.5"},
+    {"item": "rootOverflow 0, duplicateIds empty, activeRemovedReferences empty, minTarget 44 at 320/375", "evidence": "all 45 task-18/screenshots/*.styles.json", "contract": "9.9"},
+    {"item": "stopVisible true in every live styles record across all five widths and all phases", "evidence": "task-18/screenshots/*-live-*.styles.json", "contract": "9.8"},
+    {"item": "Focus ring solid 2px, non-coral, independent of recording color", "evidence": ["task-18/screenshots/960x760-live-capturing.styles.json", "task-18/screenshots/1280x800-live-capturing.png"], "contract": "9.12"}
+  ],
+  "residualRisks": [
+    "No post-redesign LIVE capture exists at 1440x900 or 1244x836, the two viewports DESIGN 9.9 names as reference comparisons. Two current captures at these widths were published concurrently by a sibling repair session (final/f1-repair/accessibility-repair/installed-viewports/viewport-1440x900-library.png and viewport-1244x836-library.png) and were inspected; both are library shell at idle capture phase and render cleanly, so neither exercises the live side-by-side seam. FAIL-V1 at those two widths remains reasoned from the CSS rule rather than directly observed.",
+    "The rootOverflow harness cannot detect overflow confined to a grid area or pane; a per-element scrollWidth>clientWidth check on text-bearing nodes is needed to close this class.",
+    "FAIL-V1 is content-length dependent; a re-capture with short synthetic caption text will render clean and falsely confirm a fix.",
+    ".review-btn__icon is a dead selector, indicating the empty-control state was unintended; the same class of defect can recur for any control whose only visible child is a responsively hidden label.",
+    "task-19/visual-reviews.md records three APPROVE lenses in one document with no distinct reviewer identity or independent receipt, and its Review 2 approves the exact two files in which FAIL-V2 and FAIL-V3 are visible. Independently confirms the blocker already recorded in final/f1-plan-compliance/DoneClaim.json."
+  ],
+  "inspectedEvidencePaths": [
+    "DESIGN.md",
+    "public/index.html",
+    "public/caret-operator.css",
+    "public/style.css",
+    ".omo/evidence/caret-clone-redesign/task-19/README.md",
+    ".omo/evidence/caret-clone-redesign/task-19/visual-reviews.md",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/02-live-960.png",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/02-live-820.png",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/02-live-375.png",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/05-viewport-1280.png",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/05-viewport-960.png",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/05-viewport-375.png",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/05-viewport-320.png",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/viewports.json",
+    ".omo/evidence/caret-clone-redesign/task-19/journey-final/live-viewports.json",
+    ".omo/evidence/caret-clone-redesign/task-18/screenshots/ (45 png, 45 styles.json, 45 ax.json)",
+    ".omo/evidence/caret-clone-redesign/task-18/screenshots/1280x800-live-capturing.png",
+    ".omo/evidence/caret-clone-redesign/task-18/screenshots/320x667-library-populated.ax.json",
+    ".omo/evidence/caret-clone-redesign/task-18/capture-qa.ts",
+    ".omo/evidence/caret-clone-redesign/task-11/baseline/baseline-geometry.json",
+    ".omo/evidence/caret-clone-redesign/task-12/green/green-geometry.json",
+    ".omo/evidence/caret-clone-redesign/final/f1-plan-compliance/DoneClaim.json",
+    ".omo/evidence/caret-clone-redesign/final/f1-repair/accessibility-repair/installed-viewports/viewport-1440x900-library.png",
+    ".omo/evidence/caret-clone-redesign/final/f1-repair/accessibility-repair/installed-viewports/viewport-1244x836-library.png"
+  ],
+  "inspectedSourceHashes": {
+    "public/caret-operator.css": "20dab12a9dbcb22b724ba2da3607d48e2d211a59c580771397536ee5ce322918",
+    "public/style.css": "d433375487cfae2ec0e6347efd966d27105ffddb0f5d2495641b89884a45fb25",
+    "public/index.html": "c81c8ed6fe5563dcb24c697cc9013ae462cb73a991556124537a6b8c0c212517",
+    "task-19/journey-final/02-live-960.png": "43fe64c09fc31b570a386f3ade9d8bdcd7da0a15dc936d23a2edc7fcb4a97e6c",
+    "task-19/journey-final/02-live-820.png": "f0c1721f71db6e607f35a932878fc0312d1d62087531e37e3444c4cea9740442",
+    "task-19/journey-final/05-viewport-320.png": "0b86b83e7f90a22a74e7cd557fabb8523238ae5db7ecab0f8ab6e9ade2a7b7e5",
+    "task-19/journey-final/05-viewport-375.png": "a484d8db2b7763628e66bbe562daf1b6a0446e6b0de7e03b761b2f8dd173713f",
+    "task-18/screenshots/1280x800-live-capturing.png": "04b18dce972ea063e9e53a4d2de4b716d88f042f203705889ab7b4ad77476cf4"
+  },
+  "filesWritten": [
+    ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/visual/REPORT.md",
+    ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/visual/DoneClaim.json",
+    ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/visual/CHECKSUMS.txt"
+  ],
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/visual/REPORT.md",
+    "sha256": "4d9b43624f0b723842d13567b8cd1fd757a680ae17536076db283b68f20d46d1"
+  }
+}

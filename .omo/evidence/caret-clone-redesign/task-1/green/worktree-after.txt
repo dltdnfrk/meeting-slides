@@ -1,0 +1,43 @@
+ M .env.example
+ M .omo/start-work/ledger.jsonl
+ M DESIGN.md
+ M README.md
+ M public/app.js
+ M public/index.html
+ M public/operator-surface.js
+ M public/workspace-split.js
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-operator-surface.test.ts
+ M tests/public-test-harness.ts
+ M tests/public-workspace.test.ts
+?? .omo/drafts/
+?? .omo/evidence/caret-clone-redesign/
+?? .omo/evidence/live-split-ulw/
+?? .omo/evidence/style-gallery-baseline/
+?? .omo/evidence/style-gallery-final/
+?? .omo/evidence/style-gallery-panels/
+?? .omo/evidence/tiro-operator/
+?? .omo/evidence/tiro-reference/
+?? .omo/plans/caret-clone-redesign.md
+?? .omo/plans/tiro-operator-rebuild.md
+?? .omo/qa/
+?? .omo/ulw-loop/
+?? .omo/ulw-research/
+?? HANDOFF.md
+?? macos/NativeSurfaceContract.swift
+?? models/
+?? public/caret-shell.css
+?? tests/fixtures/
+?? tests/helpers/
+?? tests/native-surface-contract.test.ts
+?? tests/public-caret-harness.test.ts
+?? tests/public-dom-protocol-contract.test.ts
+?? tests/public-harness-baseline.test.ts

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "task": "F4. Scope fidelity final",
+  "taskId": "st_019ff4bf",
+  "parentSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "completedAt": "2026-08-12T07:03:18Z",
+  "status": "PASS",
+  "verdict": "APPROVE",
+  "auditedHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "findings": [],
+  "priorBlockerClosure": {
+    "M1": "PASS: genuine installed native HUD material at exact 360x56 and 560x220",
+    "M2": "PASS: complete 320x667 placeholder/generated slides with transcript and enabled Stop reachable",
+    "M1R": "PASS: truthful collapsed-live status/timer/caption/enabled Stop and balanced expanded live composition"
+  },
+  "dimensionResults": {
+    "referenceHierarchy": "PASS",
+    "geometry": "PASS",
+    "typography": "PASS",
+    "material": "PASS",
+    "motion": "PASS",
+    "progressiveDisclosure": "PASS",
+    "nativeAmbientControlIntent": "PASS",
+    "meetingSlidesIdentityAndFunction": "PASS",
+    "browserOnlyStartNativeStop": "PASS",
+    "brandPrivateAssetBoundary": "PASS",
+    "privacyScreenShareClaimBoundary": "PASS",
+    "unsupportedCapabilityBoundary": "PASS"
+  },
+  "verification": {
+    "officialPacket": "PASS: 304/304",
+    "repairEvidenceChecksums": "PASS: 138/138 via Python direct SHA-256 reads",
+    "nativeMinibarFocused": "PASS: 59/59, 216 expectations",
+    "staticShellDomProtocol": "PASS: 35 pass; dynamic Puppeteer suite blocked before product assertions by installed Bun/puppeteer-core named-export incompatibility",
+    "swiftTypecheck": "PASS",
+    "installedBundleVerifier": "PASS",
+    "codesignStrict": "PASS",
+    "gitDiffCheck": "PASS",
+    "installedExecutableSha256": "915e570684a24f3f57b4ed7b3bd7b116ebc651ef8392e57e22184e76de2b40b5",
+    "minibarProjectionBytes": 23548,
+    "minibarProjectionSha256": "eb039bfcfb9c66844dae5b2bd0237a32ed4ed9701b90a2b7f68642718bffdad2",
+    "minibarViewSha256": "ba5909d23758b8d85851eed07bc1c2f477f0f577f44c2f1cf4c17e401a5eecb1",
+    "narrowCssSha256": "794ed65af8a53cb81cdde9b565c373d7385db6a357bf7f0fbbb73d2a62083dde",
+    "officialReferenceByteMatchesInShippedRoots": 0,
+    "unsupportedUserFacingScreenShareClaims": 0
+  },
+  "transientRaceResolution": {
+    "currentSourceCorrupt": false,
+    "conclusion": "Transient parallel read/write observation only; settled file remained stable for repeated stat/hash checks and exactly matches installed build receipt."
+  },
+  "boundaries": {
+    "productFilesEdited": false,
+    "testFilesEdited": false,
+    "planEdited": false,
+    "ledgerEdited": false,
+    "boulderEdited": false,
+    "todoEvidenceEdited": false,
+    "commitCreated": false,
+    "stagingPerformed": false,
+    "installedArtifactMutated": false,
+    "onlyFinalAuditDirectoryWritten": true
+  },
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f4-scope-fidelity-final/REPORT.md",
+    "sha256": "b490cc616e06a8df896e9f5c4e89332a34b74714668c5408a969f639ffdc132a"
+  },
+  "checksum": {
+    "algorithm": "sha256",
+    "scope": "UTF-8 pretty JSON with checksum.value replaced by null and one trailing LF",
+    "value": "a0ff58952bf87b0f1c1a72a6f8585491571111524be5b09b27fc6bbee38221b2"
+  }
+}

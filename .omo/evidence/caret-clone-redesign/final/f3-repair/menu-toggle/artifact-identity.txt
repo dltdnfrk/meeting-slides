@@ -1,0 +1,6 @@
+23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+com.meetingslides.app
+Identifier=com.meetingslides.app
+CDHash=65b146cfafdd04ad8fa79f5ce6e2b265f7182338
+Signature=adhoc
+TeamIdentifier=not set

@@ -1,0 +1,2 @@
+$ git diff --check (post-evidence refresh)
+EXIT=0

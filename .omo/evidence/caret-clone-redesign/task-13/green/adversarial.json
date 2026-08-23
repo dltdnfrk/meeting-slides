@@ -1,0 +1,115 @@
+{
+  "1-duplicate-ids": {
+    "duplicates": [],
+    "slideSurfaces": 1,
+    "disclosures": 1
+  },
+  "2-hidden-capability": [],
+  "3-stale-disclosure-toggle": {
+    "opened": true,
+    "after": true,
+    "preserved": true
+  },
+  "4-focus-restore": {
+    "provider-panel": {
+      "focusMovedInside": true,
+      "restoredTo": "btn-settings"
+    },
+    "attendee-panel": {
+      "focusMovedInside": true,
+      "restoredTo": "btn-attendees"
+    }
+  },
+  "5-payload-keys": {
+    "selectMeeting": {
+      "action": "selectMeeting",
+      "meetingId": 7
+    },
+    "ask": {
+      "action": "ask",
+      "meetingId": 7,
+      "question": "마감일?"
+    },
+    "selectUsesMeetingId": true,
+    "askUsesMeetingId": true
+  },
+  "6-narrow-overflow": {
+    "rootOverflowX": 0,
+    "bodyOverflowX": 0,
+    "clipped": []
+  },
+  "7-repeated-transitions": {
+    "shell": "library",
+    "disclosures": 1,
+    "compileHomes": 1,
+    "askHomes": 1,
+    "perceivableStops": [
+      "btn-record"
+    ]
+  },
+  "8-network-block": [
+    {
+      "id": "btn-export-md",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    },
+    {
+      "id": "btn-export-json",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    },
+    {
+      "id": "btn-export-transcript",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    },
+    {
+      "id": "btn-export-deck",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    },
+    {
+      "id": "btn-export-pdf",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    },
+    {
+      "id": "btn-export-png",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    },
+    {
+      "id": "btn-compile-deck",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    },
+    {
+      "id": "btn-reset",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    },
+    {
+      "id": "btn-record",
+      "disabled": true,
+      "painted": true,
+      "reasonMatches": true,
+      "reason": "앱 서버에 연결되어야 사용할 수 있습니다"
+    }
+  ]
+}

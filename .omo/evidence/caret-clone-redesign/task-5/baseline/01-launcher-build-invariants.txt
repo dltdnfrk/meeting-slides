@@ -1,0 +1,82 @@
+== protected dirty file hashes (must be unchanged at task end) ==
+b1449a31bf94f07a8357743507b4574a12f937c25660712386930fa80d84c445  .env.example
+777782b0a52844e9c308dae3b83622763447f12bec8f65a2ae50d9aa4a321b8e  .omo/start-work/ledger.jsonl
+c1fb2ba3c9299345dec6d60f7694267074ee85092ac43f67fab91d7b31da6648  DESIGN.md
+e1c3844f5cb4bb74d052b5deea9ee615940431ffa75bc49a73670e1ea912e64b  README.md
+6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad  public/app.js
+c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e  public/index.html
+e589a1fecb564ede96733cca2be08ea1802bc267584f02d8d3a1dcf86c11a56f  public/operator-surface.js
+ce5b33e747269f43ab611eb574b17fbcf83d01e0b9737f3444b2ab6f8a584599  public/workspace-split.js
+80084305117b26160b063c5c59b80ecc07fc92a2ac01ca40a64310281520a923  server.ts
+ee456f49538f5eec09789b6afe582aafff6b9180dba19e86e67cccb52dacf444  src/app-settings.ts
+0cdc3197595e30d3fc725249e26e7c667cd040b7c651e04d93eb8c19b49f90a8  src/config.ts
+12eaba3b65342171d6d53ad8cecddc8c6d291bc91a38fe403c61f618c0d43a15  src/llm.ts
+b9b8c4436264860f5b03a829f90ca8d256cb999b8758cd26812f8579631cea0e  src/minutes.ts
+17b4fa02f0c4f443ab49584f6f80f9787be432e52a23ae15d9413d382236bdb9  src/provider-adapters.ts
+624995935cf4bcaf2647942b949146d3d546f1b4ec91edbd0cee5dde83b07f5b  src/providers.ts
+2e8ec7b84774a973e9263932c83390b8fec00f8389b6a19fad9c6787b211b5a7  tests/app-settings.test.ts
+73d9c3d62bdaab1bcb2acec8ce0aa845e893b0567ebed82995570e70fb4402c5  tests/providers.test.ts
+a4ee68f1497be5a0efabe73779925e3785dd594bb0b1ae959a1e8a7a00002bc2  tests/public-operator-surface.test.ts
+90e3d3e89b3e3cd9628371ef5def2226d3b2e463389b4d8f81a582c236bd1bab  tests/public-workspace.test.ts
+
+== macos/ tree ==
+total 24
+drwxr-xr-x@  3 hyunjun  staff    96 Aug  6 09:44 .
+drwxr-xr-x@ 37 hyunjun  staff  1184 Aug 11 15:27 ..
+-rw-r--r--@  1 hyunjun  staff  9106 Aug  6 09:44 launcher.swift
+265345c61bdba05852e5f59f906f37c7867417270b747ce9786edb13580df6c9  macos/launcher.swift
+dbe1d53412d71a839a6ac53f6e3c6cff812b285e923b3e4ccccc1dad49938e34  scripts/build-app.sh
+
+== launcher invariants (grep receipts) ==
+-- imports --
+4:import AVFoundation
+5:import AppKit
+6:import EventKit
+7:import Foundation
+-- default port --
+90:    guard let contents = try? String(contentsOfFile: envFile, encoding: .utf8) else { return 8787 }
+95:        guard parts.count == 2, parts[0].trimmingCharacters(in: .whitespaces) == "HTTP_PORT" else { continue }
+100:    return 8787
+210:env["HTTP_PORT"] = String(port)
+-- readiness signature --
+118:            // launcher health: title + runtime-bootstrap
+119:            ok = body.contains("<title>Meeting Slides") && body.contains("runtime-bootstrap")
+-- webkit --
+103:/// 서버 readiness: 웹앱 HTML 시그니처 (WKWebView 아님).
+-- auto-capture endpoint --
+171:                post("api/auto-capture")
+
+== build-app.sh invariants ==
+36:  <key>CFBundleIdentifier</key><string>com.meetingslides.app</string>
+40:  <key>CFBundleExecutable</key><string>meeting-slides</string>
+66:swiftc -O -o "$MACOS_DIR/meeting-slides" macos/launcher.swift \
+75:codesign --verify --deep --strict "$APP"
+82:if strings "$MACOS_DIR/meeting-slides" | rg -q 'WKWebView|WebKit\.framework'; then
+84:  if otool -L "$MACOS_DIR/meeting-slides" | rg -q 'WebKit'; then
+85:    echo "build still links WebKit"
+89:if otool -L "$MACOS_DIR/meeting-slides" | rg -q 'WebKit'; then
+90:  echo "build still links WebKit"
+
+== installed bundle Info.plist ==
+{
+  "CFBundleDevelopmentRegion" => "ko"
+  "CFBundleDisplayName" => "Meeting Slides"
+  "CFBundleExecutable" => "meeting-slides"
+  "CFBundleIconFile" => "AppIcon"
+  "CFBundleIdentifier" => "com.meetingslides.app"
+  "CFBundleInfoDictionaryVersion" => "6.0"
+  "CFBundleName" => "Meeting Slides"
+  "CFBundlePackageType" => "APPL"
+  "CFBundleShortVersionString" => "0.3.0"
+  "CFBundleVersion" => "3"
+  "LSApplicationCategoryType" => "public.app-category.productivity"
+  "LSMinimumSystemVersion" => "13.0"
+  "LSMultipleInstancesProhibited" => true
+  "LSUIElement" => false
+  "NSAppTransportSecurity" => {
+    "NSAllowsLocalNetworking" => true
+  }
+  "NSHighResolutionCapable" => true
+  "NSMicrophoneUsageDescription" => "회의 음성을 로컬에서 전사하기 위해 마이크가 필요합니다."
+  "NSSupportsAutomaticGraphicsSwitching" => true
+}

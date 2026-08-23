@@ -1,0 +1,134 @@
+{
+  "provider-panel-1244": {
+    "triggerFocusedBefore": "btn-settings",
+    "open": {
+      "hidden": false,
+      "role": "dialog",
+      "ariaModal": "false",
+      "position": "fixed",
+      "box": {
+        "x": 804,
+        "y": 68,
+        "w": 420,
+        "h": 748
+      },
+      "offscreen": false,
+      "activeElement": "btn-settings",
+      "rootOverflowX": 0
+    },
+    "afterEscape": {
+      "hidden": true,
+      "activeElement": "btn-settings"
+    }
+  },
+  "attendee-panel-1244": {
+    "triggerFocusedBefore": "btn-attendees",
+    "open": {
+      "hidden": false,
+      "role": "dialog",
+      "ariaModal": null,
+      "position": "fixed",
+      "box": {
+        "x": 462,
+        "y": 58,
+        "w": 320,
+        "h": 275
+      },
+      "offscreen": false,
+      "activeElement": "attendee-name",
+      "rootOverflowX": 0
+    },
+    "afterEscape": {
+      "hidden": true,
+      "activeElement": "btn-attendees"
+    }
+  },
+  "ask-panel-1244": {
+    "triggerFocusedBefore": "btn-attendees",
+    "open": {
+      "hidden": true,
+      "role": null,
+      "ariaModal": null,
+      "position": "fixed",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      },
+      "offscreen": false,
+      "activeElement": "btn-attendees",
+      "rootOverflowX": 0
+    },
+    "afterEscape": {
+      "hidden": true,
+      "activeElement": "btn-attendees"
+    }
+  },
+  "provider-panel-375": {
+    "triggerFocusedBefore": "btn-settings",
+    "open": {
+      "hidden": false,
+      "role": "dialog",
+      "ariaModal": "false",
+      "position": "fixed",
+      "box": {
+        "x": 10,
+        "y": 60,
+        "w": 351,
+        "h": 742
+      },
+      "offscreen": false,
+      "activeElement": "btn-settings",
+      "rootOverflowX": 0
+    },
+    "afterEscape": {
+      "hidden": true,
+      "activeElement": "btn-settings"
+    }
+  },
+  "attendee-panel-375": {
+    "triggerFocusedBefore": "btn-attendees",
+    "open": {
+      "hidden": false,
+      "role": "dialog",
+      "ariaModal": null,
+      "position": "fixed",
+      "box": {
+        "x": 12,
+        "y": 52,
+        "w": 351,
+        "h": 275
+      },
+      "offscreen": false,
+      "activeElement": "attendee-name",
+      "rootOverflowX": 0
+    },
+    "afterEscape": {
+      "hidden": true,
+      "activeElement": "btn-attendees"
+    }
+  },
+  "ask-panel-375": {
+    "triggerFocusedBefore": "btn-attendees",
+    "open": {
+      "hidden": true,
+      "role": null,
+      "ariaModal": null,
+      "position": "fixed",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      },
+      "offscreen": false,
+      "activeElement": "btn-attendees",
+      "rootOverflowX": 0
+    },
+    "afterEscape": {
+      "hidden": true,
+      "activeElement": "btn-attendees"
+    }
+  }
+}

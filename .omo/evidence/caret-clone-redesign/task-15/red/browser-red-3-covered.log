@@ -1,0 +1,93 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+850 |                 .map(label);
+851 |               if (covering.length > 0) out.push(`${name}<-${covering[0]}`);
+852 |             }
+853 |             return out;
+854 |           }, SHELL_CONTROL_SELECTOR);
+855 |           expect({ shell, covered }).toEqual({ shell, covered: [] });
+                                           ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "covered": [],
++   "covered": [
++     "btn-action-copy<-dock__more-summary(buried)",
++     "btn-action-open<-dock__more-summary(buried)",
++   ],
+    "shell": "library",
+  }
+
+- Expected  - 1
++ Received  + 4
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:855:38)
+(fail) Todo 15 · every painted control is a real target, scroll included > 1440x900 library: no painted control is covered by another surface [84.95ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1440x900 live: no painted control is covered by another surface [90.36ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1244x836 library: no painted control is covered by another surface [83.27ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1244x836 live: no painted control is covered by another surface [87.33ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1100x800 library: no painted control is covered by another surface [81.57ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1100x800 live: no painted control is covered by another surface [89.44ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 960x760 library: no painted control is covered by another surface [78.17ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 960x760 live: no painted control is covered by another surface [84.88ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 900x760 library: no painted control is covered by another surface [81.05ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 900x760 live: no painted control is covered by another surface [83.53ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 899x760 library: no painted control is covered by another surface [76.45ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 899x760 live: no painted control is covered by another surface [84.00ms]
+850 |                 .map(label);
+851 |               if (covering.length > 0) out.push(`${name}<-${covering[0]}`);
+852 |             }
+853 |             return out;
+854 |           }, SHELL_CONTROL_SELECTOR);
+855 |           expect({ shell, covered }).toEqual({ shell, covered: [] });
+                                           ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "covered": [],
++   "covered": [
++     "btn-action-copy<-dock__commandbar(buried)",
++     "btn-action-open<-dock__commandbar(buried)",
++   ],
+    "shell": "library",
+  }
+
+- Expected  - 1
++ Received  + 4
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:855:38)
+(fail) Todo 15 · every painted control is a real target, scroll included > 820x900 library: no painted control is covered by another surface [79.85ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 820x900 live: no painted control is covered by another surface [82.85ms]
+850 |                 .map(label);
+851 |               if (covering.length > 0) out.push(`${name}<-${covering[0]}`);
+852 |             }
+853 |             return out;
+854 |           }, SHELL_CONTROL_SELECTOR);
+855 |           expect({ shell, covered }).toEqual({ shell, covered: [] });
+                                           ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "covered": [],
++   "covered": [
++     "btn-action-copy<-dock__tabs(buried)",
++     "btn-action-open<-dock__tabs(buried)",
++   ],
+    "shell": "library",
+  }
+
+- Expected  - 1
++ Received  + 4
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:855:38)
+(fail) Todo 15 · every painted control is a real target, scroll included > 375x812 library: no painted control is covered by another surface [77.20ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 375x812 live: no painted control is covered by another surface [84.40ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 320x667 library: no painted control is covered by another surface [77.57ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 320x667 live: no painted control is covered by another surface [81.59ms]
+
+ 15 pass
+ 56 filtered out
+ 3 fail
+ 18 expect() calls
+Ran 18 tests across 1 file. [1.93s]

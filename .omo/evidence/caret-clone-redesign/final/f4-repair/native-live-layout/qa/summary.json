@@ -1,0 +1,142 @@
+{
+  "verdict": "PASS",
+  "installedExecutableSHA256": "915e570684a24f3f57b4ed7b3bd7b116ebc651ef8392e57e22184e76de2b40b5",
+  "isolatedPort": 54832,
+  "noMicUserDbExternalAPI": true,
+  "offDisplayRestoration": {
+    "seed": [
+      9000,
+      9000,
+      360,
+      56
+    ],
+    "bounds": {
+      "Height": 56,
+      "Width": 360,
+      "X": 1136,
+      "Y": 854
+    },
+    "pass": true
+  },
+  "collapsedIdle": {
+    "bounds": {
+      "Height": 56,
+      "Width": 360,
+      "X": 1136,
+      "Y": 854
+    },
+    "status": true,
+    "stopEnabled": false,
+    "stopHelp": "중지할 녹음이 없습니다",
+    "pass": true
+  },
+  "collapsedLive": {
+    "bounds": {
+      "Height": 56,
+      "Width": 360,
+      "X": 1136,
+      "Y": 854
+    },
+    "status": true,
+    "caption": true,
+    "timer": "02:05",
+    "expectedTimerSecondsAtCapture": 125,
+    "stopEnabled": true,
+    "stopHelp": "진행 중인 녹음을 중지합니다",
+    "capturingWireFrame": {
+      "type": "capture",
+      "capturing": true,
+      "mode": "mic",
+      "phase": "capturing",
+      "startedAt": 1786517313019
+    },
+    "pass": true
+  },
+  "expandedLive": {
+    "bounds": {
+      "Height": 220,
+      "Width": 560,
+      "X": 936,
+      "Y": 690
+    },
+    "layoutUsesBothRegions": true,
+    "statusX": 977.5,
+    "stopX": 959,
+    "transcriptXs": [
+      1147,
+      1147,
+      1147,
+      1147
+    ],
+    "actionsX": [
+      1135,
+      1313
+    ],
+    "allContentInsideWindow": true,
+    "pass": true
+  },
+  "expandedEnded": {
+    "bounds": {
+      "Height": 220,
+      "Width": 560,
+      "X": 936,
+      "Y": 690
+    },
+    "status": true,
+    "stopEnabled": false,
+    "stopHelp": "중지할 녹음이 없습니다",
+    "transcriptCleared": true,
+    "authoritativeIdleFrames": 2,
+    "pass": true
+  },
+  "nativeStopWire": {
+    "commands": [
+      "{\"action\":\"stopCapture\"}"
+    ],
+    "pass": true
+  },
+  "menuToggle": {
+    "hiddenWindowCount": 1,
+    "restoredBounds": {
+      "Height": 220,
+      "Width": 560,
+      "X": 936,
+      "Y": 690
+    },
+    "pass": true
+  },
+  "screenshots": {
+    "01-collapsed-idle.display": {
+      "sha256": "17101ef47f83168df1ff64a7c5cdf2c23465e7ec0ec75c8ae55badc0236c7820",
+      "bytes": 1574197
+    },
+    "01-collapsed-idle.panel": {
+      "sha256": "550b12e8f2cec0e1f30e2888fb1814f1419faa3e8bfbf27f662d028598dfa842",
+      "bytes": 29377
+    },
+    "02-collapsed-live.display": {
+      "sha256": "b73fd696d30193670fba8174f7890973f511e984657bc80b9f608220d7d41e82",
+      "bytes": 1576868
+    },
+    "02-collapsed-live.panel": {
+      "sha256": "04b02c5c12f0a0151394c462db1694010e5efc09ed2bd02da20594eb50aa1cbb",
+      "bytes": 32779
+    },
+    "03-expanded-live.display": {
+      "sha256": "a7f359622cdcd24136b9870a57cdbb57b93b54bde0b05ab7325ace936ed98e78",
+      "bytes": 1607557
+    },
+    "03-expanded-live.panel": {
+      "sha256": "8ccf7035b2c92c55034778512a81fe8df449affc002c3ab6af453c43ac0f2432",
+      "bytes": 85910
+    },
+    "04-expanded-ended.display": {
+      "sha256": "1cf55b429a6ac422c1cbea8bc48f02cb2a50ee251ff199a30ff9434015994a44",
+      "bytes": 1599664
+    },
+    "04-expanded-ended.panel": {
+      "sha256": "3ebca0ae34956169dd9878f604af7711842bebd5c13338b70dae8fb80aabf6ab",
+      "bytes": 59449
+    }
+  }
+}

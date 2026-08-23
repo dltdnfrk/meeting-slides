@@ -1,0 +1,22 @@
+started=2026-08-12T04:45:54Z
+root=/Users/hyunjun/Documents/MUNI/meeting-slides
+head=a1ed25f95980980cd958044b90e739ac45e8280d
+status_sha256=e59fb72ad966d164578e43c76859133c3c7c6050134b2f4a19575fda813b4ad5
+existing_exec_sha256=
+marker=
+displays:
+Graphics/Displays:
+      Displays:
+          Display Type: Built-in Liquid Retina XDR Display
+          Resolution: 3024 x 1964 Retina
+          Main Display: Yes
+          Online: Yes
+          Resolution: 3840 x 2160 (2160p/4K UHD 1 - Ultra High Definition)
+          UI Looks like: 1920 x 1080 @ 60.00Hz
+          Online: Yes
+          Resolution: 2160 x 3840
+          UI Looks like: 1080 x 1920 @ 60.00Hz
+          Online: Yes
+          Resolution: 3840 x 2160 (2160p/4K UHD 1 - Ultra High Definition)
+          UI Looks like: 1920 x 1080 @ 60.00Hz
+          Online: Yes

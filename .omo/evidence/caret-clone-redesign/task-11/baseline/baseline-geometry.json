@@ -1,0 +1,181 @@
+{
+  "empty-library": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 327,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "rootOverflow": {
+      "horizontal": 0
+    },
+    "meetingTitles": [],
+    "transcriptLines": 0
+  },
+  "library-overview": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 335,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 223
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "rootOverflow": {
+      "horizontal": 0
+    },
+    "meetingTitles": [
+      "제품 로드맵 정렬",
+      "고객 온보딩 리뷰",
+      "분기 회고"
+    ],
+    "transcriptLines": 15
+  },
+  "library-transcript": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 335,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 223
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "rootOverflow": {
+      "horizontal": 0
+    },
+    "meetingTitles": [
+      "제품 로드맵 정렬",
+      "고객 온보딩 리뷰",
+      "분기 회고"
+    ],
+    "transcriptLines": 15
+  }
+}

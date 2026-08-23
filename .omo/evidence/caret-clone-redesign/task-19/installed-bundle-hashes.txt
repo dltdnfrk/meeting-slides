@@ -1,0 +1,2 @@
+f77a58fb22bbe5a63de7ea7fbbfeb79cbbedd12be8674fc78811b8d0fc66b6c2  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+1b22a6d3c58c297be772bc6f122b6e83af39cab03f319bedeb9ca0d0443f6df4  /Users/hyunjun/Applications/Meeting Slides.app/Contents/Info.plist

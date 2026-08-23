@@ -1,0 +1,5 @@
+== swiftc -typecheck launcher + AppLifecycle (bundle target) ==
+exit=0
+
+== swiftc -typecheck pure seam (contract + lifecycle + transport + driver) ==
+exit=0

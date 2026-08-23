@@ -1,0 +1,404 @@
+{
+  "segment": "A",
+  "expectedHash": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+  "port": 54741,
+  "deadlines": [
+    {
+      "label": "initial-connected",
+      "ms": 30000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "capturing",
+      "ms": 60000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "sixteen-final-lines",
+      "ms": 60000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "compile-disclosure-open",
+      "ms": 10000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "compile-terminal",
+      "ms": 180000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "history-preview",
+      "ms": 180000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "history-return",
+      "ms": 10000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "export:#btn-export-md",
+      "ms": 120000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "export:#btn-export-json",
+      "ms": 120000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "export:#btn-export-transcript",
+      "ms": 120000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "export:#btn-export-deck",
+      "ms": 120000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "connection-lost",
+      "ms": 30000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "connection-restored",
+      "ms": 60000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "browser-reopen-live",
+      "ms": 30000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "browser-stop-idle",
+      "ms": 30000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "ended-meeting-row",
+      "ms": 30000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "review-ready",
+      "ms": 60000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "ask-answer",
+      "ms": 60000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "compile-disclosure-open",
+      "ms": 10000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "reset-selection",
+      "ms": 10000,
+      "subscribedBeforeTrigger": true
+    },
+    {
+      "label": "controlled-bad-input",
+      "ms": 60000,
+      "subscribedBeforeTrigger": true
+    }
+  ],
+  "installed": {
+    "pid": 7573,
+    "actualHash": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+    "isolatedProject": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/f3-manual-qa.PSSUqH/project",
+    "database": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/f3-manual-qa.PSSUqH/meetings.db",
+    "exports": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/f3-manual-qa.PSSUqH/project/exports"
+  },
+  "start": {
+    "shell": "live",
+    "detailTab": "overview",
+    "capturePhase": "capturing",
+    "stageState": "empty",
+    "uiState": "capture-live",
+    "connectionState": "online",
+    "connection": "connected",
+    "focus": "btn-live-stop",
+    "lines": 16,
+    "overflow": 0,
+    "stop": {
+      "x": 486.453125,
+      "y": 73,
+      "w": 66.0859375,
+      "h": 44
+    },
+    "slide": {
+      "x": 16,
+      "y": 134,
+      "w": 1083,
+      "h": 544.5
+    }
+  },
+  "viewports": {
+    "1440x900": {
+      "shell": "live",
+      "detailTab": "overview",
+      "capturePhase": "capturing",
+      "stageState": "empty",
+      "uiState": "capture-live",
+      "connectionState": "online",
+      "connection": "connected",
+      "focus": "btn-live-stop",
+      "lines": 16,
+      "overflow": 0,
+      "stop": {
+        "x": 486.453125,
+        "y": 73,
+        "w": 66.0859375,
+        "h": 44
+      },
+      "slide": {
+        "x": 16,
+        "y": 134,
+        "w": 1083,
+        "h": 544.5
+      }
+    },
+    "1244x836": {
+      "shell": "live",
+      "detailTab": "overview",
+      "capturePhase": "capturing",
+      "stageState": "empty",
+      "uiState": "capture-live",
+      "connectionState": "online",
+      "connection": "connected",
+      "focus": "btn-live-stop",
+      "lines": 16,
+      "overflow": 0,
+      "stop": {
+        "x": 388.453125,
+        "y": 73,
+        "w": 66.0859375,
+        "h": 44
+      },
+      "slide": {
+        "x": 16,
+        "y": 134,
+        "w": 887,
+        "h": 480.5
+      }
+    },
+    "960x760": {
+      "shell": "live",
+      "detailTab": "overview",
+      "capturePhase": "capturing",
+      "stageState": "empty",
+      "uiState": "capture-live",
+      "connectionState": "online",
+      "connection": "connected",
+      "focus": "btn-live-stop",
+      "lines": 16,
+      "overflow": 0,
+      "stop": {
+        "x": 246.453125,
+        "y": 73,
+        "w": 66.0859375,
+        "h": 44
+      },
+      "slide": {
+        "x": 16,
+        "y": 134,
+        "w": 603,
+        "h": 404.5
+      }
+    },
+    "820x900": {
+      "shell": "live",
+      "detailTab": "overview",
+      "capturePhase": "capturing",
+      "stageState": "empty",
+      "uiState": "capture-live",
+      "connectionState": "online",
+      "connection": "connected",
+      "focus": "btn-live-stop",
+      "lines": 16,
+      "overflow": 0,
+      "stop": {
+        "x": 338.953125,
+        "y": 73,
+        "w": 66.0859375,
+        "h": 44
+      },
+      "slide": {
+        "x": 16,
+        "y": 134,
+        "w": 788,
+        "h": 306
+      }
+    },
+    "375x812": {
+      "shell": "live",
+      "detailTab": "overview",
+      "capturePhase": "capturing",
+      "stageState": "empty",
+      "uiState": "capture-live",
+      "connectionState": "online",
+      "connection": "connected",
+      "focus": "btn-live-stop",
+      "lines": 16,
+      "overflow": 0,
+      "stop": {
+        "x": 116.453125,
+        "y": 82,
+        "w": 66.0859375,
+        "h": 44
+      },
+      "slide": {
+        "x": 12,
+        "y": 143,
+        "w": 351,
+        "h": 197.4375
+      }
+    },
+    "320x667": {
+      "shell": "live",
+      "detailTab": "overview",
+      "capturePhase": "capturing",
+      "stageState": "empty",
+      "uiState": "capture-live",
+      "connectionState": "online",
+      "connection": "connected",
+      "focus": "btn-live-stop",
+      "lines": 16,
+      "overflow": 0,
+      "stop": {
+        "x": 88.953125,
+        "y": 82,
+        "w": 66.0859375,
+        "h": 44
+      },
+      "slide": {
+        "x": 12,
+        "y": 143,
+        "w": 296,
+        "h": 166.5
+      }
+    }
+  },
+  "compile": {
+    "status": "슬라이드 3장 완성",
+    "state": {
+      "shell": "live",
+      "detailTab": "overview",
+      "capturePhase": "capturing",
+      "stageState": "history-preview",
+      "uiState": "compile-complete",
+      "connectionState": "online",
+      "connection": "connected",
+      "focus": null,
+      "lines": 16,
+      "overflow": 0,
+      "stop": {
+        "x": 246.453125,
+        "y": 73,
+        "w": 66.0859375,
+        "h": 44
+      },
+      "slide": {
+        "x": 16,
+        "y": 134,
+        "w": 603,
+        "h": 261.5
+      }
+    }
+  },
+  "exports": {
+    "meeting-2026-08-12T05-18-25-790Z.md": "445b90a3482340d917247b31a8cd0329f58a38d6924e7e531e4e6ee0892835a9",
+    "meeting-2026-08-12T05-18-25-815Z.json": "7667ee404c9165dbf1e290ba994213287da83eab78ff379802082627f18683ec",
+    "scene-2026-08-12T05-18-25-714Z/index.html": "f549d62377da3caa9cb7efc34964d9ba8bdfa91b1c3c18c7e321d35e481192f7",
+    "scene-2026-08-12T05-18-25-714Z/narrative.json": "98c8cdc11d468bc637834c732252d8da32ebdb03e156326d098fbfaad7fe765c",
+    "scene-2026-08-12T05-18-25-714Z/presentation.pptx": "5665a7a1d6742bc363c1aeb1fcc5ebdf3843dac4675cf541bfe95379d84d1243",
+    "scene-2026-08-12T05-18-25-714Z/scene.json": "330225dd0b303985909a3c7848ff527f45e6ffdfcd7a1f849a6a2c223a3fba55",
+    "scene-2026-08-12T05-18-25-714Z/slides/slide-00.html": "443609354a9cd576493d6f99dfe3c0d234cb4667950159cb5b7472f33aff0efa",
+    "scene-2026-08-12T05-18-25-714Z/slides/slide-01.html": "c7e9fa2c617ff1a1313efe69961b2adbbdadb2ba722135635af054783633f4e7",
+    "scene-2026-08-12T05-18-25-714Z/slides/slide-02.html": "f83ec007ad75c9ec7dd7a9baac8037afefb452f8710dda439ccee984a90537f5",
+    "scene-2026-08-12T05-18-25-907Z/index.html": "f549d62377da3caa9cb7efc34964d9ba8bdfa91b1c3c18c7e321d35e481192f7",
+    "scene-2026-08-12T05-18-25-907Z/narrative.json": "98c8cdc11d468bc637834c732252d8da32ebdb03e156326d098fbfaad7fe765c",
+    "scene-2026-08-12T05-18-25-907Z/presentation.pptx": "5665a7a1d6742bc363c1aeb1fcc5ebdf3843dac4675cf541bfe95379d84d1243",
+    "scene-2026-08-12T05-18-25-907Z/scene.json": "330225dd0b303985909a3c7848ff527f45e6ffdfcd7a1f849a6a2c223a3fba55",
+    "scene-2026-08-12T05-18-25-907Z/slides/slide-00.html": "443609354a9cd576493d6f99dfe3c0d234cb4667950159cb5b7472f33aff0efa",
+    "scene-2026-08-12T05-18-25-907Z/slides/slide-01.html": "c7e9fa2c617ff1a1313efe69961b2adbbdadb2ba722135635af054783633f4e7",
+    "scene-2026-08-12T05-18-25-907Z/slides/slide-02.html": "f83ec007ad75c9ec7dd7a9baac8037afefb452f8710dda439ccee984a90537f5",
+    "transcript-2026-08-12T05-18-25-853Z.md": "590790201cf7ab3a140dbd435784b0a4b7b20afef067a65999ec3f30830aded0"
+  },
+  "reconnect": {
+    "beforeDisconnect": 16,
+    "afterDisconnect": 16
+  },
+  "browserReopen": {
+    "shell": "live",
+    "detailTab": "overview",
+    "capturePhase": "capturing",
+    "stageState": "waiting",
+    "uiState": "capture-live",
+    "connectionState": "online",
+    "connection": "connected",
+    "focus": null,
+    "lines": 16,
+    "overflow": 0,
+    "stop": {
+      "x": 388.453125,
+      "y": 73,
+      "w": 66.0859375,
+      "h": 44
+    },
+    "slide": {
+      "x": 16,
+      "y": 134,
+      "w": 887,
+      "h": 457
+    }
+  },
+  "stop": {
+    "shell": "library",
+    "detailTab": "overview",
+    "capturePhase": "idle",
+    "stageState": "empty",
+    "uiState": "idle-library",
+    "connectionState": "online",
+    "connection": "connected",
+    "focus": "btn-live-stop",
+    "lines": 16,
+    "overflow": 0,
+    "stop": {
+      "x": 0,
+      "y": 0,
+      "w": 0,
+      "h": 0
+    },
+    "slide": {
+      "x": 261,
+      "y": 274,
+      "w": 760,
+      "h": 427.5
+    }
+  },
+  "review": {
+    "state": "ready",
+    "text": "회의록 검토\n      원문 연결됨\n      ✕\n    \n    \n    \n    \n      \n      결정 사항과 할 일을 정리하는 중…\n    \n    확인할 결정 사항이나 할 일을 찾지 못했습니다\n    \n      다시 정리\n      확인한 항목만 최종 회의록에 반영됩니다\n      \n        검토 완료 0"
+  },
+  "ask": "배포일과 담당자는 누구인가요?금요일 배포로 결정했고 민수가 릴리스 노트를 담당합니다.\n\n\n(전사 5개 구간에서 답변)",
+  "resetDialog": {
+    "type": "confirm",
+    "message": "현재 회의를 닫고 새 회의를 준비할까요?\n저장된 회의 기록과 내보낸 파일은 그대로 남습니다."
+  },
+  "badInput": {
+    "text": "회의 #2 기록을 불러왔습니다",
+    "role": "status"
+  },
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "result": "PASS"
+}

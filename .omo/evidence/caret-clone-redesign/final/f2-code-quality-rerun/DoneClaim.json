@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "task": "F2. Code quality review rerun after native quit-protection repair",
+  "taskId": "st_019ff440",
+  "parentSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "completedAt": "2026-08-12T04:40:41Z",
+  "status": "PASS",
+  "verdict": "APPROVE",
+  "auditedHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "findings": {
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "rejectionRepair": {
+    "originalFinding": "Quit protection omitted stopping and switching-model.",
+    "predicate": "CapturePhase.requiresQuitProtection == (phase != idle)",
+    "enumCases": [
+      "idle",
+      "starting",
+      "capturing",
+      "stopping",
+      "switching-model"
+    ],
+    "phaseTable": {
+      "idle": false,
+      "starting": true,
+      "capturing": true,
+      "stopping": true,
+      "switching-model": true
+    },
+    "coverage": "PASS: exact one-to-one coverage of all five cases",
+    "controllerDelegation": "PASS",
+    "repairManifest": "PASS"
+  },
+  "verification": {
+    "nativeMinibar": "PASS: 56/56",
+    "nativeLauncherBoundary": "PASS: 42/42",
+    "nativeSurfaceContract": "PASS: 31/31",
+    "nativeAggregate": "PASS: 129/129, 350 assertions",
+    "planRelatedAggregate": "PASS: 983/983, 5003 assertions, 71 files",
+    "typescript": "PASS",
+    "swiftAggregateTypecheck": "PASS",
+    "generatedModuleDrift": "PASS",
+    "appBuild": "PASS",
+    "bundleVerifier": "PASS",
+    "codesignStrict": "PASS",
+    "gitDiffCheck": "PASS",
+    "protectedUnrelatedHashes": "PASS"
+  },
+  "diagnostics": {
+    "publicJs": "PASS: zero diagnostics",
+    "publicReducerTs": "PASS: zero diagnostics",
+    "nativeTestTs": "PASS: zero diagnostics",
+    "serverTs": "PASS: no errors/warnings; unused-symbol hints only",
+    "swift": "standalone SourceKit cross-file noise; authoritative aggregate swiftc PASS",
+    "environmentGaps": [
+      "Biome unavailable for HTML/CSS diagnostics",
+      "bash-language-server unavailable for shell diagnostics"
+    ]
+  },
+  "unrelatedAttribution": {
+    "acceptedFrom": "current F1/F2 attribution after fresh protected-byte comparison",
+    "excludedOnly": [
+      "tests/llm-transport.test.ts",
+      "tests/start-review-action.test.ts",
+      "tests/attendees-action.test.ts"
+    ],
+    "allHashesMatch": true,
+    "planRelatedFilesExcluded": false
+  },
+  "installedArtifactHashes": {
+    "executable": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+    "infoPlist": "1b22a6d3c58c297be772bc6f122b6e83af39cab03f319bedeb9ca0d0443f6df4",
+    "projectMarker": "55182b91c2255401a77db395b8b7b97c1dccb482721f890337d584693cc7ae0a"
+  },
+  "governanceObserved": {
+    "planSha256": "2f92ae504fe69d496841eb4125f30d738c0de1b1511cdcb1fe77c0b2cf61a6ae",
+    "ledgerSha256": "d76c49ef2043aa9104bb6bad28b9ae69ec8fd168474d7b3543c486367610c8e4",
+    "boulderSha256": "763f75d9093f9cab541518aabc7cfc7d43c32bcf7df84b081e5b07ba690c6b03",
+    "planState": "Todos 1-19 and F1 checked; F2-F4 unchecked"
+  },
+  "boundaries": {
+    "productFilesEdited": false,
+    "planEdited": false,
+    "ledgerEdited": false,
+    "boulderEdited": false,
+    "todoEvidenceEdited": false,
+    "commitCreated": false,
+    "stagingPerformed": false,
+    "f3OrF4Entered": false,
+    "onlyFreshEvidenceDirectoryWritten": true
+  },
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f2-code-quality-rerun/REPORT.md",
+    "sha256": "77367105e00a1129b5d4899b1aeffc532923c6528708c9b2a17b3cda8b674215"
+  },
+  "checksum": {
+    "algorithm": "sha256",
+    "scope": "UTF-8 pretty JSON with checksum.value replaced by null and one trailing LF",
+    "value": "d56299cef0bcba6101dab9aa1e0db8e10c093d99d55099667bcbbc9684187af4"
+  }
+}

@@ -1,0 +1,7 @@
+(fail) pre-capture attendee registration form > startCapture carries the prepared meeting_id once attendees are saved [74.31ms]
+(fail) pre-capture attendee registration form > capture is never hard-gated on attendees [47.92ms]
+(fail) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture [75.94ms]
+(fail) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id [70.10ms]
+(fail) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches [4987.07ms]
+ 19 pass
+ 5 fail

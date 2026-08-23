@@ -1,0 +1,23 @@
+=== repair cleanup ===
+removed: /tmp/t16fix/ (product+test backups, probe tsconfig)
+/tmp/t16fix exists: no
+tsconfig.task16.json exists: no
+tsconfig.probe.json exists: no
+
+=== processes ===
+dual-surface-driver: 0
+bun test: 0
+Chrome for Testing: 0
+stray server.ts (spawned by ws-dispatch): 0
+
+=== swiftc temp dirs ===
+none
+
+=== git boundary ===
+HEAD: a1ed25f95980980cd958044b90e739ac45e8280d
+staged: 0
+task-16 files dirty:
+   M public/app.js
+   M server.ts
+   M tests/server-ws-dispatch.test.ts
+  ?? tests/caret-dual-surface.test.ts

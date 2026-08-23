@@ -1,0 +1,40 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-operator-surface.test.ts:
+(pass) TIRO 기반 오퍼레이터 표면 > 중앙 슬라이드 계약과 필수 DOM ID를 한 번씩만 보존한다 [3.87ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 플로팅 도크가 녹음·파형·타이머와 3-way 출력을 품는다 [0.42ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 번역과 전사 편집은 서버 계약 사유를 노출한 채 비활성화된다 [0.38ms]
+(pass) TIRO 기반 오퍼레이터 표면 > capture 메시지가 녹음 버튼을 파형 상태로 전환한다 [6.88ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 3-way 출력에서 전체 전사를 선택하면 패널로 이동하고 현재 상태를 갱신한다 [66.42ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 1280·768·375에서 셸이 가로로 넘치지 않는다 [16.51ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 비활성 사유와 모바일 전사 본문이 잘리지 않는다 [7.13ms]
+(pass) TIRO 기반 오퍼레이터 표면 > caret dual shell exposes detail tabs and live compact mode [77.75ms]
+
+tests/public-protocol-reliability.test.ts:
+(pass) public meeting/export protocol reliability > transcript uses its dedicated action and selected meeting target [75.84ms]
+(pass) public meeting/export protocol reliability > historical payload hydrates transcript, current/history slides and compiled selection [28.28ms]
+(pass) public meeting/export protocol reliability > typed progress disables conflicts and terminal error restores controls with retry [18.51ms]
+
+tests/public-workspace.test.ts:
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 좌/중앙/우 세 패널을 담는다 [0.58ms]
+(pass) 워크스페이스 셸 구조 > 중앙 패널이 기존 시각 자료 무대를 그대로 품는다 [0.46ms]
+(pass) 워크스페이스 셸 구조 > 세 패널이 가로로 나란히 놓이고 하단 도크가 보존된다 [34.72ms]
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 가로 오버플로 없이 뷰포트에 맞는다 [0.38ms]
+(pass) 워크스페이스 스플리터 > 두 스플리터가 패널 사이 DOM 순서에 놓인다 [99.54ms]
+(pass) 워크스페이스 스플리터 > 포커스 가능한 스플리터가 방향과 현재·최소·최대 폭을 노출한다 [108.37ms]
+(pass) 워크스페이스 스플리터 > 키보드 Arrow/Home/End가 양쪽 스플리터 폭과 ARIA 현재값을 동기화한다 [130.84ms]
+(pass) 워크스페이스 스플리터 > 좌 스플리터를 끌면 레일이 넓어지고 무대가 그만큼 줄어든다 [180.09ms]
+(pass) 워크스페이스 스플리터 > 우 스플리터를 왼쪽으로 끌면 전사 패널이 넓어진다 [163.55ms]
+(pass) 워크스페이스 스플리터 > 최소 폭 밑으로는 접히지 않는다 [417.12ms]
+(pass) 워크스페이스 스플리터 > 드래그 결과가 workspace.layout.v1에 JSON으로 남는다 [149.86ms]
+(pass) 워크스페이스 스플리터 > 새로고침 후 저장된 폭이 복원된다 [323.87ms]
+(pass) 워크스페이스 스플리터 > 저장값이 손상돼도 기본 레이아웃으로 뜬다 [226.12ms]
+(pass) 중앙 무대 잠금과 반응형 > MeetingCard가 .stage-pane 안에만 렌더되고 무대 중앙 hit가 stage다 [96.14ms]
+(pass) 중앙 무대 잠금과 반응형 > 820px에서 레일은 접히고 무대/전사는 살아 있으며 문서 가로 스크롤이 없다 [103.64ms]
+(pass) 중앙 무대 잠금과 반응형 > 375px에서 도크 액션이 내부 스크롤되고 문서는 가로로 넘치지 않는다 [141.32ms]
+(pass) 헤르메틱 워크스페이스 E2E > 세 패널·스플리터·전사 줄·MeetingCard·레이아웃 복원을 한 흐름으로 통과한다 [767.16ms]
+
+ 28 pass
+ 0 fail
+ 118 expect() calls
+Ran 28 tests across 3 files. [7.36s]

@@ -1,0 +1,219 @@
+{
+  "task": "caret-clone-redesign Todo 16 — Synchronize browser and native capture restoration",
+  "status": "done",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "commit": "none — no commit, no staging, no reset, no restore. HEAD a1ed25f unchanged, index empty",
+  "filesChanged": {
+    "product": [
+      "server.ts — capturePhase(); captureMessage() emits the additive optional phase and keeps startedAt through the stop window; stopRequested cleared at the true end of capture so the terminal snapshot reports idle",
+      "public/app.js — record control routed through the canonical reducer's one-command guard; stop window (phase=stopping) keeps the live shell, Stop and timer; stale-compile guard moved above the state writes; just-ended meeting restored exactly once on the capturing→idle transition"
+    ],
+    "testsAndHarness": [
+      "tests/caret-dual-surface.test.ts — NEW, 28 tests",
+      "tests/helpers/dual-surface-session.ts — NEW, one Bun session serving public/ with per-client WS control and command capture",
+      "tests/helpers/native-dual-surface-client.ts — NEW, compiles and drives the real Swift client",
+      "tests/helpers/browser-dual-surface-client.ts — NEW, long-lived Chromium workspace client",
+      "tests/fixtures/native-dual-surface-driver.swift — NEW, headless real-socket native driver over the shipping pure modules",
+      "tests/server-ws-dispatch.test.ts — UPDATED, asserts additive phase/startedAt plus the authoritative idle; per-await bound raised from 10s to 30s (test bound 60s) with the two flush-driven awaits armed together; terminal idle anchored at `const idleStart = messages.length` after the verifier repair"
+    ],
+    "unchangedAndHashVerified": [
+      "macos/TransportClient.swift",
+      "macos/MinibarProjection.swift",
+      "macos/NativeSurfaceContract.swift",
+      "public/ui-state-machine.ts",
+      "public/transcript-state.ts",
+      "public/operator-surface.js",
+      "src/session.ts"
+    ]
+  },
+  "protocolCompatibility": {
+    "additiveOnly": "CaptureUpdate.phase was already declared optional in src/session.ts and was never emitted by server.ts — verified by inspection before any change. Nothing was renamed.",
+    "phaseLessCompatibility": "proven green in both surfaces; mutation L breaks the fallback and turns the compatibility test RED",
+    "spellingsPreserved": "startCapture/meeting_id, stopCapture, selectMeeting/meetingId, capture/line/caption/transcript/meetings/compile all byte-identical; tests/public-dom-protocol-contract.test.ts green"
+  },
+  "tests": {
+    "newSuite": {
+      "file": "tests/caret-dual-surface.test.ts",
+      "tests": 28,
+      "result": "28 pass, 0 fail",
+      "log": "green/01-dual-surface-green.txt",
+      "repeatRuns": "4/4 green"
+    },
+    "serverProtocol": {
+      "command": "bun test tests/server-ws-dispatch.test.ts tests/server-handler-map.test.ts tests/session.test.ts tests/public-protocol-reliability.test.ts tests/public-dom-protocol-contract.test.ts tests/server-recorder-startup.test.ts",
+      "result": "45 pass, 0 fail",
+      "log": "green/02-server-protocol-green.txt"
+    },
+    "browserCaret": {
+      "result": "255 pass, 0 fail",
+      "log": "green/03-browser-caret-green.txt"
+    },
+    "browserLegacy": {
+      "result": "83 pass, 1 fail (pre-existing)",
+      "log": "green/04-browser-legacy-green.txt"
+    },
+    "native": {
+      "command": "bun test tests/native-minibar.test.ts tests/native-surface-contract.test.ts tests/native-launcher-boundary.test.ts",
+      "result": "123 pass, 0 fail",
+      "log": "green/07-native-green.txt"
+    }
+  },
+  "staticChecks": {
+    "projectTypeScript": {
+      "command": "npx tsc --noEmit -p tsconfig.json",
+      "exit": 0
+    },
+    "strictTypeScript": {
+      "command": "npx tsc --noEmit -p <temp strict project over the new test + 3 helpers>",
+      "exit": 0,
+      "note": "temp project removed in cleanup; output in green/08"
+    },
+    "swiftTypecheck": {
+      "command": "swiftc -typecheck -swift-version 5 macos/*.swift",
+      "exit": 0
+    },
+    "swiftDriverTypecheck": {
+      "command": "swiftc -typecheck -swift-version 5 <4 pure modules> tests/fixtures/native-dual-surface-driver.swift",
+      "exit": 0
+    },
+    "generatedDrift": {
+      "command": "bun run scripts/build-public-modules.ts --check",
+      "exit": 0
+    },
+    "gitDiffCheck": {
+      "command": "git diff --check",
+      "exit": 0
+    },
+    "lsp": "no errors on server.ts, tests/caret-dual-surface.test.ts or tests/helpers/*.ts. TWO pre-existing environment/typing gaps, both reproduced on untouched files: (1) the root tsconfig excludes tests/, so the LSP resolves Array.prototype.at against a pre-ES2022 lib — identical on tests/public-attendees.test.ts; (2) TS2322 on the spawn() call in tests/server-ws-dispatch.test.ts — identical on the HEAD version of that file (line 90 there, 101 here; the only delta is comment lines). Both tsc runs pass."
+  },
+  "manualQA": {
+    "driver": "manual/qa-driver.ts — real Chromium (1244x836, deviceScaleFactor 1, frozen clock, ko-KR/Asia/Seoul) + compiled Swift native client on ONE Bun session",
+    "steps": 9,
+    "artifacts": "9 same-size PNGs + 9 per-step state JSONs + summary.json",
+    "result": "timers agree in every capture-owning state (02:05 on both surfaces through capturing, native disconnect, native reconnect, browser reload, stopping and trailing line); exactly one selectMeeting for the just-ended meeting; zero duplicate commands",
+    "screenshotsInspected": [
+      "07-stopping.png — Stop present, timer 02:05 alive, live shell retained, 3 transcript lines, DURING the stop window",
+      "09-idle-restored.png — library returns with 주간 팀 회의 selected and highlighted, its 4 sentences attributed to it (before the fix this row was unselected and the content orphaned)"
+    ],
+    "byDesignDifference": "while IDLE the ambient minibar shows no timer (it holds nothing between meetings) and the workspace leaves the just-ended duration on screen; recorded in summary.json rather than asserted away"
+  },
+  "adversarialMutations": {
+    "loadBearing": [
+      "A — server capturePhase() returns idle instead of stopping → RED in tests/server-ws-dispatch.test.ts (real spawned server)",
+      "B — sendCaptureToggle bypasses the reducer guard → RED, browser sends 2 stopCapture",
+      "C — browser collapses the stop window to idle → RED, trailing line lost",
+      "D — just-ended restoration disabled → RED, 2 failures",
+      "G — stale selection not replaced → RED, second capture cycle never restores its own meeting",
+      "I — BOTH once-only guards removed → RED, 2 failures",
+      "J — stale-compile guard moved back below the writes → RED",
+      "L — phase-less frame no longer maps from capturing → RED"
+    ],
+    "honestNonFailures": "E/F (token clear) and H (endedNow) each stayed green ALONE because the two guards are deliberately redundant; mutation I removes both together and IS red. K stayed green because serverOwnsCapture still ORs !!msg.capturing; L breaks the real compatibility path. All recorded in red/03-mutation-proofs.md rather than hidden.",
+    "otherProbes": {
+      "independentDisconnect": "each client severed alone; the other surface never observed it",
+      "malformedFrame": "unparseable JSON leaves both projections untouched, capture truth and timer retained",
+      "staleMeeting": "payload for an unselected meeting ignored by both surfaces",
+      "outOfOrderJob": "terminal answer for a superseded compile job cannot repaint the running one",
+      "rapidStop": "3 native activations → 1 frame; 1 browser double activation → 1 frame; both verified on the wire",
+      "browserReload": "re-enters live with a deduplicated transcript (3 lines, never 6)"
+    }
+  },
+  "checksums": {
+    "artifacts": 47,
+    "file": "SHA256SUMS.txt",
+    "sourceHashes": "green/09-deliverable-hashes.txt",
+    "changeSurface": "green/10-change-surface.txt"
+  },
+  "preExistingFailures": [
+    {
+      "suite": "tests/public-transcript-dock.test.ts",
+      "count": 6,
+      "subject": "transcript panel resize grips (public/transcript-resize.js, workspace.transcript.v1)",
+      "proof": "9 pass/6 fail identically with the task-16 app.js hunk reverted AND with server.ts reverted; transcript-resize.js clean since pre-plan commit bcf5c7a",
+      "action": "recorded, not chased"
+    },
+    {
+      "suite": "tests/public-shell.test.ts",
+      "count": 1,
+      "subject": "history preview thumbnail not clickable ('라이브 MeetingCard 렌더 > 히스토리 미리보기…')",
+      "proof": "7 pass/1 fail identical with public/app.js restored to HEAD; already listed as failing in task-14 evidence (green/06-failure-attribution.txt)",
+      "action": "recorded, not chased — owned by the shell layers Todos 11-13 rebuilt and Todo 18 re-authors"
+    }
+  ],
+  "flakeClosed": {
+    "suite": "tests/server-ws-dispatch.test.ts",
+    "finding": "its single 10s per-await budget bounds REAL work and was already marginal BEFORE this task: with the HEAD test body and the pre-task captureMessage(), isolated runs measured 6881ms, 5105ms, 10029ms (fail), 4277ms",
+    "action": "budget raised to 30s per await (test bound 60s) and the two flush-driven awaits armed together instead of stacked; nothing sleeps or polls",
+    "result": "5/5 isolated runs pass, 2/2 six-suite batch runs pass"
+  },
+  "cleanup": {
+    "removed": [
+      "tsconfig.task16.json (temporary strict-TS project)",
+      "/tmp/t16build/ (swift build dir, mutation backups, probes)"
+    ],
+    "processes": "no dual-surface-driver, no bun test, no Chrome for Testing processes remain; no swiftc mkdtemp dirs left",
+    "protectedWork": "all unrelated dirty provider/Alibaba/models/handoff files still dirty and byte-untouched; models/ untouched; both Meeting Slides.app symlinks intact and unchanged; installed bundle not rebuilt",
+    "postCleanupRun": "tests/caret-dual-surface.test.ts 28 pass / 0 fail with all temps gone"
+  },
+  "scopeBoundaries": {
+    "notDone": [
+      "Todo 17 packaging (scripts/build-app.sh, bundle rebuild, codesign, screen-capture matrix) — untouched",
+      "Todo 18 obsolete-layer cleanup and documentation reconciliation — untouched"
+    ]
+  },
+  "residualRisks": [
+    "public/app.js keeps `capturing` as its render flag while the reducer owns the command guard. They agree today because the capture handler sets `capturing = serverOwnsCapture` from the same frame the reducer consumes, but a future edit that moves one without the other reintroduces the duplicate-command class. The dual-surface rapid-Stop test is the guard.",
+    "The just-ended restoration reads `status === \"open\"` from the meetings list to learn the live meeting. A server that ever marks two meetings open at once, or stops sending the list during capture, would leave `liveMeetingId` stale or null; the restoration then no-ops rather than restoring the wrong meeting, which is the safe direction but is silent.",
+    "`#capture-timer` keeps the just-ended duration after idle while the minibar shows none. Truthful (it is that meeting's length) but the two surfaces read differently at rest; if Todo 18 wants them identical it is a one-line clear in stopCaptureTimer, deliberately not taken here.",
+    "The raised bound in tests/server-ws-dispatch.test.ts makes a genuine server hang take up to 30s per await to surface. It still fails rather than passing, and the suite remains the only place the real spawned server is exercised.",
+    "The native QA client is headless by construction (no AppKit). Real panel bounds, menu-bar item and focus behavior remain covered by Todo 14's evidence, not re-proven here."
+  ],
+  "postApprovalRepair": {
+    "raisedBy": "independent verifier, AFTER product behavior was approved",
+    "scope": "test quality only — no product file was modified",
+    "defect": "tests/server-ws-dispatch.test.ts asserted the terminal idle with waitForMessageAfter(0, …). That floor scans the whole buffer, including this socket's connect-time hydration frame {type:capture,capturing:false,mode:mic,phase:idle} from server.ts:1055, which is byte-identical to the terminal idle. The assertion matched hydration and held even if the server never left `stopping`.",
+    "repair": "const idleStart = messages.length captured after the stop-window assertions; both terminal awaits use it as their floor",
+    "soundness": "waitForMessageAfter slices the backlog from `start` and otherwise subscribes; later frames reach the live listener, which is by definition past the floor",
+    "proof": [
+      {
+        "scanFloor": "0 (defective)",
+        "mutation": "stopRequested cleared AFTER the terminal broadcast",
+        "result": "1 pass / 0 fail — vacuous, demonstrates the defect"
+      },
+      {
+        "scanFloor": "idleStart (repaired)",
+        "mutation": "same",
+        "result": "1 fail — timed out after 30000ms, terminal idle never arrives"
+      },
+      {
+        "scanFloor": "idleStart (repaired)",
+        "mutation": "reverted (shipping behavior)",
+        "result": "1 pass, 5/5 consecutive runs"
+      }
+    ],
+    "productIntegrity": {
+      "server.ts": "restored byte-exact after the mutation: f373a60fd60dda285ea36c58fd7754b58b4049d7c9055921b7b4d09a80f99f31 (unchanged from before the repair)",
+      "public/app.js": "untouched: 7164fb770ca2d6b0520e1bcca75002cb17b436ec7a5c9d6b0a379f2225e2ad47"
+    },
+    "hashDelta": {
+      "tests/server-ws-dispatch.test.ts": {
+        "before": "5881f692ab1c2f76c2ebbfa257c0cb2b719f992b35f7ca36181e7972f224bc95",
+        "after": "a8282758c23758c02dbee297685b579fc04e2050db330c88fff4e8aa64336700"
+      }
+    },
+    "reverification": {
+      "serverWsDispatchFocused": "5/5 consecutive runs pass",
+      "serverProtocolMatrix": "45 pass / 0 fail (2/2 batch runs)",
+      "dualSurface": "28 pass / 0 fail (2/2 runs)",
+      "projectTypeScript": "exit 0",
+      "strictTypeScript": "exit 0 over the recorded deliverable scope",
+      "swiftTypecheck": "exit 0 (macos/*.swift and the native driver)",
+      "generatedDrift": "exit 0",
+      "gitDiffCheck": "exit 0"
+    },
+    "evidence": [
+      "red/04-terminal-idle-scan-repair.md",
+      "green/02b-server-ws-dispatch-repaired.txt"
+    ]
+  }
+}

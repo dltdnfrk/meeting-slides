@@ -1,0 +1,19 @@
+checked=2026-08-12T04:55:58Z
+marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+repo_link=/Users/hyunjun/Applications/Meeting Slides.app
+exec_sha256=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+codesign=PASS
+task_port=free
+installed_processes=none
+user_db_hashes:
+24744ca540901c875784e3e8a3808343e2ea6e84a66301eac14779fc13260806  meetings.db
+2f28a9abc88037a66fd89375e8bc250ad7ef787195a2e1242646a9a460a52d9e  meetings.db-shm
+1bb6f41e4f260aacffe6a06745b1a28c384c0f7757eba496d930b2549d2bc0dc  meetings.db-wal
+defaults:
+{
+    height = 56;
+    width = 360;
+    x = 3477;
+    y = 72;
+}
+git_diff_check=PASS

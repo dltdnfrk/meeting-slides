@@ -1,0 +1,10 @@
+== orphan / port check after all manual runs ==
+bun server.ts processes:
+4380 /Users/hyunjun/.bun/bin/bun run server.ts
+
+PID 4380 start time (pre-existing user session, started 11:19, long before this task's 16:2x runs):
+  PID STARTED                      COMMAND
+ 4380 Tue Aug 11 11:19:21 2026     /Users/hyunjun/.bun/bin/bun run server.ts
+
+listeners on 8787/8898/8899:
+(empty = none)

@@ -1,0 +1,784 @@
+bun test v1.3.14 (0d9b296a)
+
+src/ask.test.ts:
+(pass) extractQueryTerms > 한국어/영어 토큰을 추출하고 불용어를 제거한다 [0.28ms]
+(pass) extractQueryTerms > 2자 미만 토큰과 불용어만 있으면 빈 배열을 반환한다 [0.02ms]
+(pass) searchTranscriptSegments > 질문 용어와 일치하는 라인 주변을 윈도우로 묶는다 [15.51ms]
+(pass) searchTranscriptSegments > 검색어가 없으면 마지막 라인을 컨텍스트로 쓴다 [5.61ms]
+(pass) searchTranscriptSegments > canonical 전사가 없으면 빈 배열을 반환한다 [5.25ms]
+(pass) askMeeting > 관련 구간과 함께 질문을 LLM에 전달해 답변을 받는다 [9.31ms]
+(pass) askMeeting > 관련 구간이 없어도 질문을 전달한다 [7.83ms]
+
+tests/public-caret-library.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/meeting-conclusion.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+29 | var deviceDescriptors_exports = {};
+30 | __export(deviceDescriptors_exports, {
+31 |   deviceDescriptors: () => deviceDescriptors
+32 | });
+33 | module.exports = __toCommonJS(deviceDescriptors_exports);
+34 | var import_deviceDescriptorsSource = __toESM(require("./deviceDescriptorsSource.json"));
+     ^
+SyntaxError: JSON Parse error: Unexpected EOF
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/deviceDescriptors.js:34:38
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/localUtilsDispatcher.js:43:5
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:31:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/index.js:38:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/remote/playwrightConnection.js:49:30
+-------------------------------
+
+
+tests/store.test.ts:
+(pass) MeetingStore > 회의 목록은 빈 저장소에서 비어 있다 [0.69ms]
+(pass) MeetingStore > 회의 목록은 첫 슬라이드 제목과 시작/종료 상태를 노출한다 [0.39ms]
+(pass) MeetingStore > 회의 라이프사이클: 시작 → 라인/슬라이드 → 종료 [0.33ms]
+(pass) MeetingStore > 회의가 열려있지 않으면 라인/슬라이드 무시 [0.17ms]
+(pass) MeetingStore > Markdown export: 헤더 + 슬라이드 + 전사본 [1.77ms]
+(pass) MeetingStore > 전사 전용 export는 노트의 슬라이드 요약과 구별되고 지정 회의만 대상으로 한다 [0.68ms]
+(pass) MeetingStore > meeting detail은 마지막 슬라이드를 current로, 나머지를 history로 hydrate한다 [0.64ms]
+(pass) MeetingStore > 같은 idx 슬라이드 갱신은 upsert되어 export에 최신 불렛이 남는다 [0.39ms]
+
+tests/sentence-assembler.test.ts:
+(pass) SentenceAssembler > 완결 구두점이면 즉시 방출 [0.06ms]
+(pass) SentenceAssembler > 미완결 조각은 보류 후 다음 조각과 병합 [0.02ms]
+(pass) SentenceAssembler > 구두점으로 끝난 뒤에는 새 문장 시작 [0.01ms]
+(pass) SentenceAssembler > 길이 상한을 넘으면 구두점 없이도 강제 방출 (실시간성 하한) [0.01ms]
+(pass) SentenceAssembler > 화자 전환/종료 시 flush로 보류분 방출
+
+tests/caret-dual-surface.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/public-caret-context.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/app-settings.test.ts:
+(pass) AppSettingsStore > persists provider, model, and effort under the project only [0.82ms]
+(pass) AppSettingsStore > rejects corrupt files and invalid registry selections [0.17ms]
+
+tests/native-minibar.test.ts:
+(pass) native minibar seam: sources and compilation > the projection module, AppKit shell and fixture driver exist [0.06ms]
+(pass) native minibar seam: sources and compilation > swiftc compiles the pure modules with the fixture driver [0.04ms]
+(pass) native minibar seam: sources and compilation > swiftc typechecks the AppKit shell against the pure modules
+(pass) native minibar seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.02ms]
+(pass) native minibar seam: sources and compilation > the projection module stays pure: no AppKit, window, socket or clock [0.36ms]
+(pass) native minibar seam: sources and compilation > the AppKit shell imports no WebKit and hosts no second engine [0.27ms]
+(pass) native minibar seam: sources and compilation > the panel frame is authoritative so content cannot grow past the contract size [0.16ms]
+(pass) native minibar seam: sources and compilation > the AppKit shell stays thin: geometry and status come from the pure modules [0.08ms]
+(pass) native minibar seam: sources and compilation > no native source advertises Pause, share or screen-share exclusion [0.38ms]
+(pass) native minibar seam: sources and compilation > the bundle build compiles the minibar sources into the app executable [0.08ms]
+(pass) native minibar seam: geometry > collapsed is exactly 360x56 and expanded exactly 560x220 [0.05ms]
+(pass) native minibar seam: geometry > expanded uses balanced status and transcript columns inside bounded content [0.04ms]
+(pass) native minibar seam: geometry > the deterministic default frame honours the 16px gutter on the active display [0.01ms]
+(pass) native minibar seam: geometry > a saved frame that no longer intersects a display falls back deterministically
+(pass) native minibar seam: geometry > expanding a restored frame keeps the anchor and clamps into the gutter
+(pass) native minibar seam: launcher quit protection > idle quit protection is false [0.05ms]
+(pass) native minibar seam: launcher quit protection > starting quit protection is true
+(pass) native minibar seam: launcher quit protection > capturing quit protection is true
+(pass) native minibar seam: launcher quit protection > stopping quit protection is true
+(pass) native minibar seam: launcher quit protection > switching-model quit protection is true
+(pass) native minibar seam: launcher quit protection > the AppKit controller delegates quit protection to the pure phase seam [0.12ms]
+(pass) native minibar seam: explicit status projection > idle, starting, live, stopping and switching-model are distinct explicit states [0.03ms]
+(pass) native minibar seam: explicit status projection > collapsed live projection paints server semantics and enables Stop [0.02ms]
+(pass) native minibar seam: explicit status projection > before any snapshot the surface says connecting rather than idle
+(pass) native minibar seam: explicit status projection > a lost socket becomes reconnecting while the known capture truth is retained [0.01ms]
+(pass) native minibar seam: explicit status projection > a malformed payload surfaces error without discarding the known capture phase
+(pass) native minibar seam: explicit status projection > every status carries a non-color glyph and a distinct title [0.05ms]
+(pass) native minibar seam: timer derives from server startedAt > elapsed time is computed from the server timestamp and the injected clock
+(pass) native minibar seam: timer derives from server startedAt > a clock skew never renders a negative timer
+(pass) native minibar seam: timer derives from server startedAt > a capture without startedAt shows no invented timer
+(pass) native minibar seam: timer derives from server startedAt > reconnecting keeps the last known timer basis rather than resetting it
+(pass) native minibar seam: bounded transcript projection > collapsed shows exactly one line: the latest finalized sentence [0.01ms]
+(pass) native minibar seam: bounded transcript projection > collapsed prefers the provisional caption when one is live
+(pass) native minibar seam: bounded transcript projection > expanded shows at most three finalized lines plus one provisional row
+(pass) native minibar seam: bounded transcript projection > a finalized line replaces its provisional caption instead of duplicating it
+(pass) native minibar seam: bounded transcript projection > an authoritative idle snapshot clears the surface instead of keeping meeting content
+(pass) native minibar seam: bounded transcript projection > a malformed transcript payload retains the last known lines [0.01ms]
+(pass) native minibar seam: bounded transcript projection > a reconnect snapshot replaces the projected lines without duplicating them [0.01ms]
+(pass) native minibar seam: truthful controls > collapsed exposes a persistent Stop plus a disclosure and nothing else [0.02ms]
+(pass) native minibar seam: truthful controls > Stop stays visible and truthfully disabled when there is nothing to stop
+(pass) native minibar seam: truthful controls > expanded adds Open Workspace and keeps the same Stop control
+(pass) native minibar seam: truthful controls > Stop stays reachable while reconnecting but refuses to lie about being sent [0.02ms]
+(pass) native minibar seam: truthful controls > the control vocabulary is closed: no Pause, no share, no second engine
+(pass) native minibar seam: Stop emits exactly one existing command > five rapid Stop activations emit exactly one stopCapture
+(pass) native minibar seam: Stop emits exactly one existing command > Stop spam across a reconnect still emits exactly one stopCapture
+(pass) native minibar seam: Stop emits exactly one existing command > Stop while idle emits nothing at all
+(pass) native minibar seam: activation policy > user-started capture shows the surface and focuses the visible Stop
+(pass) native minibar seam: activation policy > automatic calendar capture shows the surface without stealing OS focus
+(pass) native minibar seam: activation policy > a later user interaction on an automatic capture may take focus
+(pass) native minibar seam: mode and Escape > Escape collapses an expanded panel and never stops a recording
+(pass) native minibar seam: mode and Escape > Escape on a collapsed panel is a no-op
+(pass) native minibar seam: mode and Escape > the disclosure toggles between the two contract sizes
+(pass) native minibar seam: window policy > the panel is a borderless floating non-activating ambient surface [0.01ms]
+(pass) native minibar seam: window policy > the shipping view uses a readable layered native HUD material, never an opaque utility fill [0.38ms]
+(pass) native minibar seam: accessibility > the surface publishes a labelled group, status text and target sizes [0.02ms]
+(pass) native minibar seam: accessibility > reduced motion removes the transition entirely rather than shortening it [0.01ms]
+(pass) native minibar seam: announcement discipline (Todo 15) > a status announces once and never repeats on a timer tick [0.05ms]
+(pass) native minibar seam: announcement discipline (Todo 15) > an error announces its machine reason once, and recovery announces once [0.02ms]
+(pass) native minibar seam: announcement discipline (Todo 15) > every painted control carries a name, a value and a truthful help string [0.04ms]
+
+tests/public-runtime-guard.test.ts:
+(pass) operator runtime bootstrap > health signature and static shell assets are present [0.28ms]
+(pass) operator runtime bootstrap > bootstrap sets file/server runtime flag [0.33ms]
+
+tests/deck.test.ts:
+(pass) linesForSlide > 블록 시작 시각 구간으로 라인 배정 [0.02ms]
+(pass) buildDeckHtml > 타이틀/본문/마무리 섹션 구성 [0.02ms]
+(pass) buildDeckHtml > 불렛과 발표자 노트(전사) 포함 [0.02ms]
+(pass) buildDeckHtml > HTML 이스케이프 [0.10ms]
+(pass) buildDeckHtml > Given different meeting content, When reveal decks are built, Then decorative visuals derive from that content [0.26ms]
+(pass) buildSlideFiles (slides-grab 계약) > 타이틀+블록+마무리 개별 파일 생성 [0.03ms]
+(pass) buildSlideFiles (slides-grab 계약) > legacy cover/topic/closing files are produced by the SlideSpec template registry [0.11ms]
+(pass) buildSlideFiles (slides-grab 계약) > all compiled SlideSpec kinds render through first-class templates [0.09ms]
+(pass) buildSlideFiles (slides-grab 계약) > unregistered runtime kinds fail with a typed error before producing a file [0.04ms]
+(pass) buildSlideFiles (slides-grab 계약) > 16:9 고정 프레임과 로컬 테마 링크 [0.01ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given standalone slide files, When normal and empty decks are built, Then every page delegates styling and geometry to the shared theme [0.11ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given slides-grab's 960x540 presentation viewport, When standalone slide files are built, Then the shared frame adapter preserves the 1280x720 design surface [0.03ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given topic slide pages, When standalone files are built, Then each decorative visual is generated from its slide content [0.06ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given the shared deck theme, When a slide is rendered, Then the paper design system replaces the legacy dark grid [0.02ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given six product-limit Korean bullets, When a dense topic is built, Then both outputs use the compact presentation contract without losing text [0.27ms]
+(pass) buildSlideFiles (slides-grab 계약) > Given a long Korean cover title, When deck outputs are built, Then both cover surfaces use the readable long-title contract without deleting text [0.10ms]
+
+tests/public-shell.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/scene-compile-action.test.ts:
+(pass) semantic scene compile action > publishes HTML, Scene JSON, and native PPTX from one narrative plan [10.12ms]
+(pass) semantic scene compile action > success message includes the generated scene so the app can preview every slide [3.01ms]
+[deck-planner] attempt 1 failed: deck.slides[0].bullets is a removed legacy field
+[deck-planner] attempt 2 failed: deck.slides[0].bullets is a removed legacy field
+[deck-planner] using fallback narrative for meeting 1
+(pass) semantic scene compile action > invalid planner output falls back to prose scenes instead of bullet slides [3.17ms]
+[deck-planner] attempt 1 failed: planner did not return a JSON object
+[deck-planner] attempt 2 failed: planner did not return a JSON object
+[deck-planner] using fallback narrative for meeting 1
+(pass) semantic scene compile action > compile uses the exact transcript snapshot captured before planning starts [4.17ms]
+[deck-planner] attempt 1 failed: planner did not return a JSON object
+[deck-planner] attempt 2 failed: planner did not return a JSON object
+[deck-planner] using fallback narrative for meeting 1
+(pass) fallback narrative drops trailing chatter and caps slide count [3.70ms]
+
+tests/scene-graph.test.ts:
+(pass) semantic slide scene graph > narrative input rejects the legacy bullet contract [0.05ms]
+(pass) semantic slide scene graph > semantic intents compose into positioned editable scene elements [0.15ms]
+(pass) semantic slide scene graph > HTML renderer draws the scene without list markup [0.07ms]
+
+tests/whisper-artifact-filter.test.ts:
+(pass) existing Whisper artifact filters > metadata and runtime banners never become transcript chunks [0.29ms]
+(pass) existing Whisper artifact filters > timestamp wrappers are stripped while actual speech remains [0.21ms]
+
+tests/public-live-kind.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/ui-state-machine.test.ts:
+(pass) current public/app.js visible state seams > capture visibility is a bare mutable boolean, not a named state [0.16ms]
+(pass) current public/app.js visible state seams > hydration, selection, preview and job seams are separate mutable flags [0.10ms]
+(pass) current public/app.js visible state seams > connection is projected onto a data attribute with four literal values [0.10ms]
+(pass) current public/app.js visible state seams > stale job and stale meeting responses are dropped inline, per call site [0.06ms]
+(pass) current public/app.js visible state seams > malformed frames are swallowed by a catch that only logs [0.04ms]
+(pass) reducer purity > uses no DOM, clock, network, storage or global ambient value [0.10ms]
+(pass) reducer purity > declares no `any` and no unsafe cast [0.17ms]
+(pass) reducer purity > does not mutate the state it is given [0.20ms]
+(pass) reducer purity > initial state is startup and is a fresh value each call [0.02ms]
+(pass) parse boundary > accepts every server message type the protocol declares [0.29ms]
+(pass) parse boundary > rejects null as a typed failure [0.02ms]
+(pass) parse boundary > rejects undefined as a typed failure
+(pass) parse boundary > rejects string as a typed failure
+(pass) parse boundary > rejects number as a typed failure
+(pass) parse boundary > rejects array as a typed failure
+(pass) parse boundary > rejects missing type as a typed failure
+(pass) parse boundary > rejects numeric type as a typed failure
+(pass) parse boundary > rejects unknown type as a typed failure
+(pass) parse boundary > rejects capture without capturing as a typed failure
+(pass) parse boundary > rejects capture with non-boolean capturing as a typed failure
+(pass) parse boundary > rejects capture with unknown phase as a typed failure
+(pass) parse boundary > rejects meeting without meetingId as a typed failure
+(pass) parse boundary > rejects meetings without items as a typed failure
+(pass) parse boundary > rejects compile without status as a typed failure
+(pass) parse boundary > rejects compile with unknown status as a typed failure
+(pass) parse boundary > a rejected frame never reaches the reducer and never changes state [0.03ms]
+(pass) canonical states > every state in the contract is reachable from startup [0.21ms]
+(pass) canonical states > state name is always consistent with the capture and shell projection [0.08ms]
+(pass) canonical states > reduce is exhaustive: every event kind is handled from every state [0.33ms]
+(pass) capture lifecycle > happy path: activate → starting → live → stop → stopping → idle [0.04ms]
+(pass) capture lifecycle > start emits exactly one startCapture no matter how often it is activated [0.03ms]
+(pass) capture lifecycle > stop emits exactly one stopCapture from every server-confirmed capture substate [0.07ms]
+(pass) capture lifecycle > a start the server has not confirmed can neither restart nor stop [0.03ms]
+(pass) capture lifecycle > startCapture carries the wire spelling meeting_id and nothing else [0.02ms]
+(pass) capture lifecycle > startCapture omits meeting_id when no meeting is prepared
+(pass) capture lifecycle > stopCapture carries no payload [0.01ms]
+(pass) capture lifecycle > Stop stays truthful: a stop request alone never claims capture ended [0.02ms]
+(pass) capture lifecycle > start failure moves to capture-error and clears the pending request [0.02ms]
+(pass) capture lifecycle > a stale capture error is cleared by the next authoritative capture snapshot [0.01ms]
+(pass) capture lifecycle > capture-error is also clearable by an explicit dismissal [0.01ms]
+(pass) capture lifecycle > activating capture from capture-error retries once and clears the error [0.01ms]
+(pass) capture lifecycle > phase-less capture messages map compatibly [0.01ms]
+(pass) capture lifecycle > capture timer origin comes only from the server startedAt payload [0.01ms]
+(pass) capture lifecycle > switching-model is a capture phase, not a hidden idle [0.01ms]
+(pass) connection and restore > startup hydrates only after the first authoritative capture snapshot [0.01ms]
+(pass) connection and restore > pre-hydration slide and transcript frames are ignored [0.01ms]
+(pass) connection and restore > transport loss during capture enters reconnect and preserves capture [0.01ms]
+(pass) connection and restore > reconnect restores the exact capture substate the server reports [0.02ms]
+(pass) connection and restore > reconnect that returns an idle server is honoured, not overridden by the old capture [0.02ms]
+(pass) connection and restore > reconnect during a pending stop keeps the stop pending and re-sends it once [0.02ms]
+(pass) connection and restore > reconnect from every capture substate is deterministic [0.04ms]
+(pass) connection and restore > capture activation is refused while the transport is not online [0.04ms]
+(pass) connection and restore > transport error surfaces a typed error without inventing an idle capture [0.01ms]
+(pass) connection and restore > no state below `online` is ever named as a settled surface [0.05ms]
+(pass) connection and restore > an authoritative snapshot after a transport error restores the online surface [0.01ms]
+(pass) connection and restore > a transport error is cleared once the socket is online again [0.01ms]
+(pass) meeting selection and preview > selecting a meeting enters meeting-switching and emits selectMeeting [0.01ms]
+(pass) meeting selection and preview > the matching detail resolves the switch, an out-of-order one does not [0.03ms]
+(pass) meeting selection and preview > rapid selection keeps only the newest request and one action per selection [0.03ms]
+(pass) meeting selection and preview > re-selecting the meeting already in flight does not re-emit [0.02ms]
+(pass) meeting selection and preview > returning to the library clears the selection [0.01ms]
+(pass) meeting selection and preview > history preview suspends live follow and exits back to the live state [0.02ms]
+(pass) meeting selection and preview > preview survives live slide traffic and ends on authoritative idle [0.02ms]
+(pass) meeting selection and preview > idle-live is the just-ended meeting shell, distinct from the library [0.01ms]
+(pass) compile jobs > started → progress → success walks compile-running to compile-complete [0.03ms]
+(pass) compile jobs > a compile answer for a superseded job is ignored [0.02ms]
+(pass) compile jobs > compile failure records a typed error and releases the job [0.02ms]
+(pass) compile jobs > compile never blocks Stop [0.02ms]
+(pass) compile jobs > a compile job started before a reconnect is dropped, not left spinning [0.01ms]
+(pass) determinism > the same sequence yields byte-identical state five times [0.06ms]
+(pass) determinism > the visited state names are stable [0.04ms]
+(pass) determinism > reduceAll equals a manual fold [0.03ms]
+
+tests/meeting-deletion.test.ts:
+(pass) 회의 삭제는 해당 히스토리와 연결된 로컬 기록을 원자적으로 제거한다 [1.79ms]
+
+tests/public-caret-foundation.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/minutes-store.test.ts:
+(pass) MinutesStore SQLite contracts > rejects an attendee for a meeting that does not exist [1.38ms]
+(pass) MinutesStore SQLite contracts > creates and activates one prepared legacy-compatible meeting [0.93ms]
+(pass) MinutesStore SQLite contracts > stores local attendee keys independently from optional CRM ids [0.76ms]
+(pass) MinutesStore SQLite contracts > replaces prepared attendees and locks the roster after review confirmation [1.35ms]
+(pass) MinutesStore SQLite contracts > versions immutable transcript lines, finalizes, and selects canonical [0.80ms]
+(pass) MinutesStore SQLite contracts > saves sourced candidates and confirms only fully reviewed items [1.01ms]
+(pass) MinutesStore SQLite contracts > rejects endpoint-valid but interior-missing ranges and rolls back the whole review [0.83ms]
+(pass) MinutesStore SQLite contracts > revalidates source interiors during confirmation in the same transaction [0.85ms]
+(pass) MinutesStore SQLite contracts > enforces attendee provenance and successful-audio hash semantics [0.73ms]
+(pass) MinutesStore SQLite contracts > creates the complete additive minutes schema without changing legacy tables [0.58ms]
+
+tests/public-operator-surface.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/public-review.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/public-harness-baseline.test.ts:
+(pass) public test harness baseline lifecycle > origin serves the shipped index and rejects traversal names [0.77ms]
+(pass) public test harness baseline lifecycle > clientConnected resolves once a websocket client is accepted [0.03ms]
+(pass) public test harness baseline lifecycle > pushMessage broadcasts the exact JSON payload to connected clients [0.15ms]
+(pass) public test harness baseline lifecycle > nextClientMessage resolves inbound client frames in FIFO order [0.10ms]
+(pass) public test harness baseline lifecycle > disconnectClients closes live sockets without stopping the server [0.46ms]
+
+tests/public-transcript-dock.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/public-protocol-reliability.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/public-caret-harness.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/whisper-speaker.test.ts:
+(pass) extractSpeakerTurn > 마커가 있으면 turn=true + 텍스트에서 제거 [0.02ms]
+(pass) extractSpeakerTurn > 마커가 없으면 원문 유지 [0.01ms]
+(pass) extractSpeakerTurn > 마커만 있는 라인은 빈 텍스트
+(pass) isHallucinationLoop > 토큰 4회 이상 연속 반복은 환각 루프 [0.03ms]
+(pass) isHallucinationLoop > 실제 강조(3회 이하)와 정상 문장은 통과 [0.01ms]
+
+tests/public-workspace.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/slide-spec.test.ts:
+(pass) SlideSpec > all six slide kinds parse in one valid outline [0.76ms]
+(pass) SlideSpec > rejects an unknown kind [0.06ms]
+(pass) SlideSpec > rejects a missing title [0.02ms]
+(pass) SlideSpec > rejects too many bullets instead of truncating [0.04ms]
+(pass) SlideSpec > rejects over-limit strings and malformed JSON [0.15ms]
+(pass) SlideSpec > enforces kind-specific required and empty-array rules [0.03ms]
+(pass) SlideSpec > does not coerce field types [0.05ms]
+(pass) SlideSpec > maps a legacy slide to a detached live meeting card [0.05ms]
+
+tests/stt-model-manager.test.ts:
+(pass) STT model catalog > contains the exact whisper.cpp and transcribe.cpp payloads [0.06ms]
+(pass) STT model catalog > tags whisper artifacts and transcribe artifacts with their backends [0.06ms]
+(pass) STT model downloader > streams progress, follows redirects, verifies the LFS SHA-256, and atomically installs [2.60ms]
+(pass) STT model downloader > rejects a wrong payload checksum without replacing an installed file or retaining partials [0.74ms]
+(pass) STT model lifecycle > derives install state from disk, emits progress, and persists selection across managers [9.67ms]
+(pass) STT model lifecycle > rechecks disk after model files are added or removed externally [0.72ms]
+(pass) STT model lifecycle > cancels from the subscribed progress event and removes every partial file [1.60ms]
+
+tests/server-ws-dispatch.test.ts:
+(fail) (unnamed) [5001.02ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+
+tests/public-attendees.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/server-handler-map.test.ts:
+48 |       LLM_CLI_PRESET: "claude",
+49 |       WHISPER_INPUT_MODE: "mic",
+50 |     },
+51 |   });
+52 | 
+53 |   expect(result.status, result.stderr).toBe(0);
+                                            ^
+error: 29 | var deviceDescriptors_exports = {};
+30 | __export(deviceDescriptors_exports, {
+31 |   deviceDescriptors: () => deviceDescriptors
+32 | });
+33 | module.exports = __toCommonJS(deviceDescriptors_exports);
+34 | var import_deviceDescriptorsSource = __toESM(require("./deviceDescriptorsSource.json"));
+                                          ^
+SyntaxError: JSON Parse error: Unexpected EOF
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/deviceDescriptors.js:34:38)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/localUtilsDispatcher.js:38:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:32:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/index.js:39:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/remote/playwrightConnection.js:24:5)
+
+Bun v1.3.14 (macOS arm64)
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/server-handler-map.test.ts:53:40)
+(fail) the real WS registry contains executable handlers for every existing action [1568.74ms]
+
+tests/start-review.test.ts:
+(pass) startReview > extracts canonical version lines, persists the exact candidate IDs, and returns a self-contained review payload [2.37ms]
+(pass) startReview > passes user notes through to the extractor request [1.92ms]
+(pass) startReview > creates an empty version-scoped review for an empty canonical transcript [1.27ms]
+(pass) startReview > rejects extraction failures and wrong-version results without persisting a review [2.00ms]
+
+tests/extract.test.ts:
+(pass) parseMinutesExtractionJson > accepts grounded candidates, assigns local ids, and preserves valid siblings [0.43ms]
+(pass) parseMinutesExtractionJson > normalizes deadlines only from explicit source text, never model inference [0.13ms]
+(pass) parseMinutesExtractionJson > diagnoses every provenance rejection without keeping invalid candidates [0.17ms]
+(pass) parseMinutesExtractionJson > empty/non-JSON and top-level version mismatch mark the whole batch for fallback [0.08ms]
+(pass) parseMinutesExtractionJson > does not extract JSON from prose or coerce malformed candidate fields [0.03ms]
+(pass) precision local-rule fallback > copies only explicit ending lines verbatim with single-line provenance [0.13ms]
+(pass) precision local-rule fallback > never joins lines, resolves pronouns, maps speaker turns, or infers relative dates [0.05ms]
+(pass) MinutesExtractor > round-trips through chat with the provenance prompt [0.18ms]
+(pass) MinutesExtractor > falls back on transport failure and batch failure, while valid empty JSON succeeds [0.14ms]
+
+tests/server-recorder-startup.test.ts:
+31 |       resolve();
+32 |     };
+33 |     child.stdout.on("data", receive);
+34 |     child.stderr.on("data", receive);
+35 |     child.once("error", reject);
+36 |     child.once("exit", (code) => reject(new Error(`server exited before ready (${code}): ${output}`)));
+                                                 ^
+error: server exited before ready (1): 29 | var deviceDescriptors_exports = {};
+30 | __export(deviceDescriptors_exports, {
+31 |   deviceDescriptors: () => deviceDescriptors
+32 | });
+33 | module.exports = __toCommonJS(deviceDescriptors_exports);
+34 | var import_deviceDescriptorsSource = __toESM(require("./deviceDescriptorsSource.json"));
+                                          ^
+SyntaxError: JSON Parse error: Unexpected EOF
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/deviceDescriptors.js:34:38)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/localUtilsDispatcher.js:38:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:32:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/index.js:39:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/remote/playwrightConnection.js:24:5)
+
+Bun v1.3.14 (macOS arm64)
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/server-recorder-startup.test.ts:36:45)
+      at emit (node:events:98:22)
+      at #handleOnExit (node:child_process:520:14)
+(fail) recorder startup failure leaves capture stopped and never launches whisper [1634.56ms]
+
+tests/llm-runtime-routing.test.ts:
+(pass) Codex runtime routing > GUI PATH에서도 Codex 경로와 GPT-5.6을 명시한다 [482.45ms]
+(pass) Codex runtime routing > Codex 호출은 사용자 플러그인과 세션 기록을 격리한다 [0.08ms]
+(pass) Codex runtime routing > LLM 실행 실패를 가짜 로컬 슬라이드로 숨기지 않는다 [51.90ms]
+
+tests/stt-model-selection.test.ts:
+(pass) STT selection controller > serializes concurrent selects, persists the installed model, and restarts active capture once per change [7.52ms]
+
+tests/providers.test.ts:
+(pass) buildProviderEntries > 구독 CLI 가용성은 주입된 탐지 결과를 따른다 [0.08ms]
+(pass) buildProviderEntries > 설치된 CLI 는 auth unknown 이어도 선택 가능하다 [0.07ms]
+(pass) buildProviderEntries > HTTP 프로바이더는 OpenAI와 로컬만 노출한다 [0.03ms]
+(pass) buildProviderEntries > 6개 카드를 순서대로 제공 (구독 4 + API 2) [0.02ms]
+(pass) buildProviderEntries > 모델/effort 옵션 목록 제공 [0.03ms]
+(pass) upsertEnvText > 기존 키는 값만 교체하고 다른 줄은 보존 [0.07ms]
+(pass) upsertEnvText > 없는 키는 끝에 추가 [0.01ms]
+(pass) upsertEnvText > 여러 키 동시 upsert
+(pass) upsertEnvText > 키 주변 공백이 있어도 매칭
+(pass) createDetector > cli 프리셋은 API 키 없이 생성 [0.48ms]
+(pass) createDetector > 알 수 없는 id는 null [0.04ms]
+
+tests/public-caret-live.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/review-actions.test.ts:
+
+tests/public-caret-accessibility.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/deck-export.test.ts:
+(pass) export deck source preference > without a successful compile it explicitly exports legacy live history [1.84ms]
+(pass) export deck source preference > after successful publish export lists registry-rendered compiled kinds [0.52ms]
+
+tests/hybrid-path.e2e.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/native-surface-contract.test.ts:
+(pass) native surface seam: sources and compilation > the pure module and fixture driver exist [0.06ms]
+(pass) native surface seam: sources and compilation > swiftc compiles the pure module with the fixture driver [0.02ms]
+(pass) native surface seam: sources and compilation > the pure module imports no AppKit and creates no window [0.14ms]
+(pass) native surface seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.01ms]
+(pass) native surface seam: minibar geometry > collapsed bounds are exactly 360x56 [0.04ms]
+(pass) native surface seam: minibar geometry > expanded bounds are exactly 560x220
+(pass) native surface seam: minibar geometry > with no saved frame the default sits inside the 16px active-display gutter [0.02ms]
+(pass) native surface seam: minibar geometry > a fully on-display saved frame is restored verbatim
+(pass) native surface seam: minibar geometry > a saved frame entirely off-display falls back to the deterministic default
+(pass) native surface seam: minibar geometry > a saved frame with less than 50% display intersection returns the default frame
+(pass) native surface seam: minibar geometry > a mostly-visible saved frame is clamped into the 16px gutters, not discarded
+(pass) native surface seam: minibar geometry > a saved frame on a secondary display stays on that display
+(pass) native surface seam: minibar geometry > expanding keeps the surface on the saved display with expanded bounds
+(pass) native surface seam: minibar geometry > impossible display bounds yield a typed failure instead of a crash
+(pass) native surface seam: minibar geometry > an empty display list yields a typed failure instead of a crash
+(pass) native surface seam: menu-bar presentation > first toggle hides and second toggle restores without changing collapsed mode [0.01ms]
+(pass) native surface seam: menu-bar presentation > first toggle hides and second toggle restores without changing expanded mode
+(pass) native surface seam: menu-bar presentation > the shipping controller owns presentation state instead of querying NSWindow visibility [0.42ms]
+(pass) native surface seam: server payload decode subset > a capture update decodes phase, mode and startedAt [0.02ms]
+(pass) native surface seam: server payload decode subset > a phase-less capturing update maps compatibly to capturing [0.01ms]
+(pass) native surface seam: server payload decode subset > a phase-less idle update maps compatibly to idle
+(pass) native surface seam: server payload decode subset > a status update decodes as transport status
+(pass) native surface seam: server payload decode subset > a message outside the observed subset is ignored, not an error
+(pass) native surface seam: server payload decode subset > malformed JSON yields a typed failure without crashing
+(pass) native surface seam: server payload decode subset > a wrongly typed field yields a typed failure without crashing
+(pass) native surface seam: server payload decode subset > an unknown capture phase yields a typed failure without crashing
+(pass) native surface seam: one-command guards > a single Stop activation while capturing emits one stopCapture
+(pass) native surface seam: one-command guards > rapid duplicate Stop activations emit exactly one stopCapture
+(pass) native surface seam: one-command guards > Stop while idle emits nothing
+(pass) native surface seam: one-command guards > the guard rearms only after an authoritative idle snapshot
+(pass) native surface seam: launcher and build invariants > the launcher keeps the browser workspace and never imports WebKit [0.29ms]
+(pass) native surface seam: launcher and build invariants > the launcher keeps its port, readiness and auto-capture contract [0.21ms]
+(pass) native surface seam: launcher and build invariants > the build script compiles the launcher and rejects WebKit linkage [0.18ms]
+(pass) native surface seam: launcher and build invariants > the pure module is packaged through the minibar, never through a second engine [0.05ms]
+
+tests/native-launcher-boundary.test.ts:
+(pass) native launcher seam: sources and compilation > the lifecycle module, transport module and fixture driver exist [0.06ms]
+(pass) native launcher seam: sources and compilation > swiftc compiles the pure modules with the fixture driver [0.01ms]
+(pass) native launcher seam: sources and compilation > the pure modules stay free of AppKit, EventKit and window/process APIs [0.29ms]
+(pass) native launcher seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.02ms]
+(pass) native launcher seam: project and port resolution > HTTP_PORT in .env wins [0.03ms]
+(pass) native launcher seam: project and port resolution > a missing key, out-of-range value, unparsable value or missing file falls back to 8787 [0.01ms]
+(pass) native launcher seam: project and port resolution > the bun lookup order is preserved
+(pass) native launcher seam: project and port resolution > the launcher log stays at the documented user log path
+(pass) native launcher seam: Bun launch plan > the launch plan reproduces the existing bun invocation and environment [0.02ms]
+(pass) native launcher seam: Bun launch plan > a missing bun binary is a typed failure, not a crash
+(pass) native launcher seam: startup decision uses one Bun session > an unreachable port starts a server owned by the launcher
+(pass) native launcher seam: startup decision uses one Bun session > an already-running healthy Bun session is adopted instead of duplicated
+(pass) native launcher seam: startup decision uses one Bun session > a foreign listener on the port is a typed port conflict, never a second server
+(pass) native launcher seam: health signature > the existing title + runtime-bootstrap signature marks the webapp healthy
+(pass) native launcher seam: health signature > a non-200 status, foreign body or unreachable port is unhealthy with a machine reason
+(pass) native launcher seam: readiness without sleeps > readiness resolves on the first healthy attempt and reports the attempt index
+(pass) native launcher seam: readiness without sleeps > an exhausted attempt sequence reports not-ready instead of hanging
+(pass) native launcher seam: process ownership and shutdown > a clean server exit propagates its status without terminating twice
+(pass) native launcher seam: process ownership and shutdown > quitting terminates the launcher-owned server exactly once
+(pass) native launcher seam: process ownership and shutdown > an adopted server is never terminated by this launcher
+(pass) native launcher seam: process ownership and shutdown > repeated interrupts terminate the child exactly once
+(pass) native launcher seam: process ownership and shutdown > a crashed server propagates its non-zero status
+(pass) native launcher seam: process ownership and shutdown > a readiness failure terminates the owned server and exits non-zero
+(pass) native launcher seam: transport boundary > the transport targets the existing local /ws endpoint
+(pass) native launcher seam: transport boundary > an open socket plus a capture snapshot hydrates online state
+(pass) native launcher seam: transport boundary > a dropped socket becomes reconnecting while retaining the last known capture state
+(pass) native launcher seam: transport boundary > an authoritative snapshot after reconnect restores online state [0.01ms]
+(pass) native launcher seam: transport boundary > a malformed payload is counted as a typed decode failure and never clears state
+(pass) native launcher seam: transport boundary > an unknown capture phase is a typed decode failure, not a crash or a guess
+(pass) native launcher seam: transport boundary > messages outside the observed subset leave the projection untouched
+(pass) native launcher seam: transport boundary > a status message updates transport status text only
+(pass) native launcher seam: transport boundary > reconnect backoff is monotonic and bounded [0.03ms]
+(pass) native launcher seam: outbound command emission > rapid Stop activations emit exactly one existing stopCapture action
+(pass) native launcher seam: outbound command emission > Stop while the socket is down emits nothing
+(pass) native launcher seam: outbound command emission > the Stop guard rearms only after an authoritative capture snapshot
+(pass) native launcher seam: outbound command emission > the native surface invents no protocol spelling
+(pass) native launcher seam: launcher entry point and build wiring > the launcher keeps the browser workspace and never imports WebKit [0.06ms]
+(pass) native launcher seam: launcher entry point and build wiring > the launcher keeps mic permission, calendar auto-capture and bun supervision [0.06ms]
+(pass) native launcher seam: launcher entry point and build wiring > the launcher delegates decisions to the pure modules instead of re-deriving them [0.04ms]
+(pass) native launcher seam: launcher entry point and build wiring > the entry point holds side effects only, never lifecycle rules [0.05ms]
+(pass) native launcher seam: launcher entry point and build wiring > the build script compiles every native source the entry point needs [0.04ms]
+(pass) native launcher seam: launcher entry point and build wiring > the shipped bundle links the transport into exactly one executable [0.03ms]
+
+tests/public-transcript-feed.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.10ms]
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.06ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.14ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.11ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.03ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.02ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.09ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.62ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.08ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.05ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.10ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.04ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.10ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.04ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.27ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.18ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.12ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.26ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.09ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.11ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.05ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.04ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.05ms]
+
+tests/public-sessions.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/app-bundle.test.ts:
+(pass) app bundle: build > scripts/build-app.sh builds into the requested install dir and exits 0 [0.09ms]
+(pass) app bundle: build > the executable and every packaged resource is non-empty [2.18ms]
+(pass) app bundle: packaged native modules > the packaged executable contains LauncherEnvironment [0.03ms]
+(pass) app bundle: packaged native modules > the packaged executable contains ServerLifecycle
+(pass) app bundle: packaged native modules > the packaged executable contains NativeSurfaceGeometry
+(pass) app bundle: packaged native modules > the packaged executable contains StopCommandGuard
+(pass) app bundle: packaged native modules > the packaged executable contains TransportClient
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarProjection
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarWindowController
+(pass) app bundle: packaged native modules > the packaged executable contains MinibarView
+(pass) app bundle: packaged native modules > the build compiles every macos/*.swift source in one invocation [2.18ms]
+(pass) app bundle: packaged native modules > the menu-bar item, panel and browser workspace action are packaged [0.04ms]
+(pass) app bundle: packaged native modules > the packaged executable links no WebKit and stays one binary [9.76ms]
+(pass) app bundle: Info.plist identity and permissions > plutil lints the generated Info.plist [2.72ms]
+(pass) app bundle: Info.plist identity and permissions > app identity and version metadata are preserved [18.01ms]
+(pass) app bundle: Info.plist identity and permissions > every TCC facility the launcher actually uses declares a usage string [6.91ms]
+(pass) app bundle: Info.plist identity and permissions > the bundle claims no screen recording capability it does not use [1.90ms]
+(pass) app bundle: resources > the project-path resource points at this checkout [0.06ms]
+(pass) app bundle: resources > the launcher reaps its owned server on a raw signal, never orphaning it [0.05ms]
+(pass) app bundle: resources > the packaged project path resolves the runtime contract the launcher needs [0.03ms]
+(pass) app bundle: resources > the build refuses to package a project path without the server entry point
+(pass) app bundle: resources > the pure project-resolution rule rejects a directory that cannot serve [0.06ms]
+(pass) app bundle: resources > project resolution accepts only a directory that can actually serve [0.06ms]
+(pass) app bundle: signing > codesign --verify --deep --strict passes on the built bundle [4.78ms]
+(pass) app bundle: signing > the bundle is ad-hoc signed under the product identifier [3.70ms]
+(pass) app bundle: install safety > a redirected build never repoints the repository symlink [0.05ms]
+(pass) app bundle: install safety > a redirected build never touches the canonical installed app [9.21ms]
+(pass) app bundle: install safety > the build script updates the repo symlink only for the canonical install dir [0.06ms]
+(pass) app bundle: verifier rejects an incomplete bundle > removing the project-path resource fails verification [2.21ms]
+(pass) app bundle: verifier rejects an incomplete bundle > the intact bundle passes the same verifier [105.98ms]
+
+tests/slide-persist.test.ts:
+(pass) same-topic slide persistence end-to-end > 세션 같은 토픽 갱신 → SQLite → deck export에 최신 불렛 [102.97ms]
+
+tests/whisper-dedupe.test.ts:
+(pass) bigramSimilarity > 완전히 같은 문장은 1 [0.09ms]
+(pass) bigramSimilarity > 띄어쓰기·대소문자 차이는 정규화로 흡수 [0.02ms]
+(pass) bigramSimilarity > 같은 발화의 부분 수정(리비전)은 높은 유사도 [0.04ms]
+(pass) bigramSimilarity > 공통 어미(습니다)만 같은 무관한 문장은 낮은 유사도 [0.01ms]
+(pass) bigramSimilarity > 같은 글자를 어순만 바꾼 문장은 중복이 아님
+(pass) bigramSimilarity > 빈 문자열·한 글자는 0
+
+tests/public-settings-panel.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/provider-platform.test.ts:
+(pass) subscription provider registry > contains one strict adapter for every supported subscription CLI [0.05ms]
+(pass) subscription provider registry > projects installed and authenticated state without conflating them [0.09ms]
+(pass) subscription provider registry > connect descriptors use the vendor-supported interactive flows [1.11ms]
+(pass) subscription provider registry > Finder-like PATH discovers executables and never guesses unverifiable auth [1212.28ms]
+(pass) provider CLI contracts > builds exact noninteractive argv [0.07ms]
+(pass) provider CLI contracts > parses Grok ACP streaming JSON and Gemini JSON without leaking envelopes [0.20ms]
+(pass) provider CLI contracts > runs every adapter through hermetic fake CLIs with GUI-safe PATH [1380.18ms]
+
+tests/stt-model-protocol.test.ts:
+(pass) STT protocol > projects model manager states into a deterministic typed payload [0.24ms]
+(pass) STT protocol > emits null selectedModelId when nothing is selected [0.03ms]
+
+tests/public-compile-control.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'Accessibility' not found in module '/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Accessibility.js'.
+-------------------------------
+
+
+tests/scene-pptx.test.ts:
+(pass) native PPTX scene renderer > writes editable OOXML text and shapes from the shared scene [13.84ms]
+
+tests/session.test.ts:
+(pass) MeetingSession > production-style manual mode records transcript without automatic LLM detection [0.20ms]
+(pass) MeetingSession > 첫 감지에서 MeetingCard 슬라이드 생성 [0.30ms]
+(pass) MeetingSession > hysteresis: 같은 pending 후보 2회만 advance하고 첫 신호는 현재 카드를 오염시키지 않음 [0.29ms]
+(pass) MeetingSession > A→B→C 단일 신호는 A를 archive하지 않고 후보별 streak를 격리 [0.17ms]
+(pass) MeetingSession > advance 시그널이 끊기면 후보 streak 리셋 [0.22ms]
+(pass) MeetingSession > reset()은 진행 중이던 감지 결과를 폐기 (epoch 무효화) [0.19ms]
+(pass) MeetingSession > detectInterval 문장이 쌓여야 LLM 호출 [0.10ms]
+(pass) MeetingSession > 자막은 디바운스 후 정확한 caption 이벤트로 브로드캐스트 [200.24ms]
+(pass) MeetingSession > LLM 실패는 가짜 MeetingCard 없이 detecting을 안전하게 해제 [0.29ms]
+(pass) MeetingSession > setDetector로 런타임 LLM 교체 — 다음 감지부터 새 백엔드 사용 [0.17ms]
+(pass) MeetingSession > 전사 로그는 문장+시각+화자를 전부 보관하고 reset에서 비움 [0.06ms]
+(pass) MeetingSession > 화자 번호가 캡션에 실리고, 화자 변경 시 버퍼 즉시 플러시 [200.24ms]
+(pass) MeetingSession > 같은 토픽 MeetingCard 갱신도 sink.onSlide로 영속화 [0.37ms]
+(pass) meta card rejection > LLM이 회의 종료 카드를 내도 스테이지에 올리지 않는다 [0.05ms]
+(pass) meta card rejection > fallback 경로의 메타성 문장도 슬라이드를 만들지 않는다 [0.08ms]
+(pass) meta card rejection > 음성 인식 테스트 자체가 회의 주제이면 실제 논의 카드를 생성한다 [51.43ms]
+
+tests/minutes.test.ts:
+(pass) buildMinutesHtml > keeps metadata, every decision, and every action in the first-page section, including empty states [0.46ms]
+(pass) buildMinutesHtml > starts appendix content after a forced page break [0.34ms]
+(pass) buildMinutesHtml > keeps immutable provenance in data attributes while showing readable sentence positions [0.11ms]
+(pass) buildMinutesHtml > displays the canonical transcript version independently of item coordinates [0.04ms]
+(pass) buildMinutesHtml > escapes all untrusted text and attribute values [0.11ms]
+
+tests/pdf.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+29 | var deviceDescriptors_exports = {};
+30 | __export(deviceDescriptors_exports, {
+31 |   deviceDescriptors: () => deviceDescriptors
+32 | });
+33 | module.exports = __toCommonJS(deviceDescriptors_exports);
+34 | var import_deviceDescriptorsSource = __toESM(require("./deviceDescriptorsSource.json"));
+     ^
+SyntaxError: JSON Parse error: Unexpected EOF
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/deviceDescriptors.js:34:38
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/localUtilsDispatcher.js:43:5
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:31:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/index.js:38:1
+      at anonymous (unknown:1:1)
+      at /Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/remote/playwrightConnection.js:49:30
+-------------------------------
+
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.03ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.10ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.37ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [0.66ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.06ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.05ms]
+(pass) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [3.31ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.30ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.09ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.12ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.35ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.09ms]
+
+tests/deck-compiler.test.ts:

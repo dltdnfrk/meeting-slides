@@ -1,0 +1,3 @@
+chromium before=12 after=12
+bun before=3 after=3
+(driver closes browser and harness server in finally; no leaked process or port)

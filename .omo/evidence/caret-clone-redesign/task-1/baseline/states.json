@@ -1,0 +1,749 @@
+{
+  "packet": "meeting-slides-current-baseline",
+  "characterization": "existing rendered UI before any product change",
+  "startedAt": "2026-08-11T06:42:39.294Z",
+  "finishedAt": "2026-08-11T06:42:41.571Z",
+  "viewports": [
+    {
+      "name": "1440x900",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "1244x836",
+      "width": 1244,
+      "height": 836
+    },
+    {
+      "name": "960x760",
+      "width": 960,
+      "height": 760
+    },
+    {
+      "name": "820x900",
+      "width": 820,
+      "height": 900
+    },
+    {
+      "name": "375x812",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "name": "320x667",
+      "width": 320,
+      "height": 667
+    }
+  ],
+  "states": [
+    {
+      "stateId": "library-1440x900",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:42:40.213Z",
+      "shell": "library",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 232,
+          "height": 612,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "stagePane": {
+          "width": 850,
+          "height": 612,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 320,
+          "height": 612,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 1440,
+          "height": 210,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 0,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 시작"
+      },
+      "screenshot": {
+        "path": "baseline/screens/library-1440x900.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 150711,
+        "sha256": "3dfd46720b9d08f8a8d50e8d8b389975f6e92b2523c31dbc3d2cc6032834a828"
+      },
+      "computed": {
+        "path": "baseline/computed/library-1440x900.json",
+        "sha256": "5e9f9bb9f9293f673fac3f734ca46b8eabe80f5b1d246a8c90343a222739ffc3",
+        "bytes": 19008,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "live-1440x900",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:42:40.281Z",
+      "shell": "live",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 652,
+          "height": 732,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 489,
+          "height": 732,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 340.5,
+          "height": 84,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 15,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 중지"
+      },
+      "screenshot": {
+        "path": "baseline/screens/live-1440x900.png",
+        "width": 1440,
+        "height": 900,
+        "bytes": 194370,
+        "sha256": "26569c7f2ab51b711ef4819346c5d54c83d6feece13a6655360e347021fae1fc"
+      },
+      "computed": {
+        "path": "baseline/computed/live-1440x900.json",
+        "sha256": "b27863171294f26f2e2fe0f5c77ad78bed704d6617a549feb78a3d1b95677065",
+        "bytes": 18956,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "library-1244x836",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "1244x836",
+        "width": 1244,
+        "height": 836
+      },
+      "capturedAt": "2026-08-11T06:42:40.474Z",
+      "shell": "library",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 232,
+          "height": 548,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "stagePane": {
+          "width": 654,
+          "height": 548,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 320,
+          "height": 548,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 1244,
+          "height": 210,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 0,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 시작"
+      },
+      "screenshot": {
+        "path": "baseline/screens/library-1244x836.png",
+        "width": 1244,
+        "height": 836,
+        "bytes": 143452,
+        "sha256": "3287747b653756dc1a33950bd4f0c188aa810d55eabc4561bcf67b17344836b2"
+      },
+      "computed": {
+        "path": "baseline/computed/library-1244x836.json",
+        "sha256": "d7e26f6c159a6015095066e0454f0b7ac8d54ec7257d96251c330ba000b33f42",
+        "bytes": 19009,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "live-1244x836",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "1244x836",
+        "width": 1244,
+        "height": 836
+      },
+      "capturedAt": "2026-08-11T06:42:40.548Z",
+      "shell": "live",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 652,
+          "height": 668,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 489,
+          "height": 668,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 340.5,
+          "height": 84,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 15,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 중지"
+      },
+      "screenshot": {
+        "path": "baseline/screens/live-1244x836.png",
+        "width": 1244,
+        "height": 836,
+        "bytes": 162409,
+        "sha256": "ba70fee22139e2d424438163cad1082ea4d1be16ac02725eeb5b85bf0f2ba2e9"
+      },
+      "computed": {
+        "path": "baseline/computed/live-1244x836.json",
+        "sha256": "950058f1136b80bf181fc9e9ab1ffd04e24ec3424a1f0d81c0e29e004ef52ae0",
+        "bytes": 18953,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "library-960x760",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "960x760",
+        "width": 960,
+        "height": 760
+      },
+      "capturedAt": "2026-08-11T06:42:40.701Z",
+      "shell": "library",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 607,
+          "height": 472,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 320,
+          "height": 472,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 960,
+          "height": 210,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 0,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 시작"
+      },
+      "screenshot": {
+        "path": "baseline/screens/library-960x760.png",
+        "width": 960,
+        "height": 760,
+        "bytes": 118425,
+        "sha256": "77c4d56ebc4d0458f64d3e819f390bce67c53fd8aa44044ed0cd3efd730b892b"
+      },
+      "computed": {
+        "path": "baseline/computed/library-960x760.json",
+        "sha256": "ad21c73d9b9b296de28aff86ebaadc0125b929df2947426082ed967c1a20c5e9",
+        "bytes": 18985,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "live-960x760",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "960x760",
+        "width": 960,
+        "height": 760
+      },
+      "capturedAt": "2026-08-11T06:42:40.761Z",
+      "shell": "live",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 577,
+          "height": 592,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 320,
+          "height": 592,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 336.5,
+          "height": 84,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 15,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 중지"
+      },
+      "screenshot": {
+        "path": "baseline/screens/live-960x760.png",
+        "width": 960,
+        "height": 760,
+        "bytes": 132000,
+        "sha256": "b802c2026baded23b4579f03b014d698962bae1cbee829f7d7bac7e8f0578b20"
+      },
+      "computed": {
+        "path": "baseline/computed/live-960x760.json",
+        "sha256": "9583e7c51ec7ed1f34c18edccae7811a2d6371eed90dd5cfa53802fdf3599789",
+        "bytes": 18945,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "library-820x900",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "820x900",
+        "width": 820,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:42:40.950Z",
+      "shell": "library",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 800,
+          "height": 367.89,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 800,
+          "height": 228.11,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 820,
+          "height": 224,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 0,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 시작"
+      },
+      "screenshot": {
+        "path": "baseline/screens/library-820x900.png",
+        "width": 820,
+        "height": 900,
+        "bytes": 99102,
+        "sha256": "c4d1c214059567fe02855c2ddd8880635abc8096bbf125cf8270b0583e182bbf"
+      },
+      "computed": {
+        "path": "baseline/computed/library-820x900.json",
+        "sha256": "f47055c0a6cc82e7cc4e601c773df698dc92d5eb9b8ef1ff95dee5e37f80bb30",
+        "bytes": 18994,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "live-820x900",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "820x900",
+        "width": 820,
+        "height": 900
+      },
+      "capturedAt": "2026-08-11T06:42:41.013Z",
+      "shell": "live",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 782,
+          "height": 498,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 782,
+          "height": 220,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 304.5,
+          "height": 72,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 15,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 중지"
+      },
+      "screenshot": {
+        "path": "baseline/screens/live-820x900.png",
+        "width": 820,
+        "height": 900,
+        "bytes": 94255,
+        "sha256": "3b49419d51047c6966cc261cb510ebed6585bf2432f59ad7d129cb28362eb911"
+      },
+      "computed": {
+        "path": "baseline/computed/live-820x900.json",
+        "sha256": "afc1bdb16b608a389a60a99aeec7b8d6d1fe6115dc4f1a24283f8c30ae3a76ba",
+        "bytes": 18891,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "library-375x812",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "375x812",
+        "width": 375,
+        "height": 812
+      },
+      "capturedAt": "2026-08-11T06:42:41.183Z",
+      "shell": "library",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 355,
+          "height": 270.89,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 355,
+          "height": 245.09,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 375,
+          "height": 220,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 0,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 시작"
+      },
+      "screenshot": {
+        "path": "baseline/screens/library-375x812.png",
+        "width": 375,
+        "height": 812,
+        "bytes": 76657,
+        "sha256": "9620dd5a85869a5f59b06a39dac4d743868f4a926c4727906c9dd30d53d92190"
+      },
+      "computed": {
+        "path": "baseline/computed/library-375x812.json",
+        "sha256": "5d0c8c84ce6cd7d58487e5a5b30572fe01efb9de6a30d4318fadd352fb0630ae",
+        "bytes": 18995,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "live-375x812",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "375x812",
+        "width": 375,
+        "height": 812
+      },
+      "capturedAt": "2026-08-11T06:42:41.240Z",
+      "shell": "live",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 337,
+          "height": 410,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 337,
+          "height": 220,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 267.05,
+          "height": 70,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 15,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 중지"
+      },
+      "screenshot": {
+        "path": "baseline/screens/live-375x812.png",
+        "width": 375,
+        "height": 812,
+        "bytes": 68828,
+        "sha256": "7ec8405405676a9558686ccec282c3c9b9fa85e6ce22fec274f3068f0b38989c"
+      },
+      "computed": {
+        "path": "baseline/computed/live-375x812.json",
+        "sha256": "3ba77a0cbc874227607c654c8e25f30cb3860963c6c62e9697854060441ad65b",
+        "bytes": 18890,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "library-320x667",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "320x667",
+        "width": 320,
+        "height": 667
+      },
+      "capturedAt": "2026-08-11T06:42:41.401Z",
+      "shell": "library",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 300,
+          "height": 194.77,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 300,
+          "height": 176.22,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 320,
+          "height": 220,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 0,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 시작"
+      },
+      "screenshot": {
+        "path": "baseline/screens/library-320x667.png",
+        "width": 320,
+        "height": 667,
+        "bytes": 66842,
+        "sha256": "65da05db23f5dc8d121c037cfad1ed10c7f5608296ddbe2041c847bc88afc7ba"
+      },
+      "computed": {
+        "path": "baseline/computed/library-320x667.json",
+        "sha256": "236f5b6fa33b8088055cc6551396619adda859b51f14f75bfce4def8d8c01ac2",
+        "bytes": 18993,
+        "missingSelectors": []
+      }
+    },
+    {
+      "stateId": "live-320x667",
+      "kind": "meeting-slides-baseline",
+      "sourceUrl": "http://127.0.0.1:51122",
+      "viewport": {
+        "name": "320x667",
+        "width": 320,
+        "height": 667
+      },
+      "capturedAt": "2026-08-11T06:42:41.456Z",
+      "shell": "live",
+      "rootOverflow": false,
+      "surfaceVisibility": {
+        "sessionRail": {
+          "width": 0,
+          "height": 0,
+          "display": "none",
+          "visibility": "visible",
+          "perceivable": false
+        },
+        "stagePane": {
+          "width": 282,
+          "height": 264.06,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptPane": {
+          "width": 282,
+          "height": 238.92,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "dock": {
+          "width": 287.05,
+          "height": 82,
+          "display": "flex",
+          "visibility": "visible",
+          "perceivable": true
+        },
+        "transcriptLineCount": 15,
+        "meetingRowCount": 3,
+        "recordButtonLabel": "녹음 중지"
+      },
+      "screenshot": {
+        "path": "baseline/screens/live-320x667.png",
+        "width": 320,
+        "height": 667,
+        "bytes": 52281,
+        "sha256": "5d7ecffdb93dd8e6cb601eae6d1cd146ee699f2b9092099e633aa30e1aea3f19"
+      },
+      "computed": {
+        "path": "baseline/computed/live-320x667.json",
+        "sha256": "16a6fbffa02a6f965c95264c32410c798b86687bb5b1507cddb30db7bca1fd32",
+        "bytes": 18963,
+        "missingSelectors": []
+      }
+    }
+  ],
+  "errors": []
+}

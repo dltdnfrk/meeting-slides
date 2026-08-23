@@ -1,0 +1,15 @@
+{
+  "task": "F3 Real Manual QA",
+  "status": "REJECT",
+  "approved": false,
+  "reason": "Decisive fresh installed-app journey failed before compile/history/export because the 960x760 browser pointer path reported the target was not clickable; required downstream F3 surfaces were therefore not observed.",
+  "freshInstalledExecutableSha256": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+  "build": "PASS",
+  "verifyApp": "PASS",
+  "codesign": "PASS",
+  "decisiveJourneyExit": 1,
+  "cleanup": "PASS",
+  "productEdits": false,
+  "f4Entered": false,
+  "reportSha256": "320020f0526a7b0a4357959f7261b6b466bdcc26b78fcdd1ba6ce661ae8490e9"
+}

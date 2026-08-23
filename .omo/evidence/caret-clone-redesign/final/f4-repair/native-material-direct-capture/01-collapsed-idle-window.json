@@ -1,0 +1,22 @@
+{
+  "observer": "CGWindowListCopyWindowInfo(.optionOnScreenOnly)",
+  "targetPID": 94734,
+  "targetWindowCount": 1,
+  "targetWindows": [
+    {
+      "alpha": 1,
+      "bounds": {
+        "Height": 56,
+        "Width": 360,
+        "X": 1136,
+        "Y": 854
+      },
+      "layer": 3,
+      "name": "",
+      "onScreen": true,
+      "ownerName": "Meeting Slides",
+      "ownerPID": 94734,
+      "windowNumber": 104444
+    }
+  ]
+}

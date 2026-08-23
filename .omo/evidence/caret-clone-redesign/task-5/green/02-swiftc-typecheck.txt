@@ -1,0 +1,2 @@
+typecheck_exit=0
+launcher_typecheck_done

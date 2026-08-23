@@ -1,0 +1,28 @@
+=== PROBE: stale_state — fresh source hash ===
+Intent: prove the test reads the CURRENT shipped sources at run time, not a cached copy.
+
+--- source hashes at final verification time ---
+c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e  public/index.html
+6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad  public/app.js
+e589a1fecb564ede96733cca2be08ea1802bc267584f02d8d3a1dcf86c11a56f  public/operator-surface.js
+6d71c1cd0476b89b9c78d11b2e43881fa036de11fa9aab1fa4e64d7d2fc9897d  public/review-panel.js
+ce5b33e747269f43ab611eb574b17fbcf83d01e0b9737f3444b2ab6f8a584599  public/workspace-split.js
+c99bc091ac7ae392636d842d2f71600685210d3ee95e1c97c9d656e80b7ce535  public/transcript-resize.js
+710be07ffefa67fa9054c7aba98f4c95319183cd4e390bc52acdae76d2b5e99e  src/session.ts
+80084305117b26160b063c5c59b80ecc07fc92a2ac01ca40a64310281520a923  server.ts
+
+--- match against pre-work baseline (baseline/00-boundary.txt) ---
+0a1
+> c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e  public/index.html
+8d8
+< 
+
+--- proof the test re-reads sources (no build/cache step) ---
+the test calls readFileSync(join(import.meta.dir,'..',relative)) per run; a live edit is observed immediately:
+ 20 pass
+ 3 fail
+restored index.html: c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e
+
+--- baseline-vs-now comparison (corrected extraction) ---
+UNCHANGED: all 8 shipped sources byte-identical to the pre-work baseline
+(the earlier diff output was a grep line-offset artifact, not a hash mismatch)

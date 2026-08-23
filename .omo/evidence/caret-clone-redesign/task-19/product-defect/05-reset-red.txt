@@ -1,0 +1,4 @@
+Command: bun test tests/public-attendees.test.ts --test-name-pattern 'reset clears an ended'
+Result: RED, exit 1
+Failure: timed out waiting for document.querySelectorAll('.session-row--selected').length === 0 after accepted #btn-reset confirmation.
+Root cause: reset cleared internal selectedMeetingId but did not immediately rerender the meeting rail, leaving the ended row visibly selected and blocking the deterministic second-cycle boundary.

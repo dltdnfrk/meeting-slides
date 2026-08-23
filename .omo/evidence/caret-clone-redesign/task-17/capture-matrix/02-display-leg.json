@@ -1,0 +1,40 @@
+{
+  "api" : "SCScreenshotManager + SCContentFilter(display:excludingWindows:[])",
+  "macOS" : "Version 26.5.2 (Build 25F84)",
+  "probe" : "full-display-capture-leg",
+  "results" : [
+    {
+      "configuration" : "default (no exclusion API used)",
+      "displayFrame" : "(0.0, 0.0, 1512.0, 982.0)",
+      "displayImage" : "1512x982",
+      "legValid" : false,
+      "panelVisibleInDisplayCapture" : false,
+      "sampledAt" : "480,654",
+      "sampledRGB" : "0.112,0.164,0.311",
+      "scWindowFrame" : "(300.0, 626.0, 360.0, 56.0)",
+      "sharingType" : "NSWindowSharingType.readOnly"
+    },
+    {
+      "configuration" : "self-exclusion attempt",
+      "displayFrame" : "(0.0, 0.0, 1512.0, 982.0)",
+      "displayImage" : "1512x982",
+      "legValid" : true,
+      "panelVisibleInDisplayCapture" : false,
+      "sampledAt" : "480,654",
+      "sampledRGB" : "0.784,0.792,0.814",
+      "scWindowFrame" : "(300.0, 626.0, 360.0, 56.0)",
+      "sharingType" : "NSWindowSharingType.none"
+    },
+    {
+      "configuration" : "default restored after exclusion",
+      "displayFrame" : "(0.0, 0.0, 1512.0, 982.0)",
+      "displayImage" : "1512x982",
+      "legValid" : false,
+      "panelVisibleInDisplayCapture" : false,
+      "sampledAt" : "480,654",
+      "sampledRGB" : "0.784,0.792,0.814",
+      "scWindowFrame" : "(300.0, 626.0, 360.0, 56.0)",
+      "sharingType" : "NSWindowSharingType.readOnly"
+    }
+  ]
+}

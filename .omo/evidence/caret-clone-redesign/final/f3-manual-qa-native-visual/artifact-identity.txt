@@ -1,0 +1,5 @@
+expected_sha256=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+actual_sha256=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+bundle_id=com.meetingslides.app
+executable=/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+app=/Users/hyunjun/Applications/Meeting Slides.app

@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-08-17T00:00:00.000Z",
+  "evidenceRoot": ".omo/evidence/ulw/session/G001-upgrade-meeting-slides-from-a-title/a1",
+  "hashes": {
+    "claude-design-adoption-ledger.md": "a27ad9b2a4c4271a0c3c017589bcd307cbb285a8564ae1521e37330b2acf09fa",
+    "pptx-api-constraints.md": "6dcc1de960b554787e77c8077c5df4ec68d66138a60e110b150a95bab3955ebf",
+    "slide-plan-contract.md": "6a49a3fe569604e35edfab7d23c0b59ca670c8b8019731673d4a142f19c47998"
+  },
+  "cleanup": {
+    "tempScreenshots": ["/tmp/slide-plan-wide.png", "/tmp/slide-plan-narrow.png", "/tmp/slide-plan-reduced.png"],
+    "tempLogs": ["/tmp/full-suite.out", "/tmp/focused.out", "/tmp/focused2.out", "/tmp/sec-minibar.out"]
+  },
+  "classifiedFailures": {
+    "preExistingEnvironment": [
+      "product-owned deterministic raster export uses real slides-grab PNG bytes once",
+      "deterministic real-tool four-format slide artifacts"
+    ],
+    "fixedThisTurn": [
+      "public protocol persistSlidePlan contract",
+      "Todo 13 compile action now compileSlidePlan",
+      "slide paper containment and schema-key leak"
+    ]
+  }
+}

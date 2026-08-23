@@ -1,0 +1,7 @@
+build_dir=/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//native-surface-manual.ihxgBl
+== swiftc compile (manual) ==
+compile_exit=0
+total 264
+drwx------@     3 hyunjun  staff      96 Aug 11 15:31 .
+drwx------@ 10781 hyunjun  staff  344992 Aug 11 15:31 ..
+-rwxr-xr-x@     1 hyunjun  staff  131720 Aug 11 15:31 native-surface-driver

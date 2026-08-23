@@ -1,0 +1,101 @@
+[
+ {
+  "viewport": "1440x900",
+  "arrangement": "side-by-side",
+  "aspectBefore": 1.372,
+  "aspectAfter": 1.78,
+  "transcriptBodyBefore": 605,
+  "transcriptBodyAfter": 581,
+  "startOffscreenBefore": 0,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ },
+ {
+  "viewport": "1244x836",
+  "arrangement": "side-by-side",
+  "aspectBefore": 1.54,
+  "aspectAfter": 1.779,
+  "transcriptBodyBefore": 541,
+  "transcriptBodyAfter": 517,
+  "startOffscreenBefore": 0,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ },
+ {
+  "viewport": "1100x800",
+  "arrangement": "side-by-side",
+  "aspectBefore": 1.441,
+  "aspectAfter": 1.778,
+  "transcriptBodyBefore": 505,
+  "transcriptBodyAfter": 481,
+  "startOffscreenBefore": 0,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ },
+ {
+  "viewport": "960x760",
+  "arrangement": "side-by-side",
+  "aspectBefore": 1.257,
+  "aspectAfter": 1.779,
+  "transcriptBodyBefore": 465,
+  "transcriptBodyAfter": 441,
+  "startOffscreenBefore": 0,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ },
+ {
+  "viewport": "900x760",
+  "arrangement": "side-by-side",
+  "aspectBefore": 2.341,
+  "aspectAfter": 1.78,
+  "transcriptBodyBefore": 237,
+  "transcriptBodyAfter": 441,
+  "startOffscreenBefore": 0,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ },
+ {
+  "viewport": "899x760",
+  "arrangement": "stacked",
+  "aspectBefore": 13.317,
+  "aspectAfter": 1.779,
+  "transcriptBodyBefore": 80,
+  "transcriptBodyAfter": 120,
+  "startOffscreenBefore": 1,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ },
+ {
+  "viewport": "820x900",
+  "arrangement": "stacked",
+  "aspectBefore": 5.714,
+  "aspectAfter": 1.778,
+  "transcriptBodyBefore": 150,
+  "transcriptBodyAfter": 161,
+  "startOffscreenBefore": 2,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ },
+ {
+  "viewport": "375x812",
+  "arrangement": "stacked",
+  "aspectBefore": 3.539,
+  "aspectAfter": 1.782,
+  "transcriptBodyBefore": 106,
+  "transcriptBodyAfter": 151,
+  "startOffscreenBefore": 8,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ },
+ {
+  "viewport": "320x667",
+  "arrangement": "stacked",
+  "aspectBefore": 7.647,
+  "aspectAfter": 1.772,
+  "transcriptBodyBefore": 51,
+  "transcriptBodyAfter": 120,
+  "startOffscreenBefore": 8,
+  "startOffscreenAfter": 0,
+  "rootOverflowAfter": 0
+ }
+]

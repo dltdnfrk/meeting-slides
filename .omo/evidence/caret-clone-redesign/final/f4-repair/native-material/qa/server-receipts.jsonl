@@ -1,0 +1,6 @@
+{"sequence":1,"kind":"server-ready","port":54831}
+{"sequence":2,"kind":"workspace-get","host":"127.0.0.1:54831"}
+{"sequence":3,"kind":"workspace-get","host":"127.0.0.1:54831"}
+{"sequence":4,"kind":"workspace-get","host":"localhost:54831"}
+{"sequence":5,"kind":"websocket-open","clients":1}
+{"sequence":6,"kind":"websocket-close","clients":0}

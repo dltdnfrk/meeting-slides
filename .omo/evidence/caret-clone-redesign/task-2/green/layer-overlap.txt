@@ -1,0 +1,25 @@
+total distinct selectors: 566   styled by >1 layer: 80
+   50  operational-liquid.css + style.css
+   10  caret-shell.css + operational-liquid.css + style.css
+   10  operational-liquid.css + workspace-shell.css
+    6  caret-shell.css + operational-liquid.css + workspace-shell.css
+    3  caret-shell.css + style.css
+    1  caret-shell.css + operational-liquid.css
+
+--- selectors touched by 3+ layers ---
+  .ambient   <- caret-shell.css, operational-liquid.css, style.css
+  .doc-meta   <- caret-shell.css, operational-liquid.css, style.css
+  .doc-title   <- caret-shell.css, operational-liquid.css, style.css
+  .dock   <- caret-shell.css, operational-liquid.css, style.css
+  .glance   <- caret-shell.css, operational-liquid.css, style.css
+  .output-switcher__item[aria-current="page"]   <- caret-shell.css, operational-liquid.css, style.css
+  .pane__empty   <- caret-shell.css, operational-liquid.css, workspace-shell.css
+  .pane__eyebrow   <- caret-shell.css, operational-liquid.css, style.css
+  .pane__title   <- caret-shell.css, operational-liquid.css, workspace-shell.css
+  .record-btn   <- caret-shell.css, operational-liquid.css, style.css
+  .session-rail   <- caret-shell.css, operational-liquid.css, workspace-shell.css
+  .stage   <- caret-shell.css, operational-liquid.css, style.css
+  .stage-pane   <- caret-shell.css, operational-liquid.css, workspace-shell.css
+  .topbar   <- caret-shell.css, operational-liquid.css, style.css
+  .transcript-pane   <- caret-shell.css, operational-liquid.css, workspace-shell.css
+  .workspace   <- caret-shell.css, operational-liquid.css, workspace-shell.css

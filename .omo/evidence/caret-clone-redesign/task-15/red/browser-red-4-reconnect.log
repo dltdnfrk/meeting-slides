@@ -1,0 +1,56 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > 1440x900: reconnecting is stated in the surface, not only in an attribute [92.95ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > 1244x836: reconnecting is stated in the surface, not only in an attribute [83.77ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > 1100x800: reconnecting is stated in the surface, not only in an attribute [80.65ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > 960x760: reconnecting is stated in the surface, not only in an attribute [81.62ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > 900x760: reconnecting is stated in the surface, not only in an attribute [82.24ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > 899x760: reconnecting is stated in the surface, not only in an attribute [85.65ms]
+(pass) Todo 15 · failure states are explicit, truthful and retain last-good content > 820x900: reconnecting is stated in the surface, not only in an attribute [81.40ms]
+1053 |               ?.textContent?.trim() ?? null,
+1054 |           };
+1055 |         });
+1056 |         // The reason is visible where the operator is looking...
+1057 |         expect({ w: vp.width, painted: surfaced.statusPainted })
+1058 |           .toEqual({ w: vp.width, painted: true });
+                  ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "painted": true,
++   "painted": false,
+    "w": 375,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:1058:12)
+(fail) Todo 15 · failure states are explicit, truthful and retain last-good content > 375x812: reconnecting is stated in the surface, not only in an attribute [82.10ms]
+1053 |               ?.textContent?.trim() ?? null,
+1054 |           };
+1055 |         });
+1056 |         // The reason is visible where the operator is looking...
+1057 |         expect({ w: vp.width, painted: surfaced.statusPainted })
+1058 |           .toEqual({ w: vp.width, painted: true });
+                  ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "painted": true,
++   "painted": false,
+    "w": 320,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:1058:12)
+(fail) Todo 15 · failure states are explicit, truthful and retain last-good content > 320x667: reconnecting is stated in the surface, not only in an attribute [82.35ms]
+
+ 7 pass
+ 74 filtered out
+ 2 fail
+ 30 expect() calls
+Ran 9 tests across 1 file. [1222.00ms]

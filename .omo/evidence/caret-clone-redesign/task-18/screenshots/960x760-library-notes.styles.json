@@ -1,0 +1,27 @@
+{
+  "metrics": {
+    "shell": "library",
+    "phase": "idle",
+    "detail": "notes",
+    "connection": "connected",
+    "rootOverflow": 0,
+    "duplicateIds": [],
+    "minTarget": 5,
+    "narrowTargetFailures": [],
+    "status": {
+      "text": "제품 로드맵 정렬 기록을 불러왔습니다",
+      "display": "block",
+      "color": "rgb(154, 154, 163)",
+      "role": "status"
+    },
+    "activeRemovedReferences": [],
+    "stopVisible": false,
+    "transcriptLines": 1
+  },
+  "focused": {
+    "id": "",
+    "outline": "solid",
+    "width": "2px",
+    "shadow": "none"
+  }
+}

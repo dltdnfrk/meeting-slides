@@ -1,0 +1,8 @@
+purpose=bounded aggregate of all current tests except independently evidenced protected provider/minutes failures
+started_utc=2026-08-12T02:50:26Z
+included_count=71
+command=bun test $(cat included-tests.txt)
+focus_trap_sha256=0c706e13cf47afee5643e26283303e3888acda6d11e8d5f0f660cec8c961dc19
+accessibility_test_sha256=8dbbf64b13707f779ad617ec55a4c1491a77f23a95563bfa1e7ea99ecc83f8cc
+finished_utc=2026-08-12T02:52:26Z
+exit_status=0

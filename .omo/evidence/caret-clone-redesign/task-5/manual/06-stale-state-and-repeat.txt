@@ -1,0 +1,17 @@
+== stale-state probe: stopping snapshot must not rearm the guard ==
+{"driver":"native-surface-driver","results":[{"name":"stop-then-stopping-snapshot","ok":true,"value":{"actions":[],"emitted":0}},{"name":"switching-model","ok":true,"value":{"actions":[],"emitted":0}},{"name":"starting","ok":true,"value":{"actions":["stopCapture"],"emitted":1}}]}
+
+== determinism: same batch twice must be byte-identical ==
+run1={"driver":"native-surface-driver","results":[{"name":"a","ok":true,"value":{"displayId":2,"height":220,"usedSavedFrame":true,"width":560,"x":1744,"y":844}}]}
+run2={"driver":"native-surface-driver","results":[{"name":"a","ok":true,"value":{"displayId":2,"height":220,"usedSavedFrame":true,"width":560,"x":1744,"y":844}}]}
+DETERMINISTIC=yes
+
+== repeated-interruption probe: 5 sequential driver invocations, same result ==
+4172e9e09bfacaba5f13f8d227051666e0b6f1e514097d8c01a102160c34737a  -
+4172e9e09bfacaba5f13f8d227051666e0b6f1e514097d8c01a102160c34737a  -
+4172e9e09bfacaba5f13f8d227051666e0b6f1e514097d8c01a102160c34737a  -
+4172e9e09bfacaba5f13f8d227051666e0b6f1e514097d8c01a102160c34737a  -
+4172e9e09bfacaba5f13f8d227051666e0b6f1e514097d8c01a102160c34737a  -
+
+== SIGINT during driver run leaves no partial stdout ==
+interrupted_exit=130

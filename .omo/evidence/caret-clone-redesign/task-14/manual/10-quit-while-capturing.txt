@@ -1,0 +1,38 @@
+== 10. quit while capturing requires confirmation ==
+panel state before quit:
+●, 녹음 중, 06:08, 화자 1 · 첫 번째 확정 문장입니다, 화자 2 · 두 번째 확정 문장입니다, 화자 1 · 세 번째 확정 문장입니다
+pid=1834
+-- a confirmation sheet must be up and the process must still be alive --
+ 1834 S   
+, Meeting Slides 미니바
+buttons in the confirmation alert:
+
+
+-- ⌘Q did not reach a non-activating panel that was never frontmost; use the real
+   NSApplication terminate path instead (same applicationShouldTerminate hook). --
+pid=1834
+47:51: execution error: Meeting Slides에 오류 발생: AppleEvent 시간이 초과되었습니다. (-1712)
+process after quit request (must still be alive: confirmation pending):
+ 1834 S   
+windows now (alert expected):
+Meeting Slides 미니바, 경고, AXSystemDialog, AXDialog
+
+
+-- the confirmation dialog (window 2 = 경고 / AXDialog) --
+73:77: execution error: System Events에 오류 발생: window "경고" of process "meeting-slides"을(를) 가져올 수 없습니다. (-1728)
+73:78: execution error: System Events에 오류 발생: window "경고" of process "meeting-slides"을(를) 가져올 수 없습니다. (-1728)
+
+-- choose 계속 녹음: capture must survive, process must stay alive --
+69:104: execution error: System Events에 오류 발생: window "경고" of process "meeting-slides"을(를) 가져올 수 없습니다. (-1728)
+pid after refusing the quit: 1834
+●, 녹음 중, 06:19, 화자 1 · 첫 번째 확정 문장입니다, 화자 2 · 두 번째 확정 문장입니다, 화자 1 · 세 번째 확정 문장입니다
+
+-- address the alert by index (title lookup fails for AXDialog) --
+경고, AXDialog, 계속 녹음, 종료
+
+-- refuse the quit: click 계속 녹음 --
+button 계속 녹음 of window 2 of application process meeting-slides
+pid after refusing the quit: 1834   (capture must be intact, app must survive)
+●, 녹음 중, 08:41, 화자 1 · 첫 번째 확정 문장입니다, 화자 2 · 두 번째 확정 문장입니다, 화자 1 · 세 번째 확정 문장입니다
+window count back to 1:
+1

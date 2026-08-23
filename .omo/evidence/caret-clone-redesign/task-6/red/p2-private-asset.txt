@@ -1,0 +1,15 @@
+# RED probe: p2-private-asset
+{
+  "design": "/tmp/p2-private-asset.md",
+  "designSha256": "e042a9298e4b7cb57546a09f163d18a23ac6730542255d92c62fa235e0dcf71e",
+  "checks": 115,
+  "passed": 114,
+  "failed": 1,
+  "failures": [
+    {
+      "id": "forbidden/no-caret-private-assets",
+      "detail": "\"Casper\" in: The empty library state renders the Casper mascot beside the caret logo || \"caret logo\" in: The empty library state renders the Casper mascot beside the caret logo"
+    }
+  ]
+}
+exit=1

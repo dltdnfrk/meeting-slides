@@ -1,0 +1,104 @@
+canonical_root=/Users/hyunjun/Documents/MUNI/meeting-slides
+git_top=/Users/hyunjun/Documents/MUNI/meeting-slides
+head=a1ed25f95980980cd958044b90e739ac45e8280d
+baseline=a1ed25f95980980cd958044b90e739ac45e8280d
+commits_since_baseline=0
+index_entries=0
+delivery_mode=direct
+plan_checked=23
+plan_unchecked=0
+installed_executable_sha256=915e570684a24f3f57b4ed7b3bd7b116ebc651ef8392e57e22184e76de2b40b5
+symlink=/Users/hyunjun/Applications/Meeting Slides.app
+project_marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+plan_sha256=65c5352646120ffd3a566b136f1391fd575e31e852d9d1e666f24a9f60e03359
+ledger_sha256=899953b20261459c183f4afcc892b7b61ecdabd5e8345783be7470cecdf9b12e
+boulder_sha256=a2d59028b93f0c03f2796d0907366ea94a32e3201372b5bdcd2ce426ed97d181
+status_begin
+ M .env.example
+ M .omo/start-work/ledger.jsonl
+ M DESIGN.md
+ M README.md
+ M macos/launcher.swift
+ M public/app.js
+ M public/index.html
+ D public/operational-liquid.css
+ M public/operator-surface.js
+ M public/review-panel.js
+ M public/style.css
+ D public/transcript-overlay.css
+ D public/transcript-overlay.js
+ D public/workspace-shell.css
+ M public/workspace-split.js
+ M scripts/build-app.sh
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-attendees.test.ts
+ M tests/public-compile-control.test.ts
+ M tests/public-operator-surface.test.ts
+ M tests/public-protocol-reliability.test.ts
+ M tests/public-review.test.ts
+ M tests/public-runtime-guard.test.ts
+ M tests/public-shell.test.ts
+ M tests/public-test-harness.ts
+ M tests/public-transcript-dock.test.ts
+ M tests/public-workspace.test.ts
+ M tests/server-ws-dispatch.test.ts
+?? .audit2-st019ff026/
+?? .audit3/
+?? .omo/drafts/
+?? .omo/evidence/caret-clone-redesign/
+?? .omo/evidence/live-split-ulw/
+?? .omo/evidence/style-gallery-baseline/
+?? .omo/evidence/style-gallery-final/
+?? .omo/evidence/style-gallery-panels/
+?? .omo/evidence/tiro-operator/
+?? .omo/evidence/tiro-reference/
+?? .omo/plans/caret-clone-redesign.md
+?? .omo/plans/tiro-operator-rebuild.md
+?? .omo/ulw-loop/
+?? .omo/ulw-research/
+?? HANDOFF.md
+?? macos/AppLifecycle.swift
+?? macos/MinibarProjection.swift
+?? macos/MinibarView.swift
+?? macos/MinibarWindowController.swift
+?? macos/NativeSurfaceContract.swift
+?? macos/TransportClient.swift
+?? models/
+?? public/caret-operator.css
+?? public/focus-trap.js
+?? public/fonts/
+?? public/generated/
+?? public/transcript-state.ts
+?? public/ui-state-machine.ts
+?? scripts/build-public-modules.ts
+?? scripts/verify-app.sh
+?? tests/app-bundle.test.ts
+?? tests/caret-dual-surface.test.ts
+?? tests/fixtures/
+?? tests/helpers/
+?? tests/native-launcher-boundary.test.ts
+?? tests/native-minibar.test.ts
+?? tests/native-surface-contract.test.ts
+?? tests/public-active-shell.test.ts
+?? tests/public-caret-accessibility.test.ts
+?? tests/public-caret-context.test.ts
+?? tests/public-caret-foundation.test.ts
+?? tests/public-caret-harness.test.ts
+?? tests/public-caret-library.test.ts
+?? tests/public-caret-live.test.ts
+?? tests/public-caret-narrow-stage.test.ts
+?? tests/public-caret-visual-repair.test.ts
+?? tests/public-dom-protocol-contract.test.ts
+?? tests/public-harness-baseline.test.ts
+?? tests/server-ask-dispatch.test.ts
+?? tests/transcript-state.test.ts
+?? tests/ui-state-machine.test.ts
+status_end

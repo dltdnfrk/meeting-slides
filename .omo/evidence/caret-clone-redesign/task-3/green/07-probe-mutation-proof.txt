@@ -1,0 +1,24 @@
+=== PROBE: misleading_success_output — mutation proof that GREEN is earned ===
+Intent: rule out a suite that passes because it asserts nothing.
+
+--- assertion density ---
+expect() calls executed per run: 54 expect() calls
+tests: Ran 23 tests
+
+--- each of the three required source mutations produced a FOCUSED red ---
+mutation                                             result
+duplicate #current-slide (public/index.html)          2 fail
+meeting_id -> meetingId (public/app.js)               2 fail
+removed capture message (src/session.ts)              1 fail
+
+--- the failing test NAMES the regression in each case ---
+(fail) shipped DOM contract > every binding id occurs exactly once in the shipped HTML
+(fail) shipped DOM contract > no id in the shipped HTML is duplicated at all
+(fail) shipped wire protocol contract > critical payload key spellings are present and their aliases absent
+(fail) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage
+(fail) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling
+
+--- and each mutation left the other assertions passing (focused, not blanket) ---
+ 19 pass
+ 19 pass
+ 20 pass

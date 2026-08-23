@@ -1,0 +1,15 @@
+# RED probe: p3-screenshare
+{
+  "design": "/tmp/p3-screenshare.md",
+  "designSha256": "fb9652d8cba8cfb0d4f71e63024e4eaa1bd4920e75a3090ea939fa81f2c23e5e",
+  "checks": 115,
+  "passed": 114,
+  "failed": 1,
+  "failures": [
+    {
+      "id": "forbidden/no-universal-screenshare-claim",
+      "detail": "\"hidden during screen shar\" in: The minibar is hidden during screen sharing on every platform"
+    }
+  ]
+}
+exit=1

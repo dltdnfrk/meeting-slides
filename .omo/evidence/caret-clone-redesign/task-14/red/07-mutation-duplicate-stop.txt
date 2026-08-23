@@ -1,0 +1,8 @@
+== MUTATION 6: duplicate-Stop guard bypassed in the transport ==
+ 4 fail
+ 84 pass
+(fail) native launcher seam: outbound command emission > rapid Stop activations emit exactly one existing stopCapture action [0.10ms]
+(fail) native minibar seam: Stop emits exactly one existing command > five rapid Stop activations emit exactly one stopCapture [0.15ms]
+(fail) native minibar seam: Stop emits exactly one existing command > Stop spam across a reconnect still emits exactly one stopCapture [0.04ms]
+(fail) native minibar seam: Stop emits exactly one existing command > Stop while idle emits nothing at all [0.05ms]
+110f12cf8fcc2ae913f49f386df1253319aa77f6fc0f88f2ec6b8604bdb60b6f  macos/TransportClient.swift

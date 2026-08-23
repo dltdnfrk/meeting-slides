@@ -1,0 +1,9 @@
+프로젝트: /private/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/tmp.39sJYQ7Wro
+모드: 웹앱(브라우저)
+HTTP_PORT=8898 (기본값 8787)
+마이크 권한 확인됨
+이미 실행 중인 Meeting Slides 서버를 사용합니다 port=8898
+웹앱 ready → 브라우저 오픈 http://localhost:8898/
+캘린더 권한 없음 — 자동 녹음 비활성 (시스템 설정 > 개인정보 보호 > 캘린더)
+런처 종료 code=0
+exit=0

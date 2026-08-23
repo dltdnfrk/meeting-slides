@@ -1,0 +1,13 @@
+== 5. Stop spam: 5 rapid activations must emit exactly ONE stopCapture ==
+-- server-received frames BEFORE --
+[]
+button 녹음 중지 of group 1 of window 1 of application process meeting-slides
+button 녹음 중지 of group 1 of window 1 of application process meeting-slides
+button 녹음 중지 of group 1 of window 1 of application process meeting-slides
+button 녹음 중지 of group 1 of window 1 of application process meeting-slides
+button 녹음 중지 of group 1 of window 1 of application process meeting-slides
+-- server-received frames AFTER 5 clicks --
+["{\"action\":\"stopCapture\"}"]
+-- panel after the server drove stopping -> idle --
+○, 대기 중
+녹음 중지, 미니바 접기, 작업 공간 열기, false, true, true

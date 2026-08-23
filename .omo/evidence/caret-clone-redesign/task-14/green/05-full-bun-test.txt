@@ -1,0 +1,31 @@
+== bun test (full suite, single run) ==
+(fail) pre-capture attendee registration form > an unsaved roster surfaces an error but still starts capture [32.58ms]
+(fail) pre-capture attendee registration form > a reset clears the prepared meeting_id so capture never resends a dead id [156.93ms]
+(fail) pre-capture attendee registration form > the reconnect restore query names an action the real server dispatches [4635.06ms]
+(fail) 전사 피드 다줄 표시 > 15개 line 이벤트가 모두 .transcript-stream에 남는다 [5002.02ms]
+  ^ this test timed out after 5000ms.
+(fail) 전사 피드 다줄 표시 > status 텍스트가 매우 길어도 160자 내로 잘린다 [6.23ms]
+(fail) shipped DOM contract > shipped HTML loads every contract script exactly once [0.15ms]
+(fail) 세션 레일 listMeetings > 회의 목록을 렌더하고 클릭 시 선택 하이라이트한다 [5000.89ms]
+  ^ this test timed out after 5000ms.
+(fail) 세션 레일 listMeetings > 히스토리 삭제 버튼은 선택과 분리된 삭제 명령을 보낸다 [4.69ms]
+(fail) 세션 레일 listMeetings > malformed meetings payload 도 빈 목록으로 복구된다 [0.40ms]
+(fail) (unnamed) [5001.08ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+(fail) native PPTX scene renderer > writes editable OOXML text and shapes from the shared scene [1.26ms]
+(fail) WebSocket 종료는 로컬 앱 서버 연결 상태로 노출된다 [5000.10ms]
+  ^ this test timed out after 5000ms.
+(fail) startReview is ended-only, requester-scoped, and single-flight for one canonical version [10004.49ms]
+(fail) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [2.62ms]
+(fail) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [370.33ms]
+(fail) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [337.95ms]
+(fail) generic chat transport > HTTP sends user-only message with defaults and no response_format [1.68ms]
+(fail) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection [382.38ms]
+(fail) generic chat transport > CLI chat honors options.timeoutMs override [251.77ms]
+(fail) setAttendees replaces a prepared roster and rejects capturing or ended meetings [10001.83ms]
+
+ 640 pass
+ 64 fail
+ 4 errors
+ 3221 expect() calls
+Ran 704 tests across 67 files. [124.06s]

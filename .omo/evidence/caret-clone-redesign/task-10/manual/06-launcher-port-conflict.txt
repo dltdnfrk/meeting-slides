@@ -1,0 +1,5 @@
+프로젝트: /private/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/tmp.Hd7K5W5c1C
+모드: 웹앱(브라우저)
+HTTP_PORT=8899 (기본값 8787)
+포트 8899를 다른 서버가 사용 중입니다 — 두 번째 서버를 띄우지 않습니다.
+exit=1

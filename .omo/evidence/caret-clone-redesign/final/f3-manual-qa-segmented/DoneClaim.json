@@ -1,0 +1,16 @@
+{
+  "task": "F3 segmented manual QA",
+  "verdict": "REJECT",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "installedExecutableSha256": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+  "segments": {
+    "A": "PASS",
+    "B": "FAIL",
+    "C": "PASS",
+    "D": "PASS"
+  },
+  "uncoveredRequirement": "Fresh native menu-bar AX press did not produce the required observed window disappearance/reappearance, so the complete B menu/minibar sequence is unproven.",
+  "productDefectClaimed": false,
+  "cleanup": "PASS",
+  "f4Entered": false
+}

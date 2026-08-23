@@ -1,0 +1,882 @@
+{
+  "reference-library": {
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "168cf7828639a9dd0c52acc5925b5211e0356f87229bba093bbf531eb821ff4b",
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1440,
+        "height": 630
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 850,
+        "height": 612
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 341,
+        "width": 760,
+        "height": 130
+      },
+      "#transcript-pane": {
+        "x": 1106,
+        "y": 70,
+        "width": 320,
+        "height": 612
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 220
+      },
+      ".dock": {
+        "x": 0,
+        "y": 690,
+        "width": 1440,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "empty-library": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "953d9ea9b9700c8fe88699f92e691f440a68f72733214948f4cc35faefb10ce3",
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 326,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "library-overview": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "774ac760744606503b3ddc68f7b7bb8b2e9205a80f58f96a290e67c9748d904c",
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 336,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 220
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "library-notes": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "477e37a368404c8c1621d5c7a44b58a2061b1f1a5502a9ff5f2c3ce0afddc58c",
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 336,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 220
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "library-transcript": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "8dedd74ca493141447919004284916c91ff92d24d932c9dbedbb9f3415e9122a",
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 336,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 220
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "live-starting": {
+    "viewport": {
+      "width": 960,
+      "height": 760,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "069609d1a166034065cdb5cef282415d0a036d5c16299dc1bf19e1de8ae6db77",
+    "geometry": {
+      "#workspace": {
+        "x": 12,
+        "y": 72,
+        "width": 936,
+        "height": 606
+      },
+      "#stage-pane": {
+        "x": 25,
+        "y": 83,
+        "width": 517,
+        "height": 586
+      },
+      "#current-slide": {
+        "x": 36,
+        "y": 221,
+        "width": 495,
+        "height": 437
+      },
+      "#transcript-pane": {
+        "x": 547,
+        "y": 83,
+        "width": 388,
+        "height": 586
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 326,
+        "y": 688,
+        "width": 309,
+        "height": 72
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "live-capturing": {
+    "viewport": {
+      "width": 960,
+      "height": 760,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "836f0ece849825c57ef471f021fcdac434589a9515a66b9a4a014ff91b47c39c",
+    "geometry": {
+      "#workspace": {
+        "x": 12,
+        "y": 72,
+        "width": 936,
+        "height": 606
+      },
+      "#stage-pane": {
+        "x": 25,
+        "y": 83,
+        "width": 517,
+        "height": 586
+      },
+      "#current-slide": {
+        "x": 36,
+        "y": 229,
+        "width": 495,
+        "height": 437
+      },
+      "#transcript-pane": {
+        "x": 547,
+        "y": 83,
+        "width": 388,
+        "height": 586
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 326,
+        "y": 688,
+        "width": 309,
+        "height": 72
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "live-stopping": {
+    "viewport": {
+      "width": 960,
+      "height": 760,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "937d59f4022fe0556654c910eb5a8eca3672de66b689a0f7ac0568f9dc19318c",
+    "geometry": {
+      "#workspace": {
+        "x": 12,
+        "y": 72,
+        "width": 936,
+        "height": 606
+      },
+      "#stage-pane": {
+        "x": 25,
+        "y": 83,
+        "width": 517,
+        "height": 586
+      },
+      "#current-slide": {
+        "x": 36,
+        "y": 229,
+        "width": 495,
+        "height": 437
+      },
+      "#transcript-pane": {
+        "x": 547,
+        "y": 83,
+        "width": 388,
+        "height": 586
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 326,
+        "y": 688,
+        "width": 309,
+        "height": 72
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "live-reconnecting": {
+    "viewport": {
+      "width": 960,
+      "height": 760,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "46c74a6753217ece0aacc265d85db4610361d9f984131e2359217cde988f34f5",
+    "geometry": {
+      "#workspace": {
+        "x": 12,
+        "y": 72,
+        "width": 936,
+        "height": 606
+      },
+      "#stage-pane": {
+        "x": 25,
+        "y": 83,
+        "width": 517,
+        "height": 586
+      },
+      "#current-slide": {
+        "x": 36,
+        "y": 229,
+        "width": 495,
+        "height": 437
+      },
+      "#transcript-pane": {
+        "x": 547,
+        "y": 83,
+        "width": 388,
+        "height": 586
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 326,
+        "y": 688,
+        "width": 309,
+        "height": 72
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "history-preview": {
+    "viewport": {
+      "width": 960,
+      "height": 760,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "fee41f1c59897f91741c4e988fe46a747dd3f0498e8b0d36844bd063914be620",
+    "geometry": {
+      "#workspace": {
+        "x": 12,
+        "y": 72,
+        "width": 936,
+        "height": 606
+      },
+      "#stage-pane": {
+        "x": 25,
+        "y": 83,
+        "width": 517,
+        "height": 586
+      },
+      "#current-slide": {
+        "x": 36,
+        "y": 229,
+        "width": 495,
+        "height": 437
+      },
+      "#transcript-pane": {
+        "x": 547,
+        "y": 83,
+        "width": 388,
+        "height": 586
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 326,
+        "y": 688,
+        "width": 309,
+        "height": 72
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "compile-progress": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "971cb615b99dc058b45e3f28ad5e88403c526d94a42b19ec2d8203f86cf290b6",
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 336,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 220
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "compile-fallback": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "33a0e2f78083af9ea5a55200a127f17e56cf38587c352f1911d96a615a7b9e85",
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 336,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 220
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "compile-error": {
+    "viewport": {
+      "width": 1244,
+      "height": 836,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "187cf115dda0a9bf2f7542670adc4048f17e2f4636640b2268d14ec4fa98cc4c",
+    "geometry": {
+      "#workspace": {
+        "x": 0,
+        "y": 60,
+        "width": 1244,
+        "height": 566
+      },
+      "#stage-pane": {
+        "x": 251,
+        "y": 70,
+        "width": 654,
+        "height": 548
+      },
+      "#current-slide": {
+        "x": 296,
+        "y": 336,
+        "width": 564,
+        "height": 114
+      },
+      "#transcript-pane": {
+        "x": 910,
+        "y": 70,
+        "width": 320,
+        "height": 548
+      },
+      "#session-list": {
+        "x": 27,
+        "y": 213,
+        "width": 206,
+        "height": 220
+      },
+      ".dock": {
+        "x": 0,
+        "y": 626,
+        "width": 1244,
+        "height": 210
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": false,
+      "sameRow": true,
+      "sameColumn": false,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "stacked-live": {
+    "viewport": {
+      "width": 820,
+      "height": 900,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "d73637f35a2501bc4dace2f9b8c2d549dd136dcc256d82456cd70ee5b965a824",
+    "geometry": {
+      "#workspace": {
+        "x": 6,
+        "y": 72,
+        "width": 808,
+        "height": 746
+      },
+      "#stage-pane": {
+        "x": 19,
+        "y": 83,
+        "width": 782,
+        "height": 498
+      },
+      "#current-slide": {
+        "x": 30,
+        "y": 229,
+        "width": 760,
+        "height": 349
+      },
+      "#transcript-pane": {
+        "x": 19,
+        "y": 589,
+        "width": 782,
+        "height": 220
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 258,
+        "y": 828,
+        "width": 305,
+        "height": 72
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": true,
+      "sameRow": false,
+      "sameColumn": true,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "narrow-live": {
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "4fb9b5cf8d4a6beb918e1f6c93746521c5dc168a784213bb4d79b591f8ddb527",
+    "geometry": {
+      "#workspace": {
+        "x": 6,
+        "y": 68,
+        "width": 363,
+        "height": 658
+      },
+      "#stage-pane": {
+        "x": 19,
+        "y": 79,
+        "width": 337,
+        "height": 410
+      },
+      "#current-slide": {
+        "x": 30,
+        "y": 225,
+        "width": 315,
+        "height": 261
+      },
+      "#transcript-pane": {
+        "x": 19,
+        "y": 497,
+        "width": 337,
+        "height": 220
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 54,
+        "y": 736,
+        "width": 267,
+        "height": 70
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": true,
+      "sameRow": false,
+      "sameColumn": true,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  },
+  "narrow-compact": {
+    "viewport": {
+      "width": 320,
+      "height": 667,
+      "deviceScaleFactor": 1
+    },
+    "machineJsonHash": "7f04680c2abf9e2a7a40724ee398ce7ae33fa8d07fe8792fa0d04978c0b7e6d3",
+    "geometry": {
+      "#workspace": {
+        "x": 6,
+        "y": 68,
+        "width": 308,
+        "height": 513
+      },
+      "#stage-pane": {
+        "x": 19,
+        "y": 79,
+        "width": 282,
+        "height": 300
+      },
+      "#current-slide": {
+        "x": 30,
+        "y": 225,
+        "width": 260,
+        "height": 151
+      },
+      "#transcript-pane": {
+        "x": 19,
+        "y": 387,
+        "width": 282,
+        "height": 220
+      },
+      "#session-list": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      ".dock": {
+        "x": 26,
+        "y": 591,
+        "width": 267,
+        "height": 70
+      }
+    },
+    "layout": {
+      "stageAboveTranscript": true,
+      "sameRow": false,
+      "sameColumn": true,
+      "stageVisible": true,
+      "transcriptVisible": true
+    },
+    "external": 0,
+    "overflow": 0
+  }
+}

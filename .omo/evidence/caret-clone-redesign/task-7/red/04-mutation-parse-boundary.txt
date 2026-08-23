@@ -1,0 +1,5 @@
+$ # MUTATION 3: parse boundary accepts unknown message types instead of failing
+$ bun test tests/ui-state-machine.test.ts
+ 1 fail
+ 68 pass
+(fail) parse boundary > rejects unknown type as a typed failure [0.09ms]

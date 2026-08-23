@@ -1,0 +1,7 @@
+Changed-file LSP status for tests/public-active-shell.test.ts:
+- Direct fresh-diagnostics requests timed out twice at the tool's fixed 3000 ms boundary after the final URL-mask addition.
+- A subsequent TypeScript LSP directory scan completed across 50 test files and reported no diagnostic for tests/public-active-shell.test.ts.
+- The directory scan surfaced 29 pre-existing diagnostics in unrelated legacy/duplicate tests; none is in the changed file.
+- Both project and strict TypeScript checks independently exited 0 after the final source change (06-typescript-final.txt).
+
+Earlier Repair 3 direct changed-file LSP request, before the final URL/data masking assertion, returned "No diagnostics found." The final two-line assertion/scanner extension is covered by the completed directory LSP scan and final project/strict compilers.

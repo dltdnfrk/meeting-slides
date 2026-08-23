@@ -1,0 +1,19 @@
+date_utc=2026-08-12T05:12:36Z
+marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+marker_canonical=true
+port_54732_free=true
+task_processes=
+temporary_roots=
+defaults_begin
+{
+    height = 56;
+    width = 360;
+    x = 3477;
+    y = 72;
+}
+defaults_end
+user_db_candidates_after:
+24744ca540901c875784e3e8a3808343e2ea6e84a66301eac14779fc13260806  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings.db
+OK bundle verified: /Users/hyunjun/Applications/Meeting Slides.app
+/Users/hyunjun/Applications/Meeting Slides.app: valid on disk
+/Users/hyunjun/Applications/Meeting Slides.app: satisfies its Designated Requirement

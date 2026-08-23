@@ -1,0 +1,38 @@
+{
+  "malformedMessage": {
+    "kind": "CaretFixtureTimeoutError",
+    "missingState": "capture:capturing",
+    "capturedStale": false,
+    "timeoutMs": 800
+  },
+  "unknownAwaitState": {
+    "kind": "Error",
+    "message": "unknown caret await state: totally:bogus"
+  },
+  "missingClickTarget": {
+    "kind": "Error",
+    "message": "caret fixture \"probe-missing-click-target\": click target not found: #does-not-exist"
+  },
+  "noStaleCarryOver": {
+    "meetingTitles": [],
+    "transcriptLines": 0,
+    "slideTitle": null,
+    "capturing": false
+  },
+  "repeatedRuns": {
+    "hashes": [
+      "8dedd74ca493141447919004284916c91ff92d24d932c9dbedbb9f3415e9122a",
+      "8dedd74ca493141447919004284916c91ff92d24d932c9dbedbb9f3415e9122a",
+      "8dedd74ca493141447919004284916c91ff92d24d932c9dbedbb9f3415e9122a",
+      "8dedd74ca493141447919004284916c91ff92d24d932c9dbedbb9f3415e9122a",
+      "8dedd74ca493141447919004284916c91ff92d24d932c9dbedbb9f3415e9122a"
+    ],
+    "stable": true
+  },
+  "preSubscriptionSlide": {
+    "kind": "CaretFixtureTimeoutError",
+    "missingState": "capture:capturing",
+    "capturedStale": false,
+    "timeoutMs": 800
+  }
+}

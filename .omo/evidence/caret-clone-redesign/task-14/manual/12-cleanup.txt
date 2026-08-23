@@ -1,0 +1,57 @@
+== 12. teardown, process and artifact cleanup ==
+-- stop the capture, then quit cleanly (no confirmation expected when idle) --
+○, 대기 중
+pid=1834
+app process after quit: 
+
+-- kill the fixture server --
+fixture process: 84436
+port 8899 listener: 2 lines
+
+-- delete the temp app bundle, temp project and defaults --
+temp app bundle: deleted
+temp project: deleted
+
+-- canonical installed app must be byte-identical to the baseline --
+7173f815172d5e32045c35e3621062e9508af0f6a50f01b88264de6fa0186744  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+baseline: 7173f815172d5e32045c35e3621062e9508af0f6a50f01b88264de6fa0186744
+ce111995689098c96140668314c063b0c154d723ed8a178fb7414f090683326e  /Users/hyunjun/Applications/Meeting Slides.app/Contents/Info.plist
+baseline: ce111995689098c96140668314c063b0c154d723ed8a178fb7414f090683326e
+
+-- repo symlink must resolve to the canonical installed app --
+lrwxr-xr-x@ 1 hyunjun  staff  46 Aug 11 18:19 Meeting Slides.app -> /Users/hyunjun/Applications/Meeting Slides.app
+
+-- no stray generated binaries in the repo --
+ M .env.example
+ M .omo/start-work/ledger.jsonl
+ M DESIGN.md
+ M README.md
+ M macos/launcher.swift
+ M public/app.js
+ M public/index.html
+ M public/operator-surface.js
+ M public/workspace-split.js
+ M scripts/build-app.sh
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-operator-surface.test.ts
+
+-- no orphan meeting-slides / bun process attributable to this task --
+84436 bun run fixture.ts
+
+-- fixture required SIGKILL (its cwd had been deleted); re-verified: --
+fixture process: 
+port 8899 listener: 0 lines
+meeting-slides process: 
+project port 8789 (untouched by this task): 0 lines
+
+-- temp dirs gone --
+no ms-tempapp/ms-qaproj temp dirs remain
+helper temp files removed

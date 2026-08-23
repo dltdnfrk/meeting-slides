@@ -1,0 +1,21 @@
+== 11. Escape collapses expanded; Open Workspace opens the browser ==
+expanded:
+560, 220
+-- Escape (panel must collapse, recording must NOT stop) --
+after Escape:
+360, 56
+capture still live (Escape never stops a recording):
+○, 대기 중, 
+server received (still exactly one stopCapture from the earlier spam test + one offline-era send):
+["{\"action\":\"stopCapture\"}","{\"action\":\"stopCapture\"}","{\"action\":\"stopCapture\"}","{\"action\":\"stopCapture\"}"]
+-- clean re-measure: Escape must emit NO command and must NOT stop a live capture --
+stopCapture frames before: 4
+state before: ●, 녹음 중, , 09:14
+stopCapture frames after : 4   (must be unchanged)
+size after Escape: 360, 56
+state after: ●, 녹음 중, , 09:17
+
+-- Open Workspace opens the browser at the fixture URL (no embedded webview) --
+button 작업 공간 열기 of group 1 of window 1 of application process meeting-slides
+no WebKit in the shipped binary:
+0 WebKit references

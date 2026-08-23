@@ -1,0 +1,43 @@
+== files changed/created by this task ==
+ M macos/launcher.swift
+ M scripts/build-app.sh
+?? macos/AppLifecycle.swift
+?? macos/NativeSurfaceContract.swift
+?? macos/TransportClient.swift
+?? tests/fixtures/native-launcher-driver.swift
+?? tests/native-launcher-boundary.test.ts
+?? tests/native-surface-contract.test.ts
+
+== full bun test summary ==
+ 548 pass
+ 36 fail
+ 4 errors
+ 2529 expect() calls
+Ran 584 tests across 64 files. [291.95s]
+exit=1
+
+== failing suites (none are native/macOS) ==
+(fail) 전사 패널 다중 모서리 리사이즈
+(fail) 라이브 MeetingCard 렌더
+(fail) (unnamed) [5000.45ms]
+(fail) (unnamed) [5001.05ms]
+(fail) (unnamed) [5001.38ms]
+(fail) (unnamed) [5001.49ms]
+(fail) existing LLM detectBlock transport behavior
+(fail) fallback narrative drops trailing chatter and caps slide count [3.07ms]
+(fail) generic chat transport
+(fail) native PPTX scene renderer
+(fail) pre-capture attendee registration form
+(fail) raw audio hash and recorder contract
+(fail) recorder startup failure leaves capture stopped and never launches whisper [3574.48ms]
+(fail) semantic scene compile action
+(fail) the real WS registry contains executable handlers for every existing action [3238.95ms]
+
+== this task's suites inside the full run ==
+42
+31
+0
+
+attribution: this task touched only macos/*.swift, scripts/build-app.sh and the two native
+test seams. No failing suite loads any of those files (they are Puppeteer browser, LLM
+transport, scene/PPTX and recorder suites owned by pre-existing work / concurrent siblings).

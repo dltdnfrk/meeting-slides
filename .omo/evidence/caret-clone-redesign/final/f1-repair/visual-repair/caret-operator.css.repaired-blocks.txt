@@ -1,0 +1,60 @@
+### V1 — .app[data-shell="live"] #island
+.app[data-shell="live"] #island {
+  display: flex;
+  /* The island is a flex child of #stage-pane, which occupies only grid column
+     1 of the live surface at >=900px. `flex: none` plus the default
+     `min-width: auto` let a long provisional caption inflate the row past its
+     container (measured 902px inside a 635px stage), shearing glyphs at x<0 and
+     running under the transcript pane. Cross-axis stretch with an explicit
+     `min-inline-size: 0` keeps the row exactly as wide as the pane that owns it
+     and hands the shrinking to .island__text, which already ellipsizes. */
+  flex: 0 1 auto;
+  align-self: stretch;
+  align-items: center;
+  gap: var(--cf-space-2);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 0;
+  margin: 0;
+  padding: var(--cf-space-3) var(--cf-space-4);
+  border: 0;
+  border-block-start: var(--cf-rule-width) solid var(--cf-rule);
+  border-radius: 0;
+  background-color: var(--cf-raised);
+  box-shadow: none;
+}
+
+### V1 — .island__text
+.app[data-shell="live"] #island .island__text {
+  /* Owns the shrinking for the row above: without `min-inline-size: 0` a flex
+     item cannot shrink below its min-content width, so the ellipsis it already
+     declares can never engage. */
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  color: var(--cf-text-muted);
+  font-family: var(--cf-font-body);
+  font-size: var(--cf-text-sm);
+  font-style: italic;
+  line-height: var(--cf-leading-normal);
+  word-break: keep-all;
+}
+
+### V3 — .action-card__head
+.app[data-shell="library"] .action-card__head {
+  display: flex;
+  /* At the narrow floor the command group is `flex-shrink: 0`, so a single
+     non-wrapping row left the title/description column at 81px of a 254px box
+     (32%): "Send follow-up" and the Korean description fragmented into a ragged
+     sliver. Wrapping lets the commands drop to their own row and gives the text
+     column the full measure, which is the same stacking rule the rest of the
+     surface already uses below the seam. */
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cf-space-4);
+}
+
+.app[data-shell="library"] .action-card__head > :first-child {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}

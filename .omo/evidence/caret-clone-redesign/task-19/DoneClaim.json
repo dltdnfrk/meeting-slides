@@ -1,0 +1,62 @@
+{
+  "task": "19. Prove the complete Caret-grade user journey",
+  "status": "DONE_WITH_UNRELATED_PREEXISTING_FAILURES",
+  "done": true,
+  "session": "st_019ff3a2",
+  "boundary": {
+    "browserOnlyStart": true,
+    "nativeStarts": 0,
+    "cycles": 2,
+    "nativeStops": 2,
+    "stopCommandsPerCycle": [1, 1],
+    "nativeOpenWorkspacePerCycle": true
+  },
+  "journey": {
+    "installedExecutable": true,
+    "ownedServer": true,
+    "finalSessions": 2,
+    "finalizedLines": [16, 5],
+    "compiledSlides": 3,
+    "exportArtifacts": 17,
+    "exportHashesStableAcrossReload": true,
+    "reconnectPreservedLines": true,
+    "reviewConfirmed": true,
+    "askGrounded": true,
+    "badPayloadAnnouncedWithoutDataLoss": true,
+    "viewportWidths": [320, 375, 820, 960, 1280],
+    "nativeDropCount": 0
+  },
+  "productFixes": [
+    "real WebSocket Ask dispatch",
+    "first-use Review reachability and startReview dispatch",
+    "reset immediately clears visible ended-meeting selection",
+    "narrow Review control uses canonical 44px target",
+    "app-bundle build hook uses a bounded 30s process deadline"
+  ],
+  "verification": {
+    "journey": "PASS",
+    "typescript": "PASS",
+    "swiftTypecheck": "PASS",
+    "diffCheck": "PASS",
+    "buildApp": "PASS",
+    "verifyApp": "PASS",
+    "codesign": "PASS",
+    "appBundleTest": "30 pass, 0 fail",
+    "focusedProductMatrix": "PASS",
+    "fullBunTest": "927 pass, 11 fail on required single run; 3 plan-related failures repaired and focused-green; 8 unrelated dirty-work failures retained and attributed"
+  },
+  "cleanup": {
+    "ownedProcesses": 0,
+    "taskPortFree": true,
+    "temporaryRuntimeRemoved": true,
+    "defaultsRestored": true,
+    "projectMarkerRestored": true,
+    "temporaryQaRemoved": true
+  },
+  "exceptions": [
+    "CSS LSP unavailable because Biome is not installed; TypeScript/Swift/static checks passed",
+    "CGWindowList panel capture unsupported for the QA process; exact installed AppKit AX state and bounds are retained without a screen-share exclusion claim",
+    "unrelated dirty provider/minutes tests remain failing and were not modified"
+  ],
+  "f1ToF4Entered": false
+}

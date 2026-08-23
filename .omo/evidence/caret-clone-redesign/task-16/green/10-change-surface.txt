@@ -1,0 +1,29 @@
+=== UNCHANGED from the task-16 baseline (task touched nothing here) ===
+  SAME  macos/MinibarProjection.swift
+  SAME  macos/NativeSurfaceContract.swift
+  SAME  macos/TransportClient.swift
+  SAME  public/operator-surface.js
+  SAME  public/transcript-state.ts
+  SAME  public/ui-state-machine.ts
+  SAME  src/session.ts
+
+=== CHANGED by task 16 ===
+  DIFF  public/app.js
+          before 8de43f922623f4bc43fd388ead9394518506f6577ee4dbc3809a8af5d0c1f351
+          after  7164fb770ca2d6b0520e1bcca75002cb17b436ec7a5c9d6b0a379f2225e2ad47
+  DIFF  server.ts
+          before 80084305117b26160b063c5c59b80ecc07fc92a2ac01ca40a64310281520a923
+          after  f373a60fd60dda285ea36c58fd7754b58b4049d7c9055921b7b4d09a80f99f31
+
+=== NEW in task 16 (not present at baseline) ===
+  NEW   tests/caret-dual-surface.test.ts  6995e1514288b576836bd5add105681fd1c7c049caee6e2713cbb15520654a1f
+  NEW   tests/fixtures/native-dual-surface-driver.swift  889d6708922e644f6c9f4f004f0dd2a12afe253e9b96ea5e9a8c39781459aae8
+  NEW   tests/helpers/browser-dual-surface-client.ts  d37b3b8b6fbff989d42e7050b6bbf10a116fa21d5cd8da9d307bc4a0ac68306d
+  NEW   tests/helpers/dual-surface-session.ts  9ee4647b8708b2a737319975c722043b7de1b4ee5e67ea95f39e35405efd4950
+  NEW   tests/helpers/native-dual-surface-client.ts  1a09cc0bb3d145d741fe27f0e385afdfea5dee3f9579a4c0550f4b80663d219d
+  NEW   tests/server-ws-dispatch.test.ts  a8282758c23758c02dbee297685b579fc04e2050db330c88fff4e8aa64336700
+
+=== VERIFIER REPAIR (terminal idle scan floor) ===
+  tests/server-ws-dispatch.test.ts  5881f692ab1c2f76c2ebbfa257c0cb2b719f992b35f7ca36181e7972f224bc95
+                                 -> a8282758c23758c02dbee297685b579fc04e2050db330c88fff4e8aa64336700
+  public/app.js and server.ts UNCHANGED by the repair (test-only fix).

@@ -1,0 +1,10 @@
+(fail) transcript projection — duplicate suppression > the same finalized line delivered twice appears once [0.13ms]
+(fail) transcript projection — duplicate suppression > duplicate detection normalizes whitespace but respects ts and speaker [0.10ms]
+(fail) transcript projection — duplicate suppression > a duplicate arriving after later lines does not reorder the projection [0.08ms]
+(fail) transcript projection — minibar > the minibar derives from the same store, with no duplicate rows [0.33ms]
+(fail) transcript projection — duplicate suppression > the same finalized line delivered twice appears once [0.13ms]
+(fail) transcript projection — duplicate suppression > duplicate detection normalizes whitespace but respects ts and speaker [0.10ms]
+(fail) transcript projection — duplicate suppression > a duplicate arriving after later lines does not reorder the projection [0.08ms]
+(fail) transcript projection — minibar > the minibar derives from the same store, with no duplicate rows [0.33ms]
+ 52 pass
+ 4 fail

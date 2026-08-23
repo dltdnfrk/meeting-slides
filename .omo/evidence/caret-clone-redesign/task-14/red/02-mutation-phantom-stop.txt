@@ -1,0 +1,6 @@
+== MUTATION 1: reconnecting reports idle instead of retaining capture truth ==
+ 2 fail
+ 44 pass
+(fail) native minibar seam: explicit status projection > a lost socket becomes reconnecting while the known capture truth is retained [0.13ms]
+(fail) native minibar seam: explicit status projection > every status carries a non-color glyph and a distinct title [0.07ms]
+59e419c655438bbe6dfe8d06868eb10e96c1e33ad95730ba6267e11911133d44  macos/MinibarProjection.swift

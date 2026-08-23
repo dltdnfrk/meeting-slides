@@ -1,0 +1,13 @@
+compile browser webapp launcher…
+/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-probe.OC5QaP/Meeting Slides.app: replacing existing signature
+
+OK webapp launcher: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-probe.OC5QaP/Meeting Slides.app
+mode: default browser -> http://localhost (not WKWebView/Tauri)
+project: /Users/hyunjun/Documents/MUNI/meeting-slides
+run: open "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-probe.OC5QaP/Meeting Slides.app"
+log: ~/Library/Logs/Meeting Slides/launcher.log
+PROBE (pre-change, current build script):
+MEETING_SLIDES_APP_DIR override build -> exit 0
+DEFECT OBSERVED: repo 'Meeting Slides.app' symlink was repointed to the temp install dir
+  after: /var/folders/.../ms-probe.OC5QaP/Meeting Slides.app
+  restored by hand to /Users/hyunjun/Applications/Meeting Slides.app

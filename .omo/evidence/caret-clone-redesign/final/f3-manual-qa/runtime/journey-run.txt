@@ -1,0 +1,14 @@
+41 |                 break;
+42 |         }
+43 |         this.#args = args;
+44 |         this.#world.taskManager.add(this);
+45 |         if (options.timeout) {
+46 |             this.#timeoutError = new TimeoutError(`Waiting failed: ${options.timeout}ms exceeded`);
+                                          ^
+TimeoutError: Waiting failed: 180000ms exceeded
+      at WaitTask (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:46:38)
+      at waitForFunction (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Realm.js:49:30)
+      at waitForFunction (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:580:43)
+      at timeoutState (/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa/tools/f3-journey.ts:9:72)
+
+Bun v1.3.14 (macOS arm64)

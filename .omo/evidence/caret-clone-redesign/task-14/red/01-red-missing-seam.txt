@@ -1,0 +1,10 @@
+== RED: bun test tests/native-minibar.test.ts (no implementation yet) ==
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:540:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-minibar.test.ts:919:12)
+(fail) native minibar seam: accessibility > reduced motion removes the transition entirely rather than shortening it [0.02ms]
+
+ 0 pass
+ 46 fail
+ 6 expect() calls
+Ran 46 tests across 1 file. [179.00ms]
+exit=1

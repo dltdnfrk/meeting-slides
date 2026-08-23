@@ -1,0 +1,14 @@
+           <span class="attendee-btn__count" id="attendee-count" hidden>0</span>
+         </button>
+         <button id="btn-review" class="review-btn" type="button" title="회의록 검토" aria-label="회의록 검토" aria-expanded="false" aria-controls="review-panel" hidden>
++          <!-- DESIGN §9.12: below 620px .review-btn__label is hidden, so without
++               this glyph the control renders as an empty 44x44 capsule. The
++               sibling #btn-attendees already carries the same decorative icon
++               node, and public/style.css has always styled .review-btn__icon. -->
++          <span class="review-btn__icon" aria-hidden="true">✓</span>
+           <span class="review-btn__label">회의록 검토</span>
+           <span class="review-btn__count" id="review-count" hidden>0</span>
+         </button>
+@@ -78,8 +83,20 @@
+           <span class="onair__label">녹음 대기</span>
+         </div>

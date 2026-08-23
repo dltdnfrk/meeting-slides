@@ -1,0 +1,198 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 1440x900: the rail's per-row delete control meets 44px [89.68ms]
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 1244x836: the rail's per-row delete control meets 44px [86.61ms]
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 1100x800: the rail's per-row delete control meets 44px [87.89ms]
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 960x760: the rail's per-row delete control meets 44px [74.83ms]
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 900x760: the rail's per-row delete control meets 44px [82.92ms]
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 899x760: the rail's per-row delete control meets 44px [81.11ms]
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 820x900: the rail's per-row delete control meets 44px [77.69ms]
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 375x812: the rail's per-row delete control meets 44px [76.08ms]
+731 |             name: del.getAttribute("aria-label") ?? "",
+732 |           };
+733 |         });
+734 |         expect(row).not.toBeNull();
+735 |         expect({ w: row!.w >= MIN_TARGET_PX, h: row!.h >= MIN_TARGET_PX })
+736 |           .toEqual({ w: true, h: true });
+                 ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "h": true,
+-   "w": true,
++   "h": false,
++   "w": false,
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-accessibility.test.ts:736:12)
+(fail) Todo 15 · every painted control is a real target, scroll included > 320x667: the rail's per-row delete control meets 44px [86.10ms]
+
+ 0 pass
+ 47 filtered out
+ 9 fail
+ 18 expect() calls
+Ran 9 tests across 1 file. [1272.00ms]

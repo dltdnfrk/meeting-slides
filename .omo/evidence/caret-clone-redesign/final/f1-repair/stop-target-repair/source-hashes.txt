@@ -1,0 +1,4 @@
+5c2ef5f75aa6d781f07e90c7a59dd87bf00025e7db0cbf28313ec4dd236fb145  public/caret-operator.css
+b08d066a8c4395df980d1b4caa698ca42361aa34fb9a90aa09126b0ff88022e9  public/index.html
+b3db58cd467e11f43950fee09cad6df4490073b2d2673091157830607964f51e  tests/public-caret-accessibility.test.ts
+2acec90237ea08f9a3998070f347417701ac1b99887b323dde0298f592a42db1  public/operator-surface.js

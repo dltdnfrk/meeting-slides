@@ -1,0 +1,147 @@
+{
+  "probes": [
+    {
+      "probe": "blocked-network",
+      "expectation": "must-pass",
+      "filter": "(whole focused file)",
+      "note": "the foundation probe aborts every off-origin request unconditionally; this GREEN run is taken with all external network refused",
+      "mutated": null,
+      "restored": {
+        "pass": 29,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    },
+    {
+      "probe": "corrupt-font",
+      "expectation": "must-fail",
+      "filter": "recorded size and SHA-256",
+      "mutated": {
+        "pass": 0,
+        "fail": 1,
+        "exitStatus": 1
+      },
+      "restored": {
+        "pass": 1,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    },
+    {
+      "probe": "missing-font",
+      "expectation": "must-fail",
+      "filter": "recorded size and SHA-256",
+      "mutated": {
+        "pass": 0,
+        "fail": 1,
+        "exitStatus": 1
+      },
+      "restored": {
+        "pass": 1,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    },
+    {
+      "probe": "stale-asset-hash",
+      "expectation": "must-fail",
+      "filter": "recorded size and SHA-256",
+      "mutated": {
+        "pass": 0,
+        "fail": 1,
+        "exitStatus": 1
+      },
+      "restored": {
+        "pass": 1,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    },
+    {
+      "probe": "remove-token",
+      "expectation": "must-fail",
+      "filter": "every required semantic token",
+      "mutated": {
+        "pass": 0,
+        "fail": 1,
+        "exitStatus": 1
+      },
+      "restored": {
+        "pass": 1,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    },
+    {
+      "probe": "remove-motion-token",
+      "expectation": "must-fail",
+      "filter": "motion budget",
+      "mutated": {
+        "pass": 0,
+        "fail": 1,
+        "exitStatus": 1
+      },
+      "restored": {
+        "pass": 1,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    },
+    {
+      "probe": "remove-reduced-motion",
+      "expectation": "must-fail",
+      "filter": "prefers-reduced-motion",
+      "mutated": {
+        "pass": 0,
+        "fail": 1,
+        "exitStatus": 1
+      },
+      "restored": {
+        "pass": 1,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    },
+    {
+      "probe": "network-font-url",
+      "expectation": "must-fail",
+      "filter": "only same-origin font sources",
+      "mutated": {
+        "pass": 0,
+        "fail": 1,
+        "exitStatus": 1
+      },
+      "restored": {
+        "pass": 1,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    },
+    {
+      "probe": "geometry-1px-rounding",
+      "expectation": "must-pass",
+      "filter": "canonical viewport",
+      "note": "a 1px viewport change is not a golden failure: the foundation pins semantics, tokens and zero root overflow, never exact pixel geometry",
+      "mutated": {
+        "pass": 6,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "restored": {
+        "pass": 6,
+        "fail": 0,
+        "exitStatus": 0
+      },
+      "satisfied": true
+    }
+  ],
+  "allSatisfied": true
+}

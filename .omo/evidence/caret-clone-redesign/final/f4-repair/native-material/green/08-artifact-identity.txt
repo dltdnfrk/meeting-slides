@@ -1,0 +1,7 @@
+7847745f6d94512434c6ac41e3e3352e5c33825aa3c9f921fc8613d86b8e5281  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+c83cecbad9a69593ef3dbceb2cfab2f48383578e5f653afabcb9f41fecc15140  macos/MinibarView.swift
+a9ce72ff87a0106e5aa7c24b4c0409cb03cf7125b58922df1aaffaa6ff69fc56  macos/MinibarWindowController.swift
+d18db4de30cdaae8b9c7e5e8dc0221c0be08e353c8725012aa2f920fb5890a77  tests/native-minibar.test.ts
+Identifier=com.meetingslides.app
+Signature=adhoc
+TeamIdentifier=not set

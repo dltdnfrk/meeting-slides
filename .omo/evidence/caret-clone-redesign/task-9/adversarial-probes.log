@@ -1,0 +1,11 @@
+OK   blocked-network: 29p/0f with all external requests aborted
+OK   corrupt-font: mutated 0p/1f -> restored 1p/0f
+OK   missing-font: mutated 0p/1f -> restored 1p/0f
+OK   stale-asset-hash: mutated 0p/1f -> restored 1p/0f
+OK   remove-token: mutated 0p/1f -> restored 1p/0f
+OK   remove-motion-token: mutated 0p/1f -> restored 1p/0f
+OK   remove-reduced-motion: mutated 0p/1f -> restored 1p/0f
+OK   network-font-url: mutated 0p/1f -> restored 1p/0f
+OK   geometry-1px-rounding: shifted 6p/0f (must stay green)
+
+all probes satisfied: true

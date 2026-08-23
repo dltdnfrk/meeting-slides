@@ -1,0 +1,36 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/caret-dual-surface.test.ts:
+(pass) dual-surface seam builds and connects > the native client compiles against the SHIPPING pure modules [0.06ms]
+(pass) dual-surface seam builds and connects > one session holds both surfaces as independent clients [0.04ms]
+(pass) dual-surface seam builds and connects > no surface in this seam synchronises on elapsed time [0.86ms]
+(pass) dual-surface seam builds and connects > the native driver drives the real transport module, not a copy [0.09ms]
+(pass) browser client hydration is not connection state > both surfaces hydrate idle from the same connect snapshot [0.87ms]
+(pass) manual start from the browser reaches both surfaces > startCapture uses the existing action and meeting_id spelling [7.97ms]
+(pass) manual start from the browser reaches both surfaces > both surfaces derive the SAME timer from the server startedAt [0.40ms]
+(pass) live transcript projects into both surfaces > finalized lines reach the browser stream and the native viewport [4.15ms]
+(pass) live transcript projects into both surfaces > a provisional caption is provisional on both surfaces [1.38ms]
+(pass) independent transport loss never claims capture stopped > the native client alone drops: reconnecting, capture truth retained [1.91ms]
+(pass) independent transport loss never claims capture stopped > the native client re-enters live from the reconnect snapshot [4.87ms]
+(pass) independent transport loss never claims capture stopped > the browser alone drops: live content and timer retained, no phantom stop [1.59ms]
+(pass) independent transport loss never claims capture stopped > browser reload during capture re-enters live with a deduplicated transcript [56.29ms]
+(pass) stale and malformed frames cannot overwrite current state > a meeting payload for a meeting nobody selected is ignored [3.09ms]
+(pass) stale and malformed frames cannot overwrite current state > a malformed frame leaves both projections untouched [2.23ms]
+(pass) stale and malformed frames cannot overwrite current state > an out-of-order compile result for a superseded job does not disturb capture [1.90ms]
+(pass) rapid Stop emits exactly one existing command > the native surface sends one stopCapture under repeated activation [0.45ms]
+(pass) rapid Stop emits exactly one existing command > the browser surface sends one stopCapture under a double activation [0.73ms]
+(pass) the stop window stays truthful while trailing lines flush > both surfaces report stopping, not idle, before the flush completes [0.83ms]
+(pass) the stop window stays truthful while trailing lines flush > trailing lines emitted after the stop broadcast are kept by both surfaces [1.85ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > idle ends capture on both surfaces [0.98ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > the just-ended meeting is restored, and selected exactly once [6.10ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > the restoration does not repeat when further idle snapshots arrive [1.05ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > an idle re-asserted after reconnect cannot restore a second time [3004.89ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > a SECOND capture cycle restores its own meeting, and only its own [5.67ms]
+(pass) phase-less capture frames stay compatible > a phase-less capture message still drives both surfaces [1.08ms]
+(pass) calendar auto-capture and natural recorder failure > automatic capture reaches both surfaces without a client command [0.75ms]
+(pass) calendar auto-capture and natural recorder failure > a natural recorder failure ends capture truthfully on both surfaces [0.82ms]
+
+ 28 pass
+ 0 fail
+ 114 expect() calls
+Ran 28 tests across 1 file. [6.32s]

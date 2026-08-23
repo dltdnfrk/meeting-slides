@@ -1,0 +1,44 @@
+
+=== 1. happy capture ===
+(initial)                          name=startup               conn=booting         cap=idle               shell=library startedAt=-              out=[]                                         err=-
+transport connecting               name=startup               conn=connecting      cap=idle               shell=library startedAt=-              out=[]                                         err=-
+transport open                     name=startup               conn=connecting      cap=idle               shell=library startedAt=-              out=[]                                         err=-
+server capture idle                name=idle-library          conn=online          cap=idle               shell=library startedAt=-              out=[]                                         err=-
+server meetings                    name=idle-library          conn=online          cap=idle               shell=library startedAt=-              out=[]                                         err=-
+user activates capture             name=capture-starting      conn=online          cap=starting           shell=live    startedAt=-              out=[{"action":"startCapture"}]                err=-
+server capture starting            name=capture-starting      conn=online          cap=starting           shell=live    startedAt=-              out=[]                                         err=-
+server capture live                name=capture-live          conn=online          cap=capturing          shell=live    startedAt=1710376735000  out=[]                                         err=-
+user previews slide 2              name=history-preview       conn=online          cap=capturing          shell=live    startedAt=1710376735000  out=[]                                         err=-
+user exits preview                 name=capture-live          conn=online          cap=capturing          shell=live    startedAt=1710376735000  out=[]                                         err=-
+
+=== 2. reconnect during capture ===
+(initial)                          name=startup               conn=booting         cap=idle               shell=library startedAt=-              out=[]                                         err=-
+transport open                     name=startup               conn=connecting      cap=idle               shell=library startedAt=-              out=[]                                         err=-
+server capture live                name=capture-live          conn=online          cap=capturing          shell=live    startedAt=1710376735000  out=[]                                         err=-
+socket closed                      name=reconnect             conn=reconnecting    cap=capturing          shell=live    startedAt=1710376735000  out=[]                                         err=-
+socket open again                  name=reconnect             conn=connecting      cap=capturing          shell=live    startedAt=1710376735000  out=[]                                         err=-
+server re-asserts live             name=capture-live          conn=online          cap=capturing          shell=live    startedAt=1710376735000  out=[]                                         err=-
+
+=== 3. stop from live ===
+(initial)                          name=startup               conn=booting         cap=idle               shell=library startedAt=-              out=[]                                         err=-
+transport open                     name=startup               conn=connecting      cap=idle               shell=library startedAt=-              out=[]                                         err=-
+server capture live                name=capture-live          conn=online          cap=capturing          shell=live    startedAt=1710376735000  out=[]                                         err=-
+user presses Stop                  name=capture-stopping      conn=online          cap=stopping           shell=live    startedAt=1710376735000  out=[{"action":"stopCapture"}]                 err=-
+user presses Stop again            name=capture-stopping      conn=online          cap=stopping           shell=live    startedAt=1710376735000  out=[]                                         err=-
+server capture stopping            name=capture-stopping      conn=online          cap=stopping           shell=live    startedAt=1710376735000  out=[]                                         err=-
+trailing line arrives              name=capture-stopping      conn=online          cap=stopping           shell=live    startedAt=1710376735000  out=[]                                         err=-
+server capture idle                name=idle-live             conn=online          cap=idle               shell=live    startedAt=-              out=[]                                         err=-
+user returns to library            name=idle-library          conn=online          cap=idle               shell=library startedAt=-              out=[]                                         err=-
+
+=== 4. bad events at the parse boundary ===
+null                                                     ok=false reason="frame is not an object"
+"capture"                                                ok=false reason="frame is not an object"
+{"capturing":true}                                       ok=false reason="frame has no string type"
+{"type":"teleport"}                                      ok=false reason="unknown message type: teleport"
+{"type":"capture","capturing":"yes","mode":"mic"}        ok=false reason="capture.capturing is not a boolean"
+{"type":"capture","capturing":true,"mode":"mic","phase":"warping"} ok=false reason="capture.phase is not a declared phase"
+{"type":"compile","status":"melted","jobId":"compile-1"} ok=false reason="compile.status is not a declared status"
+
+state before bad frame: {"name":"capture-live","capture":"capturing"}
+state after  bad frame: {"name":"capture-live","capture":"capturing","err":{"scope":"protocol","reason":"capture.capturing is not a boolean"}}
+capture preserved across a bad frame: true

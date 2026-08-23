@@ -1,0 +1,90 @@
+--
+1664-.app[data-shell="library"] #current-slide .slide__emphasis-label {
+1665-  margin-inline-end: 1cqw;
+1666-  font-family: var(--cf-font-mono);
+1667-  font-size: 1.8cqw;
+1668-  letter-spacing: var(--cf-tracking-mono);
+1669-}
+1670-
+1671-
+1672:.app[data-shell="library"] #current-slide .slide__placeholder {
+1673-  display: grid;
+1674-  place-content: center;
+1675-  gap: var(--cf-space-2);
+1676-  height: 100%;
+1677-  padding: var(--cf-space-6);
+1678-  text-align: center;
+1679-}
+1680-
+--
+2556-  box-shadow: none;
+2557-  overflow: hidden;
+2558-  animation: none;
+2559-  
+2560-  container-type: inline-size;
+2561-}
+2562-
+2563-.app[data-shell="live"] #current-slide .slide__inner,
+2564:.app[data-shell="live"] #current-slide .slide__topic-main {
+2565-  display: flex;
+2566-  flex-direction: column;
+2567-  gap: 2cqw;
+2568-  inline-size: 100%;
+2569-  block-size: 100%;
+2570-  min-block-size: 0;
+2571-  padding: 5cqw 6cqw;
+2572-  box-sizing: border-box;
+2573-  overflow: hidden;
+2574-  grid-template-columns: none;
+2575-}
+2576-
+2577:.app[data-shell="live"] #current-slide .slide__topic-main {
+2578-  padding: 0;
+2579-  block-size: auto;
+2580-}
+2581-
+2582-
+2583-.app[data-shell="live"] #current-slide .slide__topic-visual,
+2584-.app[data-shell="live"] #current-slide .slide__accent,
+2585-.app[data-shell="live"] #current-slide .slide__cover-number,
+--
+2636-.app[data-shell="live"] #current-slide .slide__emphasis-label {
+2637-  margin-inline-end: 1cqw;
+2638-  font-family: var(--cf-font-mono);
+2639-  font-size: max(8px, 1.8cqw);
+2640-  letter-spacing: var(--cf-tracking-mono);
+2641-}
+2642-
+2643-
+2644:.app[data-shell="live"] #current-slide .slide__placeholder {
+2645-  display: grid;
+2646-  place-content: center;
+2647-  gap: var(--cf-space-2);
+2648-  block-size: 100%;
+2649-  min-block-size: 0;
+2650-  padding: var(--cf-space-6);
+2651-  box-sizing: border-box;
+2652-  text-align: center;
+--
+3108-  .app[data-shell="live"] {
+3109-    --live-gutter: var(--live-gutter-compact);
+3110-  }
+3111-
+3112-  .app[data-shell="live"] #slide-frame {
+3113-    height: min(calc((100vw - 2 * var(--live-gutter)) * 9 / 16), 30vh);
+3114-  }
+3115-
+3116:  .app[data-shell="live"] #current-slide .slide__inner {
+3117-    gap: 1cqw;
+3118-    padding: 3cqw 4cqw;
+3119-  }
+3120-
+3121:  .app[data-shell="live"] #current-slide .slide__topic-main {
+3122-    gap: 1cqw;
+3123-  }
+3124-
+3125-  
+3126-  .app[data-shell="live"] #transcript-card .pane__head {
+3127-    padding: var(--cf-space-2) var(--cf-space-3);
+3128-  }
+3129-

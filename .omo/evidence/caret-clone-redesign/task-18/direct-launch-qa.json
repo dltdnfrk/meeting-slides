@@ -1,0 +1,34 @@
+{
+  "executable": "/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides",
+  "port": 8789,
+  "httpStatus": 200,
+  "healthSignature": true,
+  "browserTruth": {
+    "title": "Meeting Slides — 실시간 회의 슬라이드",
+    "runtime": "server",
+    "styles": [
+      "/style.css",
+      "/caret-operator.css"
+    ],
+    "scripts": [
+      "/workspace-split.js",
+      "/transcript-resize.js",
+      "/operator-surface.js",
+      "/review-panel-render.js",
+      "/review-panel.js",
+      "/app.js"
+    ],
+    "shellCount": 1,
+    "removedReferences": []
+  },
+  "wsTruth": {
+    "opened": true,
+    "firstType": "status"
+  },
+  "meetingRows": {
+    "before": "[{\"count\":60,\"maxId\":60}]",
+    "after": "[{\"count\":60,\"maxId\":60}]",
+    "unchanged": true
+  },
+  "noMicCommandSent": true
+}

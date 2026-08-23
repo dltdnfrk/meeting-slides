@@ -1,0 +1,22 @@
+[
+  {
+    "button": "#btn-export-md",
+    "savedPath": "exports/meeting-2026-08-12T02-27-58-305Z.md",
+    "status": "회의 메모 저장 완료"
+  },
+  {
+    "button": "#btn-export-json",
+    "savedPath": "exports/meeting-2026-08-12T02-27-58-312Z.json",
+    "status": "회의 데이터 저장 완료"
+  },
+  {
+    "button": "#btn-export-transcript",
+    "savedPath": "exports/transcript-2026-08-12T02-27-58-317Z.md",
+    "status": "전사 원문 저장 완료"
+  },
+  {
+    "button": "#btn-export-deck",
+    "savedPath": "exports/scene-2026-08-12T02-27-58-364Z/index.html",
+    "status": "웹 슬라이드 저장 완료"
+  }
+]

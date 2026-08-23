@@ -1,0 +1,125 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-shell.test.ts:
+(pass) 라이브 MeetingCard 렌더 > 슬라이드가 없으면 플레이스홀더를 유지한다 [6.42ms]
+(pass) 라이브 MeetingCard 렌더 > kicker/emphasis 포함 카드가 모두 렌더된다 [3.71ms]
+(pass) 라이브 MeetingCard 렌더 > 375px 폭에서 가로 오버플로가 없다 [5.26ms]
+(pass) 라이브 MeetingCard 렌더 > 한국어 제목과 불릿은 단어를 보존하고 예외적으로 긴 토큰만 줄바꿈한다 [1.72ms]
+(pass) 라이브 MeetingCard 렌더 > kicker/emphasis 없는 레거시 슬라이드도 제목/불릿만으로 렌더된다 [0.94ms]
+(pass) 라이브 MeetingCard 렌더 > 불릿이 비어도 제목 카드가 깨지지 않는다 [0.74ms]
+687 |          * Returns the middle point within an element unless a specific offset is provided.
+688 |          */
+689 |         async clickablePoint(offset) {
+690 |             const box = await this.#clickableBox();
+691 |             if (!box) {
+692 |                 throw new Error('Node is either not clickable or not an Element');
+                                ^
+error: Node is either not clickable or not an Element
+      at clickablePoint (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:692:27)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:118:33)
+      at async click (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:722:41)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/ElementHandle.js:129:37)
+      at async click (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:749:30)
+      at async <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-shell.test.ts:260:16)
+(fail) 라이브 MeetingCard 렌더 > 히스토리 미리보기에서도 같은 카드 레이아웃을 쓴다 [10.62ms]
+(pass) HTML 이스케이프 > 모델 텍스트의 마크업이 실행되지 않는다 [2.91ms]
+
+tests/public-operator-surface.test.ts:
+(pass) TIRO 기반 오퍼레이터 표면 > 중앙 슬라이드 계약과 필수 DOM ID를 한 번씩만 보존한다 [4.01ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 플로팅 도크가 녹음·파형·타이머와 3-way 출력을 품는다 [1.67ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 번역과 전사 편집은 서버 계약 사유를 노출한 채 비활성화된다 [1.24ms]
+(pass) TIRO 기반 오퍼레이터 표면 > capture 메시지가 녹음 버튼을 파형 상태로 전환한다 [10.13ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 3-way 출력에서 전체 전사를 선택하면 패널로 이동하고 현재 상태를 갱신한다 [53.60ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 1280·768·375에서 셸이 가로로 넘치지 않는다 [7.80ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 비활성 사유와 모바일 전사 본문이 잘리지 않는다 [6.66ms]
+(pass) TIRO 기반 오퍼레이터 표면 > caret dual shell exposes detail tabs and live compact mode [77.27ms]
+
+tests/public-review.test.ts:
+(pass) review panel shell > the panel mounts hidden and leaves the slide shell intact [50.39ms]
+(pass) review panel shell > capture is not hard-gated by the review panel [47.59ms]
+(pass) candidate cards > a review message renders one card per candidate with quote and version-scoped coordinates [28.21ms]
+(pass) candidate cards > every candidate carries the immutable transcript version id, not just a seq [25.93ms]
+(pass) candidate cards > a multi-line segment shows the joined evidence text of the whole range [22.81ms]
+(pass) candidate cards > action items surface deadline text alongside the normalized deadline [23.02ms]
+(pass) candidate cards > decisions and open items have no assignee control — only action items do [23.33ms]
+(pass) attendee dropdown attribution > attribution options come only from the review attendees, never free text [22.87ms]
+(pass) attendee dropdown attribution > the suggested attribution is preselected and a change sends updateItem [27.24ms]
+(pass) attendee dropdown attribution > assigning an action item sends updateItem with the assignee patch [27.21ms]
+(pass) attendee dropdown attribution > with no attendees the dropdowns are disabled and explain why [22.19ms]
+(pass) edit and drop controls > editing a description sends updateItem with the trimmed text [66.69ms]
+(pass) edit and drop controls > an empty edit is rejected without sending anything [48.81ms]
+(pass) edit and drop controls > dropping a candidate marks it rejected and sends the review_state patch [42.66ms]
+(pass) edit and drop controls > a dropped candidate can be restored to candidate state [41.82ms]
+(pass) confirm action > the actual browser flow confirms complete candidates, corrects an action deadline, then confirms the review [80.13ms]
+(pass) confirm action > the confirm button reports how many candidates will be kept [44.30ms]
+(pass) confirm action > a review with every candidate rejected remains confirmable [47.41ms]
+(pass) empty, error, and loading states > an empty candidate list shows the no-candidates notice and no cards [20.71ms]
+(pass) empty, error, and loading states > the extraction status message drives a loading state before the payload lands [23.52ms]
+(pass) empty, error, and loading states > an extraction failure status shows a retry affordance instead of stale cards [40.42ms]
+(pass) keyboard accessibility > Escape closes the panel and the toggle reopens it without refetching [34.87ms]
+(pass) keyboard accessibility > opening the panel moves focus into it and the toggle reflects expansion [24.21ms]
+(pass) keyboard accessibility > every control is reachable and labelled for assistive tech [31.31ms]
+(pass) keyboard accessibility > Enter on the drop control toggles it, so the panel is operable keyboard-only [32.16ms]
+(pass) reconnect and update handling > a second review message replaces the previous candidates rather than appending [51.98ms]
+(pass) reconnect and update handling > a dropped socket disables confirm and reconnect restores it [3065.36ms]
+(pass) reconnect and update handling > local edits survive a re-render triggered by an unrelated message [26.41ms]
+(pass) hostile payloads > markup in descriptions, quotes, and attendee names is escaped as text [22.97ms]
+(pass) hostile payloads > a malformed review payload is ignored without tearing down the shell [23.18ms]
+(pass) hostile payloads > a kind outside the updateItem wire contract is refused, not rendered as an actionable card [52.73ms]
+(pass) hostile payloads > items missing required evidence or source coordinates are refused rather than rendered uncited [20.28ms]
+
+tests/public-workspace.test.ts:
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 레일과 단일 문서 표면을 담고 전사는 탭으로 도달된다 [1.47ms]
+(pass) 워크스페이스 셸 구조 > 중앙 패널이 기존 시각 자료 무대를 그대로 품는다 [0.70ms]
+(pass) 워크스페이스 셸 구조 > 레일과 문서 표면이 가로로 나란히 놓이고 하단 도크가 보존된다 [34.30ms]
+(pass) 워크스페이스 셸 구조 > 워크스페이스가 가로 오버플로 없이 뷰포트에 맞는다 [0.42ms]
+(pass) 워크스페이스 스플리터 > 스플리터가 자신이 나누는 패널 사이 DOM 순서에 놓인다 [108.52ms]
+(pass) 워크스페이스 스플리터 > 포커스 가능한 스플리터가 방향과 현재·최소·최대 폭을 노출한다 [107.67ms]
+(pass) 워크스페이스 스플리터 > 키보드 Arrow/Home/End가 레일 스플리터 폭과 ARIA 현재값을 동기화한다 [118.25ms]
+(pass) 워크스페이스 스플리터 > 라이브 셸에서 키보드가 전사 스플리터 폭과 ARIA 현재값을 동기화한다 [143.31ms]
+(pass) 워크스페이스 스플리터 > 좌 스플리터를 끌면 레일이 넓어지고 무대가 그만큼 줄어든다 [168.23ms]
+(pass) 워크스페이스 스플리터 > 라이브 셸에서 우 스플리터를 왼쪽으로 끌면 전사 패널이 넓어진다 [188.69ms]
+(pass) 워크스페이스 스플리터 > 라이브 셸에서 전사는 최소 폭 밑으로 접히지 않는다 [242.73ms]
+(pass) 워크스페이스 스플리터 > 라이브러리에서 레일은 최소 폭 밑으로 접히지 않는다 [208.26ms]
+(pass) 워크스페이스 스플리터 > 드래그 결과가 workspace.layout.v1에 JSON으로 남는다 [155.52ms]
+(pass) 워크스페이스 스플리터 > 새로고침 후 저장된 폭이 복원된다 [308.42ms]
+(pass) 워크스페이스 스플리터 > 저장값이 손상돼도 기본 레이아웃으로 뜬다 [218.36ms]
+(pass) 중앙 무대 잠금과 반응형 > MeetingCard가 .stage-pane 안에만 렌더되고 무대 중앙 hit가 stage다 [76.16ms]
+(pass) 중앙 무대 잠금과 반응형 > 820px에서 레일은 접히고 무대/전사는 살아 있으며 문서 가로 스크롤이 없다 [80.28ms]
+(pass) 중앙 무대 잠금과 반응형 > 375px에서 도크 액션이 줄바꿈으로 모두 도달되고 문서는 가로로 넘치지 않는다 [111.89ms]
+(pass) 헤르메틱 워크스페이스 E2E > 세 패널·스플리터·전사 줄·MeetingCard·레이아웃 복원을 한 흐름으로 통과한다 [329.77ms]
+
+tests/public-transcript-feed.test.ts:
+(pass) 전사 피드 다줄 표시 > 15개 line 이벤트가 모두 .transcript-stream에 남는다 [13.22ms]
+(pass) 전사 피드 다줄 표시 > status 텍스트가 매우 길어도 160자 내로 잘린다 [2.20ms]
+
+tests/public-sessions.test.ts:
+(pass) 세션 레일 listMeetings > 빈 목록이면 empty state 를 보여준다 [4.51ms]
+(pass) 세션 레일 listMeetings > 회의 목록을 렌더하고 클릭 시 선택 하이라이트한다 [61.67ms]
+(pass) 세션 레일 listMeetings > 히스토리 삭제 버튼은 선택과 분리된 삭제 명령을 보낸다 [21.22ms]
+(pass) 세션 레일 listMeetings > malformed meetings payload 도 빈 목록으로 복구된다 [1.41ms]
+
+tests/public-settings-panel.test.ts:
+(pass) AI 모델 설정 UI > 설치와 로그인 상태를 사용자 언어로 구분해 표시한다 [23.41ms]
+(pass) AI 모델 설정 UI > 연결·재검사·프로바이더/모델 선택 액션을 프로토콜대로 보낸다 [40.28ms]
+(pass) STT 모델 설정 UI > 카탈로그 네 모델을 크기·라이선스와 함께 렌더한다 [41.34ms]
+(pass) STT 모델 설정 UI > absent→downloading→installed→selected 상태와 진행률을 반영한다 [5.05ms]
+(pass) STT 모델 설정 UI > 실패 상태는 오류와 재시도를 노출한다 [2.00ms]
+(pass) STT 모델 설정 UI > install/cancel/select/recheck 액션을 modelId와 함께 보낸다 [97.83ms]
+(pass) 설정 패널 접근성 > 좁은 폭에서도 잘리지 않고 키보드로 열고 닫을 수 있다 [30.73ms]
+
+tests/public-compile-control.test.ts:
+(pass) 컴파일 컨트롤 > PowerPoint 생성은 하나의 명확한 주 버튼으로 제공한다 [11.24ms]
+(pass) 컴파일 컨트롤 > 요청을 보내고 진행·완료·실패 상태와 생성 결과를 사용자에게 표시한다 [79.33ms]
+
+tests/public-fresh-workspace.test.ts:
+(pass) 비캡처 재접속은 이전 라이브 화면 대신 빈 작업면을 유지한다 [8.75ms]
+(pass) WebSocket 종료는 로컬 앱 서버 연결 상태로 노출된다 [1.64ms]
+
+1 tests failed:
+(fail) 라이브 MeetingCard 렌더 > 히스토리 미리보기에서도 같은 카드 레이아웃을 쓴다 [10.62ms]
+
+ 83 pass
+ 1 fail
+ 257 expect() calls
+Ran 84 tests across 9 files. [12.41s]

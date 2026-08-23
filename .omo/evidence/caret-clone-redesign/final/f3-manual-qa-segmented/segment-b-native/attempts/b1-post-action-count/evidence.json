@@ -1,0 +1,20 @@
+{
+  "segment": "B",
+  "expectedHash": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+  "port": 54742,
+  "deadlines": [],
+  "installed": {
+    "pid": 14453,
+    "actualHash": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+    "isolatedProject": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/f3-manual-qa.ViYEFo/project",
+    "database": "/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/f3-manual-qa.ViYEFo/meetings.db"
+  },
+  "collapsed": {
+    "owner": "AXWindow, AXSystemDialog, Meeting Slides 미니바, 1136, 854, 360, 56",
+    "expectedSize": "360, 56",
+    "offDisplaySaved": "9000,9000,360,56",
+    "restoredOnDisplay": true
+  },
+  "result": "FAIL",
+  "error": "Error: menu press expected window absence, got count=1\n    at /Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-b-native.ts:13:322\n    at processTicksAndRejections (native:7:39)"
+}

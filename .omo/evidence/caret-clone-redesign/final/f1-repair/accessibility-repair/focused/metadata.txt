@@ -1,0 +1,6 @@
+command=bun test tests/public-caret-accessibility.test.ts --test-name-pattern "every shipped dialog traps"
+started_utc=2026-08-12T03:23:37Z
+test_sha256=9d7ae56990d81e78a99a308ad6becea9e172c6852c9b6f3dd6465f8061ce934d
+focus_trap_sha256=0c706e13cf47afee5643e26283303e3888acda6d11e8d5f0f660cec8c961dc19
+exit_status=0
+finished_utc=2026-08-12T03:23:39Z

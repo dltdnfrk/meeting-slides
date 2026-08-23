@@ -1,0 +1,464 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/native-launcher-boundary.test.ts:
+393 |   return found.value as Record<string, unknown>;
+394 | }
+395 | 
+396 | describe("native launcher seam: sources and compilation", () => {
+397 |   test("the lifecycle module, transport module and fixture driver exist", () => {
+398 |     expect(existsSync(LIFECYCLE_SWIFT)).toBe(true);
+                                              ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:398:41)
+(fail) native launcher seam: sources and compilation > the lifecycle module, transport module and fixture driver exist [0.24ms]
+399 |     expect(existsSync(TRANSPORT_SWIFT)).toBe(true);
+400 |     expect(existsSync(DRIVER_SWIFT)).toBe(true);
+401 |   });
+402 | 
+403 |   test("swiftc compiles the pure modules with the fixture driver", () => {
+404 |     expect(compileLog).not.toMatch(/error:/);
+                                 ^
+error: expect(received).not.toMatch(expected)
+
+Expected substring or pattern: not /error:/
+Received: "<unknown>:0: error: error opening input file '/Users/hyunjun/Documents/MUNI/meeting-slides/macos/AppLifecycle.swift' (No such file or directory)\n<unknown>:0: error: error opening input file '/Users/hyunjun/Documents/MUNI/meeting-slides/macos/TransportClient.swift' (No such file or directory)\n<unknown>:0: error: error opening input file '/Users/hyunjun/Documents/MUNI/meeting-slides/tests/fixtures/native-launcher-driver.swift' (No such file or directory)\n"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:404:28)
+(fail) native launcher seam: sources and compilation > swiftc compiles the pure modules with the fixture driver [0.11ms]
+405 |     expect(compileExit).toBe(0);
+406 |   });
+407 | 
+408 |   test("the pure modules stay free of AppKit, EventKit and window/process APIs", () => {
+409 |     for (const path of [LIFECYCLE_SWIFT, TRANSPORT_SWIFT]) {
+410 |       const source = readFileSync(path, "utf8");
+                           ^
+error: ENOENT: no such file or directory, open '/Users/hyunjun/Documents/MUNI/meeting-slides/macos/AppLifecycle.swift'
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:410:22)
+(fail) native launcher seam: sources and compilation > the pure modules stay free of AppKit, EventKit and window/process APIs [0.10ms]
+414 |     }
+415 |   });
+416 | 
+417 |   test("the driver runs once, exits 0 and emits machine-readable JSON", () => {
+418 |     expect(driverStderr).toBe("");
+419 |     expect(driverExit).toBe(0);
+                             ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: -1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:419:24)
+(fail) native launcher seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "port-from-env-file"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:427:12)
+(fail) native launcher seam: project and port resolution > HTTP_PORT in .env wins [0.06ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "port-missing-key"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:431:12)
+(fail) native launcher seam: project and port resolution > a missing key, out-of-range value, unparsable value or missing file falls back to 8787 [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "launch-plan-healthy"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:440:12)
+(fail) native launcher seam: Bun launch plan > the launch plan reproduces the existing bun invocation and environment [0.04ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "launch-plan-missing-bun"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:450:21)
+(fail) native launcher seam: Bun launch plan > a missing bun binary is a typed failure, not a crash [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "startup-fresh-server"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:458:12)
+(fail) native launcher seam: startup decision uses one Bun session > an unreachable port starts a server owned by the launcher [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "startup-already-running-bun"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:462:12)
+(fail) native launcher seam: startup decision uses one Bun session > an already-running healthy Bun session is adopted instead of duplicated [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "startup-foreign-server-on-port"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:469:22)
+(fail) native launcher seam: startup decision uses one Bun session > a foreign listener on the port is a typed port conflict, never a second server [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "health-ok"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:477:12)
+(fail) native launcher seam: health signature > the existing title + runtime-bootstrap signature marks the webapp healthy [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "health-bad-status"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:481:12)
+(fail) native launcher seam: health signature > a non-200 status, foreign body or unreachable port is unhealthy with a machine reason [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "readiness-succeeds-after-boot"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:489:12)
+(fail) native launcher seam: readiness without sleeps > readiness resolves on the first healthy attempt and reports the attempt index [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "readiness-exhausted"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:493:12)
+(fail) native launcher seam: readiness without sleeps > an exhausted attempt sequence reports not-ready instead of hanging [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "shutdown-clean-exit"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:499:12)
+(fail) native launcher seam: process ownership and shutdown > a clean server exit propagates its status without terminating twice [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "shutdown-on-quit-terminates-owned-server"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:507:12)
+(fail) native launcher seam: process ownership and shutdown > quitting terminates the launcher-owned server exactly once [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "shutdown-not-owned-server-untouched"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:515:12)
+(fail) native launcher seam: process ownership and shutdown > an adopted server is never terminated by this launcher [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "shutdown-repeated-interrupts-terminate-once"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:523:12)
+(fail) native launcher seam: process ownership and shutdown > repeated interrupts terminate the child exactly once [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "shutdown-server-crash-exit-code"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:531:12)
+(fail) native launcher seam: process ownership and shutdown > a crashed server propagates its non-zero status [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "shutdown-readiness-failure-terminates-server"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:539:12)
+(fail) native launcher seam: process ownership and shutdown > a readiness failure terminates the owned server and exits non-zero [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-url"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:549:12)
+(fail) native launcher seam: transport boundary > the transport targets the existing local /ws endpoint [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-connects-and-hydrates"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:553:12)
+(fail) native launcher seam: transport boundary > an open socket plus a capture snapshot hydrates online state [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-reconnects-retaining-last-state"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:563:12)
+(fail) native launcher seam: transport boundary > a dropped socket becomes reconnecting while retaining the last known capture state [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-authoritative-snapshot-restores-online"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:573:12)
+(fail) native launcher seam: transport boundary > an authoritative snapshot after reconnect restores online state [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-malformed-payload-retains-state"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:583:12)
+(fail) native launcher seam: transport boundary > a malformed payload is counted as a typed decode failure and never clears state [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-unknown-phase-is-typed-failure"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:594:12)
+(fail) native launcher seam: transport boundary > an unknown capture phase is a typed decode failure, not a crash or a guess [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-ignores-unobserved-messages"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:605:12)
+(fail) native launcher seam: transport boundary > messages outside the observed subset leave the projection untouched [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-status-message-is-transport-status"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:615:12)
+(fail) native launcher seam: transport boundary > a status message updates transport status text only [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "transport-backoff-is-bounded-and-monotonic"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:626:21)
+(fail) native launcher seam: transport boundary > reconnect backoff is monotonic and bounded [0.04ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "commands-stop-once-under-rapid-activation"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:641:12)
+(fail) native launcher seam: outbound command emission > rapid Stop activations emit exactly one existing stopCapture action [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "commands-stop-suppressed-while-offline"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:647:12)
+(fail) native launcher seam: outbound command emission > Stop while the socket is down emits nothing [0.02ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "commands-stop-rearms-after-authoritative-capture"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:651:12)
+(fail) native launcher seam: outbound command emission > the Stop guard rearms only after an authoritative capture snapshot [0.03ms]
+381 |   if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+382 | });
+383 | 
+384 | function result(name: string): DriverResult {
+385 |   const found = byName.get(name);
+386 |   if (!found) throw new Error(`driver produced no result for scenario "${name}"`);
+                                                                                      ^
+error: driver produced no result for scenario "commands-use-existing-protocol-spellings"
+      at result (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:386:81)
+      at value (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:391:17)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:657:12)
+(fail) native launcher seam: outbound command emission > the native surface invents no protocol spelling [0.02ms]
+(pass) native launcher seam: launcher entry point and build wiring > the launcher keeps the browser workspace and never imports WebKit [0.10ms]
+(pass) native launcher seam: launcher entry point and build wiring > the launcher keeps mic permission, calendar auto-capture and bun supervision [0.04ms]
+679 |     expect(source).toMatch(/OPEN_BROWSER/);
+680 |   });
+681 | 
+682 |   test("the launcher delegates decisions to the pure modules instead of re-deriving them", () => {
+683 |     const source = launcher();
+684 |     expect(source).toMatch(/LauncherEnvironment\.httpPort\(/);
+                         ^
+error: expect(received).toMatch(expected)
+
+Expected substring or pattern: /LauncherEnvironment\.httpPort\(/
+Received: "// Meeting Slides webapp launcher: mic TCC + bun server + default browser.\n// UI is http://localhost browser webapp.\n\nimport AVFoundation\nimport AppKit\nimport EventKit\nimport Foundation\n\nlet bundleURL = Bundle.main.bundleURL\nlet resourcesURL = Bundle.main.resourceURL\n\nfunc log(_ s: String) {\n    FileHandle.standardOutput.write((s + \"\\n\").data(using: .utf8)!)\n    // 사용자 로그 디렉터리에도 남긴다.\n    let dir = (NSHomeDirectory() as NSString).appendingPathComponent(\"Library/Logs/Meeting Slices\")\n        .replacingOccurrences(of: \"Meeting Slices\", with: \"Meeting Slides\")\n    try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)\n    let path = (dir as NSString).appendingPathComponent(\"launcher.log\")\n    let line = \"\\(ISO8601DateFormatter().string(from: Date()))  \\(s)\\n\"\n    if let data = line.data(using: .utf8) {\n        if FileManager.default.fileExists(atPath: path) {\n            if let handle = FileHandle(forWritingAtPath: path) {\n                handle.seekToEndOfFile()\n                handle.write(data)\n                try? handle.close()\n            }\n        } else {\n            try? data.write(to: URL(fileURLWithPath: path))\n        }\n    }\n}\n\nfunc findBun() -> String? {\n    let fm = FileManager.default\n    let candidates = [\n        \"\\(NSHomeDirectory())/.bun/bin/bun\",\n        \"/opt/homebrew/bin/bun\",\n        \"/usr/local/bin/bun\",\n    ]\n    for path in candidates where fm.isExecutableFile(atPath: path) { return path }\n    let which = Process()\n    which.executableURL = URL(fileURLWithPath: \"/usr/bin/env\")\n    which.arguments = [\"which\", \"bun\"]\n    let pipe = Pipe()\n    which.standardOutput = pipe\n    which.standardError = FileHandle.nullDevice\n    try? which.run()\n    which.waitUntilExit()\n    let out = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?\n        .trimmingCharacters(in: .whitespacesAndNewlines)\n    return (out?.isEmpty == false) ? out : nil\n}\n\n/// 빌드 시 기록한 프로젝트 경로 → 없으면 .app 상위 디렉터리(레거시).\nfunc resolveProjectDir() -> String {\n    if let resourcesURL {\n        let marker = resourcesURL.appendingPathComponent(\"project-path.txt\")\n        if let text = try? String(contentsOf: marker, encoding: .utf8) {\n            let path = text.trimmingCharacters(in: .whitespacesAndNewlines)\n            var isDir: ObjCBool = false\n            if !path.isEmpty, FileManager.default.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue {\n                return path\n            }\n        }\n    }\n    // 레거시: Meeting Slides.app 이 프로젝트 루트 안에 있을 때\n    return bundleURL.deletingLastPathComponent().path\n}\n\nfunc requestMicAccess() -> Bool {\n    switch AVCaptureDevice.authorizationStatus(for: .audio) {\n    case .authorized:\n        return true\n    case .notDetermined:\n        let sem = DispatchSemaphore(value: 0)\n        var granted = false\n        AVCaptureDevice.requestAccess(for: .audio) { ok in\n            granted = ok\n            sem.signal()\n        }\n        _ = sem.wait(timeout: .now() + 120)\n        return granted\n    default:\n        return false\n    }\n}\n\nfunc readHttpPort(projectDir: String) -> Int {\n    let envFile = (projectDir as NSString).appendingPathComponent(\".env\")\n    guard let contents = try? String(contentsOfFile: envFile, encoding: .utf8) else { return 8787 }\n    for raw in contents.split(whereSeparator: \\.isNewline) {\n        let line = raw.trimmingCharacters(in: .whitespaces)\n        if line.hasPrefix(\"#\") || line.isEmpty { continue }\n        let parts = line.split(separator: \"=\", maxSplits: 1).map(String.init)\n        guard parts.count == 2, parts[0].trimmingCharacters(in: .whitespaces) == \"HTTP_PORT\" else { continue }\n        if let port = Int(parts[1].trimmingCharacters(in: .whitespacesAndNewlines)), (1...65535).contains(port) {\n            return port\n        }\n    }\n    return 8787\n}\n\n/// 서버 readiness: 웹앱 HTML 시그니처 (WKWebView 아님).\nfunc waitUntilWebAppReady(port: Int, timeoutSeconds: Double = 30) -> Bool {\n    let url = URL(string: \"http://127.0.0.1:\\(port)/\")!\n    let deadline = Date().addingTimeInterval(timeoutSeconds)\n    while Date() < deadline {\n        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 1.5)\n        req.httpMethod = \"GET\"\n        let sem = DispatchSemaphore(value: 0)\n        var ok = false\n        let task = URLSession.shared.dataTask(with: req) { data, response, _ in\n            defer { sem.signal() }\n            guard\n                let http = response as? HTTPURLResponse, http.statusCode == 200,\n                let data, let body = String(data: data, encoding: .utf8)\n            else { return }\n            // launcher health: title + runtime-bootstrap\n            ok = body.contains(\"<title>Meeting Slides\") && body.contains(\"runtime-bootstrap\")\n        }\n        task.resume()\n        _ = sem.wait(timeout: .now() + 2)\n        if ok { return true }\n        Thread.sleep(forTimeInterval: 0.25)\n    }\n    return false\n}\n\n/// 캘린더에서 다음 회의 시작을 감지해 서버에 자동 녹음 시작을 알린다.\n/// EventKit 권한이 없거나 캘린더 항목이 없으면 조용히 무시한다.\nfunc calendarAutoCapture(port: Int) {\n    let store = EKEventStore()\n    let sem = DispatchSemaphore(value: 0)\n    var granted = false\n    if #available(macOS 14.0, *) {\n        store.requestFullAccessToEvents { ok, _ in\n            granted = ok\n            sem.signal()\n        }\n    } else {\n        store.requestAccess(to: .event) { ok, _ in\n            granted = ok\n            sem.signal()\n        }\n    }\n    _ = sem.wait(timeout: .now() + 10)\n    guard granted else {\n        log(\"캘린더 권한 없음 — 자동 녹음 비활성 (시스템 설정 > 개인정보 보호 > 캘린더)\")\n        return\n    }\n    let base = URL(string: \"http://127.0.0.1:\\(port)\")!\n    func post(_ path: String) {\n        var req = URLRequest(url: base.appendingPathComponent(path))\n        req.httpMethod = \"POST\"\n        let task = URLSession.shared.dataTask(with: req)\n        task.resume()\n    }\n    var lastTriggered = Date(timeIntervalSince1970: 0)\n    let calendar = Calendar.current\n    while true {\n        let now = Date()\n        let start = calendar.startOfDay(for: now)\n        guard let end = calendar.date(byAdding: .day, value: 7, to: start) else { continue }\n        let predicate = store.predicateForEvents(withStart: start, end: end, calendars: nil)\n        let events = store.events(matching: predicate)\n        for event in events where event.isAllDay == false && event.startDate > now {\n            let delta = event.startDate.timeIntervalSince(now)\n            if delta > 0, delta <= 60, event.startDate.timeIntervalSince(lastTriggered) > 60 {\n                lastTriggered = event.startDate\n                log(\"캘린더 감지: \\(event.title ?? \"(제목 없음)\") — 자동 녹음 시작\")\n                post(\"api/auto-capture\")\n            }\n        }\n        Thread.sleep(forTimeInterval: 15)\n    }\n}\n\n// ── 1. 프로젝트 / bun ──\nlet projectDir = resolveProjectDir()\nlog(\"프로젝트: \\(projectDir)\")\nlog(\"모드: 웹앱(브라우저)\")\n\nguard let bun = findBun() else {\n    log(\"bun을 찾을 수 없습니다 — https://bun.sh\")\n    exit(1)\n}\n\nlet port = readHttpPort(projectDir: projectDir)\nlet appURL = URL(string: \"http://localhost:\\(port)/\")!\n\n// ── 0. 캘린더 자동 녹음 (백그라운드 폴링) ──\nlet calendarThread = Thread {\n    calendarAutoCapture(port: port)\n}\ncalendarThread.name = \"calendar-auto-capture\"\ncalendarThread.start()\n\n\n// ── 2. 마이크 권한 (번들 이름 = Meeting Slides) ──\nlet micOK = requestMicAccess()\nlog(micOK ? \"마이크 권한 확인됨\" : \"⚠️ 마이크 권한 없음 — 시스템 설정에서 Meeting Slides 허용 필요\")\n\n// ── 3. 서버 (웹앱). 브라우저 자동 오픈은 런처가 1회만 담당. ──\nlet server = Process()\nserver.executableURL = URL(fileURLWithPath: bun)\nserver.arguments = [\"run\", \"server.ts\"]\nserver.currentDirectoryURL = URL(fileURLWithPath: projectDir)\nvar env = ProcessInfo.processInfo.environment\nenv[\"OPEN_BROWSER\"] = \"false\" // 서버 쪽 중복 open 방지\nenv[\"HTTP_PORT\"] = String(port)\nserver.environment = env\nserver.standardOutput = FileHandle.standardOutput\nserver.standardError = FileHandle.standardError\n\ndo {\n    try server.run()\n    log(\"서버 시작 pid=\\(server.processIdentifier) port=\\(port)\")\n} catch {\n    log(\"서버 실행 실패: \\(error.localizedDescription)\")\n    exit(1)\n}\n\n// ── 4. 웹앱 ready 후 기본 브라우저로 오픈 ──\nif waitUntilWebAppReady(port: port) {\n    log(\"웹앱 ready → 브라우저 오픈 \\(appURL.absoluteString)\")\n    NSWorkspace.shared.open(appURL)\n} else {\n    log(\"서버가 \\(port)에서 준비되지 않았습니다. 로그를 확인하세요.\")\n    server.terminate()\n    exit(1)\n}\n\n// ── 5. 서버 생명주기 ──\nserver.waitUntilExit()\nlog(\"서버 종료 code=\\(server.terminationStatus)\")\nexit(server.terminationStatus)\n"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:684:20)
+(fail) native launcher seam: launcher entry point and build wiring > the launcher delegates decisions to the pure modules instead of re-deriving them [0.11ms]
+688 |     expect(source).not.toMatch(/return 8787/);
+689 |     expect(source).not.toMatch(/runtime-bootstrap/);
+690 |   });
+691 | 
+692 |   test("the entry point stays a thin wiring layer", () => {
+693 |     expect(launcher().split("\n").length).toBeLessThan(200);
+                                                ^
+error: expect(received).toBeLessThan(expected)
+
+Expected: < 200
+Received: 237
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:693:43)
+(fail) native launcher seam: launcher entry point and build wiring > the entry point stays a thin wiring layer [0.07ms]
+694 |   });
+695 | 
+696 |   test("the build script compiles every native source the entry point needs", () => {
+697 |     const source = build();
+698 |     expect(source).toMatch(/macos\/launcher\.swift/);
+699 |     expect(source).toMatch(/macos\/AppLifecycle\.swift/);
+                         ^
+error: expect(received).toMatch(expected)
+
+Expected substring or pattern: /macos\/AppLifecycle\.swift/
+Received: "#!/usr/bin/env bash\nset -euo pipefail\n\nAPP_NAME=\"Meeting Slides.app\"\nBUNDLE_ID=\"com.meetingslides.app\"\nPROJ=\"$(cd \"$(dirname \"$0\")/..\" && pwd)\"\nAPP_INSTALL_DIR=\"${MEETING_SLIDES_APP_DIR:-$HOME/Applications}\"\nAPP=\"$APP_INSTALL_DIR/$APP_NAME\"\nPROJECT_APP_LINK=\"$PROJ/$APP_NAME\"\nCONTENTS=\"$APP/Contents\"\nRESOURCES=\"$CONTENTS/Resources\"\nMACOS_DIR=\"$CONTENTS/MacOS\"\nTMP_BUILD=\"$(mktemp -d \"${TMPDIR:-/tmp}/meeting-slides-build.XXXXXX\")\"\ntrap 'rm -rf \"$TMP_BUILD\"' EXIT\n\ncd \"$PROJ\"\nmkdir -p \"$APP_INSTALL_DIR\"\n\nfor tool in swiftc codesign plutil xattr; do\n  if ! command -v \"$tool\" >/dev/null 2>&1; then\n    echo \"missing tool: $tool (xcode-select --install)\"\n    exit 1\n  fi\ndone\n\nrm -rf \"$CONTENTS\"\nmkdir -p \"$MACOS_DIR\" \"$RESOURCES\"\n\ncat > \"$CONTENTS/Info.plist\" <<'EOF'\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>CFBundleName</key><string>Meeting Slides</string>\n  <key>CFBundleDisplayName</key><string>Meeting Slides</string>\n  <key>CFBundleIdentifier</key><string>com.meetingslides.app</string>\n  <key>CFBundleVersion</key><string>3</string>\n  <key>CFBundleShortVersionString</key><string>0.3.0</string>\n  <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>\n  <key>CFBundleExecutable</key><string>meeting-slides</string>\n  <key>CFBundlePackageType</key><string>APPL</string>\n  <key>CFBundleIconFile</key><string>AppIcon</string>\n  <key>CFBundleDevelopmentRegion</key><string>ko</string>\n  <key>LSApplicationCategoryType</key><string>public.app-category.productivity</string>\n  <key>LSMinimumSystemVersion</key><string>13.0</string>\n  <key>LSMultipleInstancesProhibited</key><true/>\n  <key>NSHighResolutionCapable</key><true/>\n  <key>NSSupportsAutomaticGraphicsSwitching</key><true/>\n  <key>NSMicrophoneUsageDescription</key><string>회의 음성을 로컬에서 전사하기 위해 마이크가 필요합니다.</string>\n  <key>NSAppTransportSecurity</key>\n  <dict>\n    <key>NSAllowsLocalNetworking</key><true/>\n  </dict>\n  <key>LSUIElement</key><false/>\n</dict>\n</plist>\nEOF\n\nprintf '%s\\n' \"$PROJ\" > \"$RESOURCES/project-path.txt\"\n\nif [[ -f \"$HOME/Applications/Meeting Slides.app/Contents/Resources/AppIcon.icns\" ]]; then\n  cp \"$HOME/Applications/Meeting Slides.app/Contents/Resources/AppIcon.icns\" \"$RESOURCES/AppIcon.icns\" || true\nfi\n\necho \"compile browser webapp launcher…\"\nswiftc -O -o \"$MACOS_DIR/meeting-slides\" macos/launcher.swift \\\n  -framework AVFoundation \\\n  -framework AppKit \\\n  -framework Foundation\nchmod +x \"$MACOS_DIR/meeting-slides\"\n\nplutil -lint \"$CONTENTS/Info.plist\" >/dev/null\nxattr -cr \"$APP\" || true\ncodesign --force --deep --sign - --identifier \"$BUNDLE_ID\" \"$APP\"\ncodesign --verify --deep --strict \"$APP\"\n\nif [[ \"$PROJECT_APP_LINK\" != \"$APP\" ]]; then\n  rm -rf \"$PROJECT_APP_LINK\"\n  ln -sfn \"$APP\" \"$PROJECT_APP_LINK\"\nfi\n\nif strings \"$MACOS_DIR/meeting-slides\" | rg -q 'WKWebView|WebKit\\.framework'; then\n  # Framework linkage would also show in otool\n  if otool -L \"$MACOS_DIR/meeting-slides\" | rg -q 'WebKit'; then\n    echo \"build still links WebKit\"\n    exit 1\n  fi\nfi\nif otool -L \"$MACOS_DIR/meeting-slides\" | rg -q 'WebKit'; then\n  echo \"build still links WebKit\"\n  exit 1\nfi\n\nprintf '\\nOK webapp launcher: %s\\n' \"$APP\"\nprintf 'mode: default browser -> http://localhost (not WKWebView/Tauri)\\n'\nprintf 'project: %s\\n' \"$PROJ\"\nprintf 'run: open \\\"%s\\\"\\n' \"$APP\"\nprintf 'log: ~/Library/Logs/Meeting Slides/launcher.log\\n'\n"
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/native-launcher-boundary.test.ts:699:20)
+(fail) native launcher seam: launcher entry point and build wiring > the build script compiles every native source the entry point needs [0.07ms]
+(pass) native launcher seam: launcher entry point and build wiring > minibar-only modules are still not wired into the shipped bundle [0.02ms]
+
+ 3 pass
+ 37 fail
+ 17 expect() calls
+Ran 40 tests across 1 file. [102.00ms]
+exit=1

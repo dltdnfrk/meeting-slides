@@ -1,0 +1,21 @@
+### PROBE 1 — bad-cwd (malformed environment): MUNI container root
+$ cd /Users/hyunjun/Documents/MUNI && boundary-validator.sh --emit .../SHOULD-NOT-EXIST.json
+BOUNDARY-FAIL: cwd '/Users/hyunjun/Documents/MUNI' != canonical root '/Users/hyunjun/Documents/MUNI/meeting-slides'
+no-write: validator exited before any filesystem write
+exit=2
+write-check: PASS no file created
+
+### PROBE 2 — bad-cwd: unrelated sibling project (muni-crm)
+BOUNDARY-FAIL: cwd '/Users/hyunjun/Documents/MUNI/muni-crm' != canonical root '/Users/hyunjun/Documents/MUNI/meeting-slides'
+no-write: validator exited before any filesystem write
+exit=2
+write-check: PASS no file created
+
+### PROBE 3 — bad-cwd: non-git temp dir
+BOUNDARY-FAIL: cwd '/private/tmp' != canonical root '/Users/hyunjun/Documents/MUNI/meeting-slides'
+no-write: validator exited before any filesystem write
+exit=2
+
+### PROBE 4 — symlinked path must resolve physically (pwd -P)
+BOUNDARY-OK cwd=/Users/hyunjun/Documents/MUNI/meeting-slides git_root=/Users/hyunjun/Documents/MUNI/meeting-slides origin=https://github.com/dltdnfrk/meeting-slides.git branch=main head=a1ed25f95980980cd958044b90e739ac45e8280d dirty_entries=214
+exit=0  (0 expected: symlink resolves to canonical physical root)

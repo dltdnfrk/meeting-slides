@@ -1,0 +1,6 @@
+== LSP diagnostics
+public/ui-state-machine.ts: no diagnostics
+tests/ui-state-machine.test.ts: no diagnostics
+
+Root tsconfig.json includes only src/**/*.ts and server.ts and excludes public/,
+so the strict check for this task uses its own config, archived at green/tsconfig.task7.json.

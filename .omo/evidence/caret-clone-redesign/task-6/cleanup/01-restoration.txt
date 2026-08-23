@@ -1,0 +1,60 @@
+# Restoration receipts (post font-path repair)
+
+## Files changed outside this evidence directory: DESIGN.md only
+ DESIGN.md | 670 ++++++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 412 insertions(+), 258 deletions(-)
+
+## Temporary probe mutations, all reverted:
+- validator task-1 hash expectation: restored, 115/115 green
+- tests/fixtures/public-dom-contract.json: moved and restored, hash identical
+- public/fonts/font-manifest.json: moved and restored, hash identical
+
+## Cited artifact hashes now:
+1b1707078b2deafd1e12f66d5d9c5a1bdfd1f025cf9e9aa18abde433b0102f57  tests/fixtures/public-dom-contract.json
+2c999d76e5e5ae309f563252e64e4921e65a0749530e472c71fa9e82d5642bd7  tests/fixtures/public-protocol-contract.json
+95b8246a0afaf64ac87d7567278358ba9f1cc8ca5e0c3e2e06b78b0a502dcfd9  .omo/evidence/caret-clone-redesign/task-1/manifest.json
+b545c7724732921e6a7ecfce27b3474d10a80514c4f96319b14eb61555d08d7b  .omo/evidence/caret-clone-redesign/task-2/green/ledger.md
+d78927aaa4069cc6babd3048839f65489c5659f9eca1954eaffdeb8f389a613c  public/fonts/font-manifest.json
+
+## DESIGN.md sha256:
+7894baee3778bd209026324c117c260076a774074c514c149fbd5cb1483b3484  DESIGN.md
+
+## Probe inputs live only under red/ and /tmp. No product file was mutated in place.
+
+## git status (scoped to product paths)
+ M DESIGN.md
+ M macos/launcher.swift
+ M public/app.js
+ M public/index.html
+ M public/operator-surface.js
+ M public/workspace-split.js
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-operator-surface.test.ts
+ M tests/public-test-harness.ts
+ M tests/public-workspace.test.ts
+?? macos/AppLifecycle.swift
+?? macos/NativeSurfaceContract.swift
+?? macos/TransportClient.swift
+?? public/caret-foundation.css
+?? public/caret-shell.css
+?? public/fonts/
+?? public/transcript-state.ts
+?? public/ui-state-machine.ts
+?? tests/fixtures/
+?? tests/helpers/
+?? tests/native-launcher-boundary.test.ts
+?? tests/native-surface-contract.test.ts
+?? tests/public-caret-foundation.test.ts
+?? tests/public-caret-harness.test.ts
+?? tests/public-dom-protocol-contract.test.ts
+?? tests/public-harness-baseline.test.ts
+?? tests/transcript-state.test.ts
+?? tests/ui-state-machine.test.ts

@@ -1,0 +1,2 @@
+== LSP/tsc diagnostics on the seam test ==
+tsc_exit=0

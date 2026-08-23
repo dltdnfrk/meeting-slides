@@ -1,0 +1,4 @@
+ 2 fail
+ 54 pass
+(fail) transcript projection — provisional captions > a corrected final replaces the provisional caption it supersedes [0.07ms]
+(fail) transcript projection — provisional captions > the matching final replaces its provisional caption [0.16ms]

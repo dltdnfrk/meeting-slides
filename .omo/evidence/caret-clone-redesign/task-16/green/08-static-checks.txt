@@ -1,0 +1,26 @@
+=== project tsc ===
+exit=0
+
+=== strict tsc (task-16 deliverables) ===
+exit=0
+
+=== swiftc -typecheck macos/*.swift ===
+exit=0
+
+=== swiftc -typecheck native dual-surface driver ===
+exit=0
+
+=== generated drift ===
+ok      public/generated/ui-state-machine.js
+ok      public/generated/transcript-state.js
+
+All generated artifacts match their sources.
+exit=0
+
+=== git diff --check ===
+exit=0
+
+=== PRE-EXISTING (not this task): strict/LSP spawn typing in tests/server-ws-dispatch.test.ts ===
+TS2322 ChildProcessByStdio -> ChildProcessWithoutNullStreams at the spawn() call.
+Reproduced identically on the HEAD version of the same file (line 90 there, 101 here;
+the only delta is comment lines added by task 16). Untouched by this task.

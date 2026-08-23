@@ -1,0 +1,13 @@
+01-idle-hydrated: browser=idle/00:00 native=idle/null agree=false
+02-capturing: browser=capturing/02:05 native=live/02:05 agree=true
+03-live-transcript: browser=capturing/02:05 native=live/02:05 agree=true
+04-native-disconnected: browser=capturing/02:05 native=reconnecting/02:05 agree=true
+05-native-reconnected: browser=capturing/02:05 native=live/02:05 agree=true
+06-browser-reloaded: browser=capturing/02:05 native=live/02:05 agree=true
+07-stopping: browser=stopping/02:05 native=stopping/02:05 agree=true
+08-trailing-line: browser=stopping/02:05 native=stopping/02:05 agree=true
+09-idle-restored: browser=idle/02:05 native=idle/null agree=false
+
+timers agree in every capture-owning state: true
+stopCapture commands on the wire: 0
+selectMeeting commands: {"action":"selectMeeting","meetingId":7}

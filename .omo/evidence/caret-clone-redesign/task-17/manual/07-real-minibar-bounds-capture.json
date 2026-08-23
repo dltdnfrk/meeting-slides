@@ -1,0 +1,22 @@
+{
+  "observedPid" : 92036,
+  "panel" : {
+    "boundsTopLeft" : {
+      "x" : 1136,
+      "y" : 854
+    },
+    "layer" : 3,
+    "size" : {
+      "height" : 56,
+      "width" : 360
+    },
+    "windowID" : 92106
+  },
+  "singleWindowCapture" : {
+    "capturedImage" : "360x56",
+    "inconclusive" : false,
+    "litSampledPixels" : "134 of 136",
+    "offeredByScreenCaptureKit" : true,
+    "pixelsReadable" : true
+  }
+}

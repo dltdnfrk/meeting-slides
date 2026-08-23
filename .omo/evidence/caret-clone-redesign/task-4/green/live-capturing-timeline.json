@@ -1,0 +1,53 @@
+{
+  "timeline": [
+    {
+      "awaitState": "capture:capturing",
+      "triggerKind": "message",
+      "subscribedAtSeq": 1,
+      "triggeredAtSeq": 2,
+      "harnessSentBefore": 146,
+      "harnessSentAfter": 147,
+      "pageArmedOrdinal": 1,
+      "pageTriggeredOrdinal": null
+    },
+    {
+      "awaitState": "meetings:listed",
+      "triggerKind": "message",
+      "subscribedAtSeq": 3,
+      "triggeredAtSeq": 4,
+      "harnessSentBefore": 147,
+      "harnessSentAfter": 148,
+      "pageTriggeredOrdinal": null
+    },
+    {
+      "awaitState": "slide:rendered",
+      "triggerKind": "message",
+      "subscribedAtSeq": 5,
+      "triggeredAtSeq": 6,
+      "harnessSentBefore": 148,
+      "harnessSentAfter": 149,
+      "pageArmedOrdinal": 3,
+      "pageTriggeredOrdinal": null
+    },
+    {
+      "awaitState": "transcript:lines=15",
+      "triggerKind": "message",
+      "subscribedAtSeq": 7,
+      "triggeredAtSeq": 8,
+      "harnessSentBefore": 149,
+      "harnessSentAfter": 150,
+      "pageArmedOrdinal": 4,
+      "pageTriggeredOrdinal": null
+    },
+    {
+      "awaitState": "caption:shown",
+      "triggerKind": "message",
+      "subscribedAtSeq": 9,
+      "triggeredAtSeq": 10,
+      "harnessSentBefore": 150,
+      "harnessSentAfter": 151,
+      "pageTriggeredOrdinal": null
+    }
+  ],
+  "clientActions": []
+}

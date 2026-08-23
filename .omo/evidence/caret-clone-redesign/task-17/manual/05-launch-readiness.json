@@ -1,0 +1,11 @@
+59 |   drain();
+60 |   const already = seen.find((line) => pattern.test(line));
+61 |   if (already) return Promise.resolve(already);
+62 |   return new Promise((resolve, reject) => {
+63 |     const timer = setTimeout(() => {
+64 |       reject(new Error(`timeout waiting for ${label} (${pattern})`));
+                      ^
+error: timeout waiting for port resolution (/HTTP_PORT=/)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/task-17/manual/qa-launch.ts:64:18)
+
+Bun v1.3.14 (macOS arm64)

@@ -1,0 +1,2 @@
+8e524df24d13d5187ad81aa3263fc02042526af0159c811ebe9d1de5cee356f1  public/ui-state-machine.ts
+6536f7d5705a3d4ecf0e811c90ee846f044a93689870a07cb56782cea34eea4d  tests/ui-state-machine.test.ts

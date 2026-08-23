@@ -1,0 +1,6 @@
+== tsc --strict --noEmit on the new test seam ==
+exit=0
+
+== LSP diagnostics (error severity) ==
+tests/native-launcher-boundary.test.ts: none
+tests/native-surface-contract.test.ts: none

@@ -1,0 +1,46 @@
+== artifact index (SHA-256) ==
+15999b9fcad01214caec8c6fde29d5279701c16299967611529599cc7448cdd0  .omo/evidence/caret-clone-redesign/task-14/baseline/00-boundary.txt
+a39e4402ad493b448d2c4bb9c796ecc97b36ec4d709d75483cc1046891e6d42f  .omo/evidence/caret-clone-redesign/task-14/baseline/01-protected-hashes.txt
+3048805c18db7ae165497a031d6b821659226a4d9ef02a3f1d0ccd4da5047550  .omo/evidence/caret-clone-redesign/task-14/green/01-green-focused.txt
+ae9d9f33464c7815076c5d45bec7e45fcec84b5eceb87608cc2c516160aedacc  .omo/evidence/caret-clone-redesign/task-14/green/02-swiftc-typecheck.txt
+179d95e6bac88188438acc517ea07bcf449011516c0b5e7d5878da848fac7951  .omo/evidence/caret-clone-redesign/task-14/green/03-typecheck-ts.txt
+f91d1da74b9942ffe5b4a4c4b1f24a4e2bfdbdf815744e7f758a4045f87d4b5e  .omo/evidence/caret-clone-redesign/task-14/green/04-diff-check.txt
+cc54f8e3ecd8376e3b03721573f03dcda63c14e220b90d347ee4a32f18d101f3  .omo/evidence/caret-clone-redesign/task-14/green/05-full-bun-test.txt
+cab0fcab68f168797ee9ab837dca30bfb5094323f9f2212dd4275d3a445fb5e6  .omo/evidence/caret-clone-redesign/task-14/green/06-failure-attribution.txt
+69c8f73599b5505cab3ddc2181866e62fbfd8ce2b741de026588d34614c9b27b  .omo/evidence/caret-clone-redesign/task-14/green/07-protected-integrity.txt
+a30b1ef26a07828456f200161959e5b567b78074fbbb14c2ece8a8861fa254c3  .omo/evidence/caret-clone-redesign/task-14/green/08-green-final.txt
+13dd4e9255161f837e434b3a66021c4ae748bab19abd2d6bba1bc85ae6901dca  .omo/evidence/caret-clone-redesign/task-14/manual/00-build-temp-app.txt
+ecb8c9da99cb76e9ca7b02e25a91b1cf0273b98c679e5afdda26ff4001f4f0b9  .omo/evidence/caret-clone-redesign/task-14/manual/01-symlink-and-bundle.txt
+0f571934f22e44476c2888674bf4696d6951dcfd79bbcb1b27b3d95b5530d1fb  .omo/evidence/caret-clone-redesign/task-14/manual/02-collapsed-bounds-ax.txt
+4b10e8a36d982b48f3a0890ccd8daeaf3a5e70d92448b2349194b5b5489c51c2  .omo/evidence/caret-clone-redesign/task-14/manual/03-capture-sequence.txt
+86c7d05a9ed91352173dd3d0d6dcaed90893ac6ddddf16472180e8386ede0c49  .omo/evidence/caret-clone-redesign/task-14/manual/04-expanded.txt
+ee0e04091e5a38ecc79e4bbbbcd1156fcd9aff4b4f35338aa8c186192080b444  .omo/evidence/caret-clone-redesign/task-14/manual/05-stop-once.txt
+840b34f5310eb88e353c18e3e25b956d7eb436c6216313e4bd84a512700f11d7  .omo/evidence/caret-clone-redesign/task-14/manual/06-reconnect.txt
+f088b90d4169cf8183196f8e9cffaa5f7a6c92f8171f6a00d24d714ae467e9fa  .omo/evidence/caret-clone-redesign/task-14/manual/06b-reconnecting-window.txt
+eba03eaaf0119ed0f4e1a720a29bd84a756e77d0fe329efeaded82fba3320df9  .omo/evidence/caret-clone-redesign/task-14/manual/07-bad-payload.txt
+159f900099570eb6aae5a85d0cb5566ec1c539ac26ffc4eef9cf6f67d4542489  .omo/evidence/caret-clone-redesign/task-14/manual/08-offdisplay.txt
+45150574441de408fc5acebd25736f4f0f2967d4ca69f26f17d09abef9780674  .omo/evidence/caret-clone-redesign/task-14/manual/09-screencapture-compat.txt
+4461ba2d14824c8ad229f102a09b6eb8e2ad3f11934ccd797b0834567e33431b  .omo/evidence/caret-clone-redesign/task-14/manual/10-quit-while-capturing.txt
+12eb0595b518be3d20a5a78949fd0bca33dca3b0a23e64b24bdafeddd8cc6daa  .omo/evidence/caret-clone-redesign/task-14/manual/11-escape-openworkspace.txt
+29ccb14eff7ee4f992b0c82e8d47afbc409aba7e07cce8f3d36495f153e25ed5  .omo/evidence/caret-clone-redesign/task-14/manual/12-cleanup.txt
+c14d516ca5476004f37f6558a79da60039709cc445163e03a9b1aa263f403ec1  .omo/evidence/caret-clone-redesign/task-14/manual/13-artifact-index.txt
+bba359ea7b53c0c01e9c292f8f57a75609f33f0783c28c1e6afb9a5e560f17e9  .omo/evidence/caret-clone-redesign/task-14/manual/screenshots/01-collapsed-live.png
+5c4004456d36c2775a63b17f6882dd2362a232b8f08b681fc6dba4c86311c6a4  .omo/evidence/caret-clone-redesign/task-14/manual/screenshots/02-expanded-live.png
+2c477b8c6eec8efe511647431a9111eb7e07604ade58fe31765c9f88623e0625  .omo/evidence/caret-clone-redesign/task-14/red/01-red-missing-seam.txt
+c00635ddcd8a4895e6d39019ce148d3c3cca91dd50300fc313447e844eb25d01  .omo/evidence/caret-clone-redesign/task-14/red/02-mutation-phantom-stop.txt
+d644053f71ca96328724f1d0ab354171b55543bbcb507361d54f6c4af6caf5d6  .omo/evidence/caret-clone-redesign/task-14/red/03-mutation-unbounded-transcript.txt
+24b3c44de0a4aca9198a97a69edfd96a90cef69e181e9cb933619adb98e10681  .omo/evidence/caret-clone-redesign/task-14/red/04-mutation-stop-lies-while-offline.txt
+887edc24f575fca1797089593b735150b6d7bece5580b5bd931f430cb88e89a6  .omo/evidence/caret-clone-redesign/task-14/red/05-mutation-automatic-focus-steal.txt
+43df92599f78081e1dad66aa99177bb333b7936568dee8bb6a1af2909bc1ef4a  .omo/evidence/caret-clone-redesign/task-14/red/06-mutation-invented-timer.txt
+711ce7d9a099f16d2faba2bbdf467506d6caa0376edb7bedd88ace53bfd14d3b  .omo/evidence/caret-clone-redesign/task-14/red/07-mutation-duplicate-stop.txt
+
+== deliverable hashes ==
+59e419c655438bbe6dfe8d06868eb10e96c1e33ad95730ba6267e11911133d44  macos/MinibarProjection.swift
+8dac7b3a23a3b72c2778d738b2593e3e9382a3bbbe7f7f2b12f05962cf64eab4  macos/MinibarWindowController.swift
+e1c033b44a2febfc15dd3bc367982e9f4cd31794a9f8500718a00087672bccad  macos/MinibarView.swift
+cc12dcffa9a6bfe184b2952a1c230767b2420404f4ccb3fbaea125c53cd419b4  macos/launcher.swift
+b829809c23c75a955c30beabc2c5c08cd5d15791533b19a7a882fb19f1c2ba7c  scripts/build-app.sh
+25784ab3599d1eba8b655f14acb6d6a03cd4148dff7b07df085e036953ab754d  tests/fixtures/native-minibar-driver.swift
+12a3465d098d060317581fe88dfffd61fd733fe83e6e72b70d22b3b3e5cec850  tests/native-minibar.test.ts
+8cfc74163357ff69c51ba0180f7835b61c3ec483564651bea7279ced73a4afba  tests/native-surface-contract.test.ts
+044a4649e9648245f56e75ddc5759af3537bfdb2b387eab33905645ee9a71f82  tests/native-launcher-boundary.test.ts

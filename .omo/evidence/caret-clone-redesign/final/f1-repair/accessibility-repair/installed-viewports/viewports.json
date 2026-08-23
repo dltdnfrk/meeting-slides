@@ -1,0 +1,126 @@
+{
+  "origin": "http://127.0.0.1:8789",
+  "capturedAtUnixSeconds": 1786505037.829,
+  "records": [
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "library",
+      "note": "reference comparison",
+      "shell": "library",
+      "rootScrollWidth": 1440,
+      "rootClientWidth": 1440,
+      "horizontalOverflowPx": 0,
+      "clippedControls": [],
+      "undersizedControls": [],
+      "focusTrapLoaded": true,
+      "settingsTrap": {
+        "first": "btn-recheck",
+        "wrapped": "btn-recheck",
+        "contained": true,
+        "lastControl": "button.stt-btn"
+      },
+      "screenshot": "viewport-1440x900-library.png"
+    },
+    {
+      "width": 1244,
+      "height": 836,
+      "state": "library",
+      "note": "library reference",
+      "shell": "library",
+      "rootScrollWidth": 1244,
+      "rootClientWidth": 1244,
+      "horizontalOverflowPx": 0,
+      "clippedControls": [],
+      "undersizedControls": [],
+      "focusTrapLoaded": true,
+      "settingsTrap": {
+        "first": "btn-recheck",
+        "wrapped": "btn-recheck",
+        "contained": true,
+        "lastControl": "button.stt-btn"
+      },
+      "screenshot": "viewport-1244x836-library.png"
+    },
+    {
+      "width": 960,
+      "height": 760,
+      "state": "live",
+      "note": "live reference, side-by-side split",
+      "shell": "library",
+      "rootScrollWidth": 960,
+      "rootClientWidth": 960,
+      "horizontalOverflowPx": 0,
+      "clippedControls": [],
+      "undersizedControls": [],
+      "focusTrapLoaded": true,
+      "settingsTrap": {
+        "first": "btn-recheck",
+        "wrapped": "btn-recheck",
+        "contained": true,
+        "lastControl": "button.stt-btn"
+      },
+      "screenshot": "viewport-960x760-live.png"
+    },
+    {
+      "width": 820,
+      "height": 900,
+      "state": "live",
+      "note": "live stacks, stage above transcript",
+      "shell": "library",
+      "rootScrollWidth": 820,
+      "rootClientWidth": 820,
+      "horizontalOverflowPx": 0,
+      "clippedControls": [],
+      "undersizedControls": [],
+      "focusTrapLoaded": true,
+      "settingsTrap": {
+        "first": "btn-recheck",
+        "wrapped": "btn-recheck",
+        "contained": true,
+        "lastControl": "button.stt-btn"
+      },
+      "screenshot": "viewport-820x900-live.png"
+    },
+    {
+      "width": 375,
+      "height": 812,
+      "state": "live",
+      "note": "narrow, scrollable rails",
+      "shell": "library",
+      "rootScrollWidth": 375,
+      "rootClientWidth": 375,
+      "horizontalOverflowPx": 0,
+      "clippedControls": [],
+      "undersizedControls": [],
+      "focusTrapLoaded": true,
+      "settingsTrap": {
+        "first": "btn-recheck",
+        "wrapped": "btn-recheck",
+        "contained": true,
+        "lastControl": "button.stt-btn"
+      },
+      "screenshot": "viewport-375x812-live.png"
+    },
+    {
+      "width": 320,
+      "height": 667,
+      "state": "library",
+      "note": "minimum supported",
+      "shell": "library",
+      "rootScrollWidth": 320,
+      "rootClientWidth": 320,
+      "horizontalOverflowPx": 0,
+      "clippedControls": [],
+      "undersizedControls": [],
+      "focusTrapLoaded": true,
+      "settingsTrap": {
+        "first": "btn-recheck",
+        "wrapped": "btn-recheck",
+        "contained": true,
+        "lastControl": "button.stt-btn"
+      },
+      "screenshot": "viewport-320x667-library.png"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+COMMAND: bun test tests/native-minibar.test.ts
+EXIT: 0
+
+COMMAND: bun test tests/native-launcher-boundary.test.ts
+EXIT: 0
+
+COMMAND: bun test tests/native-surface-contract.test.ts
+EXIT: 0
+

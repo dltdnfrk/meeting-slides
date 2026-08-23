@@ -1,0 +1,103 @@
+=== FINAL GREEN: required four-suite command, single run ===
+command: bun test tests/public-dom-protocol-contract.test.ts tests/public-operator-surface.test.ts tests/server-ws-dispatch.test.ts tests/server-handler-map.test.ts
+date: 2026-08-11T06:46:01Z
+
+bun test v1.3.14 (0d9b296a)
+
+tests/public-operator-surface.test.ts:
+(pass) TIRO 기반 오퍼레이터 표면 > 중앙 슬라이드 계약과 필수 DOM ID를 한 번씩만 보존한다 [4.05ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 플로팅 도크가 녹음·파형·타이머와 3-way 출력을 품는다 [0.93ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 번역과 전사 편집은 서버 계약 사유를 노출한 채 비활성화된다 [1.39ms]
+(pass) TIRO 기반 오퍼레이터 표면 > capture 메시지가 녹음 버튼을 파형 상태로 전환한다 [6.18ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 3-way 출력에서 전체 전사를 선택하면 패널로 이동하고 현재 상태를 갱신한다 [47.37ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 1280·768·375에서 셸이 가로로 넘치지 않는다 [9.96ms]
+(pass) TIRO 기반 오퍼레이터 표면 > 비활성 사유와 모바일 전사 본문이 잘리지 않는다 [7.36ms]
+(pass) TIRO 기반 오퍼레이터 표면 > caret dual shell exposes detail tabs and live compact mode [122.73ms]
+
+tests/server-ws-dispatch.test.ts:
+(fail) (unnamed) [5001.02ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+
+tests/server-handler-map.test.ts:
+48 |       LLM_CLI_PRESET: "claude",
+49 |       WHISPER_INPUT_MODE: "mic",
+50 |     },
+51 |   });
+52 | 
+53 |   expect(result.status, result.stderr).toBe(0);
+                                            ^
+error: 16 |   return to;
+17 | };
+18 | var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+19 | var jsHandleDispatcher_exports = {};
+20 | __export(jsHandleDispatcher_exports, {
+21 |   JSHandleDispatcher: () => JSHandleDispatcher,
+                                 ^
+ReferenceError: Cannot access 'JSHandleDispatcher' before initialization.
+      at JSHandleDispatcher (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:21:29)
+      at get (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:14:41)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/elementHandlerDispatcher.js:27:39)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/jsHandleDispatcher.js:28:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/electronDispatcher.js:27:5)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/playwright-core/lib/server/dispatchers/playwrightDispatcher.js:31:5)
+
+Bun v1.3.14 (macOS arm64)
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/server-handler-map.test.ts:53:40)
+(fail) the real WS registry contains executable handlers for every existing action [2709.55ms]
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.09ms]
+(pass) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.07ms]
+(pass) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.09ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.10ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.03ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.03ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.10ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.22ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.08ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.05ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.09ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.04ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.09ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.03ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.11ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.13ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.11ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.26ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.07ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.11ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.06ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.04ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.06ms]
+
+2 tests failed:
+(fail) (unnamed) [5001.02ms]
+  ^ a beforeEach/afterEach hook timed out for this test.
+(fail) the real WS registry contains executable handlers for every existing action [2709.55ms]
+
+ 31 pass
+ 2 fail
+ 90 expect() calls
+Ran 33 tests across 4 files. [9.01s]
+
+=== git diff --check ===
+git diff --check exit: 0
+
+=== interpretation ===
+tests/public-dom-protocol-contract.test.ts : 23/23 PASS (this task's deliverable)
+tests/public-operator-surface.test.ts     : 8/8 PASS
+tests/server-ws-dispatch.test.ts          : FAIL - pre-existing, server.ts cannot be imported
+tests/server-handler-map.test.ts          : FAIL - pre-existing, same root cause
+
+Root cause of the two server failures (see green/03-server-suite-isolated.txt):
+  server.ts import aborts with 'utils.inherits is not a function' from jszip 3.10.1
+  (Utf8DecodeWorker / GenericWorker). Both suites spawn or import server.ts and time out.
+  server.ts is dirty from unrelated pre-existing provider work (5 deletions) and was NOT
+  touched by this task - hash verified identical to the pre-work baseline in
+  cleanup/01-source-restoration.txt and red/05-probe-stale-state.txt.
+  This task added no dependency and no import. Reported as a pre-existing failure, not fixed.

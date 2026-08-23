@@ -1,0 +1,18 @@
+launcher pid=17342
+-- pre-quit processes --
+17342 /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+17358 /Users/hyunjun/.bun/bin/bun run server.ts
+-- send SIGTERM --
+-- post-SIGTERM --
+17342 /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+launcher still running (FAIL)
+17358 /Users/hyunjun/.bun/bin/bun run server.ts
+ORPHAN BUN still present (bug NOT fixed)
+COMMAND   PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+bun     17358 hyunjun   10u  IPv4 0xa181b62e45dbbfca      0t0  TCP 127.0.0.1:8789 (LISTEN)
+port 8789 STILL BOUND (bug NOT fixed)
+-- log tail --
+2026-08-11T16:58:18Z  서버 시작 pid=17358 port=8789
+2026-08-11T16:58:18Z  캘린더 권한 없음 — 자동 녹음 비활성 (시스템 설정 > 개인정보 보호 > 캘린더)
+2026-08-11T16:58:20Z  웹앱 ready → 브라우저 오픈 http://localhost:8789/
+2026-08-11T16:58:20Z  미니바 준비됨 port=8789

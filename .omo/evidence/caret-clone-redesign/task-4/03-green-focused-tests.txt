@@ -1,0 +1,36 @@
+### focused (plain bun test, default 5000ms runner timeout) ###
+bun test v1.3.14 (0d9b296a)
+
+tests/public-harness-baseline.test.ts:
+(pass) public test harness baseline lifecycle > origin serves the shipped index and rejects traversal names [0.76ms]
+(pass) public test harness baseline lifecycle > clientConnected resolves once a websocket client is accepted [0.04ms]
+(pass) public test harness baseline lifecycle > pushMessage broadcasts the exact JSON payload to connected clients [0.21ms]
+(pass) public test harness baseline lifecycle > nextClientMessage resolves inbound client frames in FIFO order [0.13ms]
+(pass) public test harness baseline lifecycle > disconnectClients closes live sockets without stopping the server [0.47ms]
+
+tests/public-caret-harness.test.ts:
+(pass) canonical fixture catalogue > covers every state named in the plan with unique ids [0.09ms]
+(pass) canonical fixture catalogue > every canonical viewport in the plan matrix is exercised by a real fixture [0.03ms]
+(pass) canonical fixture catalogue > every fixture step is a real trigger: a server message or a user interaction [0.22ms]
+(pass) canonical fixture catalogue > every fixture pins a canonical viewport, locale, timezone and fixed clock [0.04ms]
+(pass) canonical fixture catalogue > canonical viewports include the plan's browser matrix at deviceScaleFactor 1 [0.02ms]
+(pass) canonical fixture catalogue > fixture events are frozen server messages, never mutable current time [0.34ms]
+(pass) deterministic browser state capture > 1244x836 library fixture yields byte-identical machine JSON twice [498.55ms]
+(pass) deterministic browser state capture > 960x760 live fixture yields byte-identical machine JSON twice with a fixed timer [238.69ms]
+(pass) deterministic browser state capture > 1440x900 reference fixture yields byte-identical machine JSON and geometry twice [207.72ms]
+(pass) deterministic browser state capture > 820x900 stacked fixture yields byte-identical machine JSON and the stacked-state contract [212.17ms]
+(pass) deterministic browser state capture > locale, timezone, fonts and clock are pinned inside the page [106.95ms]
+(pass) deterministic browser state capture > no fixture reaches the network beyond the local harness origin [101.53ms]
+(pass) deterministic browser state capture > geometry is the deterministic artifact; screenshots are visual artifacts only [297.39ms]
+(pass) deterministic browser state capture > transcript, meetings, slides and job fixtures land deterministically [197.98ms]
+(pass) event-before-trigger synchronization > the driver subscribes before every message trigger [85.50ms]
+(pass) event-before-trigger synchronization > click-driven steps prove ordering with an in-page observable counter [98.36ms]
+(pass) event-before-trigger synchronization > a slide emitted before the subscribed capture state fails with a named bounded timeout [1582.37ms]
+(pass) event-before-trigger synchronization > the default state deadline stays below Bun's default test timeout [0.03ms]
+(pass) static determinism guards > harness, fixtures and driver never use sleep or polling wait APIs [1.58ms]
+(pass) static determinism guards > no QA driver under tests/helpers reintroduces a polling delay [0.50ms]
+
+ 25 pass
+ 0 fail
+ 494 expect() calls
+Ran 25 tests across 2 files. [4.47s]

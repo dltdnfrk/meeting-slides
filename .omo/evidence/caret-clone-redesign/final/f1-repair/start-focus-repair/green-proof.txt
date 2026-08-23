@@ -1,0 +1,15 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+(pass) Todo 15 · user-started capture focuses the visible Stop control > clicking Start moves focus to #btn-live-stop once the live shell reveals it [136.83ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > the focused Stop is the control that actually ends the recording [118.03ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > a server-originated capture (calendar auto-capture) never steals focus [112.19ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > first-load hydration into an already-live capture never steals focus [107.67ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > a reconnect re-asserting the same live capture never re-steals focus [157.98ms]
+(pass) Todo 15 · user-started capture focuses the visible Stop control > an open dialog keeps focus: the handoff never pulls focus out of a sheet [124.58ms]
+
+ 6 pass
+ 97 filtered out
+ 0 fail
+ 18 expect() calls
+Ran 6 tests across 1 file. [1499.00ms]

@@ -1,0 +1,10 @@
+=== drift ===
+ok      public/generated/transcript-state.js
+
+All generated artifacts match their sources.
+=== tsc ===
+tsc exit=0
+=== diff --check ===
+clean
+=== HEAD ===
+a1ed25f95980980cd958044b90e739ac45e8280d

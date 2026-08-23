@@ -1,0 +1,385 @@
+{
+  "observer": "CGWindowListCopyWindowInfo(.optionOnScreenOnly), never AXVisible",
+  "observations": [
+    {
+      "checkpoint": "01-collapsed",
+      "targetWindowCount": 1,
+      "targetWindows": [
+        {
+          "ownerPID": 76243,
+          "ownerName": "Meeting Slides",
+          "windowNumber": 103563,
+          "bounds": {
+            "Height": 56,
+            "Width": 360,
+            "X": 1136,
+            "Y": 854
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ],
+      "meetingSlidesMenuBarWindows": []
+    },
+    {
+      "checkpoint": "02-after-menu-first",
+      "targetWindowCount": 1,
+      "targetWindows": [
+        {
+          "ownerPID": 76243,
+          "ownerName": "Meeting Slides",
+          "windowNumber": 103563,
+          "bounds": {
+            "Height": 56,
+            "Width": 360,
+            "X": 1136,
+            "Y": 854
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ],
+      "meetingSlidesMenuBarWindows": [
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103568,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 4891,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103567,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 5971,
+            "Y": -124
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103565,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 2971,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "03-after-menu-second",
+      "targetWindowCount": 1,
+      "targetWindows": [
+        {
+          "ownerPID": 76243,
+          "ownerName": "Meeting Slides",
+          "windowNumber": 103563,
+          "bounds": {
+            "Height": 56,
+            "Width": 360,
+            "X": 1136,
+            "Y": 854
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ],
+      "meetingSlidesMenuBarWindows": [
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103568,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 4891,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103567,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 5971,
+            "Y": -124
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103565,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 2971,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "04-expanded",
+      "targetWindowCount": 1,
+      "targetWindows": [
+        {
+          "ownerPID": 76243,
+          "ownerName": "Meeting Slides",
+          "windowNumber": 103563,
+          "bounds": {
+            "Height": 220,
+            "Width": 560,
+            "X": 936,
+            "Y": 690
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ],
+      "meetingSlidesMenuBarWindows": [
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103568,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 4891,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103567,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 5971,
+            "Y": -124
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103565,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 2971,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "06-capturing-stop",
+      "targetWindowCount": 1,
+      "targetWindows": [
+        {
+          "ownerPID": 76243,
+          "ownerName": "Meeting Slides",
+          "windowNumber": 103563,
+          "bounds": {
+            "Height": 220,
+            "Width": 560,
+            "X": 936,
+            "Y": 690
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ],
+      "meetingSlidesMenuBarWindows": [
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103566,
+          "bounds": {
+            "Height": 33,
+            "Width": 32,
+            "X": 1053,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103568,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 4891,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103567,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 5971,
+            "Y": -124
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "07-after-stop-idle",
+      "targetWindowCount": 1,
+      "targetWindows": [
+        {
+          "ownerPID": 76243,
+          "ownerName": "Meeting Slides",
+          "windowNumber": 103563,
+          "bounds": {
+            "Height": 220,
+            "Width": 560,
+            "X": 936,
+            "Y": 690
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ],
+      "meetingSlidesMenuBarWindows": [
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103566,
+          "bounds": {
+            "Height": 33,
+            "Width": 32,
+            "X": 1053,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103568,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 4891,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103567,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 5971,
+            "Y": -124
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "08-menu-owner-remains",
+      "targetWindowCount": 1,
+      "targetWindows": [
+        {
+          "ownerPID": 76243,
+          "ownerName": "Meeting Slides",
+          "windowNumber": 103563,
+          "bounds": {
+            "Height": 220,
+            "Width": 560,
+            "X": 936,
+            "Y": 690
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ],
+      "meetingSlidesMenuBarWindows": [
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103566,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 2971,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103568,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 4891,
+            "Y": 0
+          },
+          "alpha": 1,
+          "onScreen": true
+        },
+        {
+          "ownerName": "제어 센터",
+          "name": "com.meetingslides.app",
+          "windowNumber": 103567,
+          "bounds": {
+            "Height": 30,
+            "Width": 32,
+            "X": 5971,
+            "Y": -124
+          },
+          "alpha": 1,
+          "onScreen": true
+        }
+      ]
+    }
+  ]
+}

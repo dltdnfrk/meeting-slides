@@ -1,0 +1,27 @@
+# RED probe: p7-stale-font-path
+{
+  "design": "/tmp/p7-stale-font-path.md",
+  "designSha256": "24d765de84ca97e5885b054d00e6c78a9b12c961b0472327e237ba0bd3ca7904",
+  "checks": 115,
+  "passed": 111,
+  "failed": 4,
+  "failures": [
+    {
+      "id": "token/public/fonts/",
+      "detail": "active contract must name \"public/fonts/\""
+    },
+    {
+      "id": "token/public/fonts/font-manifest.json",
+      "detail": "active contract must name \"public/fonts/font-manifest.json\""
+    },
+    {
+      "id": "token/`/fonts/`",
+      "detail": "active contract must name \"`/fonts/`\""
+    },
+    {
+      "id": "forbidden/no-stale-font-path",
+      "detail": "\"public/assets/fonts\" in: Figtree and DM Mono are vendored\n  under `public/assets/fonts/` with license and SHA-256 recorded; Pretendard and system"
+    }
+  ]
+}
+exit=1

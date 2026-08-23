@@ -1,0 +1,9 @@
+== menu-bar item + panel via real AX / CGWindow ==
+AXIsProcessTrusted: true
+menu-bar-extra (menu bar 2): "Meeting Slides — 대기 중", title ○  -> menu-bar/status item projecting idle state
+AX window list count=0: borderless nonactivating NSPanel is not an AX window (expected; ambient surface)
+CGWindowList panel: 360x56 at top-left (1136,854), layer 3, on screen, pixels readable via SCK (134/136 samples lit)
+
+== Open Workspace: browser workspace action (NSWorkspace.open) ==
+40:83: execution error: System Events에 오류 발생: every browser whose visible = true을(를) 가져올 수 없습니다. (-1728)
+GET http://localhost:8789/ -> 200

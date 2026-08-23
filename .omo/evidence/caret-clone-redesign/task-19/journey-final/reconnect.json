@@ -1,0 +1,5 @@
+{
+  "linesBeforeReconnect": 16,
+  "linesAfterReconnect": 16,
+  "disconnectedStatus": "앱 서버 연결이 끊겼습니다. 다시 연결하는 중…"
+}

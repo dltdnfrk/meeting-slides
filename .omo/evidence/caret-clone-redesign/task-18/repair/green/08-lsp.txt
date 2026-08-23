@@ -1,0 +1,2 @@
+TypeScript LSP diagnostics for tests/public-active-shell.test.ts: no diagnostics found.
+No product CSS/HTML bytes changed in this repair; prior CSS/HTML LSP availability note remains applicable.

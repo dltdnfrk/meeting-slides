@@ -1,0 +1,10 @@
+{
+  "commandQTriggeredAfterSubscription" : true,
+  "frontmostSetStatus" : 0,
+  "observerAddStatus" : 0,
+  "observerCreateStatus" : 0,
+  "observerSubscribedBeforeTrigger" : true,
+  "pid" : 63400,
+  "timedOut" : true,
+  "timeoutFired" : true
+}

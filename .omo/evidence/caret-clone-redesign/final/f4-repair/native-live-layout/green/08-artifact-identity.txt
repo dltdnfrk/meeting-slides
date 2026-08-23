@@ -1,0 +1,7 @@
+915e570684a24f3f57b4ed7b3bd7b116ebc651ef8392e57e22184e76de2b40b5  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+eb039bfcfb9c66844dae5b2bd0237a32ed4ed9701b90a2b7f68642718bffdad2  macos/MinibarProjection.swift
+ba5909d23758b8d85851eed07bc1c2f477f0f577f44c2f1cf4c17e401a5eecb1  macos/MinibarView.swift
+a830c3d48c739553442409ab5d2f5d904f792a2ea0f8d06378ef2977c7b60a5e  tests/native-minibar.test.ts
+4a74ea32c661b7e6bb539260ed45be06209f2e21ed72b682b8ceb96b569bb6d4  tests/fixtures/native-minibar-driver.swift
+bundle-id=com.meetingslides.app
+project-marker=/Users/hyunjun/Documents/MUNI/meeting-slides

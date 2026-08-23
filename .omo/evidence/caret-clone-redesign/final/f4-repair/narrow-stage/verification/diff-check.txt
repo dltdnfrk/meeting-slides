@@ -1,0 +1,10 @@
+-- git diff --check --
+
+-- task files status --
+?? .omo/evidence/caret-clone-redesign/final/f4-repair/narrow-stage/
+?? public/caret-operator.css
+?? tests/public-caret-narrow-stage.test.ts
+
+-- governance/F4 status (observed, not edited by this task) --
+ M DESIGN.md
+?? .omo/evidence/caret-clone-redesign/final/f4-scope-fidelity/

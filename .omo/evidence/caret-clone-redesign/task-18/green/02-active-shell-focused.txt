@@ -1,0 +1,62 @@
+$ bun test focused convergence
+bun test v1.3.14 (0d9b296a)
+
+tests/public-runtime-guard.test.ts:
+(pass) operator runtime bootstrap > health signature and static shell assets are present [0.32ms]
+(pass) operator runtime bootstrap > bootstrap sets file/server runtime flag [0.35ms]
+
+tests/public-caret-foundation.test.ts:
+(pass) bundled font assets are local, deterministic and license-audited > every declared asset exists with the exact recorded size and SHA-256 [2.09ms]
+(pass) bundled font assets are local, deterministic and license-audited > every shipped font file is covered by the manifest - no stray asset [0.37ms]
+(pass) bundled font assets are local, deterministic and license-audited > every asset carries an OFL receipt whose license file is present and hashed [0.50ms]
+(pass) bundled font assets are local, deterministic and license-audited > the foundation stylesheet declares only same-origin font sources [0.48ms]
+(pass) bundled font assets are local, deterministic and license-audited > the shipped document never links a remote font stylesheet [0.15ms]
+(pass) the token layer resolves deterministically in a real browser > document.fonts.ready settles with every bundled family resolved from disk [0.04ms]
+(pass) the token layer resolves deterministically in a real browser > zero external requests reach the network [0.02ms]
+(pass) the token layer resolves deterministically in a real browser > computed families come from the bundled stacks with system fallbacks retained [0.06ms]
+(pass) the token layer resolves deterministically in a real browser > every required semantic token is declared with a resolved value [0.06ms]
+(pass) the token layer resolves deterministically in a real browser > the spacing scale is a strict 4px grid and the type scale is monotonic [0.05ms]
+(pass) the token layer resolves deterministically in a real browser > the canvas is an opaque matte near-black, never a translucent glass pane [0.14ms]
+(pass) the token layer resolves deterministically in a real browser > main surfaces carry no backdrop blur; blur is reserved for overlays [0.02ms]
+(pass) the token layer resolves deterministically in a real browser > the accent is a restrained emerald and recording state is a distinct coral [0.05ms]
+(pass) declared roles satisfy WCAG contrast > body and muted text clear AA on the canvas and on the document surface [0.14ms]
+(pass) declared roles satisfy WCAG contrast > faint text is only used at large sizes and still clears the 3:1 large-text floor [0.01ms]
+(pass) declared roles satisfy WCAG contrast > accent and record text roles clear AA where they carry meaning [0.02ms]
+(pass) declared roles satisfy WCAG contrast > strong rules and the focus ring clear the 3:1 non-text boundary floor [0.15ms]
+(pass) declared roles satisfy WCAG contrast > a focused control paints a visible ring rather than removing the outline [0.02ms]
+(pass) motion is bounded and reduced motion is complete > the motion budget stays within the reference envelope [0.09ms]
+(pass) motion is bounded and reduced motion is complete > under prefers-reduced-motion every token-driven duration collapses to zero [87.46ms]
+(pass) the foundation holds at every canonical viewport > reference 1440x900: fonts ready, tokens stable, no root overflow [84.05ms]
+(pass) the foundation holds at every canonical viewport > library 1244x836: fonts ready, tokens stable, no root overflow
+(pass) the foundation holds at every canonical viewport > live 960x760: fonts ready, tokens stable, no root overflow [97.90ms]
+(pass) the foundation holds at every canonical viewport > stacked 820x900: fonts ready, tokens stable, no root overflow [95.48ms]
+(pass) the foundation holds at every canonical viewport > narrow 375x812: fonts ready, tokens stable, no root overflow [98.65ms]
+(pass) the foundation holds at every canonical viewport > compact 320x667: fonts ready, tokens stable, no root overflow [96.59ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > index.html still declares every unique binding id exactly once [2.64ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > the converged operator source retains one semantic token declaration set [0.37ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > the generated-slide source remains separate from the operator hierarchy [0.40ms]
+
+tests/public-operator-surface.test.ts:
+(pass) Caret 오퍼레이터 표면 > 중앙 슬라이드 계약과 필수 DOM ID를 한 번씩만 보존한다 [3.33ms]
+(pass) Caret 오퍼레이터 표면 > 플로팅 도크가 녹음·파형·타이머와 3-way 출력을 품는다 [1.78ms]
+(pass) Caret 오퍼레이터 표면 > 번역과 전사 편집은 서버 계약 사유를 노출한 채 비활성화된다 [0.51ms]
+(pass) Caret 오퍼레이터 표면 > capture 메시지가 녹음 버튼을 파형 상태로 전환한다 [8.79ms]
+(pass) Caret 오퍼레이터 표면 > 3-way 출력에서 전체 전사를 선택하면 패널로 이동하고 현재 상태를 갱신한다 [38.58ms]
+(pass) Caret 오퍼레이터 표면 > 1280·768·375에서 셸이 가로로 넘치지 않는다 [36.74ms]
+(pass) Caret 오퍼레이터 표면 > 비활성 사유와 모바일 전사 본문이 잘리지 않는다 [8.84ms]
+(pass) Caret 오퍼레이터 표면 > caret dual shell exposes detail tabs and live compact mode [77.26ms]
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.03ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.08ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.16ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.19ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.05ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.08ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 47 pass
+ 0 fail
+ 419 expect() calls
+Ran 47 tests across 4 files. [1.79s]

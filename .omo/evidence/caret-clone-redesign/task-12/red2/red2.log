@@ -1,0 +1,17 @@
+=== RED (regression restored): library disclosure dissolved ===
+$ bun test tests/public-caret-live.test.ts -t 'library dock capabilities'
+
+error: expect(received).toBe(expected)
+Expected: true
+Received: false
+(fail) Todo 12 · the save/export disclosure is reachable in BOTH shells > 1440x900: all 9 library dock capabilities are mouse/keyboard reachable [91.97ms]
+error: expect(received).toBe(expected)
+Expected: true
+Received: false
+(fail) Todo 12 · the save/export disclosure is reachable in BOTH shells > 1244x836: all 9 library dock capabilities are mouse/keyboard reachable [85.73ms]
+error: expect(received).toBe(expected)
+Expected: true
+Received: false
+(fail) Todo 12 · the save/export disclosure is reachable in BOTH shells > 1100x800: all 9 library dock capabilities are mouse/keyboard reachable [89.86ms]
+ 0 pass
+ 3 fail

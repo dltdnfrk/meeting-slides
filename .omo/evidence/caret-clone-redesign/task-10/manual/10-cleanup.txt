@@ -1,0 +1,6 @@
+temporary binaries removed:
+ls: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/tmp.e0JEAevy81: No such file or directory
+ls: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/tmp.IfHrNDXxmu: No such file or directory
+
+repo-wide search for stray generated binaries:
+(no matches above = clean)

@@ -1,0 +1,10 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-narrow-stage.test.ts:
+(pass) F4 M2 · exact 320x667 narrow live stage > the complete placeholder stays inside the 16:9 slide without shrinking contract text [175.06ms]
+(pass) F4 M2 · exact 320x667 narrow live stage > a complete generated slide, transcript tail, and Stop remain reachable [132.40ms]
+
+ 2 pass
+ 0 fail
+ 34 expect() calls
+Ran 2 tests across 1 file. [1.58s]

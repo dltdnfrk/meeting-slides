@@ -1,0 +1,61 @@
+{
+  "macOS" : "Version 26.5.2 (Build 25F84)",
+  "probe" : "public-api-screen-capture-matrix",
+  "results" : [
+    {
+      "cgWindowListEnumeratesWindow" : true,
+      "configuration" : "default (no exclusion API used)",
+      "screencaptureDetail" : "INCONCLUSIVE: screencapture(1) exited 1 (Screen Recording not granted to this probe process)",
+      "screenCaptureKitError" : null,
+      "screenCaptureKitOffersWindow" : true,
+      "screenCaptureKitPixelDetail" : "SCScreenshotManager image 360x56, center rgb(0.429, 0.867, 0.621) vs marker rgb(0.000, 0.863, 0.524); luminance 0.639; greenDominant yes",
+      "screenCaptureKitPixelsReadable" : true,
+      "screencapturePixelsPresent" : null,
+      "sharingType" : "NSWindowSharingType.readOnly"
+    },
+    {
+      "cgWindowListEnumeratesWindow" : true,
+      "configuration" : "self-exclusion attempt",
+      "screencaptureDetail" : "INCONCLUSIVE: screencapture(1) exited 1 (Screen Recording not granted to this probe process)",
+      "screenCaptureKitError" : null,
+      "screenCaptureKitOffersWindow" : true,
+      "screenCaptureKitPixelDetail" : "SCScreenshotManager image 180x28, center rgb(0.000, 0.000, 0.000) vs marker rgb(0.000, 0.863, 0.524); luminance 0.000; greenDominant no",
+      "screenCaptureKitPixelsReadable" : false,
+      "screencapturePixelsPresent" : null,
+      "sharingType" : "NSWindowSharingType.none"
+    },
+    {
+      "cgWindowListEnumeratesWindow" : true,
+      "configuration" : "default restored after exclusion",
+      "screencaptureDetail" : "INCONCLUSIVE: screencapture(1) exited 1 (Screen Recording not granted to this probe process)",
+      "screenCaptureKitError" : null,
+      "screenCaptureKitOffersWindow" : true,
+      "screenCaptureKitPixelDetail" : "SCScreenshotManager image 360x56, center rgb(0.429, 0.867, 0.621) vs marker rgb(0.000, 0.863, 0.524); luminance 0.639; greenDominant yes",
+      "screenCaptureKitPixelsReadable" : true,
+      "screencapturePixelsPresent" : null,
+      "sharingType" : "NSWindowSharingType.readOnly"
+    },
+    {
+      "cgWindowListEnumeratesWindow" : true,
+      "configuration" : "self-exclusion re-applied",
+      "screencaptureDetail" : "INCONCLUSIVE: screencapture(1) exited 1 (Screen Recording not granted to this probe process)",
+      "screenCaptureKitError" : null,
+      "screenCaptureKitOffersWindow" : true,
+      "screenCaptureKitPixelDetail" : "SCScreenshotManager image 180x28, center rgb(0.000, 0.000, 0.000) vs marker rgb(0.000, 0.863, 0.524); luminance 0.000; greenDominant no",
+      "screenCaptureKitPixelsReadable" : false,
+      "screencapturePixelsPresent" : null,
+      "sharingType" : "NSWindowSharingType.none"
+    }
+  ],
+  "surfaces" : {
+    "CGWindowListCopyWindowInfo" : "public CoreGraphics window enumeration",
+    "screencapture(1)" : "shipped user-facing capture tool",
+    "SCScreenshotManager" : "public ScreenCaptureKit pixel capture (CGWindowListCreateImage was obsoleted in macOS 15.0)",
+    "SCShareableContent" : "public ScreenCaptureKit enumeration offered to capturers"
+  },
+  "window" : {
+    "level" : "floating",
+    "size" : "360x56",
+    "styleMask" : "borderless + nonactivatingPanel"
+  }
+}

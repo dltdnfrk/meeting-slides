@@ -1,0 +1,35 @@
+{
+  "verdict": "PASS",
+  "quitProtection": {
+    "continueButtonFound": true,
+    "done": true,
+    "frontmostSetStatus": 0,
+    "notification": "AXWindowCreated",
+    "observerAddStatus": 0,
+    "observerCreateStatus": 0,
+    "observerSubscribedBeforeTrigger": true,
+    "pid": 70962,
+    "pressStatus": 0,
+    "terminateRequestedAfterSubscription": true,
+    "timedOut": false,
+    "windowRole": "AXWindow",
+    "windowTitle": ""
+  },
+  "captureBroadcasts": [
+    {
+      "sequence": 6,
+      "kind": "broadcast",
+      "frame": {
+        "type": "capture",
+        "capturing": true,
+        "mode": "mic",
+        "phase": "capturing",
+        "startedAt": 1786513743647
+      }
+    }
+  ],
+  "appPid": 70962,
+  "adoptedServerPid": 70944,
+  "appSurvivedContinue": true,
+  "adoptedServerSurvivedContinue": true
+}

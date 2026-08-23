@@ -1,0 +1,112 @@
+{
+  "task": "replacement independent visual re-review",
+  "taskId": "st_019ff424",
+  "sessionId": "019ff424-70e4-72ea-bee1-16188838369b",
+  "replacesQuotaFailedTask": "st_019ff41f",
+  "priorReplacementReliedUpon": false,
+  "parentSession": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSession": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "depth": 1,
+  "timestampUtc": "2026-08-12T04:07:10Z",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "reviewedHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "workingTreeDirty": true,
+  "status": "PASS",
+  "verdict": "APPROVE",
+  "browser": "Google Chrome 151.0.7922.108 via Puppeteer",
+  "directVerification": {
+    "V1": {
+      "result": "PASS",
+      "viewports": [
+        "900x760",
+        "960x760",
+        "1244x836",
+        "1440x900"
+      ],
+      "longMixedKoEnCaption": true,
+      "islandWithinStageAll": true,
+      "islandAndStageOverflowAll": 0,
+      "rootOverflowAll": 0
+    },
+    "V2": {
+      "result": "PASS",
+      "viewports": [
+        "320x667",
+        "375x812"
+      ],
+      "boxCssPx": "44x44",
+      "visibleIcon": "✓",
+      "iconCssPx": "7.7x14",
+      "accessibleName": "회의록 검토"
+    },
+    "V3": {
+      "result": "PASS",
+      "viewport": "320x667",
+      "textShare": 1.0,
+      "actionsOwnRow": true,
+      "titleLineBoxes": 1,
+      "commandOverflow": 0,
+      "commandBoxesCssPx": [
+        "57.7x44",
+        "90.9x44"
+      ]
+    },
+    "stopTarget": {
+      "result": "PASS",
+      "viewports": [
+        "1244x836",
+        "1440x900"
+      ],
+      "targetCssPx": "66x44",
+      "edgeMisses": [],
+      "glyphCssPx": "8x8",
+      "labelFontCssPx": 12,
+      "rootAndTopbarOverflow": 0
+    },
+    "clipping": {
+      "rootOverflowAll": 0,
+      "clippedTextNodesAll": 0,
+      "personalScreenshotInspection": true,
+      "cjkPartialGlyphsObserved": false
+    }
+  },
+  "verification": {
+    "focusedTest": "10 pass / 0 fail / 120 assertions",
+    "freshGeometrySha256": "443f4a00aca4c386106885e403607ab80fbf930fb3cf3c5a6f297300173c18f4",
+    "freshStopProbeSha256": "d925a40e207486a8a360daad4c235daf84b4114919e2ee75e22bc294e2c52ef2"
+  },
+  "sourceHashes": {
+    "public/index.html": "b08d066a8c4395df980d1b4caa698ca42361aa34fb9a90aa09126b0ff88022e9",
+    "public/caret-operator.css": "5c2ef5f75aa6d781f07e90c7a59dd87bf00025e7db0cbf28313ec4dd236fb145",
+    "public/style.css": "d433375487cfae2ec0e6347efd966d27105ffddb0f5d2495641b89884a45fb25",
+    "tests/public-caret-visual-repair.test.ts": "1fc0028dc5b2d0a6bca8dc17221a497944fe3fb0e2eacacff52320e01bc167a3"
+  },
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/visual-rereview-replacement/REPORT.md",
+    "sha256": "d6ed1fbb41a2d33eb774a2defe0d37f153ec242ef9048cf232866d2725920b7d"
+  },
+  "residualRisks": [
+    "The clipping sweep is targeted and heuristic rather than a complete glyph-raster comparison.",
+    "Fallback-font metrics can differ on other operating systems.",
+    "The verdict is hash-bound to dirty working-tree shipped files; losing untracked repair files would lose the repair."
+  ],
+  "boundaries": {
+    "productEdited": false,
+    "testsEdited": false,
+    "planEdited": false,
+    "ledgerEdited": false,
+    "boulderEdited": false,
+    "todoEdited": false,
+    "commitCreated": false,
+    "f2ToF4Entered": false
+  },
+  "filesWritten": [
+    ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/visual-rereview-replacement/REPORT.md",
+    ".omo/evidence/caret-clone-redesign/final/f1-repair/reviews/visual-rereview-replacement/DoneClaim.json"
+  ],
+  "checksum": {
+    "algorithm": "sha256",
+    "scope": "UTF-8 pretty JSON with checksum.value replaced by null and one trailing LF",
+    "value": "f863dba9f7bb3f0c58742367f87379b74d2383a92609167ea719c1b6db9d0bf3"
+  }
+}

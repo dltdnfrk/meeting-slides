@@ -1,0 +1,10 @@
+{
+  "capturePhase": "capturing",
+  "timer": "00:00",
+  "glyph": "●",
+  "title": "녹음 중",
+  "stopEnabled": true,
+  "lines": 3,
+  "decodeFailures": 0,
+  "dropCount": 0
+}

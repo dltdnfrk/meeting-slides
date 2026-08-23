@@ -1,0 +1,1 @@
+public/transcript-state.ts:323:    // Live sentences belong to the live meeting, not to the history document.

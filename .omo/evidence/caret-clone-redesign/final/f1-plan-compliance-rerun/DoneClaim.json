@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "task": "F1. Plan compliance audit rerun",
+  "taskId": "st_019ff428",
+  "parentSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "completedAt": "2026-08-12T04:12:53Z",
+  "status": "PASS",
+  "verdict": "APPROVE",
+  "auditedHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "todoResults": {
+    "1": "PASS",
+    "2": "PASS",
+    "3": "PASS",
+    "4": "PASS",
+    "5": "PASS",
+    "6": "PASS",
+    "7": "PASS",
+    "8": "PASS_WITH_KNOWN_SELF_CHECKSUM_NOTE",
+    "9": "PASS",
+    "10": "PASS",
+    "11": "PASS",
+    "12": "PASS",
+    "13": "PASS",
+    "14": "PASS",
+    "15": "PASS_WITH_EXPLICIT_NATIVE_ANNOUNCEMENT_PLATFORM_LIMITATION",
+    "16": "PASS",
+    "17": "PASS",
+    "18": "PASS",
+    "19": "PASS"
+  },
+  "fullSuiteGate": {
+    "currentAttempt": "972 pass / 9 fail",
+    "planRelatedFailures": 1,
+    "planRelatedRepaired": 1,
+    "preExistingUnrelatedFailures": 8,
+    "postRepairAggregate": "966 pass / 0 fail",
+    "excludedOnly": [
+      "tests/llm-transport.test.ts",
+      "tests/start-review-action.test.ts",
+      "tests/attendees-action.test.ts"
+    ],
+    "acceptedPerRerunEvidenceRule": true
+  },
+  "independentFinalReviews": {
+    "functional": {
+      "reviewerTask": "st_019ff3d6",
+      "verdict": "PASS",
+      "reportSha256": "a0e9584d2923bd6515e4969b0a716e1ec1db925f23932a08a86c8a7295cb3feb"
+    },
+    "accessibility": {
+      "reviewerTask": "st_019ff420",
+      "verdict": "PASS_WITH_EXPLICIT_PLATFORM_LIMITATION",
+      "reportSha256": "e8a824c1e20d18ed54c299a605fcb766c856cac7a7c9fd4461c57a49a93c00d9",
+      "announcementControlSha256": "71688864299c66556791cc7fa76b23c3541b6c88b929c8a68994cabf14c740a8"
+    },
+    "visual": {
+      "reviewerTask": "st_019ff424",
+      "verdict": "APPROVE",
+      "reportSha256": "d6ed1fbb41a2d33eb774a2defe0d37f153ec242ef9048cf232866d2725920b7d"
+    }
+  },
+  "currentVerification": {
+    "focusedTests": "564 pass / 0 fail / 2964 expectations across 14 files",
+    "typescript": "PASS",
+    "swiftTypecheck": "PASS",
+    "installedBundleVerifier": "PASS",
+    "codesignStrict": "PASS",
+    "gitDiffCheck": "PASS",
+    "protectedProviderAlibaba": "PASS",
+    "currentRepairHashes": "PASS",
+    "installedArtifactHashes": "PASS"
+  },
+  "checksumValidation": {
+    "task4": "46/46",
+    "task8": "21/21 non-self entries; stale self-entry noted",
+    "task12": "29/29",
+    "task13": "108/108",
+    "task15": "398/398",
+    "task16": "47/47",
+    "task17": "46/46",
+    "task18": "215/215",
+    "task19": "71/71",
+    "accessibilityRepair": "29/29",
+    "startFocusRepair": "11/11",
+    "stopTargetRepair": "19/19",
+    "visualRepair": "29/29",
+    "topLevelF1RepairRollup": "superseded-format note: four removed intermediate paths and one replaced metadata hash; authoritative child manifests pass"
+  },
+  "governance": {
+    "planTodoState": "Todos 1-19 checked; F1-F4 unchecked",
+    "ledgerConsistent": true,
+    "boulderConsistent": true,
+    "planSha256": "d7814098b3844e7e11df636800fe0118793108c116759b9a969bada76cd0255f",
+    "ledgerSha256": "2d4add058a93277c51e69a652e629fc42a8dafcb9f36a9773c74103761c41b60",
+    "boulderSha256": "763f75d9093f9cab541518aabc7cfc7d43c32bcf7df84b081e5b07ba690c6b03"
+  },
+  "boundaries": {
+    "productFilesEdited": false,
+    "planEdited": false,
+    "ledgerEdited": false,
+    "boulderEdited": false,
+    "todoEvidenceEdited": false,
+    "commitCreated": false,
+    "stagingPerformed": false,
+    "f2ToF4Entered": false
+  },
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f1-plan-compliance-rerun/REPORT.md",
+    "sha256": "5a682fbc9bcc32b9f27ee5281917b8b26b752be250ca016b94c1e6f62be5aede"
+  },
+  "checksum": {
+    "algorithm": "sha256",
+    "scope": "UTF-8 pretty JSON with checksum.value replaced by null and one trailing LF",
+    "value": "9dad88ea255c7ce416185dd48cf511fe2d27818086b4734c91f1f39c4a2655f2"
+  }
+}

@@ -1,0 +1,2 @@
+OK bundle verified: /Users/hyunjun/Applications/Meeting Slides.app
+codesign: PASS

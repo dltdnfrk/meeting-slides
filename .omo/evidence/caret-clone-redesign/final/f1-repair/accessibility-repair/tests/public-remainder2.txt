@@ -1,0 +1,62 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/caret-dual-surface.test.ts:
+(pass) dual-surface seam builds and connects > the native client compiles against the SHIPPING pure modules [0.09ms]
+(pass) dual-surface seam builds and connects > one session holds both surfaces as independent clients [0.07ms]
+(pass) dual-surface seam builds and connects > no surface in this seam synchronises on elapsed time [1.39ms]
+(pass) dual-surface seam builds and connects > the native driver drives the real transport module, not a copy [0.09ms]
+(pass) browser client hydration is not connection state > both surfaces hydrate idle from the same connect snapshot [1.13ms]
+(pass) manual start from the browser reaches both surfaces > startCapture uses the existing action and meeting_id spelling [12.86ms]
+(pass) manual start from the browser reaches both surfaces > both surfaces derive the SAME timer from the server startedAt [0.65ms]
+(pass) live transcript projects into both surfaces > finalized lines reach the browser stream and the native viewport [5.63ms]
+(pass) live transcript projects into both surfaces > a provisional caption is provisional on both surfaces [1.58ms]
+(pass) independent transport loss never claims capture stopped > the native client alone drops: reconnecting, capture truth retained [1.42ms]
+(pass) independent transport loss never claims capture stopped > the native client re-enters live from the reconnect snapshot [3.23ms]
+(pass) independent transport loss never claims capture stopped > the browser alone drops: live content and timer retained, no phantom stop [2.31ms]
+(pass) independent transport loss never claims capture stopped > browser reload during capture re-enters live with a deduplicated transcript [75.05ms]
+(pass) stale and malformed frames cannot overwrite current state > a meeting payload for a meeting nobody selected is ignored [3.55ms]
+(pass) stale and malformed frames cannot overwrite current state > a malformed frame leaves both projections untouched [2.49ms]
+(pass) stale and malformed frames cannot overwrite current state > an out-of-order compile result for a superseded job does not disturb capture [2.77ms]
+(pass) rapid Stop emits exactly one existing command > the native surface sends one stopCapture under repeated activation [0.93ms]
+(pass) rapid Stop emits exactly one existing command > the browser surface sends one stopCapture under a double activation [1.41ms]
+(pass) the stop window stays truthful while trailing lines flush > both surfaces report stopping, not idle, before the flush completes [1.13ms]
+(pass) the stop window stays truthful while trailing lines flush > trailing lines emitted after the stop broadcast are kept by both surfaces [2.44ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > idle ends capture on both surfaces [1.57ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > the just-ended meeting is restored, and selected exactly once [7.94ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > the restoration does not repeat when further idle snapshots arrive [1.34ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > an idle re-asserted after reconnect cannot restore a second time [3004.66ms]
+(pass) authoritative idle restores the just-ended meeting exactly once > a SECOND capture cycle restores its own meeting, and only its own [5.15ms]
+(pass) phase-less capture frames stay compatible > a phase-less capture message still drives both surfaces [1.48ms]
+(pass) calendar auto-capture and natural recorder failure > automatic capture reaches both surfaces without a client command [0.77ms]
+(pass) calendar auto-capture and natural recorder failure > a natural recorder failure ends capture truthfully on both surfaces [0.73ms]
+
+tests/public-live-kind.test.ts:
+(pass) live multi-kind design > 기본 주제 카드는 topic 레이아웃(비주얼 밴드)으로 렌더된다 [13.59ms]
+(pass) live multi-kind design > 결정 emphasis는 decision 레이아웃으로 전환된다 [3.18ms]
+(pass) live multi-kind design > 액션 불릿 다수는 actions 레이아웃으로 전환된다 [5.77ms]
+(pass) LLM kind가 휴리스틱보다 우선한다 [4.03ms]
+
+tests/public-harness-baseline.test.ts:
+(pass) public test harness baseline lifecycle > origin serves the shipped index and rejects traversal names [1.54ms]
+(pass) public test harness baseline lifecycle > clientConnected resolves once a websocket client is accepted [0.11ms]
+(pass) public test harness baseline lifecycle > pushMessage broadcasts the exact JSON payload to connected clients [0.61ms]
+(pass) public test harness baseline lifecycle > nextClientMessage resolves inbound client frames in FIFO order [0.40ms]
+(pass) public test harness baseline lifecycle > disconnectClients closes live sockets without stopping the server [2.84ms]
+
+tests/public-protocol-reliability.test.ts:
+(pass) public meeting/export protocol reliability > transcript uses its dedicated action and selected meeting target [131.82ms]
+(pass) public meeting/export protocol reliability > historical payload hydrates transcript, current/history slides and compiled selection [41.95ms]
+(pass) public meeting/export protocol reliability > typed progress disables conflicts and terminal error restores controls with retry [41.98ms]
+
+tests/public-transcript-feed.test.ts:
+(pass) 전사 피드 다줄 표시 > 15개 line 이벤트가 모두 .transcript-stream에 남는다 [20.13ms]
+(pass) 전사 피드 다줄 표시 > status 텍스트가 매우 길어도 160자 내로 잘린다 [3.41ms]
+
+tests/public-compile-control.test.ts:
+(pass) 컴파일 컨트롤 > PowerPoint 생성은 하나의 명확한 주 버튼으로 제공한다 [13.61ms]
+(pass) 컴파일 컨트롤 > 요청을 보내고 진행·완료·실패 상태와 생성 결과를 사용자에게 표시한다 [118.89ms]
+
+ 44 pass
+ 0 fail
+ 152 expect() calls
+Ran 44 tests across 6 files. [13.07s]

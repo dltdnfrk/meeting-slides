@@ -1,0 +1,15 @@
+== DEFECT: orphan bun on SIGTERM (found by rebuilt-app QA) ==
+Symptom: SIGTERM to the idle launcher left 'bun run server.ts' alive (PPID 1) and port 8789 bound.
+Root cause: AppKit runLoop installed no SIGTERM/SIGINT handler, so the signal never called
+  applicationShouldTerminate; the owned server was never terminated.
+Fix: install SIGTERM/SIGINT dispatch sources routed into lifecycle.handle(.interrupt) ->
+  terminateServer. Sources retained on the type so GCD does not deactivate them.
+
+== PROOF (post-fix rebuilt binary) ==
+log line: '시그널 받음 sig=15' then '런처 종료 code=0'
+orphan bun after SIGTERM: none  (pgrep 'bun run server.ts' -> empty)
+port 8789 after SIGTERM: free
+
+RED/GREEN for the fix: pre-fix launcher source had 0 occurrences of makeSignalSource /
+handle(.interrupt); the new tests/app-bundle.test.ts assertion would be RED on that source.
+(pass) app bundle: resources > the launcher reaps its owned server on a raw signal, never orphaning it [0.05ms]

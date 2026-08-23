@@ -1,0 +1,42 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/native-surface-contract.test.ts:
+(pass) native surface seam: sources and compilation > the pure module and fixture driver exist [0.10ms]
+(pass) native surface seam: sources and compilation > swiftc compiles the pure module with the fixture driver [0.07ms]
+(pass) native surface seam: sources and compilation > the pure module imports no AppKit and creates no window [0.20ms]
+(pass) native surface seam: sources and compilation > the driver runs once, exits 0 and emits machine-readable JSON [0.03ms]
+(pass) native surface seam: minibar geometry > collapsed bounds are exactly 360x56 [0.06ms]
+(pass) native surface seam: minibar geometry > expanded bounds are exactly 560x220 [0.01ms]
+(pass) native surface seam: minibar geometry > with no saved frame the default sits inside the 16px active-display gutter [0.02ms]
+(pass) native surface seam: minibar geometry > a fully on-display saved frame is restored verbatim [0.01ms]
+(pass) native surface seam: minibar geometry > a saved frame entirely off-display falls back to the deterministic default
+(pass) native surface seam: minibar geometry > a saved frame with less than 50% display intersection returns the default frame [0.01ms]
+(pass) native surface seam: minibar geometry > a mostly-visible saved frame is clamped into the 16px gutters, not discarded [0.01ms]
+(pass) native surface seam: minibar geometry > a saved frame on a secondary display stays on that display [0.02ms]
+(pass) native surface seam: minibar geometry > expanding keeps the surface on the saved display with expanded bounds [0.01ms]
+(pass) native surface seam: minibar geometry > impossible display bounds yield a typed failure instead of a crash [0.01ms]
+(pass) native surface seam: minibar geometry > an empty display list yields a typed failure instead of a crash
+(pass) native surface seam: menu-bar presentation > first toggle hides and second toggle restores without changing collapsed mode [0.02ms]
+(pass) native surface seam: menu-bar presentation > first toggle hides and second toggle restores without changing expanded mode
+(pass) native surface seam: menu-bar presentation > the shipping controller owns presentation state instead of querying NSWindow visibility [0.35ms]
+(pass) native surface seam: server payload decode subset > a capture update decodes phase, mode and startedAt [0.01ms]
+(pass) native surface seam: server payload decode subset > a phase-less capturing update maps compatibly to capturing [0.01ms]
+(pass) native surface seam: server payload decode subset > a phase-less idle update maps compatibly to idle
+(pass) native surface seam: server payload decode subset > a status update decodes as transport status
+(pass) native surface seam: server payload decode subset > a message outside the observed subset is ignored, not an error
+(pass) native surface seam: server payload decode subset > malformed JSON yields a typed failure without crashing
+(pass) native surface seam: server payload decode subset > a wrongly typed field yields a typed failure without crashing
+(pass) native surface seam: server payload decode subset > an unknown capture phase yields a typed failure without crashing
+(pass) native surface seam: one-command guards > a single Stop activation while capturing emits one stopCapture [0.01ms]
+(pass) native surface seam: one-command guards > rapid duplicate Stop activations emit exactly one stopCapture
+(pass) native surface seam: one-command guards > Stop while idle emits nothing
+(pass) native surface seam: one-command guards > the guard rearms only after an authoritative idle snapshot
+(pass) native surface seam: launcher and build invariants > the launcher keeps the browser workspace and never imports WebKit [0.14ms]
+(pass) native surface seam: launcher and build invariants > the launcher keeps its port, readiness and auto-capture contract [0.11ms]
+(pass) native surface seam: launcher and build invariants > the build script compiles the launcher and rejects WebKit linkage [0.10ms]
+(pass) native surface seam: launcher and build invariants > the pure module is packaged through the minibar, never through a second engine [0.26ms]
+
+ 34 pass
+ 0 fail
+ 77 expect() calls
+Ran 34 tests across 1 file. [1319.00ms]

@@ -1,0 +1,5 @@
+== swiftc optimized full-surface build ==
+swiftc -O exit=0
+
+== swiftc -typecheck ==
+typecheck exit=0

@@ -1,0 +1,40 @@
+$ bun test tests/public-active-shell.test.ts (Repair 2 parser fixture before fix)
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.13ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.17ms]
+195 |         }
+196 |       }
+197 |     `);
+198 |     const workspace = parsed.find((rule) => rule.selectors[0] === ".workspace")!;
+199 |     expect(workspace.selectors).toEqual([".workspace", ":is(.app, .workspace)"]);
+200 |     expect(Object.fromEntries(workspace.declarations)).toEqual({
+                                                             ^
+error: expect(received).toEqual(expected)
+
+  {
+    "--payload": ""/* literal comment */ } {"",
++   "/* leading */ grid-template-columns /* interleaved */": "/* value-leading */ 1fr /* trailing */",
+    "background-image": "url("data:image/svg+xml;utf8,<svg>{/* literal */}</svg>")",
+-   "grid-template-columns": "1fr",
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:200:56)
+(fail) Todo 18 active shell convergence > CSS ownership parser removes declaration comments without touching strings [0.53ms]
+(pass) Todo 18 active shell convergence > linked stylesheets enforce selector and declaration ownership [3.85ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.21ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.07ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.08ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 9 pass
+ 1 fail
+ 51 expect() calls
+Ran 10 tests across 1 file. [32.00ms]
+EXIT=1

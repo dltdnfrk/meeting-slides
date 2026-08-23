@@ -1,0 +1,43 @@
+== 1. required artifacts present ==
+  PASS  .omo/evidence/caret-clone-redesign/task-2/boundary-validator.sh
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/boundary-receipt.json
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/boundary-happy.log
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/pre-work-status.txt
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/protected-hashes-before.tsv
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/active-load-order.md
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/ledger.md
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/css-rule-map.tsv
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/layer-overlap.txt
+  PASS  .omo/evidence/caret-clone-redesign/task-2/green/unreferenced-selector-candidates.tsv
+  PASS  .omo/evidence/caret-clone-redesign/task-2/failure/boundary-failure.log
+== 2. boundary receipt says pass and matches live repo ==
+  PASS  verdict=pass
+  PASS  git_top_level matches live repo
+  PASS  origin matches live repo
+== 3. failure log proves non-zero exit with no write ==
+  PASS  recorded exit=2
+  PASS  no-write proven
+  PASS  absent: SHOULD-NOT-EXIST.json
+  PASS  absent: SHOULD-NOT-EXIST-2.json
+== 4. protected hash table shape ==
+  PASS  header
+  rows: 204
+  PASS  row count >= 200
+  PASS  every row has 6 columns
+  PASS  every protected path still exists
+== 5. paths referenced by the ledger exist ==
+  distinct referenced paths: 15
+  PASS  all ledger/load-order paths exist
+== 5b. every line range cited in the ledger is within its file ==
+  citations checked: 54
+  PASS  all cited line ranges are in range
+== 6. protected content unchanged (before vs after) ==
+  PASS  sha256 identical for every content-hashed path
+  PASS  size identical for every dataless path
+  NOTE  mtime-only drift from concurrent sibling tasks:
+        -public/index.html	product-surface	27675	2026-08-11T06:32:47Z	sha256	c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e
+        +public/index.html	product-surface	27675	2026-08-11T06:45:02Z	sha256	c375457e136d0fee752121fe8ca4c9200ccb0a61589c28d02d00bb08a552420e
+        -public/app.js	product-surface	71450	2026-08-11T06:32:58Z	sha256	6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad
+        +public/app.js	product-surface	71450	2026-08-11T06:45:02Z	sha256	6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad
+
+EVIDENCE-VALID: all checks passed

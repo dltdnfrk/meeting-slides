@@ -1,0 +1,5 @@
+== MUTATION 3: Stop advertised as enabled while reconnecting ==
+ 1 fail
+ 45 pass
+(fail) native minibar seam: truthful controls > Stop stays reachable while reconnecting but refuses to lie about being sent [0.13ms]
+59e419c655438bbe6dfe8d06868eb10e96c1e33ad95730ba6267e11911133d44  macos/MinibarProjection.swift

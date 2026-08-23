@@ -1,0 +1,14 @@
+$ # MUTATION 1: server snapshot priority dropped below local pending intent
+$ bun test tests/ui-state-machine.test.ts
+(fail) capture lifecycle > happy path: activate → starting → live → stop → stopping → idle [0.23ms]
+(fail) capture lifecycle > Stop stays truthful: a stop request alone never claims capture ended [0.09ms]
+(fail) connection and restore > reconnect during a pending stop keeps the stop pending and re-sends it once [0.07ms]
+(fail) connection and restore > reconnect from every capture substate is deterministic [0.12ms]
+(fail) determinism > the visited state names are stable [0.11ms]
+(fail) capture lifecycle > happy path: activate → starting → live → stop → stopping → idle [0.23ms]
+(fail) capture lifecycle > Stop stays truthful: a stop request alone never claims capture ended [0.09ms]
+(fail) connection and restore > reconnect during a pending stop keeps the stop pending and re-sends it once [0.07ms]
+(fail) connection and restore > reconnect from every capture substate is deterministic [0.12ms]
+(fail) determinism > the visited state names are stable [0.11ms]
+ 64 pass
+ 5 fail

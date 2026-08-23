@@ -1,0 +1,6 @@
+== mutation B: minimumVisibleFraction 0.5 -> 0.1 ==
+(fail) native surface seam: minibar geometry > a saved frame with less than 50% display intersection returns the default frame [0.19ms]
+(fail) native surface seam: minibar geometry > a saved frame with less than 50% display intersection returns the default frame [0.19ms]
+ 30 pass
+ 1 fail
+ 67 expect() calls

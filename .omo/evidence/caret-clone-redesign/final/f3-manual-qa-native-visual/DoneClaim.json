@@ -1,0 +1,20 @@
+{
+  "task": "F3 segmented gap B native visual supplemental observation",
+  "verdict": "FAIL",
+  "terminalPass": false,
+  "installedExecutableSha256": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+  "observer": "screencapture + CGWindowListCopyWindowInfo(.optionOnScreenOnly)",
+  "failedRequirement": "The first direct System Events AXPress of the menu-bar owner did not hide the minibar: CGWindowList retained the same on-screen window id 103563 at 1136,854,360,56 and the after screenshot visibly retained it.",
+  "passingObservations": [
+    "off-display frame restored on an available display at 1136,854,360,56",
+    "disclosure expanded to 936,690,560,220",
+    "Open Workspace produced a post-action GET for localhost:54745",
+    "recording projection visibly showed Stop",
+    "five rapid Stop AXPress activations produced exactly one stopCapture receipt",
+    "authoritative idle projection restored",
+    "menu-bar owner remained on-screen and AXPress-accessible"
+  ],
+  "cleanup": "PASS",
+  "productEdits": false,
+  "f4Entered": false
+}

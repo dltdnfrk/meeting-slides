@@ -1,0 +1,38 @@
+== scripts/verify-app.sh on canonical install ==
+FAIL: bundle is not ad-hoc signed
+verify exit=1
+
+== repo symlink ==
+lrwxr-xr-x@ 1 hyunjun  staff  46 Aug 12 01:45 Meeting Slides.app -> /Users/hyunjun/Applications/Meeting Slides.app
+readlink: /Users/hyunjun/Applications/Meeting Slides.app
+resolves to: /Users/hyunjun/Applications/Meeting Slides.app
+same inode as canonical:
+205611252 Meeting Slides.app/Contents/MacOS/meeting-slides
+205611252 /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+
+== plutil -lint + full plist ==
+/Users/hyunjun/Applications/Meeting Slides.app/Contents/Info.plist: OK
+{
+  "CFBundleDevelopmentRegion" => "ko"
+  "CFBundleDisplayName" => "Meeting Slides"
+  "CFBundleExecutable" => "meeting-slides"
+  "CFBundleIconFile" => "AppIcon"
+  "CFBundleIdentifier" => "com.meetingslides.app"
+  "CFBundleInfoDictionaryVersion" => "6.0"
+  "CFBundleName" => "Meeting Slides"
+  "CFBundlePackageType" => "APPL"
+  "CFBundleShortVersionString" => "0.3.0"
+  "CFBundleVersion" => "3"
+  "LSApplicationCategoryType" => "public.app-category.productivity"
+  "LSMinimumSystemVersion" => "13.0"
+  "LSMultipleInstancesProhibited" => true
+  "LSUIElement" => false
+  "NSAppTransportSecurity" => {
+    "NSAllowsLocalNetworking" => true
+  }
+  "NSCalendarsFullAccessUsageDescription" => "다음 회의 시작에 맞춰 녹음을 자동으로 시작하기 위해 캘린더 일정을 읽습니다."
+  "NSCalendarsUsageDescription" => "다음 회의 시작에 맞춰 녹음을 자동으로 시작하기 위해 캘린더 일정을 읽습니다."
+  "NSHighResolutionCapable" => true
+  "NSMicrophoneUsageDescription" => "회의 음성을 로컬에서 전사하기 위해 마이크가 필요합니다."
+  "NSSupportsAutomaticGraphicsSwitching" => true
+}

@@ -1,0 +1,5 @@
+4c261d02dc44f3a553abe25f1a74f01c97c77e74fcbc182482f0e3a68805780f  tests/public-test-harness.ts
+bee0936f135d476577b3fd8ea1d51d3aab07ee19b67cdd7969878efb47f04c81  tests/fixtures/caret-ui-states.ts
+11e3c882694fb7019e4f10f20fc83a6719f5e6277de8297b54f04998207dcac4  tests/helpers/caret-browser-driver.ts
+322782eef86d00d113007102f815d04ca6ae2ce0e15abf0b32f09262bce5d554  tests/public-caret-harness.test.ts
+9f307efef16ada32ac41f6bf5aafcbf1cfbf9a27dd624ccdcc923c9ecfc1cab7  tests/public-harness-baseline.test.ts

@@ -1,0 +1,12 @@
+== 7. malformed payloads against the live panel ==
+before:
+●, 녹음 중, 04:56, 화자 1 · 첫 번째 확정 문장입니다
+after truncated JSON:
+!, 오류, 04:57, 화자 1 · 첫 번째 확정 문장입니다
+after badly typed line:
+!, 오류, 04:58, 화자 1 · 첫 번째 확정 문장입니다
+process still alive (no crash):
+92913 S   
+
+recovery via an authoritative snapshot:
+●, 녹음 중, 04:59, 화자 1 · 첫 번째 확정 문장입니다

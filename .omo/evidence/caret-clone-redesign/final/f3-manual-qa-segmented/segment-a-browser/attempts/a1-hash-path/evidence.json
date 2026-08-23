@@ -1,0 +1,9 @@
+{
+  "segment": "A",
+  "expectedHash": "dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c",
+  "port": 54741,
+  "deadlines": [],
+  "result": "FAIL",
+  "error": "Error: artifact hash drift \n    at /Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-a-browser.ts:28:202\n    at processTicksAndRejections (native:7:39)",
+  "consoleErrors": []
+}

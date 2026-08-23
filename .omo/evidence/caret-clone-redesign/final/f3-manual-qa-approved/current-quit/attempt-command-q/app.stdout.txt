@@ -1,0 +1,9 @@
+프로젝트: /Users/hyunjun/Documents/MUNI/meeting-slides
+모드: 웹앱(브라우저)
+HTTP_PORT=8789 (기본값 8787)
+마이크 권한 확인됨
+이미 실행 중인 Meeting Slides 서버를 사용합니다 port=8789
+웹앱 ready → 브라우저 오픈 http://localhost:8789/
+캘린더 권한 없음 — 자동 녹음 비활성 (시스템 설정 > 개인정보 보호 > 캘린더)
+미니바 준비됨 port=8789
+채택한 서버 — 이 런처는 서버를 소유하지 않습니다

@@ -1,0 +1,4 @@
+command: bunx tsc -p .omo/qa/tsconfig.caret-task4.json
+(strict + noImplicitAny, mirroring the repository tsconfig compiler options)
+exit: 0
+(no output = clean)

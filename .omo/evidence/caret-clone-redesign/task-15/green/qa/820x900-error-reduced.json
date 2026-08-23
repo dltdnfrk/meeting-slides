@@ -1,0 +1,184 @@
+{
+  "state": {
+    "connection": "connected",
+    "capturePhase": "capturing",
+    "shell": "live",
+    "detailTab": "overview",
+    "stageState": "slide",
+    "capturingClass": true
+  },
+  "overflow": {
+    "root": 0,
+    "body": 0
+  },
+  "moving": [],
+  "liveRegions": [
+    {
+      "id": "status-text",
+      "live": null,
+      "role": "status",
+      "atomic": "true",
+      "painted": true
+    },
+    {
+      "id": "stt-list",
+      "live": "polite",
+      "role": null,
+      "atomic": null,
+      "painted": false
+    },
+    {
+      "id": "attendee-error",
+      "live": null,
+      "role": "alert",
+      "atomic": null,
+      "painted": false
+    },
+    {
+      "id": "transcript-stream",
+      "live": null,
+      "role": "log",
+      "atomic": "false",
+      "painted": true
+    },
+    {
+      "id": "compile-status",
+      "live": "polite",
+      "role": "status",
+      "atomic": null,
+      "painted": false
+    },
+    {
+      "id": "review-error",
+      "live": null,
+      "role": "alert",
+      "atomic": null,
+      "painted": false
+    }
+  ],
+  "controls": [
+    {
+      "id": "btn-attendees",
+      "x": 373,
+      "y": 21,
+      "w": 73,
+      "h": 28,
+      "meets44": false
+    },
+    {
+      "id": "btn-settings",
+      "x": 740,
+      "y": 22,
+      "w": 39,
+      "h": 26,
+      "meets44": false
+    },
+    {
+      "id": "btn-live-stop",
+      "x": 339,
+      "y": 77,
+      "w": 66,
+      "h": 28,
+      "meets44": false
+    },
+    {
+      "id": "a.output-switcher__item",
+      "x": 285,
+      "y": 743,
+      "w": 65,
+      "h": 32,
+      "meets44": false
+    },
+    {
+      "id": "a.output-switcher__item",
+      "x": 354,
+      "y": 743,
+      "w": 68,
+      "h": 32,
+      "meets44": false
+    },
+    {
+      "id": "button.output-switcher__item",
+      "x": 427,
+      "y": 743,
+      "w": 109,
+      "h": 32,
+      "meets44": false
+    },
+    {
+      "id": "btn-ask",
+      "x": 60,
+      "y": 800,
+      "w": 62,
+      "h": 40,
+      "meets44": false
+    },
+    {
+      "id": "summary.dock__more-summary",
+      "x": 16,
+      "y": 848,
+      "w": 788,
+      "h": 40,
+      "meets44": false
+    }
+  ],
+  "undersized": [
+    "btn-attendees:73x28",
+    "btn-settings:39x26",
+    "btn-live-stop:66x28",
+    "a.output-switcher__item:65x32",
+    "a.output-switcher__item:68x32",
+    "button.output-switcher__item:109x32",
+    "btn-ask:62x40",
+    "summary.dock__more-summary:788x40"
+  ],
+  "overlaps": [],
+  "contrast": [
+    {
+      "id": "doc-title",
+      "present": false,
+      "ratio": 0,
+      "fontPx": 0
+    },
+    {
+      "id": "doc-meta",
+      "present": false,
+      "ratio": 0,
+      "fontPx": 0
+    },
+    {
+      "id": "status-text",
+      "present": true,
+      "ratio": 13.22,
+      "fontPx": 10
+    },
+    {
+      "id": "meeting-chrome-title",
+      "present": false,
+      "ratio": 0,
+      "fontPx": 0
+    },
+    {
+      "id": "live-topbar-timer",
+      "present": true,
+      "ratio": 17.77,
+      "fontPx": 12
+    },
+    {
+      "id": "caption-text",
+      "present": true,
+      "ratio": 7.1,
+      "fontPx": 13
+    },
+    {
+      "id": "transcript-count",
+      "present": true,
+      "ratio": 4.62,
+      "fontPx": 12
+    }
+  ],
+  "viewport": {
+    "w": 820,
+    "h": 900
+  }
+}

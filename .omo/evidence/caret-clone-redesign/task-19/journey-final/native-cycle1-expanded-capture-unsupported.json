@@ -1,0 +1,4 @@
+{
+  "supported": false,
+  "reason": "CGWindowList did not expose the installed minibar to this process"
+}

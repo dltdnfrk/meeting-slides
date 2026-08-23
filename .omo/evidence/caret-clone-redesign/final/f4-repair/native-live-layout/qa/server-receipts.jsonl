@@ -1,0 +1,15 @@
+{"sequence":1,"kind":"server-ready","port":54832}
+{"sequence":2,"kind":"workspace-get","host":"127.0.0.1:54832"}
+{"sequence":3,"kind":"workspace-get","host":"127.0.0.1:54832"}
+{"sequence":4,"kind":"workspace-get","host":"localhost:54832"}
+{"sequence":5,"kind":"websocket-open","clients":1}
+{"sequence":6,"kind":"server-frame","frame":{"type":"capture","capturing":false,"mode":"mic","phase":"idle","startedAt":null}}
+{"sequence":7,"kind":"server-frame","frame":{"type":"capture","capturing":true,"mode":"mic","phase":"capturing","startedAt":1786517313019}}
+{"sequence":8,"kind":"server-frame","frame":{"type":"line","text":"핵심 결정 사항을 확정했습니다.","ts":1786517314019,"speaker":1}}
+{"sequence":9,"kind":"server-frame","frame":{"type":"line","text":"다음 단계와 담당자를 확인합니다.","ts":1786517315019,"speaker":2}}
+{"sequence":10,"kind":"server-frame","frame":{"type":"line","text":"발표 자료 구조를 정리했습니다.","ts":1786517316019,"speaker":1}}
+{"sequence":11,"kind":"server-frame","frame":{"type":"caption","text":"현재 논의를 기록하고 있습니다","ts":1786517317019}}
+{"sequence":12,"kind":"client-command","raw":"{\"action\":\"stopCapture\"}"}
+{"sequence":13,"kind":"server-frame","frame":{"type":"capture","capturing":false,"mode":"mic","phase":"idle","startedAt":null}}
+{"sequence":14,"kind":"capture-ended","source":"native-stopCapture"}
+{"sequence":15,"kind":"websocket-close","clients":0}

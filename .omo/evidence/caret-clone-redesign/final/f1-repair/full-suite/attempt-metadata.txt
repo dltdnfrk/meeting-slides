@@ -1,0 +1,7 @@
+canonical_root=/Users/hyunjun/Documents/MUNI/meeting-slides
+started_utc=2026-08-12T02:37:30Z
+head=a1ed25f95980980cd958044b90e739ac45e8280d
+bun=1.3.14
+command=bun test
+finished_utc=2026-08-12T02:48:37Z
+exit_status=1

@@ -1,0 +1,16 @@
+프로젝트: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/task19-journey.USSssv/project
+모드: 웹앱(브라우저)
+HTTP_PORT=54321 (기본값 8787)
+마이크 권한 확인됨
+서버 시작 pid=21783 port=54321
+캘린더 권한 없음 — 자동 녹음 비활성 (시스템 설정 > 개인정보 보호 > 캘린더)
+HTTP: http://localhost:54321
+입력 모드: mic
+meeting-slides 서버 시작. 브라우저에서 http://localhost:54321 접속
+웹앱 ready → 브라우저 오픈 http://localhost:54321/
+LLM 연결 OK: cli / cli:claude(/var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/task19-journey.USSssv/claude-fixture)
+미니바 준비됨 port=54321
+[whisper] whisper-stream 시작: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/task19-journey.USSssv/whisper-fixture -m /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/task19-journey.USSssv/model.bin -l ko -t 4 --step 3000 --length 5000 --keep 200 -c 1 -fa -kc
+[whisper] whisper-stream 종료 (code=0)
+[whisper] whisper-stream 시작: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/task19-journey.USSssv/whisper-fixture -m /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T/task19-journey.USSssv/model.bin -l ko -t 4 --step 3000 --length 5000 --keep 200 -c 1 -fa -kc
+[whisper] whisper-stream 종료 (code=0)

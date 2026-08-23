@@ -1,0 +1,131 @@
+timestamp=2026-08-12T05:25:37Z
+canonical_marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+expected_marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+installed_hash=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+expected_hash=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+task_ports:
+54741=free
+54742=free
+54743=free
+54744=free
+installed_processes:
+43828 /bin/bash -c E='.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented'; {
+ echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)";
+ echo "canonical_marker=$(tr -d '\n' < "$HOME/Applications/Meeting Slides.app/Contents/Resources/project-path.txt")";
+ echo "expected_marker=$PWD";
+ echo "installed_hash=$(shasum -a 256 "$HOME/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides"|awk '{print $1}')";
+ echo "expected_hash=$(cat "$E/build/EXECUTABLE_SHA256")";
+ echo 'task_ports:';
+ for p in 54741 54742 54743 54744; do ids=$(lsof -nP -tiTCP:$p -sTCP:LISTEN 2>/dev/null || true); echo "$p=${ids:-free}"; done
+ echo 'installed_processes:';
+ pgrep -afil '/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides' || true;
+ echo 'defaults:'; defaults read com.meetingslides.app 'minibar.frame.v1' 2>/dev/null || true;
+ echo 'user_db_hashes_after:'; find "$PWD" -maxdepth 1 -name 'meetings*.db*' -type f -print0 | sort -z | xargs -0 shasum -a 256 2>/dev/null || true;
+ echo 'worktree_status:'; git status --short;
+} > "$E/terminal/final-cleanup-verification.txt"
+# Compare only database checksum lines from build preflight and final cleanup.
+grep -E '^[0-9a-f]{64} ' "$E/build/preflight.txt" | sort > "$E/terminal/user-db-before.hashes"
+grep -E '^[0-9a-f]{64} ' "$E/terminal/final-cleanup-verification.txt" | sort > "$E/terminal/user-db-after.hashes"
+diff -u "$E/terminal/user-db-before.hashes" "$E/terminal/user-db-after.hashes" > "$E/terminal/user-db-hash-diff.txt" || true
+printf 'marker=%s\nhash=%s\nports=%s\nprocesses=%s\nuser_db_diff_lines=%s\n' "$(tr -d '\n' < "$HOME/Applications/Meeting Slides.app/Contents/Resources/project-path.txt")" "$(shasum -a 256 "$HOME/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides"|awk '{print $1}')" "$(for p in 54741 54742 54743 54744; do lsof -nP -tiTCP:$p -sTCP:LISTEN 2>/dev/null; done | wc -l | tr -d ' ')" "$(pgrep -f '/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides' | wc -l | tr -d ' ')" "$(wc -l < "$E/terminal/user-db-hash-diff.txt" | tr -d ' ')"
+defaults:
+{
+    height = 56;
+    width = 360;
+    x = 1136;
+    y = 854;
+}
+user_db_hashes_after:
+99de34b89ef3ff0be5d87e8e8c5a92ed08b8839047d23a5069dc907ebc6256f5  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings 2.db
+f477e5116410c1682336f2315d3f2c85a9462f6fa86511de921c8730ff84c5a5  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings 2.db-shm
+3ecb66dc8f04a105f8991754cec2238770f41b7f87eae5fbe6d4d1453bdc4ae2  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings 2.db-wal
+24744ca540901c875784e3e8a3808343e2ea6e84a66301eac14779fc13260806  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings.db
+2f28a9abc88037a66fd89375e8bc250ad7ef787195a2e1242646a9a460a52d9e  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings.db-shm
+1bb6f41e4f260aacffe6a06745b1a28c384c0f7757eba496d930b2549d2bc0dc  /Users/hyunjun/Documents/MUNI/meeting-slides/meetings.db-wal
+worktree_status:
+ M .env.example
+ M .omo/start-work/ledger.jsonl
+ M DESIGN.md
+ M README.md
+ M macos/launcher.swift
+ M public/app.js
+ M public/index.html
+ D public/operational-liquid.css
+ M public/operator-surface.js
+ M public/review-panel.js
+ M public/style.css
+ D public/transcript-overlay.css
+ D public/transcript-overlay.js
+ D public/workspace-shell.css
+ M public/workspace-split.js
+ M scripts/build-app.sh
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-attendees.test.ts
+ M tests/public-compile-control.test.ts
+ M tests/public-operator-surface.test.ts
+ M tests/public-protocol-reliability.test.ts
+ M tests/public-review.test.ts
+ M tests/public-runtime-guard.test.ts
+ M tests/public-shell.test.ts
+ M tests/public-test-harness.ts
+ M tests/public-transcript-dock.test.ts
+ M tests/public-workspace.test.ts
+ M tests/server-ws-dispatch.test.ts
+?? .audit2-st019ff026/
+?? .audit3/
+?? .omo/drafts/
+?? .omo/evidence/caret-clone-redesign/
+?? .omo/evidence/live-split-ulw/
+?? .omo/evidence/style-gallery-baseline/
+?? .omo/evidence/style-gallery-final/
+?? .omo/evidence/style-gallery-panels/
+?? .omo/evidence/tiro-operator/
+?? .omo/evidence/tiro-reference/
+?? .omo/plans/caret-clone-redesign.md
+?? .omo/plans/tiro-operator-rebuild.md
+?? .omo/ulw-loop/
+?? .omo/ulw-research/
+?? HANDOFF.md
+?? macos/AppLifecycle.swift
+?? macos/MinibarProjection.swift
+?? macos/MinibarView.swift
+?? macos/MinibarWindowController.swift
+?? macos/NativeSurfaceContract.swift
+?? macos/TransportClient.swift
+?? models/
+?? public/caret-operator.css
+?? public/focus-trap.js
+?? public/fonts/
+?? public/generated/
+?? public/transcript-state.ts
+?? public/ui-state-machine.ts
+?? scripts/build-public-modules.ts
+?? scripts/verify-app.sh
+?? tests/app-bundle.test.ts
+?? tests/caret-dual-surface.test.ts
+?? tests/fixtures/
+?? tests/helpers/
+?? tests/native-launcher-boundary.test.ts
+?? tests/native-minibar.test.ts
+?? tests/native-surface-contract.test.ts
+?? tests/public-active-shell.test.ts
+?? tests/public-caret-accessibility.test.ts
+?? tests/public-caret-context.test.ts
+?? tests/public-caret-foundation.test.ts
+?? tests/public-caret-harness.test.ts
+?? tests/public-caret-library.test.ts
+?? tests/public-caret-live.test.ts
+?? tests/public-caret-visual-repair.test.ts
+?? tests/public-dom-protocol-contract.test.ts
+?? tests/public-harness-baseline.test.ts
+?? tests/server-ask-dispatch.test.ts
+?? tests/transcript-state.test.ts
+?? tests/ui-state-machine.test.ts

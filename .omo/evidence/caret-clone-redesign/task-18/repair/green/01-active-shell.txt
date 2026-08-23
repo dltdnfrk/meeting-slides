@@ -1,0 +1,17 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.10ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.15ms]
+(pass) Todo 18 active shell convergence > linked stylesheets enforce selector and declaration ownership [4.15ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.24ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.09ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.09ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 9 pass
+ 0 fail
+ 49 expect() calls
+Ran 9 tests across 1 file. [27.00ms]

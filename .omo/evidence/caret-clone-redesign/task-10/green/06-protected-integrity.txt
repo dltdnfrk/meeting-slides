@@ -1,0 +1,17 @@
+== protected-path integrity vs baseline ==
+.omo/evidence/caret-clone-redesign/task-10/baseline/01-protected-hashes.txt: FAILED
+.omo/ulw-research/20260809-205918/executive-deck/.slides-grab/design-gate.json: FAILED
+tests/native-surface-contract.test.ts: FAILED
+shasum: WARNING: 3 computed checksums did NOT match
+
+attribution:
+1) 01-protected-hashes.txt itself - self-referential, hashed before it was complete. Not a source file.
+2) tests/native-surface-contract.test.ts - INTENTIONAL, owned by this task's charter:
+   Todo 10 moves port/readiness/launch rules out of macos/launcher.swift into macos/AppLifecycle.swift.
+   The Todo-5 invariant test pinned those literals to the launcher FILE, not to the behavior.
+   One test block now asserts the same invariants in their new home; coverage is unchanged (31 tests, all pass).
+3) .omo/ulw-research/.../design-gate.json - NOT touched by this task.
+-rw-r--r--@ 1 hyunjun  staff  14355 Aug  9 21:59 .omo/ulw-research/20260809-205918/executive-deck/.slides-grab/design-gate.json
+   mtime is Aug 9 (before this task started at 16:1x on Aug 11); baseline recorded the empty-file
+   hash e3b0c442... which is the SHA-256 of zero bytes, i.e. the baseline snapshot raced a
+   concurrent sibling writer. Current content is 14355 bytes, unmodified by this task.

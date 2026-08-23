@@ -1,0 +1,6 @@
+(pass) transcript parse boundary > a rejected frame is recorded without disturbing content [0.01ms]
+
+ 79 pass
+ 0 fail
+ 162 expect() calls
+Ran 79 tests across 2 files. [44.00ms]

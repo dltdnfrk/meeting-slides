@@ -1,0 +1,133 @@
+=== task 8 manual QA: pure transcript projection ===
+
+── initial (empty, live)
+   meetingId=null count=0 truncated=false rejected=0
+   interim (none)
+   minibar finals=0 provisional=none
+
+── interim: 화자 1 partial
+   meetingId=null count=0 truncated=false rejected=0
+   interim [0ms, 화자 1] 이번 분기 로드맵을
+   minibar finals=0 provisional=yes
+
+── interim: 화자 1 longer
+   meetingId=null count=0 truncated=false rejected=0
+   interim [1000ms, 화자 1] 이번 분기 로드맵을 먼저 정렬하고
+   minibar finals=0 provisional=yes
+
+── final: 화자 1
+   meetingId=null count=1 truncated=false rejected=0
+   final   [2000ms, 화자 1] 이번 분기 로드맵을 먼저 정렬하고 시작하겠습니다.
+   interim (none)
+   minibar finals=1 provisional=none
+
+── interim: 화자 2 misheard
+   meetingId=null count=1 truncated=false rejected=0
+   final   [2000ms, 화자 1] 이번 분기 로드맵을 먼저 정렬하고 시작하겠습니다.
+   interim [4000ms, 화자 2] 온보딩 이탈률이 지난달보다 십이
+   minibar finals=1 provisional=yes
+
+── final: 화자 2 corrected
+   meetingId=null count=2 truncated=false rejected=0
+   final   [2000ms, 화자 1] 이번 분기 로드맵을 먼저 정렬하고 시작하겠습니다.
+   final   [5000ms, 화자 2] 온보딩 이탈률이 지난달보다 12퍼센트 줄었습니다.
+   interim (none)
+   minibar finals=2 provisional=none
+
+── duplicate final replay
+   meetingId=null count=2 truncated=false rejected=0
+   final   [2000ms, 화자 1] 이번 분기 로드맵을 먼저 정렬하고 시작하겠습니다.
+   final   [5000ms, 화자 2] 온보딩 이탈률이 지난달보다 12퍼센트 줄었습니다.
+   interim (none)
+   minibar finals=2 provisional=none
+
+── multiline final
+   meetingId=null count=3 truncated=false rejected=0
+   final   [2000ms, 화자 1] 이번 분기 로드맵을 먼저 정렬하고 시작하겠습니다.
+   final   [5000ms, 화자 2] 온보딩 이탈률이 지난달보다 12퍼센트 줄었습니다.
+   final   [8000ms, 화자 1] 설치 시간은 평균 4분에서 2분 30초로 짧아졌습니다.
+   interim (none)
+   minibar finals=3 provisional=none
+
+── late final (older ts)
+   meetingId=null count=4 truncated=false rejected=0
+   final   [2000ms, 화자 1] 이번 분기 로드맵을 먼저 정렬하고 시작하겠습니다.
+   final   [5000ms, 화자 2] 온보딩 이탈률이 지난달보다 12퍼센트 줄었습니다.
+   final   [6000ms, 화자 2] 튜토리얼 단계가 여전히 많다는 피드백이 있습니다.
+   final   [8000ms, 화자 1] 설치 시간은 평균 4분에서 2분 30초로 짧아졌습니다.
+   interim (none)
+   minibar finals=3 provisional=none
+
+── snapshot replaces projection
+   meetingId=null count=2 truncated=true rejected=0
+   final   [10000ms, 화자 1] 그래서 네 단계로 줄이는 방안을 제안합니다.
+   final   [13000ms, 화자 2] 지원팀 문의 중 절반이 3단계에서 발생했습니다.
+   interim (none)
+   minibar finals=2 provisional=none
+
+── export transcript (must not touch projection)
+   meetingId=null count=2 truncated=true rejected=0
+   final   [10000ms, 화자 1] 그래서 네 단계로 줄이는 방안을 제안합니다.
+   final   [13000ms, 화자 2] 지원팀 문의 중 절반이 3단계에서 발생했습니다.
+   interim (none)
+   minibar finals=2 provisional=none
+
+── activate history meeting 101
+   meetingId=101 count=0 truncated=false rejected=0
+   interim (none)
+   minibar finals=0 provisional=none
+
+── stale detail for meeting 77
+   meetingId=101 count=0 truncated=false rejected=1
+   interim (none)
+   minibar finals=0 provisional=none
+   lastError=meeting detail 77 does not match the active meeting
+
+── live line while history is active
+   meetingId=101 count=0 truncated=false rejected=2
+   interim (none)
+   minibar finals=0 provisional=none
+   lastError=line for the live meeting while a history meeting is active
+
+── detail for meeting 101
+   meetingId=101 count=2 truncated=false rejected=2
+   final   [30000ms, 화자 1] 각 팀 리드가 금요일까지 범위를 확정합니다.
+   final   [33000ms, 화자 2] 리뷰 결과는 회의록으로 공유하겠습니다.
+   interim (none)
+   minibar finals=2 provisional=none
+   lastError=line for the live meeting while a history meeting is active
+
+── malformed: speaker is a label → REJECTED: line entry is malformed
+   meetingId=101 count=2 truncated=false rejected=3
+   final   [30000ms, 화자 1] 각 팀 리드가 금요일까지 범위를 확정합니다.
+   final   [33000ms, 화자 2] 리뷰 결과는 회의록으로 공유하겠습니다.
+   interim (none)
+   minibar finals=2 provisional=none
+   lastError=line entry is malformed
+
+── malformed: not an object → REJECTED: frame is not an object
+   meetingId=101 count=2 truncated=false rejected=4
+   final   [30000ms, 화자 1] 각 팀 리드가 금요일까지 범위를 확정합니다.
+   final   [33000ms, 화자 2] 리뷰 결과는 회의록으로 공유하겠습니다.
+   interim (none)
+   minibar finals=2 provisional=none
+   lastError=frame is not an object
+
+── malformed: unknown type → REJECTED: unknown message type: transcriptDelta
+   meetingId=101 count=2 truncated=false rejected=5
+   final   [30000ms, 화자 1] 각 팀 리드가 금요일까지 범위를 확정합니다.
+   final   [33000ms, 화자 2] 리뷰 결과는 회의록으로 공유하겠습니다.
+   interim (none)
+   minibar finals=2 provisional=none
+   lastError=unknown message type: transcriptDelta
+
+── return to live
+   meetingId=null count=0 truncated=false rejected=5
+   interim (none)
+   minibar finals=0 provisional=none
+   lastError=unknown message type: transcriptDelta
+
+── reset
+   meetingId=null count=0 truncated=false rejected=0
+   interim (none)
+   minibar finals=0 provisional=none

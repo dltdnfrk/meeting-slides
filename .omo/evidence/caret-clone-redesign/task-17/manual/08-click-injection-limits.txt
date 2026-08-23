@@ -1,0 +1,11 @@
+== panel click injection (environment-limited) ==
+Synthetic window-server click at disclosure offset (1450,882): panel stayed 360x56.
+AXIsProcessTrusted=true but CGEvent posts from this non-FDA shell context do not
+reach the borderless non-activating panel -> Disclosure/Stop click surface cannot be
+exercised by injection in THIS context. This is an environment boundary, not an app defect:
+the same actions ARE covered headless by tests/native-minibar.test.ts and by hand in
+task-14 manual/05 (Stop-once) and manual/11 (Escape/OpenWorkspace) in an interactive session.
+
+== idle Stop must emit nothing (minibar guard) ==
+GET /api/status -> 404
+Not Found

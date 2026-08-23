@@ -1,0 +1,4 @@
+timestamp_utc=2026-08-12T05:45:52Z
+root=/Users/hyunjun/Documents/MUNI/meeting-slides
+prebuild_exec_sha256=23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d
+repair_expected_sha256=23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d

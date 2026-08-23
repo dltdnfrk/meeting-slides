@@ -1,0 +1,18 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-visual-repair.test.ts:
+(pass) V1 — the live provisional caption row stays inside the pane that owns it > seam900 — #island fits its pane and never shears across the split [109.55ms]
+(pass) V1 — the live provisional caption row stays inside the pane that owns it > live960 — #island fits its pane and never shears across the split [93.27ms]
+(pass) V1 — the live provisional caption row stays inside the pane that owns it > library1244 — #island fits its pane and never shears across the split [105.40ms]
+(pass) V1 — the live provisional caption row stays inside the pane that owns it > reference1440 — #island fits its pane and never shears across the split [94.50ms]
+(pass) V2 — #btn-review is never a blank control > compact320 — the review control renders visible content and keeps its name [129.85ms]
+(pass) V2 — #btn-review is never a blank control > narrow375 — the review control renders visible content and keeps its name [127.94ms]
+(pass) V2 — #btn-review is never a blank control > threshold420 — the review control renders visible content and keeps its name [131.89ms]
+(pass) V2 — #btn-review is never a blank control > the .review-btn__icon selector is not dead — the markup provides the node [133.08ms]
+(pass) V3 — action-card commands stay legible at the narrow floor > compact320 — no action command truncates mid-glyph or renders unlabeled [135.36ms]
+(pass) V3 — action-card commands stay legible at the narrow floor > narrow375 — no action command truncates mid-glyph or renders unlabeled [144.40ms]
+
+ 10 pass
+ 0 fail
+ 120 expect() calls
+Ran 10 tests across 1 file. [1.79s]

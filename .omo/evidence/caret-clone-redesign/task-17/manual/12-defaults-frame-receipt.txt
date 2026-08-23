@@ -1,0 +1,4 @@
+== minibar.frame.v1 written by the rebuilt app during QA ==
+{ "x"=1136; "y"=854; "width"=360; "height"=56; } — no displayId key: the Todo-14 stored-id
+field (dead, write-only) is gone from the persisted contract. Domain deleted after QA;
+final state: 'Domain com.meetingslides.app does not exist'.

@@ -1,0 +1,10 @@
+9019e284dc5efaa76af937ed8e2088213106d10a5dcb476e11a3f59832821ee8  ./artifact-identity.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  ./build-app.exit
+d13a4f934415726f047110b1b40b4be8ed79dd84bf5f144ea7e46eff8f3b8978  ./build-app.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  ./codesign.exit
+fde3f050791d96f6469ff1e790fd9884dfedc18e6642d2f96a6854a15b4ba4da  ./codesign.txt
+f178f7d91fcad4d6b7624fceee1bf0e4e5575d6f77d889d4cedf4197d23537f2  ./EXECUTABLE_SHA256
+2f5ab7bd05d52fd0622f8f6f486071a40749a0552f3c19b86b5f3f455ec3df6a  ./preflight.txt
+f4e6f8f01479dcdfe2df6922a4b30a604fbb56aae1e8ad781d5d80c5a4950a81  ./quit-helper-hash.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  ./verify-app.exit
+4cec07bd0f495cdacb0ec05b0262389df6015467aec7f1015f1c74b1331ae31b  ./verify-app.txt

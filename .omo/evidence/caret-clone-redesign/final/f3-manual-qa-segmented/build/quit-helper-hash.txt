@@ -1,0 +1,1 @@
+1344648c63cc5e15223a4e22e29cf69916b8b249129979b99631a0ceeff52018  .omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/quit-protection

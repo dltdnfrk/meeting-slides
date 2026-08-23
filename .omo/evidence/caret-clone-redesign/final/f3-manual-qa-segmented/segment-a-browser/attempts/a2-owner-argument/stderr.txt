@@ -1,0 +1,42 @@
+77 |         callback.resolve(value);
+78 |     }
+79 |     clear() {
+80 |         for (const callback of this.#callbacks.values()) {
+81 |             // TODO: probably we can accept error messages as params.
+82 |             this._reject(callback, new TargetCloseError('Target closed'));
+                                        ^
+TargetCloseError: Protocol error (Runtime.callFunctionOn): Target closed
+      at clear (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/common/CallbackRegistry.js:82:36)
+      at onClosed (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/CdpSession.js:121:25)
+      at onMessage (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/Connection.js:159:25)
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/node/NodeWebSocketTransport.js:38:32)
+
+101 |     #id;
+102 |     #error = new ProtocolError();
+103 |     #deferred = Deferred.create();
+104 |     #timer;
+105 |     #label;
+106 |     constructor(id, label, timeout) {
+                      ^
+ProtocolError: 
+      at Callback (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/common/CallbackRegistry.js:106:17)
+      at create (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/common/CallbackRegistry.js:42:10)
+      at send (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/CdpSession.js:113:13)
+      at #evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:360:50)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:404:32)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:131:26)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:720:38)
+      at evaluate (/Users/hyunjun/Documents/MUNI/meeting-slides/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:826:43)
+      at deadline (/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-a-browser.ts:16:32)
+13 | const evidence: Record<string, unknown> = { segment: "A", expectedHash, port, deadlines: [] };
+14 | const consoleErrors: string[] = [];
+15 | 
+16 | function hashTree(dir: string) { const out: Record<string,string> = {}; if (!existsSync(dir)) return out; const walk=(d:string,p:string)=>{for(const n of readdirSync(d).sort()){const f=join(d,n),r=p?`${p}/${n}`:n;if(statSync(f).isDirectory())walk(f,r);else out[r]=createHash("sha256").update(readFileSync(f)).digest("hex")}}; walk(dir,""); return out; }
+17 | function deadline(p: Page, predicate: string, label: string, ms=30000) { (evidence.deadlines as unknown[]).push({label,ms,subscribedBeforeTrigger:true}); return bounded(p.evaluate((expression)=>new Promise<boolean>((resolve,reject)=>{let test:()=>boolean;try{test=()=>Boolean(new Function(`return (${expression})`)()())}catch(error){reject(error);return}if(test()){resolve(true);return}const observer=new MutationObserver(()=>{try{if(test()){observer.disconnect();resolve(true)}}catch(error){observer.disconnect();reject(error)}});observer.observe(document.documentElement,{attributes:true,childList:true,characterData:true,subtree:true})}), predicate), label, ms); }
+18 | async function owner(selector:string){return page!.evaluate((s)=>{const e=document.querySelector<HTMLElement>(s);if(!e)return{selector:s,exists:false};const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,h=document.elementFromPoint(x,y),style=getComputedStyle(e);const roles:Record<string,string>={BUTTON:"button",SUMMARY:"button",INPUT:"textbox",A:"link"};return{selector:s,exists:true,role:e.getAttribute("role")||roles[e.tagName]||"",name:e.getAttribute("aria-label")||e.getAttribute("title")||(e.textContent||"").trim().slice(0,120),rect:{x:r.x,y:r.y,w:r.width,h:r.height},display:style.display,visibility:style.visibility,hidden:e.hidden,disabled:(e as HTMLButtonElement).disabled===true,inViewport:r.width>0&&r.height>0&&x>=0&&x<innerWidth&&y>=0&&y<innerHeight,hit:h===e||Boolean(h&&e.contains(h)),active:document.activeElement===e}},s)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+ReferenceError: s is not defined
+      at owner (/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-a-browser.ts:18:856)
+      at click (/Users/hyunjun/Documents/MUNI/meeting-slides/.omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/tools/segment-a-browser.ts:16:92)
+
+Bun v1.3.14 (macOS arm64)

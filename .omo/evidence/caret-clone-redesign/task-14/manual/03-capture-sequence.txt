@@ -1,0 +1,12 @@
+== 3. deterministic capture sequence against the REAL minibar ==
+starting   -> AX: 360, 56, Meeting Slides 미니바
+capturing  -> AX: 360, 56, Meeting Slides 미니바
+line1      -> AX: 360, 56, Meeting Slides 미니바
+line2      -> AX: 360, 56, Meeting Slides 미니바
+caption    -> AX: 360, 56, Meeting Slides 미니바
+
+-- static text the panel actually publishes (AX tree) --
+●, 녹음 중, 지금 말하는 중…, 03:51
+
+-- buttons (name + enabled) --
+녹음 중지, 미니바 펼치기, true, true

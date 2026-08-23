@@ -1,0 +1,1 @@
+{"driver":"native-surface-driver","results":[{"error":{"detail":"stdin is not {scenarios:[...]}","kind":"malformedBatch"},"name":"<batch>","ok":false}]}

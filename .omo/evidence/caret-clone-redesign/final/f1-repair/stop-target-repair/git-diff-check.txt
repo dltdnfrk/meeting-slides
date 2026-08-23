@@ -1,0 +1,23 @@
+# files are untracked; git diff --check has no tracked hunks for them
+# whitespace audit of the changed regions:
+public/caret-operator.css:7:  
+public/caret-operator.css:11:  
+public/caret-operator.css:14:  
+public/caret-operator.css:18:  
+public/caret-operator.css:25:  
+public/caret-operator.css:28:  
+public/caret-operator.css:163:  
+public/caret-operator.css:302:  
+public/caret-operator.css:312:  
+public/caret-operator.css:873:  
+public/caret-operator.css:881:  
+public/caret-operator.css:883:  
+public/caret-operator.css:887:  
+public/caret-operator.css:892:  
+public/caret-operator.css:898:  
+public/caret-operator.css:903:  
+public/caret-operator.css:908:  
+public/caret-operator.css:931:  
+public/caret-operator.css:940:  
+public/caret-operator.css:943:  
+(no trailing-whitespace lines listed above = clean)

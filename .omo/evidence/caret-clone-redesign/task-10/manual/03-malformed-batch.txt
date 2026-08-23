@@ -1,0 +1,15 @@
+== malformed batch ==
+{"driver":"native-launcher-driver","results":[{"error":{"detail":"stdin is not {scenarios:[...]}","kind":"malformedBatch"},"name":"<batch>","ok":false}]}
+exit=1
+== empty stdin ==
+{"driver":"native-launcher-driver","results":[{"error":{"detail":"stdin is not {scenarios:[...]}","kind":"malformedBatch"},"name":"<batch>","ok":false}]}
+exit=1
+== batch without scenarios key ==
+{"driver":"native-launcher-driver","results":[{"error":{"detail":"stdin is not {scenarios:[...]}","kind":"malformedBatch"},"name":"<batch>","ok":false}]}
+exit=1
+== determinism: 5 identical runs ==
+6af338ca5dfa63aec6c05ffbe1cb4eb9667e8b0ec542d4695cfe25ba1a6a4724  -
+6af338ca5dfa63aec6c05ffbe1cb4eb9667e8b0ec542d4695cfe25ba1a6a4724  -
+6af338ca5dfa63aec6c05ffbe1cb4eb9667e8b0ec542d4695cfe25ba1a6a4724  -
+6af338ca5dfa63aec6c05ffbe1cb4eb9667e8b0ec542d4695cfe25ba1a6a4724  -
+6af338ca5dfa63aec6c05ffbe1cb4eb9667e8b0ec542d4695cfe25ba1a6a4724  -

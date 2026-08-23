@@ -1,0 +1,37 @@
+{
+  "step": "03-live-transcript",
+  "browser": {
+    "capturePhase": "capturing",
+    "shell": "live",
+    "capturing": true,
+    "timer": "02:05",
+    "transcriptLines": 3,
+    "selectedMeetingIds": [],
+    "connection": "connected"
+  },
+  "native": {
+    "status": "live",
+    "capturePhase": "capturing",
+    "timer": "02:05",
+    "glyph": "●",
+    "title": "녹음 중",
+    "lines": [
+      {
+        "text": "첫 번째 문장입니다",
+        "provisional": false
+      },
+      {
+        "text": "두 번째 문장입니다",
+        "provisional": false
+      },
+      {
+        "text": "세 번째 문장입니다",
+        "provisional": false
+      }
+    ],
+    "stopEnabled": true,
+    "connection": "online"
+  },
+  "capturePhaseOwnsTimer": true,
+  "timersAgree": true
+}

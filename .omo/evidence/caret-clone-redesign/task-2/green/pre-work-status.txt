@@ -1,0 +1,225 @@
+# Pre-work git status snapshot - caret-clone-redesign task 2
+# captured_utc: 2026-08-11T06:31:05Z
+# command: git status --porcelain=v1 -uall
+# head: a1ed25f95980980cd958044b90e739ac45e8280d   branch: main
+# NOTE: sibling wave-1 tasks (task-1/3/4/5) write concurrently under
+#       .omo/evidence/caret-clone-redesign/ and tests/; untracked counts there are volatile by design.
+
+ M .env.example
+ M .omo/start-work/ledger.jsonl
+ M DESIGN.md
+ M README.md
+ M public/app.js
+ M public/index.html
+ M public/operator-surface.js
+ M public/workspace-split.js
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-operator-surface.test.ts
+ M tests/public-workspace.test.ts
+?? .omo/drafts/caret-clone-redesign.md
+?? .omo/evidence/caret-clone-redesign/task-1/driver/capture-lib.mjs
+?? .omo/evidence/caret-clone-redesign/task-1/driver/capture-reference.mjs
+?? .omo/evidence/caret-clone-redesign/task-2/boundary-validator.sh
+?? .omo/evidence/caret-clone-redesign/task-2/failure/boundary-failure.log
+?? .omo/evidence/caret-clone-redesign/task-2/green/boundary-happy.log
+?? .omo/evidence/caret-clone-redesign/task-2/green/boundary-receipt.json
+?? .omo/evidence/caret-clone-redesign/task-2/green/pre-work-status.txt
+?? .omo/evidence/caret-clone-redesign/task-3/baseline/00-boundary.txt
+?? .omo/evidence/caret-clone-redesign/task-3/baseline/01-current-spellings.json
+?? .omo/evidence/caret-clone-redesign/task-4/00-baseline-source-hashes.txt
+?? .omo/evidence/caret-clone-redesign/task-4/01-baseline-characterization.txt
+?? .omo/evidence/caret-clone-redesign/task-4/02-red-initial.txt
+?? .omo/evidence/caret-clone-redesign/task-5/baseline/00-boundary.txt
+?? .omo/evidence/caret-clone-redesign/task-5/baseline/01-launcher-build-invariants.txt
+?? .omo/evidence/caret-clone-redesign/task-5/red/01-red-missing-seam.txt
+?? .omo/evidence/live-split-ulw/README.md
+?? .omo/evidence/live-split-ulw/desktop-live.png
+?? .omo/evidence/live-split-ulw/desktop-restored.png
+?? .omo/evidence/live-split-ulw/narrow-live.png
+?? .omo/evidence/style-gallery-baseline/1280.png
+?? .omo/evidence/style-gallery-baseline/375.png
+?? .omo/evidence/style-gallery-baseline/768.png
+?? .omo/evidence/style-gallery-final/1280-capturing.png
+?? .omo/evidence/style-gallery-final/1280.png
+?? .omo/evidence/style-gallery-final/375-capturing.png
+?? .omo/evidence/style-gallery-final/375.png
+?? .omo/evidence/style-gallery-final/768.png
+?? .omo/evidence/style-gallery-panels/attendees-375.png
+?? .omo/evidence/style-gallery-panels/settings-1280.png
+?? .omo/evidence/style-gallery-panels/settings-375.png
+?? .omo/evidence/tiro-operator/operator-1280-idle.png
+?? .omo/evidence/tiro-operator/operator-1280-live.png
+?? .omo/evidence/tiro-operator/operator-375-reduced-live.png
+?? .omo/evidence/tiro-operator/operator-768-settings.png
+?? .omo/evidence/tiro-operator/operator-768.png
+?? .omo/evidence/tiro-reference/login-modal.png
+?? .omo/plans/caret-clone-redesign.md
+?? .omo/plans/tiro-operator-rebuild.md
+?? .omo/ulw-loop/ppt-engine-research-20260809-205918/brief.md
+?? .omo/ulw-loop/ppt-engine-research-20260809-205918/goals.json
+?? .omo/ulw-loop/ppt-engine-research-20260809-205918/ledger.jsonl
+?? .omo/ulw-research/20260809-065345/brief.md
+?? .omo/ulw-research/20260809-065345/candidate-ranking.md
+?? .omo/ulw-research/20260809-065345/claim-graph.json
+?? .omo/ulw-research/20260809-065345/final-report.md
+?? .omo/ulw-research/20260809-065345/integration-surface.md
+?? .omo/ulw-research/20260809-065345/intent-diff.md
+?? .omo/ulw-research/20260809-065345/observation-manifest.md
+?? .omo/ulw-research/20260809-065345/outputs/STT-ASR-Model-Landscape-2026.docx
+?? .omo/ulw-research/20260809-065345/outputs/STT-ASR-Model-Landscape-2026.html
+?? .omo/ulw-research/20260809-065345/outputs/STT-ASR-Model-Landscape-2026.md
+?? .omo/ulw-research/20260809-065345/outputs/STT-ASR-Model-Landscape-2026.pdf
+?? .omo/ulw-research/20260809-065345/outputs/qa/.gitkeep
+?? .omo/ulw-research/20260809-065345/outputs/qa/STT-ASR-Model-Landscape-2026-landscape.html
+?? .omo/ulw-research/20260809-065345/outputs/qa/STT-ASR-Model-Landscape-2026-landscape.pdf
+?? .omo/ulw-research/20260809-065345/outputs/qa/STT-ASR-Model-Landscape-2026.pdf
+?? .omo/ulw-research/20260809-065345/outputs/qa/compact-page-03.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/compact-page-04.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/final-page-03.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/final-page-04.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/final-page-05.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/html-page-03.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/html-page-04.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/landscape-page-03.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/landscape-page-04.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-01.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-02.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-03.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-04.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-05.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-06.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-07.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-08.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-09.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-10.png
+?? .omo/ulw-research/20260809-065345/outputs/qa/page-11.png
+?? .omo/ulw-research/20260809-065345/outputs/report.css
+?? .omo/ulw-research/20260809-065345/sources-ledger.md
+?? .omo/ulw-research/20260809-065345/team-state.json
+?? .omo/ulw-research/20260809-065345/traceability-matrix.md
+?? .omo/ulw-research/20260809-065345/wave-0-scope-xai-google.md
+?? .omo/ulw-research/20260809-065345/wave-1-major-labs.md
+?? .omo/ulw-research/20260809-065345/wave-2-independent-multimodal.md
+?? .omo/ulw-research/20260809-065345/wave-3-vendor-and-korean-gaps.md
+?? .omo/ulw-research/20260809-065345/wave-4-apple-silicon-runtime.md
+?? .omo/ulw-research/20260809-205918/SYNTHESIS.md
+?? .omo/ulw-research/20260809-205918/brief.md
+?? .omo/ulw-research/20260809-205918/cause-disappearance.md
+?? .omo/ulw-research/20260809-205918/claim-graph.md
+?? .omo/ulw-research/20260809-205918/debate-log.md
+?? .omo/ulw-research/20260809-205918/design-spec.md
+?? .omo/ulw-research/20260809-205918/excursion-log.md
+?? .omo/ulw-research/20260809-205918/executive-deck/.slides-grab/design-gate-report.md
+?? .omo/ulw-research/20260809-205918/executive-deck/.slides-grab/design-gate.json
+?? .omo/ulw-research/20260809-205918/executive-deck/contact-sheet-720.png
+?? .omo/ulw-research/20260809-205918/executive-deck/contact-sheet-final.png
+?? .omo/ulw-research/20260809-205918/executive-deck/contact-sheet.png
+?? .omo/ulw-research/20260809-205918/executive-deck/deck.css
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-01.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-02.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-03.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-04.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-05.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-06.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-07.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-08.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-09.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-10.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-11.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-1080/slide-12.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-01.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-02.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-03.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-04.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-05.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-06.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-07.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-08.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-09.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-10.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-11.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-720/slide-12.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-01.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-02.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-03.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-04.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-05.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-06.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-07.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-08.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-09.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-10.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-11.png
+?? .omo/ulw-research/20260809-205918/executive-deck/preview-png/slide-12.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-01.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-02.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-03.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-04.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-05.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-06.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-07.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-08.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-09.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-10.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-11.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/gate-preview/slide-12.png
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/pass-a-visual.md
+?? .omo/ulw-research/20260809-205918/executive-deck/qa/pass-b-content.md
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-01.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-02.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-03.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-04.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-05.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-06.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-07.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-08.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-09.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-10.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-11.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-12.html
+?? .omo/ulw-research/20260809-205918/executive-deck/slide-outline.md
+?? .omo/ulw-research/20260809-205918/expansion-log.md
+?? .omo/ulw-research/20260809-205918/intent-diff.md
+?? .omo/ulw-research/20260809-205918/journal.md
+?? .omo/ulw-research/20260809-205918/observation-manifest.md
+?? .omo/ulw-research/20260809-205918/outputs/evaluation-economics-scorecard.md
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-01.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-02.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-03.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-04.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-05.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-06.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-07.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-08.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-09.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-10.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-11.png
+?? .omo/ulw-research/20260809-205918/outputs/executive-deck-png/slide-12.png
+?? .omo/ulw-research/20260809-205918/outputs/ppt-engine-executive-deck.experimental.pptx
+?? .omo/ulw-research/20260809-205918/outputs/ppt-engine-executive-deck.pdf
+?? .omo/ulw-research/20260809-205918/outputs/ppt-engine-strategy.docx
+?? .omo/ulw-research/20260809-205918/outputs/ppt-engine-strategy.html
+?? .omo/ulw-research/20260809-205918/outputs/ppt-engine-strategy.pdf
+?? .omo/ulw-research/20260809-205918/report.css
+?? .omo/ulw-research/20260809-205918/sources-ledger.md
+?? .omo/ulw-research/20260809-205918/verification-economics.md
+?? .omo/ulw-research/20260809-205918/wave-1-distill.md
+?? HANDOFF.md
+?? macos/NativeSurfaceContract.swift
+?? models/stt/nemotron-3.5-asr-streaming-0.6b-Q8_0.gguf
+?? public/caret-shell.css
+?? tests/fixtures/caret-ui-states.ts
+?? tests/fixtures/native-surface-driver.swift
+?? tests/fixtures/public-dom-contract.json
+?? tests/fixtures/public-protocol-contract.json
+?? tests/native-surface-contract.test.ts
+?? tests/public-caret-harness.test.ts
+?? tests/public-harness-baseline.test.ts

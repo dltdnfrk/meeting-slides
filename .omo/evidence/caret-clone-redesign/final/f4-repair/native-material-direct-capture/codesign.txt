@@ -1,0 +1,4 @@
+$ codesign --verify --deep --strict --verbose=2 "$APP"
+/Users/hyunjun/Applications/Meeting Slides.app: valid on disk
+/Users/hyunjun/Applications/Meeting Slides.app: satisfies its Designated Requirement
+exit=0

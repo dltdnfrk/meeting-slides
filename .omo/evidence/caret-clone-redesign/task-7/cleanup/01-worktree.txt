@@ -1,0 +1,60 @@
+== worktree status at task end
+ M .env.example
+ M .omo/start-work/ledger.jsonl
+ M DESIGN.md
+ M README.md
+ M macos/launcher.swift
+ M public/app.js
+ M public/index.html
+ M public/operator-surface.js
+ M public/workspace-split.js
+ M scripts/build-app.sh
+ M server.ts
+ M src/app-settings.ts
+ M src/config.ts
+ M src/llm.ts
+ M src/minutes.ts
+ M src/provider-adapters.ts
+ M src/providers.ts
+ M tests/app-settings.test.ts
+ M tests/providers.test.ts
+ M tests/public-operator-surface.test.ts
+ M tests/public-test-harness.ts
+ M tests/public-workspace.test.ts
+?? .omo/drafts/
+?? .omo/evidence/caret-clone-redesign/
+?? .omo/evidence/live-split-ulw/
+?? .omo/evidence/style-gallery-baseline/
+?? .omo/evidence/style-gallery-final/
+?? .omo/evidence/style-gallery-panels/
+?? .omo/evidence/tiro-operator/
+?? .omo/evidence/tiro-reference/
+?? .omo/plans/caret-clone-redesign.md
+?? .omo/plans/tiro-operator-rebuild.md
+?? .omo/ulw-loop/
+?? .omo/ulw-research/
+?? HANDOFF.md
+?? macos/AppLifecycle.swift
+?? macos/NativeSurfaceContract.swift
+?? macos/TransportClient.swift
+?? models/
+?? public/caret-shell.css
+?? public/transcript-state.ts
+?? public/ui-state-machine.ts
+?? tests/fixtures/
+?? tests/helpers/
+?? tests/native-launcher-boundary.test.ts
+?? tests/native-surface-contract.test.ts
+?? tests/public-caret-harness.test.ts
+?? tests/public-dom-protocol-contract.test.ts
+?? tests/public-harness-baseline.test.ts
+?? tests/transcript-state.test.ts
+?? tests/ui-state-machine.test.ts
+
+== git diff --check
+exit=0
+
+== protected source hashes (unchanged since baseline)
+6a9942ec1ba1e32bd52fd04ae4392afea8e39acd83940c6d698ba925266dc5ad  public/app.js
+710be07ffefa67fa9054c7aba98f4c95319183cd4e390bc52acdae76d2b5e99e  src/session.ts
+2c999d76e5e5ae309f563252e64e4921e65a0749530e472c71fa9e82d5642bd7  tests/fixtures/public-protocol-contract.json

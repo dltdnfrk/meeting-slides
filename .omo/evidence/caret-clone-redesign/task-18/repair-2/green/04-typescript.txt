@@ -1,0 +1,4 @@
+$ bunx tsc --noEmit
+PROJECT_EXIT=0
+$ bunx tsc --noEmit --strict
+STRICT_EXIT=0

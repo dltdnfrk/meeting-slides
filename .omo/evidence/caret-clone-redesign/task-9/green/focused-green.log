@@ -1,0 +1,37 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-foundation.test.ts:
+(pass) bundled font assets are local, deterministic and license-audited > every declared asset exists with the exact recorded size and SHA-256 [1.63ms]
+(pass) bundled font assets are local, deterministic and license-audited > every shipped font file is covered by the manifest - no stray asset [0.20ms]
+(pass) bundled font assets are local, deterministic and license-audited > every asset carries an OFL receipt whose license file is present and hashed [0.29ms]
+(pass) bundled font assets are local, deterministic and license-audited > the foundation stylesheet declares only same-origin font sources [0.28ms]
+(pass) bundled font assets are local, deterministic and license-audited > the shipped document never links a remote font stylesheet [0.13ms]
+(pass) the token layer resolves deterministically in a real browser > document.fonts.ready settles with every bundled family resolved from disk [0.05ms]
+(pass) the token layer resolves deterministically in a real browser > zero external requests reach the network [0.02ms]
+(pass) the token layer resolves deterministically in a real browser > computed families come from the bundled stacks with system fallbacks retained [0.05ms]
+(pass) the token layer resolves deterministically in a real browser > every required semantic token is declared with a resolved value [0.04ms]
+(pass) the token layer resolves deterministically in a real browser > the spacing scale is a strict 4px grid and the type scale is monotonic [0.04ms]
+(pass) the token layer resolves deterministically in a real browser > the canvas is an opaque matte near-black, never a translucent glass pane [0.13ms]
+(pass) the token layer resolves deterministically in a real browser > main surfaces carry no backdrop blur; blur is reserved for overlays [0.02ms]
+(pass) the token layer resolves deterministically in a real browser > the accent is a restrained emerald and recording state is a distinct coral [0.04ms]
+(pass) declared roles satisfy WCAG contrast > body and muted text clear AA on the canvas and on the document surface [0.06ms]
+(pass) declared roles satisfy WCAG contrast > faint text is only used at large sizes and still clears the 3:1 large-text floor [0.01ms]
+(pass) declared roles satisfy WCAG contrast > accent and record text roles clear AA where they carry meaning [0.03ms]
+(pass) declared roles satisfy WCAG contrast > strong rules and the focus ring clear the 3:1 non-text boundary floor [0.13ms]
+(pass) declared roles satisfy WCAG contrast > a focused control paints a visible ring rather than removing the outline
+(pass) motion is bounded and reduced motion is complete > the motion budget stays within the reference envelope [0.06ms]
+(pass) motion is bounded and reduced motion is complete > under prefers-reduced-motion every token-driven duration collapses to zero [91.10ms]
+(pass) the foundation holds at every canonical viewport > reference 1440x900: fonts ready, tokens stable, no root overflow [89.13ms]
+(pass) the foundation holds at every canonical viewport > library 1244x836: fonts ready, tokens stable, no root overflow
+(pass) the foundation holds at every canonical viewport > live 960x760: fonts ready, tokens stable, no root overflow [121.63ms]
+(pass) the foundation holds at every canonical viewport > stacked 820x900: fonts ready, tokens stable, no root overflow [90.78ms]
+(pass) the foundation holds at every canonical viewport > narrow 375x812: fonts ready, tokens stable, no root overflow [76.52ms]
+(pass) the foundation holds at every canonical viewport > compact 320x667: fonts ready, tokens stable, no root overflow [81.89ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > index.html still declares every unique binding id exactly once [1.85ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > the foundation stylesheet declares tokens and never rewrites shell structure [0.20ms]
+(pass) the foundation preserves the task-3 DOM and protocol contract > generated-slide renderer colors are not touched by the foundation [0.15ms]
+
+ 29 pass
+ 0 fail
+ 337 expect() calls
+Ran 29 tests across 1 file. [1170.00ms]

@@ -1,0 +1,11 @@
+# GREEN: active contract validator, single run
+$ node .omo/evidence/caret-clone-redesign/task-6/check-design-contract.mjs
+{
+  "design": "/Users/hyunjun/Documents/MUNI/meeting-slides/DESIGN.md",
+  "designSha256": "7894baee3778bd209026324c117c260076a774074c514c149fbd5cb1483b3484",
+  "checks": 115,
+  "passed": 115,
+  "failed": 0,
+  "failures": []
+}
+exit=0

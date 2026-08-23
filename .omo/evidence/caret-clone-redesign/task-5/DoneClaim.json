@@ -1,0 +1,93 @@
+{
+  "taskId": "st_019fef7f",
+  "plan": "caret-clone-redesign",
+  "checkbox": "5",
+  "title": "Establish native compiler and geometry test seam",
+  "status": "done",
+  "verifiedBy": "senpi-task-st_019fef7f",
+  "worktree": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "baselineHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "committed": false,
+  "commitAuthorized": false,
+
+  "deliverables": {
+    "macos/NativeSurfaceContract.swift": "d750cd83253b2e6b46dc6a8172769f2b5f3d5c6c0c298da83965f2228df76721",
+    "tests/fixtures/native-surface-driver.swift": "9f472a6165a9977859c3ba6a5616c34fdd25100a36d73b9d19f0327e1bca0f97",
+    "tests/native-surface-contract.test.ts": "0729e4a228098050592b02719d17361ca3a24b40e2d8e8029f288944e4a01f45",
+    "evidence": ".omo/evidence/caret-clone-redesign/task-5/"
+  },
+
+  "acceptanceCriteria": [
+    { "criterion": "swiftc compiles the pure module and fixture driver", "result": "pass", "evidence": "green/02-swiftc-typecheck.txt, manual/00-build.txt (compile_exit=0)" },
+    { "criterion": "360x56 collapsed bounds", "result": "pass", "evidence": "green/07-green-final.txt; manual/01-happy-stdout.json {height:56,width:360}" },
+    { "criterion": "560x220 expanded bounds", "result": "pass", "evidence": "green/07-green-final.txt; manual/01-happy-stdout.json {height:220,width:560}" },
+    { "criterion": "16px display gutters", "result": "pass", "evidence": "default frame x=1352,y=1045 on 1728x1117 -> 16px from right and bottom; mutation 16->12 goes RED (red/02)" },
+    { "criterion": "invalid off-display frame fallback", "result": "pass", "evidence": "manual/03-bad-bounds-stdout.json off-display-saved -> usedSavedFrame:false, default frame" },
+    { "criterion": "capture payload decode", "result": "pass", "evidence": "capture/status/phase-less/ignored subset all asserted; manual/01, manual/02" },
+    { "criterion": "duplicate Stop suppression", "result": "pass", "evidence": "5 activations -> emitted:1 (manual/01); mutation removing the guard goes RED (red/04)" },
+    { "criterion": "malformed payload yields typed failure without crash", "result": "pass", "evidence": "manual/02-bad-json-stdout.json: 5x malformedPayload + unknownPhase, exit 0, stderr empty" },
+    { "criterion": "impossible display bounds yield typed failure without crash", "result": "pass", "evidence": "manual/03-bad-bounds-stdout.json: invalidDisplayBounds x3, noActiveDisplay, exit 0, stderr empty" },
+    { "criterion": "no AppKit window creation in the pure module", "result": "pass", "evidence": "module imports Foundation only; test asserts no AppKit/SwiftUI/WebKit/Cocoa import and no NSPanel/NSWindow/NSStatusItem/NSApplication symbol" },
+    { "criterion": "no GUI requirement for focused tests", "result": "pass", "evidence": "driver is a headless stdin/stdout process; suite ran in a non-GUI shell session" },
+    { "criterion": "launcher/build invariants characterized", "result": "pass", "evidence": "baseline/01-launcher-build-invariants.txt; 4 invariant tests passed already at RED, proving they characterize the baseline rather than new behavior" }
+  ],
+
+  "qaScenarios": {
+    "happy": "bun test tests/native-surface-contract.test.ts -> 31 pass / 0 fail, exit 0; swiftc invoked once in beforeAll, driver invoked once (green/07-green-final.txt)",
+    "failure": "saved frame with 49% display intersection returns the deterministic default frame, identical to the no-saved-frame default (green test 'a saved frame with less than 50% display intersection returns the default frame'; threshold mutation proof in red/03)"
+  },
+
+  "redProof": {
+    "missingSeam": "red/01-red-missing-seam.txt -> 27 fail / 4 pass, exit 1. The 4 passes are baseline launcher/build invariants.",
+    "mutations": [
+      "red/02-mutation-gutter.txt: displayGutter 16->12 -> 2 targeted failures",
+      "red/03-mutation-visibility.txt: minimumVisibleFraction 0.5->0.1 -> 1 targeted failure",
+      "red/04-mutation-stop-guard.txt: duplicate-Stop suppression removed -> 2 targeted failures",
+      "red/05-mutation-unknown-phase.txt: unknown phase coerced to idle -> 1 targeted failure"
+    ],
+    "restoration": "module restored from a byte-identical backup after every mutation (hash equality verified in-run)"
+  },
+
+  "verification": {
+    "focused": "bun test tests/native-surface-contract.test.ts -> 31 pass / 0 fail (run 4x, always identical)",
+    "swift": "swiftc -typecheck module+driver exit 0; swiftc -O compile exit 0; macos/launcher.swift typechecks clean",
+    "types": "tsc --strict on the new test -> exit 0; LSP diagnostics clean (one real type error found and fixed, not suppressed)",
+    "whitespace": "git diff --check -> exit 0",
+    "full": "bun test -> 370 pass / 36 fail; seam suite 31/31 pass inside that run",
+    "fullFailureAttribution": "PRE-EXISTING / sibling-owned. This task created 3 files and modified zero existing files. tests/public-shell.test.ts fails identically with the seam test file removed (green/05-failure-attribution.txt). Failures are Puppeteer browser suites belonging to concurrently running Wave-1 sibling tasks.",
+    "manual": "Real Swift fixture driver compiled and executed by hand with happy, bad-JSON, bad-bounds, malformed-batch and empty-stdin inputs; stdout/exit/stderr captured under manual/"
+  },
+
+  "adversarialProbes": {
+    "malformed_input": "typed failures for truncated JSON, HTML body, bare null, bare array, wrong field type, unknown phase, non-JSON stdin batch; clean stderr, no crash",
+    "stale_state": "stopping and switching-model snapshots never rearm the Stop guard; only an authoritative non-stopping snapshot does",
+    "dirty_worktree": "19 pre-existing dirty paths hashed pre-work and re-verified byte-identical (changed_count=0); no staging/reset/restore/commit",
+    "generated_artifacts": "suite builds into mkdtemp and removes it in afterAll; manual binary deleted; repo-wide search finds no stray binary",
+    "misleading_success_output": "driver exits 1 on malformed batch instead of faking success; suite asserts empty stderr and exit 0; four mutations prove assertions bind real behavior",
+    "repeated_interruptions": "5 sequential runs identical SHA-256; SIGINT mid-run exits 130 with no partial stdout",
+    "flaky_tests": "no sleep/poll/timing dependency; compile+run once in beforeAll; all assertions read a pure in-memory parse",
+    "long_commands": "full bun test (624s) captured to file; macOS lacks timeout(1) so the tool-level timeout was used",
+    "prompt_injection": "N/A - no untrusted external content is read; all driver input is literal, authored in this task"
+  },
+
+  "scope": {
+    "written": [
+      "macos/NativeSurfaceContract.swift (new)",
+      "tests/fixtures/native-surface-driver.swift (new)",
+      "tests/native-surface-contract.test.ts (new)",
+      ".omo/evidence/caret-clone-redesign/task-5/** (new)"
+    ],
+    "deliberatelyExcluded": [
+      "scripts/build-app.sh - packaging the new module belongs to Todo 17; a test asserts it is NOT wired yet",
+      "macos/launcher.swift - the lifecycle split is Todo 10; this task only characterizes its current invariants",
+      "AppKit panel/status item - Todo 14",
+      "all pre-existing dirty provider/Alibaba/model/handoff work - untouched, hashes verified"
+    ]
+  },
+
+  "cleanup": {
+    "temporaryBinaries": "removed (manual/07-cleanup.txt)",
+    "strayArtifacts": "none in repo or TMPDIR",
+    "mutationProbes": "all reverted; module hash matches backup"
+  }
+}

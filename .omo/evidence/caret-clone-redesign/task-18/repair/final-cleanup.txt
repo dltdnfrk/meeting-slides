@@ -1,0 +1,11 @@
+# final cleanup
+2026-08-11T19:36:17Z
+## task temp paths
+## task ports
+OK port 8787 free
+OK port 8789 free
+## product hashes unchanged
+a410a85a695e2cc25ca8a8e00d602542485f82d0e635fad917e4511f5b78b4b7  public/style.css
+20dab12a9dbcb22b724ba2da3607d48e2d211a59c580771397536ee5ce322918  public/caret-operator.css
+## test hash
+7065f4d2231c8fd928e5acca92a59ddc17dc58a28ccf3a138b2d5bbc77db237c  tests/public-active-shell.test.ts

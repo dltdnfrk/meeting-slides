@@ -1,0 +1,631 @@
+{
+  "stateId": "library-375x812",
+  "url": "http://127.0.0.1:51122",
+  "viewport": {
+    "name": "375x812",
+    "width": 375,
+    "height": 812
+  },
+  "capturedAt": "2026-08-11T06:42:41.183Z",
+  "deterministic": {
+    "locale": "ko-KR",
+    "timezone": "Asia/Seoul",
+    "deviceScaleFactor": 1,
+    "colorScheme": "dark",
+    "reducedMotion": "reduce",
+    "fixedNow": 1754899200000,
+    "captureStartedAt": 1754898446000
+  },
+  "shell": "library",
+  "fixture": "3 meetings, idle capture",
+  "surfaceVisibility": {
+    "sessionRail": {
+      "width": 0,
+      "height": 0,
+      "display": "none",
+      "visibility": "visible",
+      "perceivable": false
+    },
+    "stagePane": {
+      "width": 355,
+      "height": 270.89,
+      "display": "flex",
+      "visibility": "visible",
+      "perceivable": true
+    },
+    "transcriptPane": {
+      "width": 355,
+      "height": 245.09,
+      "display": "flex",
+      "visibility": "visible",
+      "perceivable": true
+    },
+    "dock": {
+      "width": 375,
+      "height": 220,
+      "display": "flex",
+      "visibility": "visible",
+      "perceivable": true
+    },
+    "transcriptLineCount": 0,
+    "meetingRowCount": 3,
+    "recordButtonLabel": "녹음 시작"
+  },
+  "record": {
+    "root": {
+      "selector": ":root",
+      "typography": {
+        "fontFamily": "\"Apple SD Gothic Neo\"",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(255, 255, 255)",
+        "backgroundColor": "rgb(12, 12, 14)",
+        "borderTopColor": "rgb(255, 255, 255)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "none",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 812
+      }
+    },
+    "body": {
+      "selector": "body",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "rgb(12, 12, 14)",
+        "borderTopColor": "rgb(244, 244, 245)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "none",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 812
+      }
+    },
+    "app": {
+      "selector": ".app",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "rgb(244, 244, 245)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "none",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 812
+      }
+    },
+    "topbar": {
+      "selector": ".topbar",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "color(srgb 0.0784314 0.0784314 0.0862745 / 0.92)",
+        "borderTopColor": "rgba(255, 255, 255, 0.08)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "16px",
+        "borderTopRightRadius": "16px",
+        "borderBottomLeftRadius": "16px",
+        "borderBottomRightRadius": "16px"
+      },
+      "material": {
+        "backdropFilter": "blur(22px) saturate(1.1)",
+        "boxShadow": "rgba(0, 0, 0, 0.35) 0px 18px 48px 0px",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 10,
+        "y": 8,
+        "width": 355,
+        "height": 48
+      }
+    },
+    "workspace": {
+      "selector": ".workspace",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "rgb(244, 244, 245)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "none",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 56,
+        "width": 375,
+        "height": 536
+      }
+    },
+    "sessionRail": {
+      "selector": ".session-rail",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "color(srgb 0.0784314 0.0784314 0.0862745 / 0.92)",
+        "borderTopColor": "rgba(255, 255, 255, 0.08)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "18px",
+        "borderTopRightRadius": "18px",
+        "borderBottomLeftRadius": "18px",
+        "borderBottomRightRadius": "18px"
+      },
+      "material": {
+        "backdropFilter": "blur(22px) saturate(1.1)",
+        "boxShadow": "rgba(0, 0, 0, 0.35) 0px 18px 48px 0px",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      }
+    },
+    "stagePane": {
+      "selector": "#stage-pane",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "color(srgb 0.0784314 0.0784314 0.0862745 / 0.92)",
+        "borderTopColor": "rgba(255, 255, 255, 0.08)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "16px",
+        "borderTopRightRadius": "16px",
+        "borderBottomLeftRadius": "16px",
+        "borderBottomRightRadius": "16px"
+      },
+      "material": {
+        "backdropFilter": "blur(22px) saturate(1.1)",
+        "boxShadow": "rgba(0, 0, 0, 0.35) 0px 18px 48px 0px",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 10,
+        "y": 64,
+        "width": 355,
+        "height": 270.89
+      }
+    },
+    "currentSlide": {
+      "selector": "#current-slide",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "color(srgb 0.0470588 0.0470588 0.054902 / 0.58)",
+        "borderTopColor": "rgba(255, 255, 255, 0.12)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "14px",
+        "borderTopRightRadius": "14px",
+        "borderBottomLeftRadius": "14px",
+        "borderBottomRightRadius": "14px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "rgba(255, 255, 255, 0.09) 0px 1px 0px 0px inset, color(srgb 0.0470588 0.0470588 0.054902 / 0.55) 0px -48px 80px 0px inset",
+        "backgroundImage": "radial-gradient(circle at 50% 34%, rgba(232, 93, 76, 0.14), rgba(0, 0, 0, 0) 20%), linear-gradient(rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0) 42%), none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 31,
+        "y": 302.16,
+        "width": 313,
+        "height": 18
+      }
+    },
+    "transcriptPane": {
+      "selector": "#transcript-pane",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "color(srgb 0.0784314 0.0784314 0.0862745 / 0.92)",
+        "borderTopColor": "rgba(255, 255, 255, 0.08)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "16px",
+        "borderTopRightRadius": "16px",
+        "borderBottomLeftRadius": "16px",
+        "borderBottomRightRadius": "16px"
+      },
+      "material": {
+        "backdropFilter": "blur(22px) saturate(1.1)",
+        "boxShadow": "rgba(0, 0, 0, 0.35) 0px 18px 48px 0px",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 10,
+        "y": 342.89,
+        "width": 355,
+        "height": 245.09
+      }
+    },
+    "transcriptStream": {
+      "selector": "#transcript-stream",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderTopColor": "rgba(255, 255, 255, 0.07)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "0px",
+        "borderTopRightRadius": "0px",
+        "borderBottomLeftRadius": "0px",
+        "borderBottomRightRadius": "0px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      }
+    },
+    "recordButton": {
+      "selector": "#btn-record",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "13px",
+        "fontWeight": "600",
+        "lineHeight": "normal",
+        "letterSpacing": "-0.13px",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(12, 12, 14)",
+        "backgroundColor": "rgb(232, 93, 76)",
+        "borderTopColor": "rgba(0, 0, 0, 0)",
+        "borderTopWidth": "0px",
+        "borderTopStyle": "none",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "999px",
+        "borderTopRightRadius": "999px",
+        "borderBottomLeftRadius": "999px",
+        "borderBottomRightRadius": "999px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "rgba(255, 255, 255, 0.22) 0px 1px 0px 0px inset, rgba(232, 93, 76, 0.14) 0px 8px 22px 0px",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "none",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 128.5,
+        "y": 607,
+        "width": 118,
+        "height": 40
+      }
+    },
+    "dock": {
+      "selector": ".dock",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "color(srgb 0.0784314 0.0784314 0.0862745 / 0.92)",
+        "borderTopColor": "rgba(255, 255, 255, 0.08)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "999px",
+        "borderTopRightRadius": "999px",
+        "borderBottomLeftRadius": "999px",
+        "borderBottomRightRadius": "999px"
+      },
+      "material": {
+        "backdropFilter": "blur(22px) saturate(1.1)",
+        "boxShadow": "rgba(0, 0, 0, 0.35) 0px 18px 48px 0px",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 0,
+        "y": 592,
+        "width": 375,
+        "height": 220
+      }
+    },
+    "detailTabs": {
+      "selector": ".detail-tabs",
+      "typography": {
+        "fontFamily": "Inter, \"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", \"Apple SD Gothic Neo\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "letterSpacing": "normal",
+        "textTransform": "none"
+      },
+      "color": {
+        "color": "rgb(244, 244, 245)",
+        "backgroundColor": "rgba(255, 255, 255, 0.04)",
+        "borderTopColor": "rgba(255, 255, 255, 0.08)",
+        "borderTopWidth": "1px",
+        "borderTopStyle": "solid",
+        "opacity": "1"
+      },
+      "radius": {
+        "borderTopLeftRadius": "999px",
+        "borderTopRightRadius": "999px",
+        "borderBottomLeftRadius": "999px",
+        "borderBottomRightRadius": "999px"
+      },
+      "material": {
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "backgroundImage": "none",
+        "mixBlendMode": "normal"
+      },
+      "motion": {
+        "transitionProperty": "all",
+        "transitionDuration": "1e-05s",
+        "transitionTimingFunction": "ease",
+        "animationName": "none",
+        "animationDuration": "0s"
+      },
+      "geometry": {
+        "x": 33,
+        "y": 151,
+        "width": 261.38,
+        "height": 38
+      }
+    }
+  },
+  "missing": [],
+  "documentScrollWidth": 375,
+  "documentClientWidth": 375
+}

@@ -1,0 +1,13 @@
+{
+  "task": "F3 manual QA rerun",
+  "verdict": "REJECT",
+  "complete": false,
+  "decisiveRuns": 1,
+  "classification": "hidden-non-owner-with-visible-accessible-owner",
+  "failedSelector": "#thumbnails .thumbnail",
+  "visibleOwner": "#current-slide .slide__notice",
+  "productDefect": false,
+  "productEdits": false,
+  "cleanupVerified": true,
+  "report": "REPORT.md"
+}

@@ -1,0 +1,80 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/ui-state-machine.test.ts:
+(pass) current public/app.js visible state seams > capture visibility is a bare mutable boolean, not a named state [0.13ms]
+(pass) current public/app.js visible state seams > hydration, selection, preview and job seams are separate mutable flags [0.08ms]
+(pass) current public/app.js visible state seams > connection is projected onto a data attribute with four literal values [0.08ms]
+(pass) current public/app.js visible state seams > stale job and stale meeting responses are dropped inline, per call site [0.05ms]
+(pass) current public/app.js visible state seams > malformed frames are swallowed by a catch that only logs [0.03ms]
+(pass) reducer purity > uses no DOM, clock, network, storage or global ambient value [0.10ms]
+(pass) reducer purity > declares no `any` and no unsafe cast [0.26ms]
+(pass) reducer purity > does not mutate the state it is given [0.18ms]
+(pass) reducer purity > initial state is startup and is a fresh value each call [0.02ms]
+(pass) parse boundary > accepts every server message type the protocol declares [0.46ms]
+(pass) parse boundary > rejects null as a typed failure [0.02ms]
+(pass) parse boundary > rejects undefined as a typed failure
+(pass) parse boundary > rejects string as a typed failure
+(pass) parse boundary > rejects number as a typed failure
+(pass) parse boundary > rejects array as a typed failure
+(pass) parse boundary > rejects missing type as a typed failure
+(pass) parse boundary > rejects numeric type as a typed failure
+(pass) parse boundary > rejects unknown type as a typed failure
+(pass) parse boundary > rejects capture without capturing as a typed failure
+(pass) parse boundary > rejects capture with non-boolean capturing as a typed failure
+(pass) parse boundary > rejects capture with unknown phase as a typed failure
+(pass) parse boundary > rejects meeting without meetingId as a typed failure
+(pass) parse boundary > rejects meetings without items as a typed failure
+(pass) parse boundary > rejects compile without status as a typed failure
+(pass) parse boundary > rejects compile with unknown status as a typed failure
+(pass) parse boundary > a rejected frame never reaches the reducer and never changes state [0.04ms]
+(pass) canonical states > every state in the contract is reachable from startup [0.23ms]
+(pass) canonical states > state name is always consistent with the capture and shell projection [0.08ms]
+(pass) canonical states > reduce is exhaustive: every event kind is handled from every state [0.33ms]
+(pass) capture lifecycle > happy path: activate → starting → live → stop → stopping → idle [0.05ms]
+(pass) capture lifecycle > start emits exactly one startCapture no matter how often it is activated [0.03ms]
+(pass) capture lifecycle > stop emits exactly one stopCapture from every server-confirmed capture substate [0.07ms]
+(pass) capture lifecycle > a start the server has not confirmed can neither restart nor stop [0.03ms]
+(pass) capture lifecycle > startCapture carries the wire spelling meeting_id and nothing else [0.01ms]
+(pass) capture lifecycle > startCapture omits meeting_id when no meeting is prepared [0.01ms]
+(pass) capture lifecycle > stopCapture carries no payload
+(pass) capture lifecycle > Stop stays truthful: a stop request alone never claims capture ended [0.02ms]
+(pass) capture lifecycle > start failure moves to capture-error and clears the pending request [0.01ms]
+(pass) capture lifecycle > a stale capture error is cleared by the next authoritative capture snapshot [0.03ms]
+(pass) capture lifecycle > capture-error is also clearable by an explicit dismissal [0.01ms]
+(pass) capture lifecycle > activating capture from capture-error retries once and clears the error [0.02ms]
+(pass) capture lifecycle > phase-less capture messages map compatibly [0.02ms]
+(pass) capture lifecycle > capture timer origin comes only from the server startedAt payload
+(pass) capture lifecycle > switching-model is a capture phase, not a hidden idle [0.02ms]
+(pass) connection and restore > startup hydrates only after the first authoritative capture snapshot [0.02ms]
+(pass) connection and restore > pre-hydration slide and transcript frames are ignored
+(pass) connection and restore > transport loss during capture enters reconnect and preserves capture [0.01ms]
+(pass) connection and restore > reconnect restores the exact capture substate the server reports [0.02ms]
+(pass) connection and restore > reconnect that returns an idle server is honoured, not overridden by the old capture [0.01ms]
+(pass) connection and restore > reconnect during a pending stop keeps the stop pending and re-sends it once [0.02ms]
+(pass) connection and restore > reconnect from every capture substate is deterministic [0.04ms]
+(pass) connection and restore > capture activation is refused while the transport is not online [0.03ms]
+(pass) connection and restore > transport error surfaces a typed error without inventing an idle capture [0.01ms]
+(pass) connection and restore > no state below `online` is ever named as a settled surface [0.03ms]
+(pass) connection and restore > an authoritative snapshot after a transport error restores the online surface [0.01ms]
+(pass) connection and restore > a transport error is cleared once the socket is online again [0.01ms]
+(pass) meeting selection and preview > selecting a meeting enters meeting-switching and emits selectMeeting
+(pass) meeting selection and preview > the matching detail resolves the switch, an out-of-order one does not [0.02ms]
+(pass) meeting selection and preview > rapid selection keeps only the newest request and one action per selection [0.08ms]
+(pass) meeting selection and preview > re-selecting the meeting already in flight does not re-emit [0.01ms]
+(pass) meeting selection and preview > returning to the library clears the selection [0.02ms]
+(pass) meeting selection and preview > history preview suspends live follow and exits back to the live state [0.02ms]
+(pass) meeting selection and preview > preview survives live slide traffic and ends on authoritative idle [0.02ms]
+(pass) meeting selection and preview > idle-live is the just-ended meeting shell, distinct from the library [0.01ms]
+(pass) compile jobs > started → progress → success walks compile-running to compile-complete [0.03ms]
+(pass) compile jobs > a compile answer for a superseded job is ignored [0.02ms]
+(pass) compile jobs > compile failure records a typed error and releases the job [0.02ms]
+(pass) compile jobs > compile never blocks Stop [0.01ms]
+(pass) compile jobs > a compile job started before a reconnect is dropped, not left spinning [0.01ms]
+(pass) determinism > the same sequence yields byte-identical state five times [0.11ms]
+(pass) determinism > the visited state names are stable [0.03ms]
+(pass) determinism > reduceAll equals a manual fold [0.03ms]
+
+ 72 pass
+ 0 fail
+ 686 expect() calls
+Ran 72 tests across 1 file. [38.00ms]

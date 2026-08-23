@@ -1,0 +1,23 @@
+== REAL NATIVE MINIBAR QA (temp app bundle, deterministic fixture on 8899) ==
+app: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-tempapp.7r4mwW/Meeting Slides.app
+fixture startedAt: 1786439777000 (65s in the past at launch)
+
+-- 1. collapsed bounds + AX (saved frame cleared, deterministic default) --
+1136, 856, 360, 56, Meeting Slides 미니바, AXSystemDialog, AXWindow
+
+-- active display visible frame (for the 16px gutter check) --
+0, -124, 6432, 1796
+          Resolution: 3024 x 1964 Retina
+          Main Display: Yes
+          Resolution: 3840 x 2160 (2160p/4K UHD 1 - Ultra High Definition)
+          Resolution: 2160 x 3840
+          Resolution: 3840 x 2160 (2160p/4K UHD 1 - Ultra High Definition)
+
+-- 2. gutter verification --
+screen 0 main=true frame=(0.0, 0.0, 1512.0, 982.0) visible=(0.0, 54.0, 1512.0, 895.0)
+screen 1 main=false frame=(3432.0, -98.0, 1920.0, 1080.0) visible=(3432.0, -98.0, 1920.0, 1080.0)
+screen 2 main=false frame=(5352.0, -814.0, 1080.0, 1920.0) visible=(5352.0, -814.0, 1080.0, 1920.0)
+screen 3 main=false frame=(1512.0, -98.0, 1920.0, 1080.0) visible=(1512.0, -98.0, 1920.0, 1080.0)
+
+AX position/size (top-left origin, AX coords): 1136, 856, 360x56
+Expected: bottom-trailing of the ACTIVE display, inset 16px on both axes.

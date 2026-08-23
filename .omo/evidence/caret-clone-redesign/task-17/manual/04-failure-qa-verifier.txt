@@ -1,0 +1,30 @@
+== FAILURE QA: damaged bundle copies (canonical never touched) ==
+temp dir: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-failqa.Hs4dCC
+
+-- control: intact copy must PASS --
+OK bundle verified: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-failqa.Hs4dCC/Meeting Slides.app
+exit=0
+
+-- removed Contents/Resources/project-path.txt --
+FAIL: missing Resources/project-path.txt
+exit=1
+
+-- removed Contents/Info.plist --
+FAIL: missing Info.plist
+exit=1
+
+-- removed Contents/MacOS/meeting-slides --
+FAIL: missing MacOS/meeting-slides
+exit=1
+
+-- truncated executable (module stripped) --
+FAIL: packaged executable is missing LauncherEnvironment
+exit=1
+
+-- project-path pointing at a dir with no server.ts --
+FAIL: packaged project-path.txt has no server.ts: /var/folders/l_/vy0kynvx0k1dl0p56z0c3xtc0000gn/T//ms-failqa.Hs4dCC
+exit=1
+
+== canonical bundle untouched ==
+c15fac54464563d5665f7a5ef6b4b4d8b9ee3543a8e4ae3f027e65c4ac3985a9  /Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+temp removed: yes

@@ -1,0 +1,200 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-library.test.ts:
+(pass) browser-valid reducer artifacts > every reducer source has a committed, non-drifting generated artifact [2.59ms]
+(pass) browser-valid reducer artifacts > rebuilding into a clean directory reproduces byte-identical artifacts [1.72ms]
+(pass) browser-valid reducer artifacts > a mutated source is detected as drift rather than silently shipped [2.58ms]
+(pass) browser-valid reducer artifacts > generated artifacts are served as executable JavaScript, never octet-stream [1.41ms]
+404 |           // The shell must consume the reducer, not merely load it.
+405 |           reducerDrivenState: (document.querySelector(".app") as HTMLElement | null)?.dataset.uiState ?? null,
+406 |         };
+407 |       });
+408 | 
+409 |       expect(probe.uiExports).toContain("reduce");
+                                    ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "reduce"
+Received: []
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:409:31)
+(fail) browser-valid reducer artifacts > the shipped page really evaluates the reducers - no dead TypeScript seam [137.21ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) document-centric library frame > 1244x836 shows one meetings rail and exactly one document surface [2076.09ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) document-centric library frame > Overview and Transcript never coexist: exactly one panel is perceivable [2077.01ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) document-centric library frame > no redundant centre detail panel duplicates the document surface [2089.53ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) detail tabs are a real tablist > tablist, tab and tabpanel roles are complete and cross-linked [2084.96ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) detail tabs are a real tablist > ArrowRight, ArrowLeft, Home and End move selection and focus [2093.18ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) detail tabs are a real tablist > every tab is keyboard reachable and paints a visible focus ring [2090.14ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) meeting selection refreshes the single document surface > selecting another meeting replaces the document content [2078.74ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) meeting selection refreshes the single document surface > a stale meeting payload arriving after a newer selection is ignored [2087.70ms]
+(pass) meeting selection refreshes the single document surface > initial hydration shows no stale slide or transcript content [78.42ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) real note and transcript data survive the rebuild > typing a note reaches #notes-input and is sent with its contracted action [2089.11ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) real note and transcript data survive the rebuild > transcript history renders finalized lines with speaker and time metadata [2132.65ms]
+(pass) library empty, loading, error and reconnect states > an empty library explains itself and keeps the record action [108.98ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) library empty, loading, error and reconnect states > connection state is explicit and survives a reconnect without losing content [2096.90ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) library empty, loading, error and reconnect states > a malformed server frame is dropped without disturbing the shell [2105.95ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) explicit state attributes and preserved binding contracts > the shell exposes every contracted state attribute [2078.86ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) explicit state attributes and preserved binding contracts > .app--capturing still tracks the authoritative capture phase [2082.16ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) explicit state attributes and preserved binding contracts > no fake event, folder or share controls exist in the library shell [2086.58ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) library shell across the canonical viewport matrix > no root overflow and one document surface at every matrix width [2084.57ms]
+200 |       // Arm inside the page BEFORE the trigger runs.
+201 |       await page.evaluate((t: string, p: string) => window.__libAwait!(t, p), token, predicate);
+202 |       await trigger();
+203 |       let timer: ReturnType<typeof setTimeout> | undefined;
+204 |       const bounded = new Promise<never>((_resolve, reject) => {
+205 |         timer = setTimeout(() => reject(new LibraryStateTimeoutError(predicate, timeoutMs)), timeoutMs);
+                                              ^
+LibraryStateTimeoutError: library shell timed out after 2000ms waiting for: document.querySelector(".app")?.dataset.capturePhase === "idle"
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-caret-library.test.ts:205:41)
+(fail) library shell across the canonical viewport matrix > the meetings rail stays reachable at 320x667 without clipping controls [2078.40ms]
+(pass) determinism guards > the library shell issues no off-origin request [84.69ms]
+(pass) determinism guards > this suite contains no sleep or polling wait [0.91ms]
+
+ 8 pass
+ 18 fail
+ 21 expect() calls
+Ran 26 tests across 1 file. [36.69s]

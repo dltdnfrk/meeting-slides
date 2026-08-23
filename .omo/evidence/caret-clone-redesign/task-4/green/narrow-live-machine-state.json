@@ -1,0 +1,76 @@
+{
+  "captionText": "녹음 중 02:05",
+  "captureTimerText": "02:05",
+  "capturing": true,
+  "compileStatusHidden": true,
+  "compileStatusState": null,
+  "connection": "connected",
+  "environment": {
+    "deviceScaleFactor": 1,
+    "fontsReady": true,
+    "locale": "ko-KR",
+    "now": 1710376860000,
+    "timezone": "Asia/Seoul"
+  },
+  "fixtureId": "narrow-live",
+  "geometry": {
+    "#current-slide": {
+      "height": 261,
+      "width": 315,
+      "x": 30,
+      "y": 225
+    },
+    "#session-list": {
+      "height": 0,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    "#stage-pane": {
+      "height": 410,
+      "width": 337,
+      "x": 19,
+      "y": 79
+    },
+    "#transcript-pane": {
+      "height": 220,
+      "width": 337,
+      "x": 19,
+      "y": 497
+    },
+    "#workspace": {
+      "height": 658,
+      "width": 363,
+      "x": 6,
+      "y": 68
+    },
+    ".dock": {
+      "height": 70,
+      "width": 267,
+      "x": 54,
+      "y": 736
+    }
+  },
+  "layout": {
+    "sameColumn": true,
+    "sameRow": false,
+    "stageAboveTranscript": true,
+    "stageVisible": true,
+    "transcriptVisible": true
+  },
+  "meetingTitles": [
+    "제품 로드맵 정렬",
+    "고객 온보딩 리뷰",
+    "분기 회고"
+  ],
+  "recordButtonLabel": "녹음 중지",
+  "rootOverflow": {
+    "horizontal": 0
+  },
+  "selectedMeetingTitle": null,
+  "slideIndexLabel": "03",
+  "slideTitle": "다음 스프린트 액션",
+  "thumbnails": 3,
+  "transcriptCountText": "15",
+  "transcriptLines": 15
+}

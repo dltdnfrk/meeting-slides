@@ -1,0 +1,5 @@
+$ bash scripts/verify-app.sh installed
+OK bundle verified: /Users/hyunjun/Applications/Meeting Slides.app
+EXIT=0
+$ codesign --verify --deep --strict
+EXIT=0

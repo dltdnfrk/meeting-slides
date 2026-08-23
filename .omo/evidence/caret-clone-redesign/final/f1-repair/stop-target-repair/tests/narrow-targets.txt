@@ -1,0 +1,13 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+(pass) Todo 15 · every painted control is a real target, scroll included > 375x812 library: scrolled-into-view controls meet 44px [140.36ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 375x812 live: scrolled-into-view controls meet 44px [133.07ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 320x667 library: scrolled-into-view controls meet 44px [122.84ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 320x667 live: scrolled-into-view controls meet 44px [158.19ms]
+
+ 4 pass
+ 101 filtered out
+ 0 fail
+ 12 expect() calls
+Ran 4 tests across 1 file. [1429.00ms]

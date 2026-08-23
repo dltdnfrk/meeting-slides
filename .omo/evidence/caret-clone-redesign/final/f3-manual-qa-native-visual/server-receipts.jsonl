@@ -1,0 +1,12 @@
+{"sequence":1,"kind":"server-ready","hostname":"127.0.0.1","port":54745}
+{"sequence":2,"kind":"workspace-get","host":"127.0.0.1:54745","userAgent":"Meeting%20Slides/3 CFNetwork/3860.600.21 Darwin/25.5.0"}
+{"sequence":3,"kind":"workspace-get","host":"127.0.0.1:54745","userAgent":"Meeting%20Slides/3 CFNetwork/3860.600.21 Darwin/25.5.0"}
+{"sequence":4,"kind":"workspace-get","host":"localhost:54745","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+{"sequence":5,"kind":"websocket-open","clients":1}
+{"sequence":6,"kind":"broadcast","frame":{"type":"capture","capturing":false,"mode":"mic","phase":"idle","startedAt":null}}
+{"sequence":7,"kind":"workspace-get","host":"localhost:54745","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}
+{"sequence":8,"kind":"broadcast","frame":{"type":"capture","capturing":true,"mode":"mic","phase":"capturing","startedAt":1786512709905}}
+{"sequence":9,"kind":"broadcast","frame":{"type":"line","text":"네이티브 시각 검증 문장입니다.","ts":1786512709905,"speaker":1}}
+{"sequence":10,"kind":"client-command","raw":"{\"action\":\"stopCapture\"}","parsed":{"action":"stopCapture"}}
+{"sequence":11,"kind":"broadcast","frame":{"type":"capture","capturing":false,"mode":"mic","phase":"idle","startedAt":null}}
+{"sequence":12,"kind":"websocket-close","clients":0}

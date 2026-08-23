@@ -1,0 +1,65 @@
+=== PROBE: generated_artifacts ===
+Intent: account for every file this task creates; leave no temporary driver or build output.
+
+--- deliverables (intended, permanent, uncommitted) ---
+tests/fixtures/public-dom-contract.json                 12578 bytes  1b1707078b2deafd
+tests/fixtures/public-protocol-contract.json             7089 bytes  2c999d76e5e5ae30
+tests/public-dom-protocol-contract.test.ts              17154 bytes  8ee63c5426202cf3
+
+--- evidence receipts (intended, permanent) ---
+.omo/evidence/caret-clone-redesign/task-3/baseline/00-boundary.txt           1938 bytes
+.omo/evidence/caret-clone-redesign/task-3/baseline/01-current-spellings.json     1259 bytes
+.omo/evidence/caret-clone-redesign/task-3/cleanup/01-source-restoration.txt      672 bytes
+.omo/evidence/caret-clone-redesign/task-3/cleanup/02-probe-dirty-worktree.txt     1663 bytes
+.omo/evidence/caret-clone-redesign/task-3/cleanup/03-probe-interruptions.txt     1700 bytes
+.omo/evidence/caret-clone-redesign/task-3/cleanup/04-probe-generated-artifacts.txt      948 bytes
+.omo/evidence/caret-clone-redesign/task-3/green/01-green-four-suites.txt     4018 bytes
+.omo/evidence/caret-clone-redesign/task-3/green/02-preexisting-failures.txt      653 bytes
+.omo/evidence/caret-clone-redesign/task-3/green/03-server-suite-isolated.txt     1634 bytes
+.omo/evidence/caret-clone-redesign/task-3/green/04-typecheck.txt              364 bytes
+.omo/evidence/caret-clone-redesign/task-3/green/05-final-green.txt           2651 bytes
+.omo/evidence/caret-clone-redesign/task-3/green/06-probe-flaky.txt            898 bytes
+.omo/evidence/caret-clone-redesign/task-3/green/07-probe-mutation-proof.txt     1225 bytes
+.omo/evidence/caret-clone-redesign/task-3/manual/01-manifest-inspection.txt     1230 bytes
+.omo/evidence/caret-clone-redesign/task-3/red/01-duplicate-current-slide.txt     8206 bytes
+.omo/evidence/caret-clone-redesign/task-3/red/02-renamed-meeting-id.txt      5185 bytes
+.omo/evidence/caret-clone-redesign/task-3/red/03-removed-capture-message.txt     5314 bytes
+.omo/evidence/caret-clone-redesign/task-3/red/04-probe-malformed-input.txt     1907 bytes
+.omo/evidence/caret-clone-redesign/task-3/red/05-probe-stale-state.txt       1530 bytes
+
+--- temporary artifacts: created and REMOVED ---
+tsconfig.task3-check.json                removed OK
+/tmp/characterize.ts                     outside repo (scratch, not shipped)
+/tmp/gen-dom.ts                          outside repo (scratch, not shipped)
+/tmp/manual-inspect.ts                   outside repo (scratch, not shipped)
+
+--- no build output, no deck/export/db artifacts produced by this task ---
+?? macos/NativeSurfaceContract.swift
+
+--- untracked entries NOT mine (concurrent agents / pre-existing) are left untouched ---
+?? .omo/drafts/
+?? .omo/evidence/caret-clone-redesign/
+?? .omo/evidence/live-split-ulw/
+?? .omo/evidence/style-gallery-baseline/
+?? .omo/evidence/style-gallery-final/
+?? .omo/evidence/style-gallery-panels/
+?? .omo/evidence/tiro-operator/
+?? .omo/evidence/tiro-reference/
+?? .omo/plans/caret-clone-redesign.md
+?? .omo/plans/tiro-operator-rebuild.md
+?? .omo/qa/
+?? .omo/ulw-loop/
+?? .omo/ulw-research/
+?? HANDOFF.md
+?? macos/NativeSurfaceContract.swift
+?? models/
+?? public/caret-shell.css
+?? tests/fixtures/
+?? tests/helpers/
+?? tests/native-surface-contract.test.ts
+?? tests/public-caret-harness.test.ts
+?? tests/public-harness-baseline.test.ts
+
+--- clarification on the one unfiltered entry above ---
+macos/NativeSurfaceContract.swift is task-5's deliverable (concurrent agent), not this task's.
+This task created exactly 3 repo files: the 2 fixtures + 1 test, plus its own evidence tree.

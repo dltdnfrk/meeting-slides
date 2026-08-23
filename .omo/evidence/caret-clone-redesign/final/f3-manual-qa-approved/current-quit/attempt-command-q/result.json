@@ -1,0 +1,30 @@
+{
+  "verdict": "FAIL",
+  "quitProtection": {
+    "commandQTriggeredAfterSubscription": true,
+    "frontmostSetStatus": 0,
+    "observerAddStatus": 0,
+    "observerCreateStatus": 0,
+    "observerSubscribedBeforeTrigger": true,
+    "pid": 63400,
+    "timedOut": true,
+    "timeoutFired": true
+  },
+  "captureBroadcasts": [
+    {
+      "sequence": 6,
+      "kind": "broadcast",
+      "frame": {
+        "type": "capture",
+        "capturing": true,
+        "mode": "mic",
+        "phase": "capturing",
+        "startedAt": 1786513658363
+      }
+    }
+  ],
+  "appPid": 63400,
+  "adoptedServerPid": 63391,
+  "appSurvivedContinue": true,
+  "adoptedServerSurvivedContinue": true
+}

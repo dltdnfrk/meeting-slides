@@ -1,0 +1,12 @@
+{"sequence":1,"kind":"server-ready","hostname":"127.0.0.1","port":8789}
+{"sequence":2,"kind":"workspace-get","host":"127.0.0.1:8789"}
+{"sequence":3,"kind":"workspace-get","host":"127.0.0.1:8789"}
+{"sequence":4,"kind":"workspace-get","host":"localhost:8789"}
+{"sequence":5,"kind":"websocket-open","clients":1}
+{"sequence":6,"kind":"broadcast","frame":{"type":"capture","capturing":true,"mode":"mic","phase":"capturing","startedAt":1786513658363}}
+{"sequence":7,"kind":"broadcast","frame":{"type":"line","text":"메뉴 토글 복구 검증 문장입니다.","ts":1786513658363,"speaker":1}}
+{"sequence":8,"kind":"workspace-get","host":"127.0.0.1:8789"}
+{"sequence":9,"kind":"websocket-open","clients":2}
+{"sequence":10,"kind":"client-command","raw":"{\"action\":\"listMeetings\"}","parsed":{"action":"listMeetings"}}
+{"sequence":11,"kind":"client-command","raw":"{\"action\":\"attendees\"}","parsed":{"action":"attendees"}}
+{"sequence":12,"kind":"websocket-close","clients":1}

@@ -1,0 +1,11 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/public-caret-accessibility.test.ts:
+(pass) Todo 15 · every painted control is a real target, scroll included > 1244x836 live: #btn-live-stop meets 44px without inflating its glyph [120.48ms]
+(pass) Todo 15 · every painted control is a real target, scroll included > 1440x900 live: #btn-live-stop meets 44px without inflating its glyph [102.98ms]
+
+ 2 pass
+ 103 filtered out
+ 0 fail
+ 16 expect() calls
+Ran 2 tests across 1 file. [1007.00ms]

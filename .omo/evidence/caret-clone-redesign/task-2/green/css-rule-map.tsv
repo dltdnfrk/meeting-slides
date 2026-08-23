@@ -1,0 +1,677 @@
+##### public/style.css
+7-71	:root
+7-73	
+74-74	html, body
+76-82	body
+85-94	.ambient
+95-97	.ambient__glow, .ambient__grid, .ambient__noise
+101-111	.app
+114-127	.topbar
+128-134	.topbar__brand
+135-143	.brand__mark
+144-150	.brand__name
+151-155	.brand__name em
+156-161	.topbar__center
+162-169	.topbar__right
+172-180	.onair
+181-187	.onair__dot
+188-194	.onair__label
+195-195	.onair--idle .onair__dot
+196-196	.onair--idle .onair__label
+197-200	.onair:not(.onair--idle)
+201-201	.onair:not(.onair--idle) .onair__dot
+202-202	.onair:not(.onair--idle) .onair__label
+205-205	.topbar__status
+206-206	.status__indicator
+207-207	.status__indicator--ok
+208-208	.status__indicator--warn
+209-209	.status__indicator--error
+210-210	.status__text
+212-212	.icon-btn
+213-213	.icon-btn:hover
+214-214	.icon-btn--sm
+217-217	.provider-panel
+218-218	.settings-section + .settings-section
+219-219	.provider-panel__head
+220-220	.settings-section__actions
+221-221	.provider-panel__hint
+222-222	.provider-row
+223-223	.provider-row:hover
+224-224	.provider-row--current
+225-225	.provider-row--disabled
+226-226	.provider-row__select
+227-227	.provider-row__select:disabled
+228-228	.provider-row__name
+229-229	.provider-row__detail
+230-230	.provider-row__badge
+231-231	.provider-row__badge--off
+232-232	.provider-row__actions
+233-233	.provider-row__connect, .provider-row__save
+234-234	.provider-row__connect:hover, .provider-row__save:hover
+235-235	.provider-row__key
+237-237	.provider-config
+238-238	.provider-config__row
+239-239	.provider-config__select
+242-242	.provider-row__badge--ok
+243-243	.provider-row__badge--unknown
+244-244	.provider-row__badge--absent
+247-247	.stt-list
+248-248	.stt-row
+249-249	.stt-row--selected
+250-250	.stt-row--failed
+251-251	.stt-row__head
+252-252	.stt-row__name
+253-253	.stt-row__badge
+254-254	.stt-row__badge--selected
+255-255	.stt-row__badge--installed
+256-256	.stt-row__badge--downloading
+257-257	.stt-row__badge--failed
+258-258	.stt-row__badge--absent
+259-259	.stt-row__meta
+260-260	.stt-row__error
+261-261	.stt-row__actions
+262-262	.stt-btn
+263-263	.stt-btn:hover
+264-264	.stt-btn--quiet
+265-265	.stt-btn--quiet:hover
+266-266	.stt-btn[disabled]
+269-269	.stt-progress
+270-270	.stt-progress__fill
+273-281	.glance
+282-289	.glance__chip, .glance__metric
+290-290	.glance__chip--capturing
+291-291	.glance__chip--detect
+292-292	.glance__chip--detect:not([hidden])
+293-293	.glance__chip--detect:not([hidden]) .glance__label
+294-294	.glance__chip--detect:not([hidden]) .glance__dot
+295-295	.glance__chip, .glance__metric
+296-296	.glance__metric[hidden]
+297-297	.glance__metric--rec .glance__metric-value
+298-298	.glance__label
+299-299	.glance__dot
+300-300	.glance__metric
+301-301	.glance__metric-label
+302-302	.glance__metric-value
+303-303	.glance__metric--provider
+304-304	.glance__metric--provider .glance__metric-value
+307-307	.app--capturing .glance__chip--capturing
+308-308	.app--capturing .glance__chip--capturing .glance__label
+309-309	.app--capturing .glance__chip--capturing .glance__dot
+312-312	.app--capturing .glance__metric .glance__metric-value
+315-320	.stage
+321-321	.slide-frame
+322-332	.slide
+333-333	@keyframes slide-in
+334-334	.slide__inner
+336-336	.slide__header
+337-337	.slide__meta
+338-338	.slide__index
+339-346	.slide__kicker
+347-347	.slide__title
+348-348	.slide__accent
+349-349	.slide__bullets
+350-350	.slide__bullets li
+351-351	.slide__bullets li::before
+353-363	.slide__emphasis
+364-367	.slide__emphasis-label
+368-368	.slide__notice
+369-369	.slide__notice:hover
+370-370	.slide__placeholder
+371-371	.placeholder__mic
+372-372	.mic__core
+373-373	.mic__core svg
+374-374	.placeholder__title
+375-375	.placeholder__sub
+378-386	.island
+387-387	.island--live
+388-388	.island__dot
+389-389	.island__text
+390-390	.speaker-chip
+393-400	.dock
+401-401	.dock__tabs
+403-409	.dock__label
+410-410	.dock__count
+411-411	.dock__spacer
+412-421	.dock__btn
+422-422	.dock__btn span
+423-423	.dock__btn:hover
+424-424	.dock__btn:disabled
+425-425	.dock__btn--compile
+426-430	.compile-status
+431-431	.compile-status[data-state="success"]
+432-432	.compile-status[data-state="warning"]
+433-433	.compile-status[data-state="error"]
+434-434	.dock__btn--danger
+435-435	.dock__btn--danger:disabled
+436-436	.dock__btn--danger:hover
+438-438	.dock__panel
+439-439	.dock__panel[hidden]
+442-442	.filmstrip
+443-443	.filmstrip__empty
+444-444	.filmstrip__empty-ring
+445-445	.thumbnail
+446-446	.thumbnail:hover
+447-447	.thumbnail--viewing
+448-448	.thumbnail__index
+449-449	.thumbnail--viewing .thumbnail__index
+450-450	.thumbnail__title
+451-451	.thumbnail__bullets
+452-452	.thumbnail__bullets li
+453-453	.thumbnail__bullets li::before
+456-456	.feed-line
+457-457	@keyframes line-in
+458-458	.feed-line__meta
+459-459	.feed-line__time
+460-460	.feed-line__text
+463-482	.record-btn
+483-486	.record-btn:hover
+487-487	.record-btn:active
+488-491	.record-btn:focus-visible
+492-498	.record-btn__dot
+499-503	.record-btn--on
+504-504	.record-btn--on:hover
+505-509	.record-btn--on .record-btn__dot
+510-510	.record-btn__label
+511-511	@keyframes recpulse
+514-514	::-webkit-scrollbar
+515-515	::-webkit-scrollbar-track
+516-516	::-webkit-scrollbar-thumb
+517-517	::-webkit-scrollbar-thumb:hover
+520-523	:focus-visible
+524-524	button:focus-visible
+525-525	.thumbnail:focus-visible
+527-527	.session-item
+528-528	.session-item .session-row
+529-544	.session-delete
+545-554	.session-delete svg
+555-556	.session-item:hover .session-delete, .session-delete:focus-visible
+557-561	.session-delete:hover
+564-583	@media (max-width: 420px)
+585-588	@media (max-width: 340px)
+591-596	@media (max-width: 420px)
+598-602	@media (prefers-reduced-motion: reduce)
+609-609	.glance
+612-612	.app
+615-619	.stage
+620-620	.slide-frame
+623-629	.doc-head
+630-636	.doc-title
+637-642	.doc-meta
+645-651	.slide
+652-656	.slide__title
+657-659	.slide__kicker
+660-663	.slide__bullets li
+664-669	.slide__emphasis
+670-670	.slide__placeholder
+671-671	.placeholder__sub
+674-682	.island
+683-687	.island__text
+688-693	.island__sep
+694-702	.island__meta
+703-703	.island--recording
+704-704	.island--recording .island__dot
+705-705	.island--detecting
+706-706	.island--detecting .island__dot
+709-709	.onair
+710-717	.status__text
+720-720	.dock__tabs
+721-721	.dock__label
+722-722	.dock__btn
+725-733	컴파일 덱의 kind 다양성을 라이브 무대에도 투영. .slide__title 클래스는 기존 테스트 호환을 위해 모든 kind에 유지. */ .slide__inner--live
+734-734	.slide__kindchip
+735-743	.slide__inner--cover
+744-748	.slide__inner--cover > :not(.slide__cover-number)
+749-759	.slide__cover-number
+760-765	.slide__title--hero
+766-766	.slide__cover-eyebrow
+767-775	.slide__cover-foot
+776-783	.slide__inner--section
+784-787	.slide__title--section
+788-796	.slide__inner--decision
+797-804	.slide__inner--decision .slide__emphasis
+805-810	.slide__inner--actions
+811-818	.slide__actions
+819-828	.slide__action
+829-836	.slide__action-no
+837-841	.slide__action-text
+842-847	.slide__inner--summary
+848-851	.slide__summary-grid .slide__bullets
+852-854	.slide__summary-grid .slide__bullets li
+855-862	.slide__inner--topic
+863-869	.slide__topic-main
+870-877	.slide__topic-visual
+878-885	.slide__topic-number
+886-892	.live-scene
+893-896	.live-scene__text, .live-scene__shape
+897-903	.live-scene__text
+904-906	.live-scene__line
+907-922	@media (max-width: 900px)
+925-925	.attendee-panel
+926-926	.attendee-panel[hidden]
+927-927	.attendee-panel__head
+928-928	.attendee-panel__hint
+929-929	.attendee-panel__error
+930-930	.attendee-panel__error[hidden]
+931-931	.attendee-panel__save
+932-932	.attendee-panel__save:hover:not(:disabled)
+933-933	.attendee-panel__save:disabled
+935-935	.attendee-form
+936-936	.attendee-form__row
+937-937	.attendee-form__label
+938-938	.attendee-form__input
+939-939	.attendee-form__input:disabled
+940-940	.attendee-form__input::placeholder
+941-941	.attendee-form__add
+942-942	.attendee-form__add:hover:not(:disabled)
+943-943	.attendee-form__add:disabled
+945-945	.attendee-list
+946-946	.attendee-list__empty
+947-947	.attendee-row
+948-948	.attendee-row:hover
+949-949	.attendee-row--saved
+950-950	.attendee-row__body
+951-951	.attendee-row__name
+952-952	.attendee-row__crm
+953-953	.attendee-row__edit, .attendee-row__remove
+954-954	.attendee-row__edit:hover
+955-955	.attendee-row__remove:hover
+958-958	.topbar__center
+959-959	.attendee-btn
+960-960	.attendee-btn:hover:not(:disabled)
+961-961	.attendee-btn:disabled
+962-962	.attendee-btn__icon
+963-963	.attendee-btn[aria-expanded="true"]
+964-964	.attendee-btn[aria-expanded="true"] .attendee-btn__icon
+965-965	.attendee-btn__count
+966-966	.attendee-btn__count[hidden]
+968-986	검토 패널 (review-panel.js) — provider/attendee 패널의 세 번째 형제. 후보 카드는 슬라이드 셸 위에 얹히는 작업면이라 폭·높이를 더 크게 잡되, 같은 표면 언어(--z900 배경, --line 테두리, --radius-lg)를 쓴다. =
+987-987	.review-panel[hidden]
+989-993	.review-panel__head
+994-999	.review-panel__title
+1000-1006	.review-panel__version
+1008-1015	.review-panel__notice, .review-panel__error
+1016-1016	.review-panel__notice
+1017-1017	.review-panel__error
+1018-1018	.review-panel__notice[hidden], .review-panel__error[hidden]
+1021-1025	.review-loading
+1026-1026	.review-loading[hidden]
+1027-1033	.review-loading__ring
+1034-1034	@keyframes review-spin
+1036-1041	.review-list
+1042-1042	.review-list[hidden]
+1043-1047	.review-list__empty
+1050-1059	.review-item
+1060-1060	@keyframes review-item-in
+1061-1061	.review-item:hover
+1062-1062	.review-item--decision
+1063-1063	.review-item--action_item
+1064-1064	.review-item--open_item
+1065-1065	.review-item--dropped
+1066-1066	.review-item--dropped .review-item__description
+1068-1068	.review-item__head
+1069-1077	.review-item__kind
+1078-1078	.review-item--decision    .review-item__kind
+1079-1079	.review-item--action_item .review-item__kind
+1080-1080	.review-item--open_item   .review-item__kind
+1081-1087	.review-item__coords
+1089-1092	.review-item__description
+1093-1100	.review-item__editor
+1103-1109	.review-item__quote
+1110-1110	.review-item__evidence
+1111-1114	.review-item__evidence-summary
+1115-1115	.review-item__evidence-summary:hover
+1116-1124	.review-item__segment
+1126-1126	.review-item__deadline
+1127-1131	.review-item__deadline-label
+1133-1139	.review-item__foot
+1140-1140	.review-item__spacer
+1141-1141	.review-item__field
+1142-1145	.review-item__field-label
+1146-1154	.review-item__select
+1155-1155	.review-item__select:disabled
+1156-1165	.review-item__action
+1166-1166	.review-item__action:disabled
+1167-1167	.review-item__edit:hover:not(:disabled), .review-item__save:hover
+1168-1168	.review-item__drop:hover
+1169-1169	.review-item--dropped .review-item__drop
+1172-1178	.review-panel__foot
+1179-1182	.review-panel__hint
+1183-1192	.review-panel__retry
+1193-1193	.review-panel__retry[hidden]
+1194-1194	.review-panel__retry:hover
+1195-1205	.review-panel__confirm
+1206-1206	.review-panel__confirm:hover:not(:disabled)
+1207-1207	.review-panel__confirm:disabled
+1208-1213	.review-panel__confirm-count
+1216-1225	.review-btn
+1226-1226	.review-btn[hidden]
+1227-1227	.review-btn:hover
+1228-1228	.review-btn__icon
+1229-1229	.review-btn[aria-expanded="true"]
+1230-1230	.review-btn[aria-expanded="true"] .review-btn__icon
+1231-1236	.review-btn__count
+1237-1237	.review-btn__count[hidden]
+1240-1251	@media (max-width: 620px)
+1253-1255	@media (prefers-reduced-motion: reduce)
+1258-1262	@media (max-width: 420px)
+1265-1279	.ask-panel
+1280-1280	.ask-panel[hidden]
+1281-1285	.ask-panel__head
+1286-1289	.ask-panel__close
+1290-1290	.ask-panel__close:hover
+1291-1295	.ask-panel__body
+1296-1296	.ask-panel__conversation
+1297-1304	.ask-message
+1305-1310	.ask-message--user
+1311-1316	.ask-message--assistant
+1317-1321	.ask-panel__foot
+1322-1330	.ask-panel__input
+1331-1331	.ask-panel__input:focus
+1332-1343	.ask-panel__send
+1344-1344	.ask-panel__send:disabled
+1345-1345	.ask-panel .pane__empty
+1348-1352	.notes-box
+1353-1360	.notes-box__summary
+1361-1361	.notes-box__summary:hover
+1362-1374	.notes-box__input
+1375-1375	.notes-box__input:focus
+1382-1390	.pane__eyebrow
+1392-1400	.transcript-context, .transcript-tools
+1402-1406	.transcript-context
+1408-1412	.language-field
+1414-1420	.language-field__label
+1422-1430	.language-field__select
+1432-1432	.language-field__select:disabled
+1434-1438	.language-direction
+1440-1448	.language-direction svg
+1450-1459	.capability-btn
+1461-1468	.capability-btn span
+1470-1470	.capability-btn:disabled
+1471-1474	.transcript-tools
+1475-1483	.capability-reason
+1485-1498	.provider-panel
+1500-1503	.provider-panel__head
+1505-1509	.provider-row
+1511-1514	.provider-row--current
+1516-1525	.dock
+1527-1544	.dock__commandbar
+1546-1555	.output-switcher
+1557-1571	.output-switcher__item
+1573-1573	.output-switcher__item:hover:not(:disabled)
+1574-1574	.output-switcher__item:active:not(:disabled)
+1575-1579	.output-switcher__item[aria-current="page"]
+1580-1580	.output-switcher__item:disabled
+1581-1588	.output-switcher__reason
+1590-1601	.capture-pill
+1603-1608	.capture-pill__mode
+1610-1617	.capture-pill .record-btn
+1619-1622	.capture-pill .record-btn:hover:not(:disabled)
+1624-1629	.capture-pill .record-btn__dot
+1631-1634	.capture-pill .record-btn--on
+1636-1641	.capture-pill .record-btn--on .record-btn__dot
+1643-1649	.record-waveform
+1651-1658	.record-waveform__bar
+1660-1660	.record-waveform__bar:nth-child(2)
+1661-1661	.record-waveform__bar:nth-child(3)
+1662-1662	.record-waveform__bar:nth-child(4)
+1663-1663	.record-waveform__bar:nth-child(5)
+1665-1668	@keyframes record-level
+1670-1670	.app--capturing .record-waveform
+1672-1677	.capture-live
+1678-1678	.capture-live[hidden]
+1679-1683	.capture-live__label
+1684-1688	.capture-live__timer
+1690-1699	.dock__context
+1700-1700	.dock__context strong
+1701-1701	.dock__context-separator
+1703-1710	.dock__tabs
+1712-1712	.dock__tabs > *
+1713-1713	.dock__spacer
+1714-1714	.dock__panel
+1715-1715	.filmstrip__empty
+1717-1718	.stage-pane:focus, .transcript-pane:focus
+1719-1722	.stage-pane:focus-visible, .transcript-pane:focus-visible
+1724-1724	.slide-frame
+1725-1728	.slide-frame > .slide
+1730-1737	@media (max-width: 900px)
+1739-1797	@media (max-width: 600px)
+1799-1804	@media (prefers-reduced-motion: reduce)
+1807-1819	.topbar
+1821-1824	.dock
+1826-1836	.dock__commandbar, .dock__tabs, .dock__panel
+1838-1842	.dock__tabs
+1844-1848	.dock__panel
+1850-1854	.capture-pill
+1856-1867	.provider-panel
+1869-1878	body:has(#provider-panel:not([hidden])) .app::after
+1880-1882	.status__text
+1884-1889	.dock__btn:disabled
+1891-1893	.transcript-context .capability-btn:disabled
+1895-1897	.transcript-context .capability-btn:disabled span
+1899-1927	@media (max-width: 900px)
+1929-1960	@media (max-width: 600px)
+##### public/workspace-shell.css
+7-33	:root
+36-43	.workspace
+45-45	.workspace--resizing
+46-46	.workspace--resizing *
+49-56	.session-rail, .transcript-pane
+57-57	.session-rail
+58-58	.transcript-pane
+60-68	.pane__head
+69-75	.pane__title
+76-84	.pane__count
+86-91	.pane__body
+93-101	.pane__empty
+102-102	.pane__empty[hidden]
+105-110	.session-list
+111-111	.session-list:empty
+112-125	.session-row
+126-126	.session-row:hover
+127-130	.session-row--selected
+131-138	.session-row__title
+139-147	.session-row__meta
+148-148	.session-row__status
+149-149	.session-row__status--open
+153-160	--transcript-card-h가 들어오고 아래는 여백으로 남는다. */ .transcript-card
+161-167	.transcript-pane--sized .transcript-card
+169-176	그냥 검은 면이면 렌더 사고처럼 읽힌다. */ .transcript-pane--sized
+178-178	.transcript-pane--resizing
+180-184	.transcript-stream
+185-185	.transcript-stream:empty
+188-198	.transcript-trunc
+199-199	.transcript-trunc[hidden]
+202-208	서쪽 폭은 워크스페이스 스플리터가 이미 담당하므로 여기엔 두지 않는다. */ .transcript-grip
+209-209	.transcript-grip:focus-visible
+211-216	.transcript-grip--s
+218-224	.transcript-grip--s::after
+225-227	.transcript-grip--s:hover::after, .transcript-grip--s:focus-visible::after, .transcript-grip--s.transcript-grip--active::after
+230-235	.transcript-grip--sw
+236-245	.transcript-grip--sw::after
+246-248	.transcript-grip--sw:hover::after, .transcript-grip--sw:focus-visible::after, .transcript-grip--sw.transcript-grip--active::after
+251-260	.splitter
+262-266	.splitter::before
+268-274	.splitter::after
+275-277	.splitter:hover::after, .splitter:focus-visible::after, .splitter--active::after
+278-278	.splitter:focus-visible
+281-285	.stage-pane
+288-295	작업 순서를 한 줄로 보존하고 문서 전체 가로 스크롤은 만들지 않는다. */ .dock__tabs
+297-297	.dock__tabs .dock__spacer
+300-304	@media (max-width: 1180px)
+306-327	도크 복제본을 없앱으므로 여기서 숨기면 전사에 도달할 경로가 사라진다. */ @media (max-width: 900px)
+329-333	@media (max-width: 600px)
+336-339	.workspace
+341-353	.session-rail, .stage-pane, .transcript-pane
+355-361	.stage-pane
+363-363	.session-rail
+364-364	.transcript-pane
+366-372	@media (max-width: 900px)
+##### public/operational-liquid.css
+7-10	html
+12-14	body
+16-22	.ambient
+24-34	.ambient__grid
+36-49	.topbar, .session-rail, .stage-pane, .transcript-pane, .dock__commandbar, .dock__tabs, .dock__panel
+51-60	.topbar
+62-71	.topbar::after, .stage-pane::before, .dock__commandbar::before
+73-77	.brand__mark
+79-82	.brand__name
+84-90	.topbar__status
+92-95	.status__text
+97-102	.icon-btn, .attendee-btn
+104-108	.icon-btn:hover:not(:disabled), .attendee-btn:hover:not(:disabled)
+110-112	.workspace
+114-124	.session-rail, .transcript-pane
+126-131	.pane__head
+133-136	.pane__eyebrow
+138-141	.pane__title
+143-147	.pane__count
+149-151	.session-list
+153-163	.session-row
+165-172	.session-row::before
+174-176	.session-row:hover
+178-180	.session-row--selected
+182-185	.session-row--selected::before
+187-189	.session-row__title
+191-193	.session-row__meta
+195-206	.stage-pane
+208-212	.doc-head
+214-222	.doc-title
+224-228	.doc-meta
+230-234	.stage
+236-249	.slide:has(.slide__placeholder)
+251-259	.slide__placeholder
+261-269	.placeholder__mic
+271-274	.mic__core
+276-284	.placeholder__title
+286-291	.placeholder__sub
+293-303	.glance
+305-307	.glance__label
+309-311	.glance__metric
+313-317	.transcript-card
+319-326	.transcript-context
+328-338	.language-direction
+340-346	.language-direction svg
+348-350	.language-field__label
+352-354	.language-field__select
+356-361	.transcript-tools
+363-370	.capability-btn
+372-379	.capability-btn:disabled, .dock__btn:disabled, .output-switcher__item:disabled
+381-384	.capability-reason, .output-switcher__reason
+386-389	.capability-btn:disabled span
+391-395	.transcript-stream
+397-403	.pane__empty
+405-407	.splitter::before
+409-412	.splitter:hover::before, .splitter:focus-visible::before
+414-416	.dock
+418-430	.dock__commandbar
+432-438	.output-switcher
+440-447	.output-switcher__item
+449-452	.output-switcher__item:hover:not(:disabled)
+454-460	.output-switcher__item[aria-current="page"]
+462-474	.capture-pill
+476-478	.capture-pill__mode
+480-489	.record-btn
+491-494	.record-btn:hover:not(:disabled)
+496-498	.record-btn:active:not(:disabled)
+500-502	.dock__context
+504-506	.dock__context strong
+508-520	.dock__tabs
+522-524	.dock__tabs::-webkit-scrollbar
+526-528	.dock__label
+530-537	.dock__btn
+539-543	.dock__btn:hover:not(:disabled)
+545-549	.dock__btn--compile
+551-553	.dock__btn--danger
+555-558	.compile-status, .last-saved
+560-568	.dock__panel
+570-572	.filmstrip__empty
+574-577	.filmstrip__empty-ring
+579-591	.attendee-panel, .provider-panel, .review-panel, .ask-panel
+593-604	:where( button, a, select, input, textarea, summary, [tabindex] ):focus-visible
+606-622	@media (max-width: 1180px)
+624-672	@media (max-width: 900px)
+674-826	@media (max-width: 520px)
+828-836	@media (prefers-reduced-motion: no-preference)
+838-847	@media (prefers-reduced-motion: reduce)
+849-861	@keyframes operator-breathe
+##### public/caret-shell.css
+1-16	:root
+18-21	body.caret-shell
+23-25	body.caret-shell .ambient
+27-30	body.caret-shell .ambient__glow--a, body.caret-shell .ambient__glow--b
+32-34	body.caret-shell .app
+36-47	body.caret-shell .session-rail, body.caret-shell .stage-pane, body.caret-shell .transcript-pane, body.caret-shell .glance, body.caret-shell .topbar, b
+49-51	body.caret-shell .session-rail
+53-59	body.caret-shell .session-rail__title, body.caret-shell .stage-pane__label, body.caret-shell .transcript-pane__label
+61-65	body.caret-shell .session-item
+67-69	body.caret-shell .session-item:hover
+71-75	body.caret-shell .session-item.is-active, body.caret-shell .session-item[aria-current="true"]
+77-80	body.caret-shell .session-item__title
+82-84	body.caret-shell .session-item__meta
+86-92	.meeting-chrome
+94-99	.meeting-chrome__title-row
+101-107	.meeting-chrome__title
+109-116	.meeting-chrome__props
+118-128	.meeting-chrome__prop
+130-133	.meeting-chrome__prop strong
+135-144	.detail-tabs
+146-158	.detail-tabs__btn
+160-163	.detail-tabs__btn[aria-selected="true"]
+165-168	.detail-tabs__btn:focus-visible
+170-174	.meeting-overview
+176-179	.meeting-overview__block
+181-186	.meeting-overview__label
+188-192	.meeting-overview__empty
+194-201	.action-card
+203-208	.action-card__head
+210-215	.action-card__title
+217-221	.action-card__sub
+223-229	.action-card__body
+231-235	.action-card__actions
+237-249	.action-card__btn
+251-253	.action-card__btn:hover
+255-258	.action-card__btn:disabled
+260-263	.action-card[hidden], .meeting-overview[hidden]
+265-268	body.caret-shell #slide-frame, body.caret-shell #current-slide
+270-274	body.caret-shell .dock
+276-278	body.caret-shell .record-btn
+280-282	body.caret-shell .output-switcher__item[aria-current="page"]
+284-291	.caret-brand
+293-301	.caret-brand__mark
+303-307	.rail-nav
+309-324	.rail-nav__item
+326-329	.rail-nav__item[aria-current="page"]
+331-333	.rail-nav__item.is-muted
+335-339	@media (prefers-reduced-motion: reduce)
+341-343	body.caret-shell .workspace
+345-353	body.caret-shell .stage, body.caret-shell .transcript-card, body.caret-shell .session-rail, body.caret-shell .dock, body.caret-shell .glance, body.car
+355-358	body.caret-shell .doc-title, body.caret-shell .pane__title
+360-364	body.caret-shell .doc-meta, body.caret-shell .pane__eyebrow, body.caret-shell .pane__empty
+366-371	body.caret-shell .app:not(.app--capturing)[data-detail-tab="notes"] #slide-frame, body.caret-shell .app:not(.app--capturing)[data-detail-tab="notes"] 
+373-375	body.caret-shell .app:not(.app--capturing)[data-detail-tab="notes"] .notes-box
+377-379	body.caret-shell .app:not(.app--capturing)[data-detail-tab="transcript"] .transcript-card
+381-384	body.caret-shell .app.caret-live.app--capturing
+386-398	body.caret-shell .app.caret-live.app--capturing .workspace
+400-419	body.caret-shell .app.caret-live.app--capturing #session-rail, body.caret-shell .app.caret-live.app--capturing #splitter-rail, body.caret-shell .app.c
+421-423	body.caret-shell .live-topbar
+425-435	body.caret-shell .live-topbar__capsule
+437-453	body.caret-shell .live-topbar__stop
+455-457	body.caret-shell .live-topbar__stop:hover
+459-462	body.caret-shell .live-topbar__stop:focus-visible
+464-469	body.caret-shell .live-topbar__stop-dot
+471-475	body.caret-shell .live-topbar__sep
+477-482	body.caret-shell .live-topbar__timer
+484-493	body.caret-shell .app.caret-live.app--capturing .live-topbar
+495-504	body.caret-shell .app.caret-live.app--capturing .stage, body.caret-shell .app.caret-live.app--capturing .transcript-pane, body.caret-shell .app.caret-
+506-511	body.caret-shell .app.caret-live.app--capturing .stage
+513-516	body.caret-shell .app.caret-live.app--capturing .transcript-pane
+518-523	body.caret-shell .app.caret-live.app--capturing .transcript-card
+525-528	body.caret-shell .app.caret-live.app--capturing #slide-frame
+530-534	body.caret-shell .app.caret-live.app--capturing .meeting-chrome
+536-541	body.caret-shell .app.caret-live.app--capturing .meeting-chrome__title::after
+543-545	body.caret-shell .app.caret-live.app--capturing .capture-pill
+547-555	body.caret-shell .app.caret-live.app--capturing .dock
+557-561	body.caret-shell .app.caret-live.app--capturing .dock__commandbar
+563-565	body.caret-shell .app.caret-live.app--capturing .splitter--transcript
+567-579	@media (max-width: 900px)

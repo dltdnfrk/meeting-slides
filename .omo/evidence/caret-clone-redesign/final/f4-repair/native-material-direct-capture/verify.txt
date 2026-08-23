@@ -1,0 +1,3 @@
+$ scripts/verify-app.sh "$APP"
+OK bundle verified: /Users/hyunjun/Applications/Meeting Slides.app
+exit=0

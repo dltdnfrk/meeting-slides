@@ -1,0 +1,85 @@
+{
+  "task": "caret-clone-redesign Todo 15 — Complete accessibility, motion, and failure states",
+  "status": "done",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "commit": "none — no commit, no staging, no reset, no restore (per plan and task instruction)",
+  "tdd": {
+    "discipline": "RED recorded before every fix; GREEN recorded once after the smallest sufficient change",
+    "redLogs": [
+      "red/browser-red.log — 8 real failures (timer live region, glance container live region, silent status channel, zero transcript live regions, reduced motion incomplete in both shells, over-budget transitions, colour-only indicator)",
+      "red/native-red.log — 3 failures (announce-sequence, announce-error-reason, control-accessibility scenario kinds absent)",
+      "red/browser-red-2-target.log — 9 viewports: .session-delete is 32x32",
+      "red/browser-red-3-covered.log — 3 widths: Overview action-card buttons buried under the dock (later proved a driver artifact; audit corrected to scroll-then-hit-test)",
+      "red/browser-red-4-reconnect.log — 375 and 320: reconnecting stated only in data-connection"
+    ],
+    "mutationProofs": [
+      "Removed the row padding reserve → all 9 viewport target tests fail; restored → pass",
+      "Removed min-inline-size:0 → still passes, so the declaration was not load-bearing and was deleted rather than kept"
+    ]
+  },
+  "suites": {
+    "browserCaret": { "command": "bun test tests/public-caret-accessibility.test.ts tests/public-caret-library.test.ts tests/public-caret-live.test.ts tests/public-caret-context.test.ts tests/public-caret-foundation.test.ts tests/public-caret-harness.test.ts tests/public-dom-protocol-contract.test.ts", "result": "278 pass, 0 fail", "log": "green/browser-caret-green.log" },
+    "browserLegacy": { "command": "bun test tests/public-operator-surface.test.ts tests/public-fresh-workspace.test.ts tests/public-protocol-reliability.test.ts tests/public-settings-panel.test.ts tests/public-workspace.test.ts tests/public-compile-control.test.ts tests/public-review.test.ts", "result": "73 pass, 0 fail", "log": "green/browser-legacy-green.log" },
+    "native": { "command": "bun test tests/native-minibar.test.ts tests/native-surface-contract.test.ts tests/native-launcher-boundary.test.ts", "result": "123 pass, 0 fail (all three together; this combination failed at baseline on a 5s hook bound)", "log": "green/native-green.log" },
+    "newSuite": { "file": "tests/public-caret-accessibility.test.ts", "tests": 83 }
+  },
+  "staticChecks": {
+    "projectTypeScript": { "command": "npx tsc --noEmit -p tsconfig.json", "exit": 0 },
+    "strictTypeScript": { "command": "npx tsc --noEmit --strict --lib ES2022,DOM,DOM.Iterable <changed test files>", "exit": 0 },
+    "swiftTypecheck": { "command": "swiftc -typecheck -swift-version 5 macos/*.swift", "exit": 0 },
+    "generatedDrift": { "command": "bun run scripts/build-public-modules.ts --check", "exit": 0 },
+    "gitDiffCheck": { "command": "git diff --check", "exit": 0 },
+    "lsp": "no errors on any changed file"
+  },
+  "manualEvidence": {
+    "qaMatrix": "green/qa/ — 126 cells = 9 viewports (1440/1244/1100/960/900/899/820/375/320) x normal+reduced motion x 7 states (library/live/loading/empty/error/reconnect/compile)",
+    "perCell": "same-size PNG + Chromium AX snapshot + machine record (motion, live regions, targets, overlap, contrast, overflow)",
+    "defects": 0,
+    "determinism": "frozen clock 1710376860000, ko-KR, Asia/Seoul, deviceScaleFactor 1, local harness only, zero off-origin requests",
+    "screenshotsInspected": [
+      "1440x900-live.png — complete 16:9 slide, Stop + 02:05 timer, Korean multiline transcript, no clipping",
+      "320x667-reconnect.png — Stop and timer truthful, live content retained, stacked, no overflow"
+    ]
+  },
+  "adversarialProbes": {
+    "missingAriaLinkage": "covered — every focusable control has an accessible name; no positive tabindex",
+    "duplicateLiveAnnouncement": "covered — exactly one live region owns finalized lines; timer/caption/counters own none; native announces only on status change",
+    "hiddenFocus": "covered — focus ring survives reduced motion (outline or box-shadow ring)",
+    "43pxTarget": "covered — 44px floor enforced scroll-inclusive in both shells; .session-delete raised 32→44",
+    "contrastDrop": "covered — composited 4.5:1 audit over real running text",
+    "reducedMotionStateLoss": "covered — phase, class, Stop, timer text and transcript all still present under reduce",
+    "staleError": "covered — repeated identical native failure does not re-announce; recovery announces once",
+    "malformedPayload": "covered — invalid slide body AND unparseable JSON (harness.pushRaw); last-good slide, phase and lines retained",
+    "repeatedTransitions": "covered — normal motion bounded to the 200ms token",
+    "networkBlock": "covered — disconnectClients keeps phase/slide/lines/Stop/timer and states the reason in-surface at every width",
+    "cleanup": "verified — no temp dirs, no probe files, no stray Chromium or Bun process"
+  },
+  "cleanup": {
+    "removed": ["/tmp/ms-swift", "/tmp/ms-swift2", "/tmp/probe.ts", "/tmp/t15-backup", "/tmp/co-backup.css", "probe-tmp.ts (never persisted)"],
+    "symlinks": "Meeting Slides.app and Meeting Slides 2.app unchanged, both → /Users/hyunjun/Applications/Meeting Slides.app",
+    "installedApp": "untouched; bundle executable mtime Aug 9 23:15 predates this task; scripts/build-app.sh never run",
+    "unrelatedDirtyWork": "preserved; no staging, commit, reset or restore performed"
+  },
+  "preExistingFailures": [
+    {
+      "suite": "tests/public-attendees.test.ts",
+      "count": 5,
+      "provenance": "reproduced at baseline with public/index.html and public/style.css reverted to HEAD, so they predate this task",
+      "subject": "startCapture/listMeetings ordering and a reconnect restore query — untouched by this task",
+      "record": "green/preexisting-attendees-failures.txt",
+      "action": "recorded, not chased"
+    }
+  ],
+  "risks": [
+    "The narrow-width topbar fix re-lays the grid tracks below 420px (outer tracks size to content, .topbar__right stretches to its own track). It is covered by the occlusion and target audits at 375 and 320 in both shells, but it does override superseded style.css geometry and should be re-checked when Todo 18 re-authors that layer.",
+    "Reduced motion is now enforced by ONE unscoped rule in caret-shell.css. Todo 18 re-authors that file and must carry the rule forward or reduced motion regresses silently in both shells.",
+    "--cf-target-min was added to caret-foundation.css and is consumed by caret-operator.css. Todo 18's layer replacement must preserve the token, not just the rules that read it.",
+    "The native announcement commit lives in MinibarProjection.render(...). Any future caller that uses view(...) to drive a real render will reintroduce per-tick announcements; view(...) is documented as pure and non-committing for exactly this reason."
+  ],
+  "scopeBoundaries": {
+    "notDone": [
+      "Todo 16 browser/native capture restoration synchronization — out of scope",
+      "Todo 18 obsolete-layer removal — out of scope; operational-liquid.css and the TIRO block remain linked, and the accessibility fixes were made to be carried forward rather than to pre-empt that cleanup"
+    ]
+  }
+}

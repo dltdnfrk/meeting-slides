@@ -1,0 +1,68 @@
+{
+  "task": "F3 real manual QA final synthesis after menu-toggle repair",
+  "verdict": "APPROVE",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "installedApp": "/Users/hyunjun/Applications/Meeting Slides.app",
+  "installedExecutableSha256": "23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d",
+  "segments": {
+    "A": {
+      "verdict": "PASS",
+      "freshness": "Behaviorally valid across a native-only repair; current active browser/server hashes, installed canonical marker, repair scope, and bundle graph are recorded in current-identity/browser-byte-equivalence.txt.",
+      "covered": [
+        "happy Start and Stop-focus handoff",
+        "16 finalized transcript lines",
+        "1440x900, 1244x836, 960x760, 820x900, 375x812, 320x667 live layouts without horizontal overflow",
+        "compile, history preview/return, checksummed exports",
+        "disconnect/reconnect without transcript loss",
+        "browser close/reopen",
+        "Stop and just-ended meeting/library restoration",
+        "Review, grounded Ask, controlled bad input"
+      ]
+    },
+    "B": {
+      "verdict": "PASS",
+      "evidenceExecutableSha256": "23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d",
+      "covered": [
+        "off-display restoration to 1136,854,360,56",
+        "first menu press hides",
+        "second menu press restores",
+        "collapsed 360x56 and expanded 560x220 bounds",
+        "disclosure",
+        "Open Workspace",
+        "five Stop activations emit exactly one stopCapture",
+        "authoritative idle and defaults cleanup"
+      ]
+    },
+    "C": {
+      "verdict": "PASS",
+      "evidence": "current-quit/result.json",
+      "covered": "Current installed app in authoritative capturing state created the quit-protection window; Continue Recording was AX-pressed successfully and both app and adopted server survived."
+    },
+    "D": {
+      "verdict": "PASS",
+      "covered": [
+        "current build exit 0",
+        "bundle verifier exit 0",
+        "strict codesign exit 0",
+        "documented GUI launcher commands",
+        "canonical installed marker and repository symlink",
+        "adopted-server ownership",
+        "process, port, defaults, and temporary-root cleanup"
+      ]
+    }
+  },
+  "personalInspection": {
+    "browserScreenshots": 14,
+    "nativeRepairScreenshots": 5,
+    "axAndWindowInventories": true,
+    "result": "PASS"
+  },
+  "cleanup": "PASS",
+  "microphoneUsed": false,
+  "userDatabaseUsed": false,
+  "externalApiUsed": false,
+  "productEdits": false,
+  "monolithicJourneyRerun": false,
+  "f4Entered": false,
+  "commitCreated": false
+}

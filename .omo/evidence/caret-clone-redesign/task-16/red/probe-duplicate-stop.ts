@@ -1,0 +1,20 @@
+// Probe: how many stopCapture frames does ONE double activation put on the wire?
+import { createDualSurfaceSession } from "/Users/hyunjun/Documents/MUNI/meeting-slides/tests/helpers/dual-surface-session.ts";
+import { createBrowserSurfaceClient, launchBrowser } from "/Users/hyunjun/Documents/MUNI/meeting-slides/tests/helpers/browser-dual-surface-client.ts";
+const CLOCK = 1710376860000;
+const session = createDualSurfaceSession({ startedAt: CLOCK - 125000, meetings: [{ id: 7, title: "주간 팀 회의", started_at: CLOCK - 125000, status: "open" }] });
+const browser = await launchBrowser();
+const ready = session.waitForClient("browser");
+const web = await createBrowserSurfaceClient(browser, { origin: session.origin, clientLabel: "browser", clockEpochMs: CLOCK });
+await ready;
+const live = web.expect("capturing", `() => document.querySelector(".app").classList.contains("app--capturing")`);
+session.startCapture();
+await live;
+const before = session.commandsOf("stopCapture").length;
+const inbound = session.nextCommand("stopCapture");
+await web.doubleClick("#btn-record");
+await inbound;
+await new Promise(r => setTimeout(r, 500));
+console.log("stopCapture frames:", session.commandsOf("stopCapture").length - before);
+console.log("state:", JSON.stringify(await web.read(), null, 1).slice(0, 400));
+await web.close(); await browser.close(); session.stop();

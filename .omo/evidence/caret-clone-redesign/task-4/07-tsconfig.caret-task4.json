@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["bun", "node"],
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "../../tests/public-test-harness.ts",
+    "../../tests/public-harness-baseline.test.ts",
+    "../../tests/public-caret-harness.test.ts",
+    "../../tests/helpers/caret-browser-driver.ts",
+    "../../tests/fixtures/caret-ui-states.ts"
+  ]
+}

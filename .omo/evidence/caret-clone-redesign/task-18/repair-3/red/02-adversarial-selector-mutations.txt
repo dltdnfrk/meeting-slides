@@ -1,0 +1,294 @@
+## where
+:where(.workspace) { color: red; }
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.12ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.16ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [0.57ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.04ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.05ms]
+271 |     const generatedTokens = cssRulePreludes(read("public/style.css"))
+272 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+273 |     const operatorTokens = cssRulePreludes(read("public/caret-operator.css"))
+274 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+275 | 
+276 |     expect([...new Set(generatedTokens.filter(operatorOwnedClass))].sort()).toEqual([]);
+                                                                                  ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "workspace",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:276:77)
+(fail) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [2.54ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.20ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.08ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.08ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 11 pass
+ 1 fail
+ 61 expect() calls
+Ran 12 tests across 1 file. [25.00ms]
+EXIT=1
+EXPECTED_RED where
+## has-nested-functional
+.safe:has(:not(:is(.document-surface))) { color: red; }
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.11ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.16ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [0.58ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.04ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.04ms]
+271 |     const generatedTokens = cssRulePreludes(read("public/style.css"))
+272 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+273 |     const operatorTokens = cssRulePreludes(read("public/caret-operator.css"))
+274 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+275 | 
+276 |     expect([...new Set(generatedTokens.filter(operatorOwnedClass))].sort()).toEqual([]);
+                                                                                  ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "document-surface",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:276:77)
+(fail) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [2.53ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.22ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.09ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.08ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 11 pass
+ 1 fail
+ 61 expect() calls
+Ran 12 tests across 1 file. [25.00ms]
+EXIT=1
+EXPECTED_RED has-nested-functional
+## comma
+.safe, .workspace-grid { color: red; }
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.11ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.15ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [0.57ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.04ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.04ms]
+271 |     const generatedTokens = cssRulePreludes(read("public/style.css"))
+272 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+273 |     const operatorTokens = cssRulePreludes(read("public/caret-operator.css"))
+274 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+275 | 
+276 |     expect([...new Set(generatedTokens.filter(operatorOwnedClass))].sort()).toEqual([]);
+                                                                                  ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "workspace-grid",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:276:77)
+(fail) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [2.63ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.21ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.08ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.08ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 11 pass
+ 1 fail
+ 61 expect() calls
+Ran 12 tests across 1 file. [25.00ms]
+EXIT=1
+EXPECTED_RED comma
+## escaped-operator-hex
+.\77 orkspace { color: red; }
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.10ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.15ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [0.58ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.06ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.05ms]
+271 |     const generatedTokens = cssRulePreludes(read("public/style.css"))
+272 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+273 |     const operatorTokens = cssRulePreludes(read("public/caret-operator.css"))
+274 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+275 | 
+276 |     expect([...new Set(generatedTokens.filter(operatorOwnedClass))].sort()).toEqual([]);
+                                                                                  ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "workspace",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:276:77)
+(fail) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [4.47ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.25ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.10ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.09ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 11 pass
+ 1 fail
+ 61 expect() calls
+Ran 12 tests across 1 file. [26.00ms]
+EXIT=1
+EXPECTED_RED escaped-operator-hex
+## comments-between-selector-tokens
+.safe/**/.workspace { color: red; }
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.10ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.15ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [0.56ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.04ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.04ms]
+271 |     const generatedTokens = cssRulePreludes(read("public/style.css"))
+272 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+273 |     const operatorTokens = cssRulePreludes(read("public/caret-operator.css"))
+274 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+275 | 
+276 |     expect([...new Set(generatedTokens.filter(operatorOwnedClass))].sort()).toEqual([]);
+                                                                                  ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "workspace",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:276:77)
+(fail) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [2.61ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.21ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.08ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.09ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 11 pass
+ 1 fail
+ 61 expect() calls
+Ran 12 tests across 1 file. [26.00ms]
+EXIT=1
+EXPECTED_RED comments-between-selector-tokens
+## escaped-generated-hex
+.slide__inner--\6c ive { color: red; }
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.04ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.10ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.36ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [0.60ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.04ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.04ms]
+272 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+273 |     const operatorTokens = cssRulePreludes(read("public/caret-operator.css"))
+274 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+275 | 
+276 |     expect([...new Set(generatedTokens.filter(operatorOwnedClass))].sort()).toEqual([]);
+277 |     expect([...new Set(operatorTokens.filter(generatedOwnedClass))].sort()).toEqual([]);
+                                                                                  ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "slide__inner--live",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:277:77)
+(fail) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [2.48ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.22ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.09ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.08ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.05ms]
+
+ 11 pass
+ 1 fail
+ 62 expect() calls
+Ran 12 tests across 1 file. [24.00ms]
+EXIT=1
+EXPECTED_RED escaped-generated-hex
+## nested-generated-functional
+:has(:where(.review-panel__head)) { color: red; }
+bun test v1.3.14 (0d9b296a)
+
+tests/public-active-shell.test.ts:
+(pass) Todo 18 active shell convergence > loads one generated-slide source and one operator source [0.05ms]
+(pass) Todo 18 active shell convergence > deletes obsolete shell layers, duplicate artifacts, and browser overlay drivers [0.12ms]
+(pass) Todo 18 active shell convergence > the generated-slide source contains no appended TIRO operator shell [0.37ms]
+(pass) Todo 18 active shell convergence > selector lexer finds roots through functional pseudos, scope, commas, comments, and escapes [0.61ms]
+(pass) Todo 18 active shell convergence > selector lexer ignores declaration and quoted lookalikes [0.04ms]
+(pass) Todo 18 active shell convergence > four is() cross-owner forms normalize to forbidden selector roots [0.04ms]
+272 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+273 |     const operatorTokens = cssRulePreludes(read("public/caret-operator.css"))
+274 |       .flatMap((prelude) => selectorClassTokens(prelude.text));
+275 | 
+276 |     expect([...new Set(generatedTokens.filter(operatorOwnedClass))].sort()).toEqual([]);
+277 |     expect([...new Set(operatorTokens.filter(generatedOwnedClass))].sort()).toEqual([]);
+                                                                                  ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   "review-panel__head",
++ ]
+
+- Expected  - 1
++ Received  + 3
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-active-shell.test.ts:277:77)
+(fail) Todo 18 active shell convergence > linked stylesheets enforce exclusive selector-root ownership [2.78ms]
+(pass) Todo 18 active shell convergence > the operator source owns tokens, geometry, narrow failures, and global reduced motion [0.24ms]
+(pass) Todo 18 active shell convergence > the document has one app, topbar, live header, dock, and status owner [0.10ms]
+(pass) Todo 18 documentation and bundle truth > README documents only current run, build, verify, and usage surfaces [0.09ms]
+(pass) Todo 18 documentation and bundle truth > DESIGN records the measured privacy result without an exclusion claim [0.12ms]
+(pass) Todo 18 documentation and bundle truth > bundle verification checks the current project asset graph [0.04ms]
+
+ 11 pass
+ 1 fail
+ 62 expect() calls
+Ran 12 tests across 1 file. [25.00ms]
+EXIT=1
+EXPECTED_RED nested-generated-functional

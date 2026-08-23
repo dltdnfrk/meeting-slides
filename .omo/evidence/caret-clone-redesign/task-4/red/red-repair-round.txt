@@ -1,0 +1,25 @@
+REPAIR ROUND — RED BEFORE IMPLEMENTATION
+========================================
+Tests for the six verifier findings were written first, against the unrepaired
+fixtures/driver. COMMAND: bun test tests/public-caret-harness.test.ts
+(no --timeout flag: Bun's default 5000ms per-test timeout applies)
+
+(fail) canonical fixture catalogue > covers every state named in the plan with unique ids
+(fail) canonical fixture catalogue > every canonical viewport in the plan matrix is exercised by a real fixture
+(fail) canonical fixture catalogue > every fixture step is a real trigger: a server message or a user interaction
+(fail) deterministic browser state capture > 960x760 live fixture yields byte-identical machine JSON twice with a fixed timer
+(fail) deterministic browser state capture > 1440x900 reference fixture yields byte-identical machine JSON and geometry twice
+(fail) deterministic browser state capture > 820x900 stacked fixture yields byte-identical machine JSON and the stacked-state contract
+(fail) event-before-trigger synchronization > the driver subscribes before every message trigger
+(fail) event-before-trigger synchronization > click-driven steps prove ordering with an in-page observable counter
+(fail) event-before-trigger synchronization > the default state deadline stays below Bun's default test timeout
+
+ 11 pass
+ 9 fail
+
+Mapping to verifier findings:
+  (1) 5000ms Bun race          -> "default state deadline stays below Bun's default test timeout"
+  (2) missing 1440x900/820x900 -> reference/stacked fixture tests + viewport-coverage test
+  (3) click ordering vacuous   -> "click-driven steps prove ordering with an in-page observable counter"
+                                  + "every fixture step is a real trigger" (removes assertion-only steps)
+  (4) screenshot determinism   -> "geometry is the deterministic artifact; screenshots are visual artifacts only"

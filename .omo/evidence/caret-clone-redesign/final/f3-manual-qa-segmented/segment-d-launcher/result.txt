@@ -1,0 +1,13 @@
+documented_surface:
+81:bash scripts/build-app.sh
+82:bash scripts/verify-app.sh "$HOME/Applications/Meeting Slides.app"
+83:open -a "Meeting Slides"
+
+executable=/Users/hyunjun/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides
+expected_sha256=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+actual_sha256=dddc34ffa7d7776daf183ae5c601d4c28a578f81c8fb3ac2543a6e01d2b34a7c
+marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+project_link=/Users/hyunjun/Applications/Meeting Slides.app
+verify_exit=0
+codesign_exit=0
+result=PASS

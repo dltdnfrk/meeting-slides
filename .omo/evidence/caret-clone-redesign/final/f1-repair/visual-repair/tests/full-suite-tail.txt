@@ -1,0 +1,14 @@
+(fail) Todo 15 · user-started capture focuses the visible Stop control > a reconnect re-asserting the same live capture never re-steals focus [128.17ms]
+(fail) startReview is ended-only, requester-scoped, and single-flight for one canonical version [10012.19ms]
+(fail) existing LLM detectBlock transport behavior > HTTP sends the unchanged system prompt and parses provider content [5.12ms]
+(fail) existing LLM detectBlock transport behavior > CLI sends the unchanged combined prompt and returns parsed stdout [398.56ms]
+(fail) existing LLM detectBlock transport behavior > CLI preserves nonzero exit code and stderr in rejection [219.73ms]
+(fail) generic chat transport > HTTP sends user-only message with defaults and no response_format [2.77ms]
+(fail) generic chat transport > CLI chat preserves nonzero exit code and stderr in rejection [238.66ms]
+(fail) generic chat transport > CLI chat honors options.timeoutMs override [253.01ms]
+(fail) setAttendees replaces a prepared roster and rejects capturing or ended meetings [10013.45ms]
+
+ 988 pass
+ 9 fail
+ 5015 expect() calls
+Ran 997 tests across 75 files. [179.89s]

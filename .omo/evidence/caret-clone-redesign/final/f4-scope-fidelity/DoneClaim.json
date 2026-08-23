@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "task": "F4. Scope fidelity",
+  "taskId": "st_019ff487",
+  "parentSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "rootSessionId": "019fef5e-6de0-7b8b-9d1c-e4d629a0379b",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "completedAt": "2026-08-12T05:56:20Z",
+  "status": "FAIL",
+  "verdict": "REJECT",
+  "auditedHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "title": "Native minibar is an opaque generic utility panel rather than the approved Caret-grade ambient material",
+      "references": [
+        "macos/MinibarView.swift:247-250",
+        "macos/MinibarWindowController.swift:146-160",
+        ".omo/evidence/caret-clone-redesign/final/f3-repair/menu-toggle/screenshots/03-after-second-restore.png",
+        ".omo/evidence/caret-clone-redesign/final/f3-repair/menu-toggle/screenshots/04-expanded.png"
+      ]
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "title": "Fresh 320x667 live capture visibly clips the Korean stage placeholder",
+      "references": [
+        "public/caret-operator.css:2541-2558",
+        "public/caret-operator.css:2644-2665",
+        "public/caret-operator.css:3105-3112",
+        ".omo/evidence/caret-clone-redesign/final/f3-manual-qa-segmented/segment-a-browser/02-live-320x667.png"
+      ]
+    }
+  ],
+  "dimensionResults": {
+    "referenceHierarchy": "PASS",
+    "geometry": "FAIL",
+    "typography": "FAIL",
+    "material": "FAIL",
+    "motion": "PASS",
+    "progressiveDisclosure": "PASS",
+    "nativeAmbientControlIntent": "FAIL",
+    "browserOnlyStartNativeStop": "PASS",
+    "meetingSlidesIdentityAndFunction": "PASS",
+    "brandPrivateAssetBoundary": "PASS",
+    "screenShareClaimBoundary": "PASS",
+    "unsupportedCapabilityBoundary": "PASS"
+  },
+  "verification": {
+    "officialPacketHashes": "PASS: 8/8 screenshots and 8/8 computed records",
+    "fontManifestHashes": "PASS: 5/5 font assets and 3/3 OFL receipts",
+    "focusedTests": "127 pass / 0 fail / 688 expectations",
+    "installedBundleVerifier": "PASS",
+    "codesignStrict": "PASS",
+    "installedExecutableSha256": "23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d",
+    "sourceDocsScopeScan": "PASS except the two reported fidelity findings"
+  },
+  "boundaries": {
+    "productFilesEdited": false,
+    "planEdited": false,
+    "ledgerEdited": false,
+    "boulderEdited": false,
+    "todoEvidenceEdited": false,
+    "commitCreated": false,
+    "stagingPerformed": false
+  },
+  "report": {
+    "path": ".omo/evidence/caret-clone-redesign/final/f4-scope-fidelity/REPORT.md",
+    "sha256": "b2a9f80bd5f8c5c550ad59393e5513c8a1d6dbe39bbebad8e629f678b5b23024"
+  },
+  "checksum": {
+    "algorithm": "sha256",
+    "scope": "UTF-8 pretty JSON with checksum.value replaced by null and one trailing LF",
+    "value": "0c491e33bb1c511624f9b11e0ee6bb6d46602e8e06f242b12d3cbfe6ac24c45a"
+  }
+}

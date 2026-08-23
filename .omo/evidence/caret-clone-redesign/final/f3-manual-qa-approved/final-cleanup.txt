@@ -1,0 +1,16 @@
+timestamp_utc=2026-08-12T05:49:31Z
+installed_executable_sha256=23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d
+repair_executable_sha256=23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d
+marker=/Users/hyunjun/Documents/MUNI/meeting-slides
+repo_link=/Users/hyunjun/Applications/Meeting Slides.app
+meeting_slides_processes=
+port_54741_listeners=
+port_54742_listeners=
+port_54743_listeners=
+port_54744_listeners=
+port_54745_listeners=
+port_54746_listeners=
+port_54748_listeners=
+port_8789_listeners=
+current_quit_cleanup={"runExit":0,"appAliveBeforeCleanup":true,"adoptedServerAliveBeforeCleanup":true,"portFree":true,"appProcessGone":true,"temporaryRemoved":true,"executableSha256":"23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d"}
+repair_cleanup={"runExit":0,"markerRestored":true,"defaultsRestored":true,"portFree":true,"appProcessGone":true,"executableHash":"23865fbdc70fcc0d7db65bc995b893854fff1e04ef939d29b513dabdb422538d","codesignExit":0,"temporaryRemoved":true}

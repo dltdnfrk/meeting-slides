@@ -1,0 +1,27 @@
+{
+  "metrics": {
+    "shell": "live",
+    "phase": "error",
+    "detail": "overview",
+    "connection": "connected",
+    "rootOverflow": 0,
+    "duplicateIds": [],
+    "minTarget": 26,
+    "narrowTargetFailures": [],
+    "status": {
+      "text": "녹음을 시작하지 못했습니다: 입력 장치를 열 수 없습니다",
+      "display": "block",
+      "color": "rgb(154, 154, 163)",
+      "role": "status"
+    },
+    "activeRemovedReferences": [],
+    "stopVisible": true,
+    "transcriptLines": 0
+  },
+  "focused": {
+    "id": "btn-settings",
+    "outline": "solid",
+    "width": "2px",
+    "shadow": "none"
+  }
+}

@@ -1,0 +1,151 @@
+=== MUTATION 1: duplicate #current-slide in public/index.html ===
+(re-run against the FINAL test file, 23 tests)
+--- diff ---
++  <link rel="stylesheet" href="/caret-shell.css">
+-<body>
++<body class="caret-shell">
+-  <div class="app">
++  <div class="app caret-live" data-detail-tab="overview">
+-        <span class="pane__title">회의 기록</span>
++        <span class="pane__title caret-brand"><span class="caret-brand__mark" aria-hidden="true"></span>Meetings</span>
++      <nav class="rail-nav" aria-label="주요 영역">
++        <button type="button" class="rail-nav__item" aria-current="page">Meetings</button>
++        <button type="button" class="rail-nav__item is-muted" disabled title="다음 마일스톤">Extracts</button>
++      </nav>
++      <header class="live-topbar" id="live-topbar" aria-label="라이브 녹음 컨트롤">
++        <div class="live-topbar__nav" aria-hidden="true"></div>
++        <div class="live-topbar__capsule">
++          <button type="button" class="live-topbar__stop" id="btn-live-stop" aria-label="녹음 중지">
++            <span class="live-topbar__stop-dot" aria-hidden="true"></span>
++            Stop
++          </button>
++          <span class="live-topbar__sep" aria-hidden="true"></span>
++          <span class="live-topbar__timer" id="live-topbar-timer" aria-live="polite">00:00</span>
++        </div>
++      </header>
++      <div class="meeting-chrome" id="meeting-chrome">
++        <div class="meeting-chrome__title-row">
++          <h1 class="meeting-chrome__title" id="meeting-chrome-title">Untitled</h1>
++        </div>
++        <div class="meeting-chrome__props" aria-label="회의 속성">
++          <span class="meeting-chrome__prop" id="meeting-chrome-date">Date</span>
++          <span class="meeting-chrome__prop">Select event</span>
++          <span class="meeting-chrome__prop">Add to folder</span>
++        </div>
++        <div class="detail-tabs" role="tablist" aria-label="회의 상세 탭">
++          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-overview" data-detail-tab="overview" aria-selected="true">Overview</button>
++          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-notes" data-detail-tab="notes" aria-selected="false">Notes</button>
++          <button type="button" class="detail-tabs__btn" role="tab" id="detail-tab-transcript" data-detail-tab="transcript" aria-selected="false">Transcript</button>
++        </div>
++      </div>
++      <div class="slide" id="current-slide"></div>
++      <textarea class="live-note" id="live-note" placeholder="Leave a quick note" aria-label="라이브 노트"></textarea>
++
++      <section class="meeting-overview" id="meeting-overview" aria-label="회의 개요">
++        <div class="meeting-overview__block">
++          <h2 class="meeting-overview__label">Summary</h2>
++          <p class="meeting-overview__empty" id="summary-empty">No summary yet</p>
++        </div>
++        <div class="meeting-overview__block">
++          <h2 class="meeting-overview__label">Actions</h2>
++          <article class="action-card" id="action-followup">
++            <div class="action-card__head">
++              <div>
++                <h3 class="action-card__title">Send follow-up</h3>
++                <p class="action-card__sub" id="action-followup-sub">회의가 끝나면 후속 메일 초안이 여기 쌓입니다.</p>
++              </div>
++              <div class="action-card__actions">
++                <button type="button" class="action-card__btn" id="btn-action-copy" disabled>Copy</button>
++                <button type="button" class="action-card__btn" id="btn-action-open" disabled>Open draft</button>
++              </div>
++            </div>
++            <p class="action-card__body" id="action-followup-body">Subject: Following up - …
++
++Hi,
++Thank you for your time today.
++Here's a quick recap of the meeting:
++          </article>
++        </div>
++      </section>
++
+--- bun test tests/public-dom-protocol-contract.test.ts ---
+bun test v1.3.14 (0d9b296a)
+
+tests/public-dom-protocol-contract.test.ts:
+(pass) shipped DOM contract > the manifest itself lists each binding id exactly once [0.09ms]
+101 |   test("every binding id occurs exactly once in the shipped HTML", () => {
+102 |     const occurrences = idSpecs.map((spec) => ({
+103 |       id: spec.id,
+104 |       count: byId.get(spec.id)?.length ?? 0,
+105 |     }));
+106 |     expect(occurrences).toEqual(idSpecs.map((spec) => ({ id: spec.id, count: 1 })));
+                              ^
+error: expect(received).toEqual(expected)
+
+@@ -1,8 +1,8 @@
+  [
+    {
+-     "count": 1,
++     "count": 2,
+      "id": "current-slide",
+    },
+    {
+      "count": 1,
+      "id": "stage-pane",
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-dom-protocol-contract.test.ts:106:25)
+(fail) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.36ms]
+108 | 
+109 |   test("no id in the shipped HTML is duplicated at all", () => {
+110 |     const duplicated = [...byId.entries()]
+111 |       .filter(([, nodes]) => nodes.length > 1)
+112 |       .map(([id, nodes]) => ({ id, count: nodes.length }));
+113 |     expect(duplicated).toEqual([]);
+                             ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   {
++     "count": 2,
++     "id": "current-slide",
++   },
++ ]
+
+- Expected  - 1
++ Received  + 6
+
+      at <anonymous> (/Users/hyunjun/Documents/MUNI/meeting-slides/tests/public-dom-protocol-contract.test.ts:113:24)
+(fail) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.21ms]
+(pass) shipped DOM contract > binding controls keep their element and control types [0.11ms]
+(pass) shipped DOM contract > required ancestry holds, including #current-slide beneath #stage-pane [0.09ms]
+(pass) shipped DOM contract > panes that must not nest stay disjoint [0.03ms]
+(pass) shipped DOM contract > shipped HTML loads every contract script exactly once [0.12ms]
+(pass) shipped DOM contract > scripts still resolve the binding ids they own [0.28ms]
+(pass) compatibility data attributes and persisted layout keys > connection state attribute keeps its exact spelling and value set [0.15ms]
+(pass) compatibility data attributes and persisted layout keys > detail tab attribute keeps its exact spelling and value set [0.09ms]
+(pass) compatibility data attributes and persisted layout keys > capture-state classes stay readable across shipped scripts [0.11ms]
+(pass) compatibility data attributes and persisted layout keys > output switcher targets exist and resolve to real ids [0.07ms]
+(pass) compatibility data attributes and persisted layout keys > persisted layout keys and their payload keys are unchanged [0.15ms]
+(pass) shipped wire protocol contract > the protocol manifest lists each action and message type exactly once [0.04ms]
+(pass) shipped wire protocol contract > every contract action name is emitted or dispatched with its exact spelling [1.50ms]
+(pass) shipped wire protocol contract > client emits no action outside the contract [0.24ms]
+(pass) shipped wire protocol contract > startCapture keeps the snake_case meeting_id payload spelling [0.15ms]
+(pass) shipped wire protocol contract > critical payload key spellings are present and their aliases absent [0.31ms]
+(pass) shipped wire protocol contract > every server message type is declared in src/session.ts and in ServerMessage [0.09ms]
+(pass) shipped wire protocol contract > the client still handles every message type it is contracted to handle [0.12ms]
+(pass) shipped wire protocol contract > capture and transcript message shapes keep their key spellings [0.06ms]
+(pass) shipped wire protocol contract > the server handler map registers exactly the contracted actions [0.04ms]
+(pass) shipped wire protocol contract > actions not in the handler map still have an explicit dispatch branch [0.06ms]
+
+2 tests failed:
+(fail) shipped DOM contract > every binding id occurs exactly once in the shipped HTML [0.36ms]
+(fail) shipped DOM contract > no id in the shipped HTML is duplicated at all [0.21ms]
+
+ 21 pass
+ 2 fail
+ 54 expect() calls
+Ran 23 tests across 1 file. [30.00ms]

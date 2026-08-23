@@ -1,0 +1,209 @@
+{
+  "verdict": "PASS",
+  "kind": "static interaction-owner preflight; not a product journey",
+  "manifestCount": 28,
+  "forbiddenTargetsAbsent": [
+    "#thumbnails .thumbnail",
+    "#btn-return-live"
+  ],
+  "ownerPolicy": "Every browser pointer/keyboard action is rejected before dispatch unless its actual runtime owner has non-zero visible geometry, viewport inclusion, center hit-test ownership, enabled state, role, and accessible name. Native actions require named AX owners; browser lifecycle/transport/dialog actions require their event owner.",
+  "failures": [],
+  "manifest": [
+    {
+      "phase": "native-launch",
+      "action": "launch installed executable (README open -a launcher artifact)",
+      "owner": "$HOME/Applications/Meeting Slides.app/Contents/MacOS/meeting-slides",
+      "mode": "installed-app",
+      "requirement": "verified and codesigned installed bundle"
+    },
+    {
+      "phase": "native-menu",
+      "action": "toggle status item twice",
+      "owner": "menu bar item in menu bar 2",
+      "mode": "AXPress",
+      "requirement": "AX menu-bar-item owner and non-empty accessible title"
+    },
+    {
+      "phase": "native-minibar",
+      "action": "expand minibar",
+      "owner": "미니바 펼치기",
+      "mode": "AXPress",
+      "requirement": "visible AXButton with accessible title"
+    },
+    {
+      "phase": "native-minibar",
+      "action": "open workspace",
+      "owner": "작업 공간 열기",
+      "mode": "AXPress",
+      "requirement": "visible AXButton with accessible title"
+    },
+    {
+      "phase": "happy-path",
+      "action": "start capture",
+      "owner": "#btn-record",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "happy-path",
+      "action": "observe focus handoff",
+      "owner": "#btn-live-stop",
+      "mode": "focus-observation",
+      "requirement": "visible non-zero accessible button and active element"
+    },
+    {
+      "phase": "compile",
+      "action": "open progressive disclosure",
+      "owner": "#dock-more > summary",
+      "mode": "keyboard-enter",
+      "requirement": "visible non-zero hit-tested native summary with accessible name"
+    },
+    {
+      "phase": "compile",
+      "action": "compile deck",
+      "owner": "#btn-compile-deck",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "history",
+      "action": "return from automatic history preview",
+      "owner": "#current-slide .slide__notice",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible text"
+    },
+    {
+      "phase": "export",
+      "action": "export Markdown",
+      "owner": "#btn-export-md",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "export",
+      "action": "export JSON",
+      "owner": "#btn-export-json",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "export",
+      "action": "export transcript",
+      "owner": "#btn-export-transcript",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "export",
+      "action": "export deck",
+      "owner": "#btn-export-deck",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "reconnect",
+      "action": "close active local WebSocket",
+      "owner": "window.WebSocket instance",
+      "mode": "controlled-transport",
+      "requirement": "OPEN socket; disconnected then connected exact state events"
+    },
+    {
+      "phase": "browser-reopen",
+      "action": "close and reopen browser page",
+      "owner": "Puppeteer Page",
+      "mode": "browser-lifecycle",
+      "requirement": "real page close/new page and authoritative capture restoration"
+    },
+    {
+      "phase": "quit-protection",
+      "action": "request quit",
+      "owner": "installed NSApplication",
+      "mode": "real-command-q",
+      "requirement": "AX owner made frontmost; CG HID keyboard event after AX observer subscription"
+    },
+    {
+      "phase": "quit-protection",
+      "action": "continue recording",
+      "owner": "계속 녹음",
+      "mode": "AXPress",
+      "requirement": "visible AXButton in newly-created native alert"
+    },
+    {
+      "phase": "native-stop",
+      "action": "stop capture",
+      "owner": "녹음 중지",
+      "mode": "AXPress",
+      "requirement": "visible AXButton in expanded minibar"
+    },
+    {
+      "phase": "review",
+      "action": "open Review",
+      "owner": "#btn-review",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "review",
+      "action": "close Review",
+      "owner": "#btn-review-close",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "ask",
+      "action": "open Ask",
+      "owner": "#btn-ask",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "ask",
+      "action": "type question",
+      "owner": "#ask-input",
+      "mode": "keyboard-type",
+      "requirement": "visible non-zero hit-tested textbox with accessible name"
+    },
+    {
+      "phase": "ask",
+      "action": "send question",
+      "owner": "#btn-ask-send",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested enabled button with accessible name"
+    },
+    {
+      "phase": "ask",
+      "action": "close Ask",
+      "owner": "#btn-ask-close",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "bad-input",
+      "action": "open progressive disclosure",
+      "owner": "#dock-more > summary",
+      "mode": "keyboard-enter",
+      "requirement": "visible non-zero hit-tested native summary with accessible name"
+    },
+    {
+      "phase": "bad-input",
+      "action": "reset meeting",
+      "owner": "#btn-reset",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    },
+    {
+      "phase": "bad-input",
+      "action": "accept reset confirmation",
+      "owner": "window.confirm browser dialog",
+      "mode": "native-dialog",
+      "requirement": "dialog event subscribed before reset trigger; prompt type and message observed"
+    },
+    {
+      "phase": "bad-input",
+      "action": "start failing local recorder",
+      "owner": "#btn-record",
+      "mode": "pointer",
+      "requirement": "visible non-zero hit-tested button with accessible name"
+    }
+  ]
+}

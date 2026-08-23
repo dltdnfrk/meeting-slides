@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "task": "Mandatory decisive completion audit",
+  "taskId": "st_019ff4c9",
+  "canonicalRoot": "/Users/hyunjun/Documents/MUNI/meeting-slides",
+  "verdict": "COMPLETE",
+  "baselineHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "currentHead": "a1ed25f95980980cd958044b90e739ac45e8280d",
+  "commitsSinceBaseline": 0,
+  "deliveryMode": "direct",
+  "plan": {"topLevelChecked": 23, "topLevelUnchecked": 0},
+  "installedExecutableSha256": "915e570684a24f3f57b4ed7b3bd7b116ebc651ef8392e57e22184e76de2b40b5",
+  "gates": {
+    "typescript": "PASS",
+    "swiftAggregate": "PASS",
+    "generatedDrift": "PASS",
+    "buildApp": "PASS",
+    "verifyApp": "PASS",
+    "codesignStrict": "PASS",
+    "gitDiffCheck": "PASS",
+    "installedHashMatch": "PASS",
+    "manualPixelAxSample": "PASS",
+    "cleanup": "PASS"
+  },
+  "coveredEnvironmentFailure": "Installed Bun 1.3.14 Puppeteer/Playwright dependency-loader/transient APFS read failure occurred before browser product assertions; identical limitation is recorded in approved F4 and current source-bound static/native/direct-pixel gates pass.",
+  "unrelatedPreExistingFailures": {
+    "count": 8,
+    "owners": ["tests/llm-transport.test.ts (6)", "tests/start-review-action.test.ts (1)", "tests/attendees-action.test.ts (1)"],
+    "protectedOwnerHashesMatch": true
+  },
+  "boundaries": {
+    "productEditedByAudit": false,
+    "planEditedByAudit": false,
+    "ledgerEditedByAudit": false,
+    "todoEditedByAudit": false,
+    "boulderCompletionMetadataOnly": true,
+    "commitCreated": false,
+    "stagingPerformed": false
+  },
+  "report": {"path": ".omo/evidence/caret-clone-redesign/final/completion-audit/REPORT.md", "sha256": "6bef5cdcfacb18e5dc34cd9053ddd0a165144fb45f578d53662e48e01fff2573"}
+}

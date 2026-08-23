@@ -1,0 +1,27 @@
+public/style.css	231-231	DEAD-TOKENS=provider-row__badge--off	.provider-row__badge--off
+public/style.css	242-242	DEAD-TOKENS=provider-row__badge--ok	.provider-row__badge--ok
+public/style.css	243-243	DEAD-TOKENS=provider-row__badge--unknown	.provider-row__badge--unknown
+public/style.css	244-244	DEAD-TOKENS=provider-row__badge--absent	.provider-row__badge--absent
+public/style.css	254-254	DEAD-TOKENS=stt-row__badge--selected	.stt-row__badge--selected
+public/style.css	255-255	DEAD-TOKENS=stt-row__badge--installed	.stt-row__badge--installed
+public/style.css	256-256	DEAD-TOKENS=stt-row__badge--downloading	.stt-row__badge--downloading
+public/style.css	257-257	DEAD-TOKENS=stt-row__badge--failed	.stt-row__badge--failed
+public/style.css	258-258	DEAD-TOKENS=stt-row__badge--absent	.stt-row__badge--absent
+public/style.css	297-297	DEAD-TOKENS=glance__metric--rec	.glance__metric--rec .glance__metric-value
+public/style.css	336-336	DEAD-TOKENS=slide__header	.slide__header
+public/style.css	1062-1062	DEAD-TOKENS=review-item--decision	.review-item--decision
+public/style.css	1063-1063	DEAD-TOKENS=review-item--action_item	.review-item--action_item
+public/style.css	1064-1064	DEAD-TOKENS=review-item--open_item	.review-item--open_item
+public/style.css	1078-1078	DEAD-TOKENS=review-item--decision	.review-item--decision    .review-item__kind
+public/style.css	1079-1079	DEAD-TOKENS=review-item--action_item	.review-item--action_item .review-item__kind
+public/style.css	1080-1080	DEAD-TOKENS=review-item--open_item	.review-item--open_item   .review-item__kind
+public/style.css	1127-1131	DEAD-TOKENS=review-item__deadline-label	.review-item__deadline-label
+public/style.css	1228-1228	DEAD-TOKENS=review-btn__icon	.review-btn__icon
+public/style.css	1230-1230	DEAD-TOKENS=review-btn__icon	.review-btn[aria-expanded="true"] .review-btn__icon
+public/style.css	1305-1310	DEAD-TOKENS=ask-message--user	.ask-message--user
+public/style.css	1311-1316	DEAD-TOKENS=ask-message--assistant	.ask-message--assistant
+public/workspace-shell.css	149-149	DEAD-TOKENS=session-row__status--open	.session-row__status--open
+public/caret-shell.css	53-59	DEAD-TOKENS=session-rail__title,stage-pane__label,transcript-pane__label	body.caret-shell .session-rail__title, body.caret-shell .stage-pane__label, body.caret-shell .transcript-pane_
+public/caret-shell.css	71-75	DEAD-TOKENS=is-active	body.caret-shell .session-item.is-active, body.caret-shell .session-item[aria-current="true"]
+public/caret-shell.css	77-80	DEAD-TOKENS=session-item__title	body.caret-shell .session-item__title
+public/caret-shell.css	82-84	DEAD-TOKENS=session-item__meta	body.caret-shell .session-item__meta

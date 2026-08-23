@@ -1,0 +1,8 @@
+== mutation C: remove duplicate-Stop suppression ==
+(fail) native surface seam: one-command guards > rapid duplicate Stop activations emit exactly one stopCapture [1.41ms]
+(fail) native surface seam: one-command guards > the guard rearms only after an authoritative idle snapshot [0.11ms]
+(fail) native surface seam: one-command guards > rapid duplicate Stop activations emit exactly one stopCapture [1.41ms]
+(fail) native surface seam: one-command guards > the guard rearms only after an authoritative idle snapshot [0.11ms]
+ 29 pass
+ 2 fail
+ 68 expect() calls
