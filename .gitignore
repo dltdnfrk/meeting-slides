@@ -2,14 +2,22 @@ node_modules/
 .DS_Store
 .env
 models/**/*.bin
+models/
 meetings.db
 meetings.db-*
+meetings *.db
+meetings *.db-*
 exports/
 Meeting Slides.app
+Meeting Slides *.app
 vendor/ms-playwright/
+.qa-artifacts/
 
 # 로컬 런타임 상태 / 에이전트 내부 상태
 .meeting-slides/
+.omo/drafts/
+.omo/ulw-loop/
+.omo/ulw-research/
 .omo/senpi-task/
 .omo/aside-tests/
 .omo/boulder.json
