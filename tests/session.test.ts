@@ -187,6 +187,20 @@ describe("MeetingSession", () => {
     expect(harness.messages.at(-1)).toEqual({ type: "detect", detecting: false });
   });
 
+  test("LLM 장애 중에도 충분한 실제 대화는 로컬 규칙 MeetingCard로 계속 생성", async () => {
+    const harness = makeSession({ detectInterval: 3, detectBlock: async () => { throw new Error("offline"); } });
+    const detected = harness.waitFor((message) => message.type === "detect" && !message.detecting);
+    harness.session.onChunk(chunk("다음 주 제품 출시 일정을 오늘 확정하겠습니다"));
+    harness.session.onChunk(chunk("민수는 디자인 검토를 맡고 금요일까지 완료합니다"));
+    harness.session.onChunk(chunk("최종 배포일은 다음 주 수요일로 결정했습니다"));
+    await detected;
+    expect(harness.session.snapshot().current).toMatchObject({
+      title: "다음 주 제품 출시 일정을 오늘 확정하겠습니다",
+      bullets: expect.arrayContaining(["최종 배포일은 다음 주 수요일로 결정했습니다"]),
+    });
+    expect(harness.messages.some((message) => message.type === "status" && message.text.includes("로컬 규칙"))).toBe(true);
+  });
+
   test("setDetector로 런타임 LLM 교체 — 다음 감지부터 새 백엔드 사용", async () => {
     const harness = makeSession({});
     let used = "";
@@ -308,4 +322,22 @@ describe("meta card rejection", () => {
       ]),
     });
   });
+
+  test("장시간 전사는 메모리 snapshot을 50,000문장으로 제한하고 잘림을 알린다", () => {
+    const { session } = makeSession({ detectInterval: 100_000 });
+    for (let i = 0; i < 50_025; i++) session.onChunk({ text: `문장 ${i}`, ts: i });
+    const transcript = session.transcript("snapshot");
+    expect(transcript.entries).toHaveLength(50_000);
+    expect(transcript.truncated).toBe(true);
+    expect(transcript.entries[0]?.text).toBe("문장 25");
+    expect(transcript.entries.at(-1)?.text).toBe("문장 50024");
+  });
+
+
+  test("production server keeps real-time topic detection enabled", async () => {
+    const source = await Bun.file(new URL("../server.ts", import.meta.url)).text();
+    expect(source).toContain("{ automaticDetection: true }");
+    expect(source).not.toContain("{ automaticDetection: false }");
+  });
+
 });

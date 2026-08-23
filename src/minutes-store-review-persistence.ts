@@ -4,6 +4,15 @@ import type { SaveCandidatesInput, SourceRange } from "./minutes-store-types.ts"
 import { nonBlank, reviewError } from "./minutes-store-utils.ts";
 
 export class ReviewPersistenceStore extends TranscriptStore {
+  private evidenceQuote(meetingId: number, source: SourceRange, supplied?: string): string {
+    if (supplied?.trim()) return supplied.trim();
+    const rows = this.db.query(`
+      SELECT text FROM transcript_version_lines
+      WHERE meeting_id = ? AND transcript_version_id = ? AND seq BETWEEN ? AND ? ORDER BY seq
+    `).all(meetingId, source.transcriptVersionId, source.startSeq, source.endSeq) as Array<{ text: string }>;
+    return nonBlank(rows.map((row) => row.text).join("\n"), "evidenceQuote");
+  }
+
   saveCandidates(input: SaveCandidatesInput): string {
     return this.db.transaction(() => {
       const reviewId = input.reviewId ?? randomUUID();
@@ -17,16 +26,27 @@ export class ReviewPersistenceStore extends TranscriptStore {
       for (const item of input.decisions ?? []) {
         this.validateSource(input.meetingId, input.transcriptVersionId, item.source);
         this.db.run(`
-          INSERT INTO decisions VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO decisions
+            (decision_id, meeting_id, review_id, description, evidence_quote,
+             source_transcript_version_id, source_start_seq, source_end_seq,
+             attributed_attendee_id, origin, review_state, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [item.id ?? randomUUID(), input.meetingId, reviewId, nonBlank(item.description, "description"),
+          this.evidenceQuote(input.meetingId, item.source, item.evidenceQuote),
           item.source.transcriptVersionId, item.source.startSeq, item.source.endSeq,
           item.attributedAttendeeId ?? null, item.origin ?? "manual", item.reviewState ?? "candidate", now, now]);
       }
       for (const item of input.actionItems ?? []) {
         this.validateSource(input.meetingId, input.transcriptVersionId, item.source);
         this.db.run(`
-          INSERT INTO action_items VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO action_items
+            (action_item_id, meeting_id, review_id, description, evidence_quote,
+             source_transcript_version_id, source_start_seq, source_end_seq,
+             assignee_attendee_id, attributed_attendee_id, deadline, deadline_text,
+             origin, review_state, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [item.id ?? randomUUID(), input.meetingId, reviewId, nonBlank(item.description, "description"),
+          this.evidenceQuote(input.meetingId, item.source, item.evidenceQuote),
           item.source.transcriptVersionId, item.source.startSeq, item.source.endSeq,
           item.assigneeAttendeeId ?? null, item.attributedAttendeeId ?? null, item.deadline ?? null,
           item.deadlineText ?? null, item.origin ?? "manual", item.reviewState ?? "candidate", now, now]);
@@ -34,8 +54,13 @@ export class ReviewPersistenceStore extends TranscriptStore {
       for (const item of input.openItems ?? []) {
         this.validateSource(input.meetingId, input.transcriptVersionId, item.source);
         this.db.run(`
-          INSERT INTO open_items VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO open_items
+            (open_item_id, meeting_id, review_id, description, evidence_quote,
+             source_transcript_version_id, source_start_seq, source_end_seq,
+             attributed_attendee_id, origin, review_state, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [item.id ?? randomUUID(), input.meetingId, reviewId, nonBlank(item.description, "description"),
+          this.evidenceQuote(input.meetingId, item.source, item.evidenceQuote),
           item.source.transcriptVersionId, item.source.startSeq, item.source.endSeq,
           item.attributedAttendeeId ?? null, item.origin ?? "manual", item.reviewState ?? "candidate", now, now]);
       }
@@ -63,6 +88,7 @@ export class ReviewPersistenceStore extends TranscriptStore {
       ).all(reviewId) as Array<Record<string, unknown>>;
       return rows.map((row) => ({
         kind, id: row[idColumn], description: row.description as string,
+        evidenceQuote: row.evidence_quote as string,
         source: {
           transcriptVersionId: row.source_transcript_version_id,
           startSeq: row.source_start_seq,
@@ -90,6 +116,14 @@ export class ReviewPersistenceStore extends TranscriptStore {
       transcriptVersionId: row.transcript_version_id as string, status: row.status as "draft" | "confirmed",
       confirmedAt: row.confirmed_at as number | null, confirmedBy: row.confirmed_by as string | null,
     };
+  }
+
+  reviewForMeeting(meetingId: number, transcriptVersionId?: string): ReturnType<ReviewPersistenceStore["review"]> {
+    const row = (transcriptVersionId === undefined
+      ? this.db.query(`SELECT review_id FROM meeting_reviews WHERE meeting_id = ? ORDER BY created_at DESC LIMIT 1`).get(meetingId)
+      : this.db.query(`SELECT review_id FROM meeting_reviews WHERE meeting_id = ? AND transcript_version_id = ? ORDER BY created_at DESC LIMIT 1`).get(meetingId, transcriptVersionId)) as
+      { review_id: string } | null;
+    return row ? this.review(row.review_id) : null;
   }
 
   protected validateSource(meetingId: number, reviewTranscriptVersionId: string, source: SourceRange): void {

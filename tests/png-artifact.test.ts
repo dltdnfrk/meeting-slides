@@ -1,0 +1,13 @@
+import { afterEach, expect, test } from "bun:test";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { publishPngDirectory, validateAndDescribePngDirectory } from "../src/png-artifact.ts";
+let dir = ""; afterEach(() => { if (dir) rmSync(dir, { recursive: true, force: true }); dir = ""; });
+function png(width = 3840, height = 2160) { const b=Buffer.alloc(24); Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]).copy(b); b.write("IHDR",12,"ascii"); b.writeUInt32BE(width,16); b.writeUInt32BE(height,20); return b; }
+test("PNG set validates exact count, signature, dimensions and SHA receipt", () => { dir=mkdtempSync(join(tmpdir(),"png-artifact-")); writeFileSync(join(dir,"slide-01.png"),png()); const [r]=validateAndDescribePngDirectory(dir,1); expect(r).toMatchObject({file:"slide-01.png",width:3840,height:2160,byteLength:24}); expect(r.sha256).toMatch(/^[0-9a-f]{64}$/); });
+test("PNG set rejects count mismatch, corrupt signature and zero dimension", () => { dir=mkdtempSync(join(tmpdir(),"png-artifact-")); expect(()=>validateAndDescribePngDirectory(dir,1)).toThrow("count mismatch"); writeFileSync(join(dir,"bad.png"),Buffer.alloc(24)); expect(()=>validateAndDescribePngDirectory(dir,1)).toThrow("Invalid PNG"); writeFileSync(join(dir,"bad.png"),png(0,1)); expect(()=>validateAndDescribePngDirectory(dir,1)).toThrow("dimensions"); });
+
+test("atomic publisher removes a corrupt temporary directory and never creates a final orphan", () => { const root=mkdtempSync(join(tmpdir(),"png-publish-")); dir=root; const temporary=join(root,".job.tmp"); const final=join(root,"deck-png"); mkdirSync(temporary); writeFileSync(join(temporary,"bad.png"),Buffer.alloc(24)); expect(()=>publishPngDirectory({temporaryDirectory:temporary,finalDirectory:final,expectedCount:1,meetingId:7})).toThrow(); expect(existsSync(temporary)).toBe(false); expect(existsSync(final)).toBe(false); });
+
+test("atomic publisher writes the manifest and publishes a private final directory", () => { const root=mkdtempSync(join(tmpdir(),"png-publish-ok-")); dir=root; const temporary=join(root,".job.tmp"); const final=join(root,"deck-png"); mkdirSync(temporary); writeFileSync(join(temporary,"slide-01.png"),png(16,9)); const receipts=publishPngDirectory({temporaryDirectory:temporary,finalDirectory:final,expectedCount:1,meetingId:9,createdAt:"2026-01-01T00:00:00.000Z"}); expect(receipts).toHaveLength(1); expect(existsSync(temporary)).toBe(false); expect(existsSync(join(final,"artifact-manifest.json"))).toBe(true); if(process.platform!=="win32") expect(statSync(final).mode & 0o777).toBe(0o700); });

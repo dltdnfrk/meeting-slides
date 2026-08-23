@@ -185,7 +185,7 @@ function pageBootstrap(fixedNow: number): void {
     if (state === "meetings:listed") {
       const list = document.getElementById("session-list");
       const empty = document.getElementById("session-empty");
-      return Boolean(list) && (list!.children.length > 0 || empty?.hasAttribute("hidden") === false);
+      return Boolean(list) && (list!.querySelector(".session-row") !== null || empty?.hasAttribute("hidden") === false);
     }
     if (state === "meeting:selected") {
       return document.querySelectorAll("#session-list .session-row--selected").length === 1;
@@ -473,6 +473,17 @@ export async function createCaretBrowserDriver(): Promise<CaretBrowserDriver> {
           pageTriggeredOrdinal,
         });
       }
+
+      // Geometry is sampled only after finite UI motion has settled. Waiting on
+      // Web Animations promises is event-driven (no sleep/polling) and prevents
+      // the library-stage entrance transform from introducing 1px race noise.
+      await page.evaluate(async () => {
+        const finiteAnimations = document.getAnimations().filter((animation) => {
+          const iterations = animation.effect?.getTiming().iterations;
+          return iterations !== Infinity && animation.playState !== "finished";
+        });
+        await Promise.all(finiteAnimations.map((animation) => animation.finished.catch(() => undefined)));
+      });
 
       const state = await page.evaluate(readMachineState, fixture.id, viewport.deviceScaleFactor);
       const json = canonicalJson(state);

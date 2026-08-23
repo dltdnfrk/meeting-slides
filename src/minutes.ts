@@ -84,7 +84,6 @@ function displayProvider(provider: string): string {
     "cli:grok": "Grok",
     "cli:claude": "Claude",
     "cli:gemini": "Gemini",
-    alibaba: "Alibaba GLM",
     openai: "OpenAI",
     local: "로컬 모델",
   };

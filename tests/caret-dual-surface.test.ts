@@ -525,6 +525,9 @@ describe("authoritative idle restores the just-ended meeting exactly once", () =
     await disconnected;
     await reconnected;
     await web.expect("browser:restore-reconnected", P.connected);
+    // Reconnect performs one explicit authoritative refetch for the selected meeting.
+    const afterReconnect = session.commandsOf("selectMeeting").length;
+    expect(afterReconnect).toBe(before + 1);
 
     // The reconnect snapshot itself carries an authoritative idle capture frame.
     const seen = native.expect("native:post-reconnect-idle", (s) => s.reason === "message");
@@ -532,7 +535,7 @@ describe("authoritative idle restores the just-ended meeting exactly once", () =
     await seen;
     await native.snapshot("post-reconnect-barrier");
 
-    expect(session.commandsOf("selectMeeting").length).toBe(before);
+    expect(session.commandsOf("selectMeeting").length).toBe(afterReconnect);
   }, 20_000);
 
   test("a SECOND capture cycle restores its own meeting, and only its own", async () => {

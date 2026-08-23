@@ -1,13 +1,16 @@
 import { Database } from "bun:sqlite";
 import { afterAll, beforeAll, expect, test } from "bun:test";
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { spawn, type ChildProcessByStdio } from "node:child_process";
 import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { Readable } from "node:stream";
 
 const root = join(import.meta.dir, "..");
 const timeoutMs = 10_000;
-let child: ChildProcessWithoutNullStreams;
+type TestServerProcess = ChildProcessByStdio<null, Readable, Readable>;
+
+let child: TestServerProcess;
 let socket: WebSocket;
 let tempDir: string;
 let dbPath: string;
@@ -17,7 +20,9 @@ const messages: Record<string, unknown>[] = [];
 
 function waitFor<T>(subscribe: (done: (value: T) => void, fail: (error: Error) => void) => void): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);
+    const timer = setTimeout(() => reject(new Error(
+      `timed out after ${timeoutMs}ms; recent messages=${JSON.stringify(messages.slice(-8))}`,
+    )), timeoutMs);
     subscribe(
       (value) => { clearTimeout(timer); resolve(value); },
       (error) => { clearTimeout(timer); reject(error); },
@@ -87,14 +92,14 @@ function killProcessTree(pid: number, signal: NodeJS.Signals): void {
   }
 }
 
-function waitForProcessExit(proc: ChildProcessWithoutNullStreams): Promise<void> {
+function waitForProcessExit(proc: TestServerProcess): Promise<void> {
   return waitFor<void>((done) => {
     if (proc.exitCode !== null || proc.signalCode !== null) return done();
     proc.once("close", () => done());
   });
 }
 
-async function teardownChildTree(proc: ChildProcessWithoutNullStreams): Promise<void> {
+async function teardownChildTree(proc: TestServerProcess): Promise<void> {
   if (proc.exitCode !== null || proc.signalCode !== null) return;
   killProcessTree(proc.pid!, "SIGTERM");
   try {
@@ -139,6 +144,7 @@ await new Promise(() => {});
     env: {
       ...process.env,
       MEETINGS_DB_PATH: dbPath,
+      MEETING_SLIDES_SETTINGS_ROOT: tempDir,
       HTTP_PORT: String(port),
       OPEN_BROWSER: "false",
       LLM_PROVIDER: "cli",
@@ -176,7 +182,7 @@ afterAll(async () => {
   rmSync(tempDir, { recursive: true, force: true });
 });
 
-test("setAttendees replaces a prepared roster and rejects capturing or ended meetings", async () => {
+test("setAttendees replaces a prepared roster and starts a new draft after an ended meeting", async () => {
   // 재연결 복원 질의는 준비된 회의가 없을 때도 답해야 한다 — meeting_id null + 빈 명단.
   expect(await sendAndWait({ action: "attendees" }, (message) => message.type === "attendees"))
     .toEqual({ type: "attendees", meeting_id: null, attendees: [] });
@@ -259,13 +265,42 @@ test("setAttendees replaces a prepared roster and rejects capturing or ended mee
   );
   expect(db.query("SELECT phase FROM meeting_meta WHERE meeting_id = ?").get(meetingId)).toEqual({ phase: "ended" });
 
-  await errorFor({
+  const nextPrepared = await sendAndWait({
     action: "setAttendees",
     attendees: [{ attendeeId: "dana-local", name: "Dana Final" }],
-  }, `meeting ${meetingId} is not prepared`);
-  await errorFor({ action: "startCapture", meeting_id: meetingId }, "is not prepared");
-  expect(db.query("SELECT COUNT(*) AS count FROM meetings").get()).toEqual({ count: 1 });
+  }, (message) => message.type === "attendees" && message.meeting_id !== meetingId);
+  expect(nextPrepared).toMatchObject({
+    type: "attendees",
+    meeting_id: expect.any(Number),
+    attendees: [{ attendee_id: "dana-local", display_name: "Dana Final" }],
+  });
+  await errorFor({ action: "startCapture", meeting_id: meetingId }, "does not match the current prepared meeting");
+  expect(db.query("SELECT COUNT(*) AS count FROM meetings").get()).toEqual({ count: 2 });
   expect(db.query("SELECT display_name FROM attendees WHERE meeting_id = ? AND attendee_id = ?")
     .get(meetingId, "dana-local")).toEqual({ display_name: "Dana" });
   db.close();
+}, 20_000);
+
+
+test("reconnect attendees query does not revive an ended meeting id", async () => {
+  const start = messages.length;
+  socket.send(JSON.stringify({
+    action: "setAttendees",
+    attendees: [{ name: "Dana" }],
+  }));
+  const prepared = await waitForMessageAfter(start, (message) => message.type === "attendees" && message.meeting_id != null);
+  const meetingId = prepared.meeting_id as number;
+  const capturingFrom = messages.length;
+  socket.send(JSON.stringify({ action: "startCapture", meeting_id: meetingId }));
+  await waitForMessageAfter(capturingFrom, (message) => message.type === "capture" && message.capturing === true);
+  const stoppedFrom = messages.length;
+  socket.send(JSON.stringify({ action: "stopCapture" }));
+  await waitForMessageAfter(stoppedFrom, (message) => message.type === "capture" && message.capturing === false);
+  const restoredFrom = messages.length;
+  socket.send(JSON.stringify({ action: "attendees" }));
+  expect(await waitForMessageAfter(restoredFrom, (message) => message.type === "attendees")).toEqual({
+    type: "attendees",
+    meeting_id: null,
+    attendees: [],
+  });
 }, 20_000);

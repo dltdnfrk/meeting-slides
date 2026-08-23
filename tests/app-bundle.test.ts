@@ -182,10 +182,11 @@ describe("app bundle: packaged native modules", () => {
   }
 
   test("the build compiles every macos/*.swift source in one invocation", () => {
-    const sources = run("ls", ["-1", join(ROOT, "macos")]).stdout
+    const sources = run("git", ["ls-files", "--", "macos/*.swift"]).stdout
       .trim()
       .split("\n")
-      .filter((name) => name.endsWith(".swift"));
+      .filter((name) => name.endsWith(".swift"))
+      .map((name) => name.slice("macos/".length));
     expect(sources.length).toBeGreaterThanOrEqual(7);
     for (const source of sources) {
       expect(buildScriptSource).toContain(`macos/${source}`);

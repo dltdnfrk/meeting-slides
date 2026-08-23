@@ -275,6 +275,7 @@ html.standalone-slide, html.standalone-slide body {
   margin: var(--space-3) 0 var(--space-6);
   font-size: 64px;
   line-height: 1.12;
+  padding-bottom: 2px;
 }
 
 .slide-page h2 {

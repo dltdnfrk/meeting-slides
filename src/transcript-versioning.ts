@@ -136,7 +136,16 @@ export class CaptureFinalizer {
         // Recorder failures leave no row; transcript finalization remains independent.
       }
     }
-    const transcript = this.writer.finalize({ selectCanonical: true });
+    // Canonical selection and both meeting lifecycle rows commit together. If the
+    // process crashes before this transaction, startup recovery completes it; if
+    // it commits, no observer can see an ended meeting without canonical truth.
+    const finishTranscript = this.store.databaseHandle().transaction(() => {
+      const transcript = this.writer.finalize({ selectCanonical: true });
+      this.store.databaseHandle().run("UPDATE meetings SET ended_at = coalesce(ended_at, ?) WHERE id = ?", [Date.now(), this.meetingId]);
+      if (this.store.meetingMeta(this.meetingId)?.phase === "capturing") this.store.endMeeting(this.meetingId);
+      return transcript;
+    });
+    const transcript = finishTranscript.immediate();
     if (duplicateError) throw duplicateError;
     return { ...transcript, audio };
   }

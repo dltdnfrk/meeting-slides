@@ -3,6 +3,8 @@
 // ============================================================
 
 import { spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
+import { chmodSync, existsSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 
 import { cliProcessEnvironment, resolveCliExecutable, resolveLLMConfig } from "./config.js";
 import { CliLLMClient } from "./llm-cli.js";
@@ -60,13 +62,6 @@ export function buildProviderEntries(
   }));
   return [
     ...subscriptions,
-    {
-      id: "alibaba",
-      label: "Alibaba GLM",
-      detail: env.ALIBABA_TOKEN_PLAN_MODEL ?? "glm-5.2",
-      available: Boolean(env.ALIBABA_TOKEN_PLAN_API_KEY),
-      models: PROVIDER_MODELS.alibaba,
-    },
     {
       id: "openai",
       label: "OpenAI API",
@@ -137,7 +132,6 @@ export const PROVIDER_MODELS: Record<string, string[]> = {
     adapter.id,
     adapter.models.map((model) => model.id),
   ])),
-  alibaba: ["glm-5.2", "glm-5.1", "glm-4.7"],
   openai: ["gpt-4o-mini", "gpt-4o"],
   local: [],
 };
@@ -150,7 +144,6 @@ export const PROVIDER_EFFORTS: Record<string, string[]> = Object.fromEntries(
 
 export const KEY_BY_PROVIDER: Record<string, string> = {
   openai: "OPENAI_API_KEY",
-  alibaba: "ALIBABA_TOKEN_PLAN_API_KEY",
 };
 
 /** Upserts API-key settings while preserving unrelated .env lines. Subscription auth is never stored here. */
@@ -168,4 +161,20 @@ export function upsertEnvText(text: string, entries: Record<string, string>): st
     if (!seen.has(key)) out.push(`${key}=${value}`);
   }
   return out.join("\n");
+}
+
+export function persistProviderKey(path: string, key: string, value: string): void {
+  const current = existsSync(path) ? readFileSync(path, "utf-8") : "";
+  const temporaryPath = `${path}.${process.pid}.${randomUUID()}.tmp`;
+  try {
+    writeFileSync(temporaryPath, upsertEnvText(current, { [key]: value }), {
+      encoding: "utf-8",
+      flag: "wx",
+      mode: 0o600,
+    });
+    chmodSync(temporaryPath, 0o600);
+    renameSync(temporaryPath, path);
+  } finally {
+    rmSync(temporaryPath, { force: true });
+  }
 }

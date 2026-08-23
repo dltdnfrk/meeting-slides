@@ -44,7 +44,7 @@ export interface Config {
   input: FileInputConfig;
   llm: {
     provider: string;
-    config: LLMProviderConfig | null;  // HTTP 프로바이더 (alibaba|openai|local)
+    config: LLMProviderConfig | null;  // HTTP 프로바이더 (openai|local)
     cli: CliLLMConfig | null;          // provider=cli (구독 서비스 백엔드)
   };
   block: {
@@ -77,12 +77,6 @@ function intEnv(key: string, fallback: number): number {
 
 export function resolveLLMConfig(provider: string): LLMProviderConfig {
   switch (provider) {
-    case "alibaba":
-      return {
-        baseURL: env("ALIBABA_TOKEN_PLAN_BASE_URL", "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1"),
-        apiKey: env("ALIBABA_TOKEN_PLAN_API_KEY"),
-        model: env("ALIBABA_TOKEN_PLAN_MODEL", "glm-5.2"),
-      };
     case "openai":
       return {
         baseURL: env("OPENAI_BASE_URL", "https://api.openai.com/v1"),
@@ -96,7 +90,7 @@ export function resolveLLMConfig(provider: string): LLMProviderConfig {
         model: env("LOCAL_LLM_MODEL"),
       };
     default:
-      throw new Error(`알 수 없는 LLM_PROVIDER: ${provider}. alibaba|openai|local|cli 중 하나.`);
+      throw new Error(`알 수 없는 LLM_PROVIDER: ${provider}. openai|local|cli 중 하나.`);
   }
 }
 
@@ -214,7 +208,7 @@ export function loadConfig(args: string[] = []): Config {
     throw new Error("file 모드이지만 파일 경로 없음. --file <path> 또는 WHISPER_FILE_PATH 설정.");
   }
 
-  const provider = env("LLM_PROVIDER", "alibaba");
+  const provider = env("LLM_PROVIDER", "cli");
   const llm = provider === "cli"
     ? { provider, config: null, cli: resolveCliConfig() }
     : { provider, config: resolveLLMConfig(provider), cli: null };

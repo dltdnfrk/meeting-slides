@@ -107,22 +107,29 @@
     <div class="provider-panel" id="provider-panel" role="dialog" aria-modal="true" aria-label="설정" hidden>
       <section class="settings-section" aria-labelledby="provider-section-title">
         <div class="provider-panel__head">
-          <span id="provider-section-title">슬라이드 생성 모델</span>
+          <div class="provider-panel__title">
+            <span id="provider-section-title">AI 모델</span>
+            <span class="provider-panel__lede">구독 계정이나 직접 결제 API 키를 연결하세요</span>
+          </div>
           <div class="settings-section__actions">
             <button id="btn-recheck" class="icon-btn icon-btn--sm" type="button" title="연결 상태 다시 확인" aria-label="연결 상태 다시 확인">다시 확인</button>
             <button id="btn-settings-close" class="icon-btn icon-btn--sm" type="button" title="설정 닫기" aria-label="설정 닫기">닫기</button>
           </div>
         </div>
-        <div class="provider-panel__list" id="provider-list"></div>
-        <div class="provider-config" id="provider-config">
-          <label class="provider-config__row">모델
-            <select id="select-model" class="provider-config__select"></select>
-          </label>
-          <label class="provider-config__row" id="effort-row">추론 강도
-            <select id="select-effort" class="provider-config__select"></select>
-          </label>
-        </div>
-        <p class="provider-panel__hint">변경한 설정은 다음 슬라이드부터 적용됩니다</p>
+        <div class="provider-panel__list" id="provider-list" data-view="gallery" aria-label="AI 모델 제공자"></div>
+        <section class="provider-detail" id="provider-detail" data-provider="" aria-labelledby="provider-detail-title" hidden>
+          <button id="provider-back" class="provider-detail__back" type="button">모든 모델 제공자</button>
+          <div id="provider-detail-content"></div>
+          <div class="provider-config" id="provider-config" hidden>
+            <label class="provider-config__row">모델
+              <select id="select-model" class="provider-config__select"></select>
+            </label>
+            <label class="provider-config__row" id="effort-row">추론 강도
+              <select id="select-effort" class="provider-config__select"></select>
+            </label>
+            <p class="provider-panel__hint">변경한 설정은 다음 슬라이드부터 적용됩니다</p>
+          </div>
+        </section>
       </section>
 
       <section class="settings-section settings-section--stt" aria-labelledby="stt-section-title">
@@ -264,6 +271,48 @@
             <p class="placeholder__sub">지금까지의 대화로 편집 가능한 PowerPoint 초안을 만듭니다</p>
           </div>
         </div>
+        <section class="slide-plan-workspace" data-slide-plan-workspace hidden aria-label="편집 가능한 슬라이드 초안">
+          <header class="slide-plan-workspace__toolbar">
+            <div class="slide-plan-workspace__nav" aria-label="슬라이드 탐색">
+              <button type="button" data-deck-previous aria-label="이전 슬라이드">이전</button>
+              <span data-slide-counter aria-label="슬라이드 수">0 / 0</span>
+              <button type="button" data-deck-next aria-label="다음 슬라이드">다음</button>
+              <button type="button" data-deck-overview-toggle aria-expanded="false">전체 보기</button>
+            </div>
+            <div class="slide-plan-workspace__modes">
+              <button type="button" data-presenter-toggle aria-pressed="false">발표자</button>
+              <button type="button" data-speaker-notes-toggle aria-expanded="false">노트</button>
+            </div>
+          </header>
+          <div class="slide-plan-workspace__stage" data-deck-stage tabindex="0">
+            <article class="slide-plan-paper" data-slide-plan-paper>
+              <p class="slide-plan-paper__label" data-slide-plan-layout-label></p>
+              <h2 data-slide-plan-title></h2>
+              <div class="slide-plan-paper__body" data-slide-plan-body></div>
+            </article>
+          </div>
+          <footer class="slide-plan-workspace__editor">
+            <label>제목 <input type="text" data-slide-title-input></label>
+            <label>레이아웃 <select data-slide-layout>
+              <option value="hero">Hero</option><option value="summary">Summary</option>
+              <option value="decision">Decision</option><option value="comparison">Comparison</option>
+              <option value="timeline">Timeline</option><option value="metrics">Metrics</option>
+              <option value="actions">Actions</option>
+            </select></label>
+            <button type="button" data-deck-undo>실행 취소</button>
+            <button type="button" data-deck-redo>다시 실행</button>
+            <p data-slide-plan-status>저장된 초안이 없습니다</p>
+            <nav class="slide-plan-workspace__exports" aria-label="슬라이드 내보내기">
+              <a data-slide-plan-export="web">웹</a>
+              <a data-slide-plan-export="pptx">PowerPoint</a>
+              <a data-slide-plan-export="pdf">PDF</a>
+              <a data-slide-plan-export="png">첫 슬라이드 PNG</a>
+            </nav>
+          </footer>
+          <aside class="slide-plan-workspace__overview" data-deck-overview hidden aria-label="슬라이드 전체 보기"></aside>
+          <aside class="slide-plan-workspace__notes" data-speaker-notes hidden aria-hidden="true"></aside>
+
+        </section>
       </section>
 
       <section class="meeting-overview" id="meeting-overview" aria-label="회의 개요">
@@ -561,6 +610,7 @@ Here's a quick recap of the meeting:
   <!-- The shell is an ES module: it imports the canonical reducers from the
        generated browser artifacts (scripts/build-public-modules.ts). Modules are
        deferred by definition, so it runs before app.js, which is also deferred. -->
+  <script type="module" src="/slide-plan-workspace.js"></script>
   <script type="module" src="/operator-surface.js"></script>
   <script src="/review-panel-render.js"></script>
   <script src="/review-panel.js"></script>

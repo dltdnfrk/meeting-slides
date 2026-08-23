@@ -16,6 +16,7 @@ import {
   type SceneDeck,
   type SceneSlide,
 } from "./scene-graph.js";
+import type { SlidePlan } from "./slides/model/plan.ts";
 import type { LiveMeetingCard } from "./slide-spec.js";
 import type { TranscriptChunk } from "./whisper.js";
 
@@ -71,6 +72,11 @@ export interface CaptionUpdate {
 export interface StatusUpdate {
   type: "status";
   text: string;
+  /** Present on review mutation failures so stale tabs cannot misattribute the error. */
+  mutationAction?: "updateItem" | "confirmReview";
+  meetingId?: number | null;
+  reviewId?: string | null;
+  itemId?: string | null;
 }
 
 export interface TranscriptEntry {
@@ -177,8 +183,13 @@ export interface AttendeesUpdate {
 
 export interface ReviewUpdate {
   type: "review";
+  meetingId?: number;
   reviewId: string;
   transcriptVersionId: string;
+  status?: "draft" | "confirmed";
+  confirmedAt?: number | null;
+  confirmedBy?: string | null;
+  conclusion?: MeetingConcluded | null;
   attendees: Array<{ attendeeId: string; displayName: string }>;
   transcript: {
     lines: Array<{ seq: number; speakerTurn: number | null; text: string }>;
@@ -194,6 +205,7 @@ export interface ReviewUpdate {
     };
     evidenceQuote: string;
     segment_text: string;
+    reviewState?: "candidate" | "confirmed" | "rejected";
     attributedAttendeeId: string | null;
     assigneeAttendeeId?: string | null;
     deadline?: string | null;
@@ -203,6 +215,7 @@ export interface ReviewUpdate {
 
 export interface ReviewItemUpdated {
   type: "reviewItemUpdated";
+  meetingId: number;
   reviewId: string;
   itemId: string;
   kind: "decision" | "action_item" | "open_item";
@@ -210,6 +223,7 @@ export interface ReviewItemUpdated {
 
 export interface ReviewConfirmed {
   type: "reviewConfirmed";
+  meetingId: number;
   reviewId: string;
   transcriptVersionId: string;
   confirmedAt: number;
@@ -241,7 +255,9 @@ export interface SavedUpdate {
 
 export type CompileJobId = `compile-${string}`;
 export type ExportJobId = `png-${string}` | `pdf-${string}` | `pptx-${string}`;
-export type JobStage = "planning" | "render" | "publish" | "prepare" | "validate" | "preview" | "review" | "design-gate";
+export type JobStage =
+  | "planning" | "render" | "publish" | "prepare" | "validate" | "preview" | "review" | "design-gate"
+  | "assets" | "layouts" | "geometry" | "standalone" | "pptx" | "raster" | "publication";
 
 export interface CompileUpdate {
   type: "compile";
@@ -286,6 +302,17 @@ export interface MeetingDetailUpdate {
   current: Slide | null;
   history: Slide[];
   compiled: null | { title: string; slideCount: number; compiledAt: number; publishedAt: number | null };
+  review?: ReviewUpdate | null;
+  conclusion?: MeetingConcluded | null;
+  scene?: SceneDeck;
+  slidePlan?: {
+    plan: SlidePlan;
+    path: string;
+    publicationSha256: string;
+    publishedAt: number;
+    reviewId?: string;
+    reviewedItemIds?: readonly string[];
+  };
 }
 
 export type ServerMessage =
@@ -320,15 +347,17 @@ export interface AskUpdate {
 
 export type ClientAction =
   | { action: "startCapture"; meeting_id?: number }
-  | { action: "stopCapture" | "reset" | "status" | "listMeetings" | "transcript" | "recheckProviders" | "recheckSttModels" | "attendees" | "startReview" }
+  | { action: "stopCapture" | "reset" | "status" | "listMeetings" | "transcript" | "recheckProviders" | "recheckSttModels" | "attendees" }
+  | { action: "startReview"; meetingId: number; notes?: string }
   | { action: "deleteMeeting"; meetingId: number }
-  | { action: "selectMeeting" | "compileDeck" | "compileTranscriptSnapshot" | "exportDeck" | "exportPptx" | "exportPdf" | "exportPng" | "saveNotes" | "saveTranscript" | "saveJson"; meetingId?: number }
+  | { action: "selectMeeting" | "compileDeck" | "compileSlidePlan" | "compileTranscriptSnapshot" | "exportDeck" | "exportPptx" | "exportPdf" | "exportPng" | "saveNotes" | "saveTranscript" | "saveJson"; meetingId?: number }
+  | { action: "persistSlidePlan"; meetingId?: number; plan: unknown }
   | { action: "setProvider"; id: string; model?: string; effort?: string }
   | { action: "connectProvider"; id: string }
   | { action: "setProviderKey"; id: string; key: string }
   | { action: "setAttendees"; attendees: Array<{ name: string; crmPersonId?: string }> }
-  | { action: "updateItem"; reviewId: string; itemId: string; kind: "decision" | "action_item" | "open_item"; patch: Record<string, unknown> }
-  | { action: "confirmReview"; reviewId: string }
+  | { action: "updateItem"; meetingId: number; reviewId: string; itemId: string; kind: "decision" | "action_item" | "open_item"; patch: Record<string, unknown> }
+  | { action: "confirmReview"; meetingId: number; reviewId: string }
   | { action: "ask"; meetingId: number; question: string }
   | { action: "installSttModel" | "cancelSttModel" | "selectSttModel"; modelId: SttModelInfo["id"] };
 
@@ -494,7 +523,13 @@ export class MeetingSession {
     } catch (e) {
       if (epoch !== this.epoch) return;
       const message = e instanceof Error ? e.message : String(e);
-      this.broadcast({ type: "status", text: `LLM 오류: ${message}` });
+      const fallback = deriveFallbackMeetingCard(context);
+      if (fallback) {
+        this.applyDetection(fallback);
+        this.broadcast({ type: "status", text: `LLM 오류 — 로컬 규칙으로 슬라이드를 계속 생성합니다: ${message}` });
+      } else {
+        this.broadcast({ type: "status", text: `LLM 오류: ${message}` });
+      }
     } finally {
       this.detecting = false;
       this.broadcast({ type: "detect", detecting: false });

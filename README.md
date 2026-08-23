@@ -30,10 +30,11 @@ WebSocket /ws ── public/app.js ── 슬라이드·자막·히스토리 렌
 
 ## 요구 사항
 
-- [Bun](https://bun.sh) ≥ 1.x
+- [Bun](https://bun.sh) **1.3.14** (`.bun-version`에 고정)
 - [whisper.cpp](https://github.com/ggml-org/whisper.cpp) 바이너리 2개:
   ```bash
   brew install whisper.cpp   # whisper-stream, whisper-cli 제공
+  brew install ffmpeg         # 원본 WAV 보존 및 복구용 recorder
   ```
 - ggml 모델 파일 (**large-v3-turbo 권장** — large급 정확도 + 실시간 속도):
   ```bash
@@ -51,7 +52,7 @@ WebSocket /ws ── public/app.js ── 슬라이드·자막·히스토리 렌
 ```bash
 git clone https://github.com/dltdnfrk/meeting-slides.git
 cd meeting-slides
-bun install
+bun install --frozen-lockfile
 cp .env.example .env   # 열어서 LLM 키 등을 채워 넣기
 ```
 
@@ -63,60 +64,92 @@ cp .env.example .env   # 열어서 LLM 키 등을 채워 넣기
 | `OPENAI_API_KEY` | OpenAI API 키 | — |
 | `LLM_CLI_BIN` | `cli` 모드 백엔드 CLI (`claude`/`codex`, 구독 인증) | `claude` |
 | `LLM_CLI_TIMEOUT_MS` | `cli` 모드 호출 상한 (ms) | `120000` |
-| `WHISPER_MODEL_PATH` | ggml 모델 경로 | `./models/ggml-medium.bin` |
+| `WHISPER_MODEL_PATH` | ggml 모델 경로 | `./models/ggml-large-v3-turbo.bin` |
 | `WHISPER_CAPTURE_ID` | 캡처 장치 ID (`-1`=기본 마이크) | `-1` |
 | `WHISPER_STEP_MS` | 오디오 스텝(ms). 작을수록 실시간성↑ 정확도↓ | `3000` |
 | `BLOCK_DETECT_SENTENCE_INTERVAL` | LLM 호출 간격(문장 수) | `4` |
 | `BLOCK_CONTEXT_WINDOW` | LLM에 보낼 최근 문장 수 | `12` |
 | `HTTP_PORT` | 웹 UI 포트 | `8787` |
+| `MEETING_SLIDES_AUTOMATION_TOKEN` | 선택적 calendar launcher API Bearer secret. 비우면 API 비활성 | — |
 
 > **cli 모드 팁**: CLI는 호출마다 기동 비용(수 초)이 들므로 `BLOCK_DETECT_SENTENCE_INTERVAL=8` 정도로 올리는 걸 권장합니다.
 
+## 지원 범위
+
+Meeting Slides v1은 **데스크톱 로컬 웹앱**입니다.
+
+- 공식 브라우저: Google Chrome, Aside Browser
+- 기준 화면: 1440×900, 1244×836, 1180×820, 최소 1024×768
+- 실행 방식: 이 저장소에서 Bun 로컬 서버를 실행한 뒤 브라우저로 접속
+- 지원하지 않음: 모바일 브라우저, 모바일 앱, macOS 네이티브 앱
+
+마이크 오디오는 브라우저의 `getUserMedia`가 아니라 로컬 Bun 서버가 실행한
+`whisper-stream`/`ffmpeg`가 캡처합니다. 따라서 브라우저 권한 팝업 대신 서버를
+실행한 Terminal에 macOS 마이크 권한이 필요합니다. `bun run devices`와
+`WHISPER_CAPTURE_ID`로 같은 입력 장치를 명시하세요.
+
 ## 실행
 
-### macOS 앱으로 실행 (권장)
-
 ```bash
-bun install
-bash scripts/build-app.sh
-bash scripts/verify-app.sh "$HOME/Applications/Meeting Slides.app"
-open -a "Meeting Slides"
-```
+# 1. 고정된 Bun/의존성 설치
+bun --version  # 1.3.14
+bun install --frozen-lockfile
 
-빌드는 `$HOME/Applications/Meeting Slides.app`을 만들고 저장소 루트의
-`Meeting Slides.app` 심볼릭 링크를 같은 앱으로 연결합니다. 앱은 로컬 Bun 서버를
-기동하고 전체 작업 공간을 기본 브라우저에 열며, 메뉴 막대와 네이티브 미니바에는
-녹음 상태·타이머·최근 발언·Stop만 투영합니다. 회의 목록, Notes, Transcript, Ask,
-검토, 설정과 내보내기는 브라우저 작업 공간에서 사용합니다.
+# 2. 환경 설정
+cp .env.example .env
+# .env에서 LLM CLI/API, WHISPER_MODEL_PATH, WHISPER_CAPTURE_ID 확인
 
-최초 실행 시 Gatekeeper가 막으면 Finder에서 앱을 우클릭해 **열기**를 선택하고,
-마이크 및 캘린더 권한 요청은 사용할 기능에 맞게 승인합니다. 앱 번들은 현재
-체크아웃의 `server.ts`와 정적 자산을 사용하므로 소스를 이동한 뒤에는 다시
-빌드합니다.
-
-### 터미널에서 실행
-
-```bash
-# 마이크 실시간 모드 (브라우저 자동 오픈)
-bun run dev
-
-# 캡처 장치 목록 확인 (기본 마이크가 아닐 때)
+# 3. 마이크 장치와 모델 준비 상태 확인
 bun run devices
 
-# 오디오 파일로 데모/테스트 (마이크 불필요)
-bun run server.ts --file ./sample.m4a
+# 4. 로컬 서버 실행
+bun run dev
 ```
 
-브라우저에서 `http://localhost:8787` 접속하면:
+터미널에 출력된 주소(기본값 `http://localhost:8787`)를 Chrome 또는 Aside Browser로
+엽니다. `.env`의 `HTTP_PORT`를 바꾸었다면 해당 포트로 접속합니다.
 
-- Library의 회의 목록에서 Overview, Notes, Transcript 탭을 전환합니다.
-- **녹음 시작**으로 Live 작업 공간에 들어가며, 16:9 슬라이드와 확정 전사가 함께 표시됩니다.
-- Live의 **Stop**과 서버 기준 타이머는 시작·녹음·중지 처리 중 계속 보입니다.
-- 설정에서 사용 가능한 LLM 프로바이더와 음성 인식 모델을 선택합니다.
-- **만들기·저장·내보내기**에서 PowerPoint 초안과 Markdown, JSON, 전사, 웹 슬라이드, PDF, PNG를 생성합니다.
-- Ask, 참석자 지정과 회의록 검토는 선택한 회의의 실제 서버 작업을 사용합니다.
+오디오 파일로 재현 가능한 데모를 실행할 수도 있습니다. 저장소에는 샘플 음원을
+포함하지 않으므로, 사용 권한이 있는 WAV/M4A 파일 경로를 넘기세요.
 
-> 문장 분할 품질: 한국어 STT는 구두점이 자주 빠지므로, 미완결 조각을 보류해 다음 조각과 병합하는 어셈블러가 전사 파이프라인에 내장돼 있습니다(완결 구두점·화자 전환·60자 상한·종료 시 방출).
+```bash
+bun run server.ts --file /absolute/path/to/meeting-sample.m4a
+```
+
+## v1 사용자 흐름
+
+1. 우측 **READINESS**에서 앱 서버·AI·음성 인식이 준비 상태인지 확인합니다.
+2. 필요하면 **참석자**에서 이름과 CRM ID를 등록합니다.
+3. **녹음 시작**을 누르고 회의를 진행합니다.
+4. Live 화면에서 한국어 전사와 슬라이드를 확인합니다.
+5. **Stop**을 누르고 `중지 중` flush가 끝날 때까지 기다립니다.
+6. 회의 목록에서 종료된 회의를 선택해 Overview, Notes, Transcript를 확인합니다.
+7. **슬라이드 초안 만들기**로 PowerPoint/scene 슬라이드를 생성하고 filmstrip으로 탐색합니다.
+8. **회의 검토**에서 근거 문장을 확인하고 결정·할 일을 적용합니다.
+9. **만들기·저장·내보내기**에서 필요한 형식을 저장합니다.
+10. 서버를 종료했다가 다시 실행하고 같은 회의를 선택해 전사·슬라이드가 복원되는지 확인합니다.
+
+내보내기 결과는 저장소의 `exports/`에 생성됩니다.
+
+| UI 항목 | 결과 |
+|---|---|
+| 슬라이드 초안 만들기 | 편집 가능한 `.pptx` 및 scene HTML |
+| 회의 메모 | Markdown |
+| 데이터 | JSON |
+| 전사 원문 | Markdown |
+| 웹 슬라이드 | `index.html`과 slide HTML |
+| PDF | 검토용 PDF |
+| 이미지 | 슬라이드별 PNG |
+
+## 검증
+
+```bash
+bunx tsc -p tsconfig.json --noEmit
+bun test
+```
+
+제품 범위 검증은 Chrome 실제 마이크 경로와 Aside 실제 UI 증거를 함께 사용합니다.
+macOS 네이티브 전용 테스트는 v1 데스크톱 웹 제품 게이트에 포함하지 않습니다.
 
 ## 화자 분리 (tinydiarize, 실험적)
 
@@ -155,3 +188,9 @@ public/          바닐라 JS 클라이언트 (슬라이드 스테이지 + 필�
 ## License
 
 MIT
+
+## 재현성과 라이선스
+
+- 런타임은 `.bun-version`, 패키지는 exact version과 `bun.lock`으로 고정합니다. CI/릴리스 검증은 `bun install --frozen-lockfile`을 사용합니다.
+- 생성물과 로컬 DB는 Git에 포함하지 않습니다. `meetings.db`는 0600, 내보내기 루트는 0700 권한으로 정규화됩니다.
+- 소스 라이선스는 [MIT](./LICENSE)입니다. whisper.cpp, 모델, 폰트, slides-grab 등 제3자 구성요소는 각 라이선스를 따릅니다.

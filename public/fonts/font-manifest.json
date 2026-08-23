@@ -82,8 +82,8 @@
   "licenses": [
     {
       "file": "LICENSE-Figtree-OFL.txt",
-      "sha256": "140d37233e7f3ce7313798befa9600893bcceaf41a55fa0fa5ad52f7f657a268",
-      "bytes": 4388,
+      "sha256": "bb272dfcd8801eb31fb98fe51828f76f0e41ac82f89256101df8021aa3d30ce2",
+      "bytes": 4387,
       "spdx": "OFL-1.1",
       "covers": [
         "Figtree"
@@ -92,8 +92,8 @@
     },
     {
       "file": "LICENSE-DMMono-OFL.txt",
-      "sha256": "2bada5ea45c3c63b7f1ea1f88ce9672c9e4f0c42b2c3b7378949084fe55a3066",
-      "bytes": 4484,
+      "sha256": "f5898de81851415b71431c1a8ea527c88a4e79caeb23936483428d2e911af40c",
+      "bytes": 4390,
       "spdx": "OFL-1.1",
       "covers": [
         "DM Mono"
@@ -102,7 +102,7 @@
     },
     {
       "file": "LICENSE-Pretendard-OFL.txt",
-      "sha256": "d31ddd9f2bed32fd7e302a205cf2380ba0de6529152d239ef99cfb6f261bfc04",
+      "sha256": "85fce85e25260b03777bf10373d3bd9363b9da96d9e0ca86a280dd37ed7667a0",
       "bytes": 4418,
       "spdx": "OFL-1.1",
       "covers": [

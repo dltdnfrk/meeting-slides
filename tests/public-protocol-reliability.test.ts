@@ -46,6 +46,9 @@ describe("public meeting/export protocol reliability", () => {
     const select = waitForClientAction("selectMeeting");
     await page.$eval('.session-row[data-meeting-id="7"]', (button) => (button as HTMLButtonElement).click());
     expect(await select).toEqual({ action: "selectMeeting", meetingId: 7 });
+    expect(await page.$eval("#document-surface", (node) => ({
+      busy: node.getAttribute("aria-busy"), loading: (node as HTMLElement).dataset.loading,
+    }))).toEqual({ busy: "true", loading: "true" });
 
         // Todo 13 homes the save/export/compile set inside the one contextual
     // disclosure (DESIGN 9.11). Puppeteer requires a visible target, so the
@@ -76,12 +79,16 @@ describe("public meeting/export protocol reliability", () => {
       && document.querySelector("#transcript-stream")?.textContent?.includes("과거 전사"),
     );
     const state = await page.evaluate(() => ({
+      surfaceBusy: document.getElementById("document-surface")?.getAttribute("aria-busy"),
+      surfaceLoading: document.getElementById("document-surface")?.dataset.loading,
       filmstrip: [...document.querySelectorAll("#thumbnails .thumbnail__title")].map((el) => el.textContent),
       total: document.getElementById("history-count")?.textContent,
       glance: document.getElementById("glance-slide")?.textContent,
       compile: document.getElementById("compile-status")?.textContent,
     }));
     expect(state).toEqual({
+      surfaceBusy: null,
+      surfaceLoading: "false",
       filmstrip: ["이전 장", "현재 장"],
       total: "2장",
       glance: "02/02",
@@ -92,9 +99,30 @@ describe("public meeting/export protocol reliability", () => {
     // disclosure (DESIGN 9.11). Puppeteer requires a visible target, so the
     // disclosure is opened first, as a user does. Assertions are unchanged.
     await openDock(page);
-    const compile = waitForClientAction("compileTranscriptSnapshot");
+    const compile = waitForClientAction("compileSlidePlan");
     await page.click("#btn-compile-deck");
-    expect(await compile).toEqual({ action: "compileTranscriptSnapshot", meetingId: 7 });
+    expect(await compile).toEqual({ action: "compileSlidePlan", meetingId: 7 });
+  });
+
+  test("PDF 도구 실패를 사용자 언어로 정리하고 다른 저장 성공 시 고아 재시도를 제거한다", async () => {
+    harness.pushMessage({
+      type: "export", status: "error", action: "exportPdf", jobId: "pdf-job-internal", meetingId: 7,
+      stage: "validate", code: "process-failed",
+      error: "validate failed: (node:60217) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set. Use node --trace-warnings",
+    });
+    await page.waitForSelector('.job-retry[data-action="exportPdf"]');
+    expect(await page.$eval("#status-text", (node) => ({
+      text: node.textContent?.trim(),
+      title: node.getAttribute("title"),
+    }))).toEqual({
+      text: "PDF 저장 실패: 파일 생성 도구를 실행하지 못했습니다. 다시 시도해 주세요",
+      title: "PDF 저장 실패: 파일 생성 도구를 실행하지 못했습니다. 다시 시도해 주세요",
+    });
+    expect(await page.$eval("#status-text", (node) => /NO_COLOR|FORCE_COLOR|node:60217|trace-warnings/.test(node.getAttribute("title") ?? ""))).toBe(false);
+
+    harness.pushMessage({ type: "saved", path: "exports/meeting-safe.md" });
+    await page.waitForFunction(() => document.getElementById("status-text")?.textContent === "회의 메모 저장 완료");
+    expect(await page.$(".job-retry")).toBeNull();
   });
 
   test("typed progress disables conflicts and terminal error restores controls with retry", async () => {
@@ -119,4 +147,27 @@ describe("public meeting/export protocol reliability", () => {
     await page.click('.job-retry[data-action="exportPng"]');
     expect(await retry).toEqual({ action: "exportPng", meetingId: 7 });
   });
+
+  test("pending Ask keeps one requestId and reattaches exactly once after reconnect", async () => {
+    await page.$eval("#btn-ask", (button) => (button as HTMLButtonElement).click());
+    await page.type("#ask-input", "배포일은 언제인가요?");
+    const firstPending = harness.nextClientMessage();
+    await page.click("#btn-ask-send");
+    const first = await firstPending as { action?: string; meetingId?: number; question?: string; requestId?: string };
+    expect(first).toMatchObject({ action: "ask", meetingId: 7, question: "배포일은 언제인가요?" });
+    expect(first.requestId).toMatch(/^ask-|^[0-9a-f-]{36}$/);
+
+    harness.disconnectClients();
+    await harness.waitForClient();
+    let replay: Record<string, unknown> | null = null;
+    for (let i = 0; i < 8; i++) {
+      const command = await harness.nextClientMessage() as Record<string, unknown>;
+      if (command.action === "ask") { replay = command; break; }
+    }
+    expect(replay).toEqual(first);
+    expect(await page.$$eval("#ask-conversation .ask-message--user", (nodes) => nodes.length)).toBe(1);
+    harness.pushMessage({ type: "ask", requestId: first.requestId, answer: "다음 주 수요일입니다.", matchedCount: 1 });
+    await page.waitForFunction(() => document.querySelector("#ask-conversation")?.textContent?.includes("다음 주 수요일입니다."));
+  }, 20_000);
+
 });

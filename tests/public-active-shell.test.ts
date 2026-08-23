@@ -212,6 +212,7 @@ describe("Todo 18 active shell convergence", () => {
       "/focus-trap.js",
       "/workspace-split.js",
       "/transcript-resize.js",
+      "/slide-plan-workspace.js",
       "/operator-surface.js",
       "/review-panel-render.js",
       "/review-panel.js",
@@ -323,13 +324,16 @@ describe("Todo 18 active shell convergence", () => {
 });
 
 describe("Todo 18 documentation and bundle truth", () => {
-  test("README documents only current run, build, verify, and usage surfaces", () => {
+  test("README documents the supported local-server Chrome and Aside product surface", () => {
     const readme = read("README.md");
-    expect(readme).toContain("bash scripts/build-app.sh");
-    expect(readme).toContain("bash scripts/verify-app.sh");
-    expect(readme).toContain('open -a "Meeting Slides"');
+    expect(readme).toContain("bun run dev");
+    expect(readme).toContain("Google Chrome");
+    expect(readme).toContain("Aside Browser");
+    expect(readme).toContain("최소 1024×768");
+    expect(readme).toContain("지원하지 않음: 모바일 브라우저, 모바일 앱, macOS 네이티브 앱");
+    expect(readme).not.toContain("bash scripts/build-app.sh");
+    expect(readme).not.toContain('open -a "Meeting Slides"');
     expect(readme).not.toContain("install-login-item.sh");
-    expect(readme).not.toMatch(/browser[- ]only|브라우저 전용/i);
     expect(readme).not.toMatch(/private asset|private window|screen.?share.*(hide|hidden|exclude)|화면 공유.*(숨|제외)/i);
   });
 

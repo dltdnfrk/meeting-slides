@@ -74,6 +74,7 @@ beforeAll(async () => {
     env: {
       ...process.env,
       MEETINGS_DB_PATH: dbPath,
+      MEETING_SLIDES_SETTINGS_ROOT: tempDir,
       HTTP_PORT: String(port),
       OPEN_BROWSER: "false",
       LLM_PROVIDER: "cli",
@@ -118,7 +119,7 @@ test("startReview is ended-only, requester-scoped, and single-flight for one can
   }, (message) => message.type === "attendees");
   const meetingId = attendees.meeting_id as number;
 
-  const preparedFailure = await send(owner, { action: "startReview", meeting_id: 999, reviewId: "untrusted" },
+  const preparedFailure = await send(owner, { action: "startReview", meetingId, reviewId: "untrusted" },
     (message) => message.type === "status" && String(message.text).startsWith("요청 처리 실패:"));
   expect(preparedFailure.text).toContain("must be ended");
   const observerBeforeEnd: Record<string, unknown>[] = [];
@@ -144,8 +145,8 @@ test("startReview is ended-only, requester-scoped, and single-flight for one can
 
   const ownerReview = next(owner, (message) => message.type === "review");
   const observerReview = next(observer, (message) => message.type === "review");
-  owner.send(JSON.stringify({ action: "startReview", transcriptVersionId: "attacker-version" }));
-  observer.send(JSON.stringify({ action: "startReview" }));
+  owner.send(JSON.stringify({ action: "startReview", meetingId, transcriptVersionId: "attacker-version" }));
+  observer.send(JSON.stringify({ action: "startReview", meetingId }));
   const [first, second] = await Promise.all([ownerReview, observerReview]);
   expect(first).toEqual(second);
   expect(first).toMatchObject({

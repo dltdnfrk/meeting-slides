@@ -263,6 +263,7 @@ beforeAll(async () => {
     env: {
       ...process.env,
       MEETINGS_DB_PATH: dbPath,
+      MEETING_SLIDES_SETTINGS_ROOT: tempDir,
       MEETING_BUNDLE_OUTPUT_ROOT: join(tempDir, "exports"),
       MEETING_BUNDLE_TARGET_COMMIT: "0123456789abcdef0123456789abcdef01234567",
       HTTP_PORT: String(port),
@@ -317,9 +318,19 @@ afterAll(async () => {
 });
 
 test("real WS actions reject adversarial patches, persist valid changes, and conclude with one complete bundle", async () => {
-  await wsError({ action: "confirmReview", reviewId: "not-started" }, "REVIEW_NOT_DRAFT");
+  const initialMeeting = await sendAndWait(
+    { action: "selectMeeting", meetingId },
+    (message) => message.type === "meeting" && message.meetingId === meetingId,
+  );
+  expect(initialMeeting.review).toMatchObject({
+    type: "review", meetingId, reviewId, status: "draft", conclusion: null,
+    items: [expect.objectContaining({ id: "ws-action-1", evidenceQuote: "Alice will run QA by 2026-08-07.", reviewState: "candidate" })],
+  });
+
+  await wsError({ action: "confirmReview", meetingId, reviewId: "not-started" }, "REVIEW_NOT_DRAFT");
   await wsError({ action: "confirmReview" }, "INVALID_REVIEW_REQUEST");
-  await wsError({ action: "confirmReview", reviewId }, "PENDING_REVIEW_ITEMS");
+  const pendingError = await wsError({ action: "confirmReview", meetingId, reviewId }, "PENDING_REVIEW_ITEMS");
+  expect(pendingError).toMatchObject({ mutationAction: "confirmReview", meetingId, reviewId });
   await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", patch: {} }, "INVALID_REVIEW_REQUEST");
   await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", kind: "action_item" }, "INVALID_REVIEW_PATCH");
   await wsError({ action: "updateItem", reviewId, itemId: "ws-action-1", kind: "action_item", patch: {
@@ -344,13 +355,27 @@ test("real WS actions reject adversarial patches, persist valid changes, and con
       deadline: "2026-08-07", deadlineText: "next Friday", reviewState: "confirmed",
     },
   }, (message) => message.type === "reviewItemUpdated" && message.reviewId === reviewId);
-  expect(updated).toEqual({ type: "reviewItemUpdated", reviewId, itemId: "ws-action-1", kind: "action_item" });
+  expect(updated).toEqual({ type: "reviewItemUpdated", meetingId, reviewId, itemId: "ws-action-1", kind: "action_item" });
 
   const confirmed = await sendAndWait(
     { action: "confirmReview", reviewId },
     (message) => message.type === "reviewConfirmed" && message.reviewId === reviewId,
   );
-  expect(confirmed).toMatchObject({ type: "reviewConfirmed", reviewId, transcriptVersionId: "ws-canonical-v1" });
+  expect(confirmed).toMatchObject({ type: "reviewConfirmed", meetingId, reviewId, transcriptVersionId: "ws-canonical-v1" });
+
+  const concludedMeeting = await sendAndWait(
+    { action: "selectMeeting", meetingId },
+    (message) => message.type === "meeting" && message.meetingId === meetingId
+      && (message.review as Record<string, unknown> | undefined)?.status === "confirmed",
+  );
+  expect(concludedMeeting).toMatchObject({
+    review: {
+      meetingId, reviewId, status: "confirmed",
+      items: [expect.objectContaining({ id: "ws-action-1", description: "Run release QA", reviewState: "confirmed" })],
+      conclusion: expect.objectContaining({ type: "meetingConcluded", concluded: true, meetingId, reviewId }),
+    },
+    conclusion: expect.objectContaining({ type: "meetingConcluded", concluded: true, meetingId, reviewId }),
+  });
 
   const db = new Database(dbPath, { readonly: true });
   expect(db.query("SELECT description, assignee_attendee_id, attributed_attendee_id, deadline, deadline_text, review_state FROM action_items WHERE action_item_id = 'ws-action-1'").get()).toEqual({

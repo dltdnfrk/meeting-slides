@@ -9,8 +9,8 @@ import { WhisperStream, WhisperCLI, listCaptureDevices, type TranscriptChunk } f
 import { TranscribeStream, TranscribeCLI } from "./src/transcribe.ts";
 import { LLMClient, type ChatTransport, type MeetingLLM } from "./src/llm.ts";
 import { CliLLMClient } from "./src/llm-cli.ts";
-import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type CapturePhase, type ExportUpdate, type ReviewUpdate, type AskUpdate } from "./src/session.ts";
-import { buildProviderEntriesFromStates, checkCliBin, createDetector, inspectSubscriptionProviders, KEY_BY_PROVIDER, PROVIDER_ADAPTERS, providerAdapter, providerConnectCommand, upsertEnvText, type ProviderRuntimeState, type SubscriptionProviderId } from "./src/providers.ts";
+import { MeetingSession, type ServerMessage, type ClientListener, type ProvidersUpdate, type CaptureUpdate, type CapturePhase, type ExportUpdate, type ReviewUpdate, type MeetingConcluded, type AskUpdate } from "./src/session.ts";
+import { buildProviderEntriesFromStates, checkCliBin, createDetector, inspectSubscriptionProviders, KEY_BY_PROVIDER, persistProviderKey, PROVIDER_ADAPTERS, providerAdapter, providerConnectCommand, type ProviderRuntimeState, type SubscriptionProviderId } from "./src/providers.ts";
 import { AppSettingsStore } from "./src/app-settings.ts";
 import { SttModelManager } from "./src/stt-model-downloader.ts";
 import { createSelectSttModel } from "./src/stt-model-selection.ts";
@@ -21,18 +21,26 @@ import { MeetingStore } from "./src/store.ts";
 import { deleteMeetingHistory } from "./src/meeting-deletion.ts";
 import { MinutesStore, type AttendeeInput, type ReviewState } from "./src/minutes-store.ts";
 import { CaptureFinalizer, RawAudioRecorder, TranscriptVersionWriter, claimFileAudioSource, sha256File } from "./src/transcript-versioning.ts";
+import { reconcileInterruptedMeetings } from "./src/startup-recovery.ts";
 import { MinutesExtractor } from "./src/extract.ts";
 import { startReview } from "./src/start-review.ts";
 import { concludeMeeting } from "./src/conclusion.ts";
 import { runSceneCompileAction } from "./src/scene-compile-action.ts";
+import { scenePublication } from "./src/scene-store.ts";
+import { resolveSlidePlanArtifact, SlidePlanArtifactError } from "./src/slide-plan-artifacts.ts";
+import { SlidePlanStore } from "./src/slide-plan-store.ts";
+import { parseSlidePlan, type SlidePlan } from "./src/slides/model/plan-parser.ts";
+import { runSlidePlanServerAction, type SlidePlanTranscriptInput } from "./src/slides/server-action.ts";
+import { confirmedReviewEvidence } from "./src/slides/server-review-evidence.ts";
 import { prepareExportDeck } from "./src/deck-export.ts";
 import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
 import { askMeeting } from "./src/ask.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
+import { publishPngDirectory } from "./src/png-artifact.ts";
 import { createHash, randomUUID } from "node:crypto";
 import type { CompileJobId, ExportJobId } from "./src/session.ts";
-import { join, sep } from "node:path";
-import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { basename, join, sep } from "node:path";
+import { appendFileSync, chmodSync, copyFileSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { spawn, spawnSync } from "child_process";
 import type { ServerWebSocket } from "bun";
 
@@ -72,10 +80,16 @@ const broadcast = (msg: ServerMessage) => {
 // anarlog(fastrepl) 방식: 전사·슬라이드를 로컬 SQLite에 영속 저장
 const databasePath = process.env.MEETINGS_DB_PATH ?? join(import.meta.dir, "meetings.db");
 const bundleOutputRoot = process.env.MEETING_BUNDLE_OUTPUT_ROOT ?? join(import.meta.dir, "exports");
+mkdirSync(bundleOutputRoot, { recursive: true, mode: 0o700 });
+try { chmodSync(bundleOutputRoot, 0o700); } catch { /* platform/filesystem may not expose POSIX modes */ }
 const bundleTargetCommit = process.env.MEETING_BUNDLE_TARGET_COMMIT
   ?? spawnSync("git", ["rev-parse", "HEAD"], { cwd: import.meta.dir, encoding: "utf8" }).stdout.trim();
 const store = new MeetingStore(databasePath);
+try { chmodSync(databasePath, 0o600); } catch { /* platform/filesystem may not expose POSIX modes */ }
 const minutesStore = new MinutesStore(store.databaseHandle());
+const slidePlanStore = new SlidePlanStore(store.databaseHandle());
+const recoveredMeetingIds = reconcileInterruptedMeetings(minutesStore);
+if (recoveredMeetingIds.length > 0) console.warn(`[recovery] finalized interrupted meetings: ${recoveredMeetingIds.join(", ")}`);
 const transcriptWriter = new TranscriptVersionWriter(minutesStore);
 const session = new MeetingSession(
   llm,
@@ -94,11 +108,11 @@ const session = new MeetingSession(
       broadcast(meetingsMessage());
     },
   },
-  { automaticDetection: false },
+  { automaticDetection: true },
 );
 
 // ── 프로바이더 런타임 선택 (사용자가 UI에서 교체) ──
-const appSettings = new AppSettingsStore(import.meta.dir);
+const appSettings = new AppSettingsStore(process.env.MEETING_SLIDES_SETTINGS_ROOT ?? import.meta.dir);
 let providerStates: ProviderRuntimeState[] = inspectSubscriptionProviders();
 let providerEntries = buildProviderEntriesFromStates(process.env, providerStates);
 function enrichProviderEntries(): void {
@@ -133,8 +147,9 @@ try {
 // 관찰성: 마지막 저장 경로를 유지해 클라이언트에 상시 표시
 let lastSavedPath: string | null = null;
 // Compile/PPTX/PDF/PNG share one artifact pipeline and must never overlap.
-type ActiveJob = { id: CompileJobId | ExportJobId; meetingId: number; action: "compileDeck" | "compileTranscriptSnapshot" | "exportDeck" | "exportPptx" | "exportPdf" | "exportPng" };
+type ActiveJob = { id: CompileJobId | ExportJobId; meetingId: number; action: "compileDeck" | "compileSlidePlan" | "persistSlidePlan" | "compileTranscriptSnapshot" | "exportDeck" | "exportPptx" | "exportPdf" | "exportPng" };
 let activeJob: ActiveJob | null = null;
+let activeExportUpdate: ExportUpdate | null = null;
 
 function providersMessage(): ProvidersUpdate {
   return {
@@ -170,8 +185,9 @@ function validMeetingId(value: unknown): value is number {
 
 function runGrab(args: string[], timeoutMs: number): Promise<void> {
   return new Promise((resolve, reject) => {
+    const { FORCE_COLOR: _forceColor, ...grabEnv } = process.env;
     const proc = spawn(process.execPath, ["x", "slides-grab", ...args], {
-      env: { ...process.env, PLAYWRIGHT_BROWSERS_PATH: join(import.meta.dir, "vendor", "ms-playwright") },
+      env: { ...grabEnv, NO_COLOR: "1", PLAYWRIGHT_BROWSERS_PATH: join(import.meta.dir, "vendor", "ms-playwright") },
       stdio: ["ignore", "pipe", "pipe"],
     });
     let tail = "";
@@ -218,8 +234,11 @@ async function beforeDeadline<T>(work: Promise<T>, deadline: number, label: stri
 async function runImageExport(action: "exportPdf" | "exportPng", meetingId: number, jobId: ExportJobId): Promise<void> {
   const started = Date.now();
   const deadline = started + 120_000;
-  const send = (message: Omit<ExportUpdate, "type" | "action" | "jobId" | "meetingId">) =>
-    broadcast({ type: "export", action, jobId, meetingId, ...message });
+  const send = (message: Omit<ExportUpdate, "type" | "action" | "jobId" | "meetingId">) => {
+    const update: ExportUpdate = { type: "export", action, jobId, meetingId, ...message };
+    activeExportUpdate = update;
+    broadcast(update);
+  };
   send({ status: "started", stage: "prepare" });
   try {
     if (store.meeting(meetingId) === null) throw new ExportJobError("meeting-not-found", `Meeting ${meetingId} was not found`);
@@ -238,10 +257,18 @@ async function runImageExport(action: "exportPdf" | "exportPng", meetingId: numb
     send({ status: "progress", stage: "validate", completed: 1, total: 1 });
 
     if (action === "exportPng") {
-      const out = join(import.meta.dir, "exports", `deck-${stamp}-png`);
+      const finalName = `deck-${stamp}-png`;
+      const out = join(bundleOutputRoot, finalName);
+      const temporaryOut = join(bundleOutputRoot, `.${finalName}.tmp-${randomUUID()}`);
       send({ status: "progress", stage: "render", completed: 0, total: material.slideCount });
-      await runGrab(["png", "--slides-dir", slidesDir, "--output-dir", out], deadline - Date.now());
-      lastSavedPath = `exports/deck-${stamp}-png`;
+      try {
+        await runGrab(["png", "--slides-dir", slidesDir, "--output-dir", temporaryOut], deadline - Date.now());
+        publishPngDirectory({ temporaryDirectory: temporaryOut, finalDirectory: out, expectedCount: material.slideCount, meetingId });
+      } catch (error) {
+        rmSync(temporaryOut, { recursive: true, force: true });
+        throw error;
+      }
+      lastSavedPath = `${out.startsWith(import.meta.dir) ? `${out.slice(import.meta.dir.length + 1)}` : out}`;
       broadcast({ type: "saved", path: lastSavedPath });
       send({ status: "success", stage: "publish", completed: material.slideCount, total: material.slideCount, path: lastSavedPath });
       return;
@@ -389,14 +416,39 @@ const MIME: Record<string, string> = {
 // ws → listener 매핑: close 시 정확히 제거하기 위함.
 const wsListeners = new Map<ServerWebSocket<undefined>, ClientListener>();
 
-// CSWSH 방어: 브라우저가 자동으로 붙이는 Origin이 이 서버 자신이 아니면
-// 업그레이드를 거부한다. curl 같은 비브라우저 클라이언트는 Origin을 보내지
-// 않으므로 그대로 허용한다.
+// CSWSH 방어: production은 브라우저가 자동으로 붙이는 same-origin Origin만
+// 허용한다. originless test/launcher 연결은 명시적인 환경 opt-in이 필요하다.
 const ALLOWED_WS_ORIGINS = new Set([
   `http://localhost:${config.server.httpPort}`,
   `http://127.0.0.1:${config.server.httpPort}`,
   `http://[::1]:${config.server.httpPort}`,
 ]);
+const SECURITY_HEADERS = {
+  "content-security-policy": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'sha256-CTSVlnPNqSQZ/c+SNJNy+TlsMKVz2bXM+yySIVG+qv0='; connect-src 'self' ws:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+  "x-frame-options": "DENY",
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "no-referrer",
+  "permissions-policy": "camera=(), geolocation=(), payment=(), usb=()",
+  "cache-control": "no-store",
+} as const;
+function secureResponse(body: BodyInit | null = null, init: ResponseInit = {}): Response {
+  const headers = new Headers(init.headers);
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
+  return new Response(body, { ...init, headers });
+}
+const automationToken = process.env.MEETING_SLIDES_AUTOMATION_TOKEN?.trim() ?? "";
+function hasValidAutomationToken(req: Request): boolean {
+  if (!automationToken) return false;
+  const authorization = req.headers.get("authorization");
+  const supplied = authorization?.startsWith("Bearer ")
+    ? authorization.slice("Bearer ".length)
+    : req.headers.get("x-meeting-slides-token");
+  return supplied === automationToken;
+}
+function isTrustedAutomationRequest(req: Request): boolean {
+  const origin = req.headers.get("origin");
+  return (origin === null || ALLOWED_WS_ORIGINS.has(origin)) && hasValidAutomationToken(req);
+}
 
 interface WsCommand {
   action?: string;
@@ -419,9 +471,20 @@ interface WsCommand {
 
 let currentMeetingId: number | null = null;
 
-function requestError(ws: ServerWebSocket<undefined>, error: unknown): void {
+type ReviewMutationIdentity = {
+  mutationAction: "updateItem" | "confirmReview";
+  meetingId: number | null;
+  reviewId: string | null;
+  itemId?: string | null;
+};
+
+function requestError(
+  ws: ServerWebSocket<undefined>,
+  error: unknown,
+  identity?: ReviewMutationIdentity,
+): void {
   const message = error instanceof Error ? error.message : String(error);
-  ws.send(JSON.stringify({ type: "status" as const, text: `요청 처리 실패: ${message}` }));
+  ws.send(JSON.stringify({ type: "status" as const, text: `요청 처리 실패: ${message}`, ...identity }));
 }
 
 function parseAttendees(value: unknown): AttendeeInput[] {
@@ -554,24 +617,103 @@ const handleStopCapture: WsActionHandler = ({ ws, cmd }) => {
   void stopCapture();
 };
 
+function conclusionForReview(reviewId: string): MeetingConcluded | null {
+  const row = minutesStore.databaseHandle().query(`
+    SELECT meeting_id, review_id, transcript_version_id, bundle_id, bundle_path,
+      manifest_sha256, target_commit, concluded_at
+    FROM meeting_conclusions WHERE review_id = ?
+  `).get(reviewId) as {
+    meeting_id: number; review_id: string; transcript_version_id: string;
+    bundle_id: string; bundle_path: string; manifest_sha256: string;
+    target_commit: string; concluded_at: number;
+  } | null;
+  return row && {
+    type: "meetingConcluded", concluded: true, meetingId: row.meeting_id,
+    reviewId: row.review_id, transcriptVersionId: row.transcript_version_id,
+    bundleId: row.bundle_id, bundlePath: row.bundle_path,
+    manifest: { sha256: row.manifest_sha256, targetCommit: row.target_commit },
+    concludedAt: row.concluded_at,
+  };
+}
+
+/** Rebuild the wire payload exclusively from durable rows; no process cache is authoritative. */
+function reviewSnapshotForMeeting(meetingId: number): ReviewUpdate | null {
+  const canonical = minutesStore.canonicalVersion(meetingId);
+  if (!canonical) return null;
+  const review = minutesStore.reviewForMeeting(meetingId, canonical.transcriptVersionId);
+  if (!review) return null;
+  const lines = minutesStore.transcriptVersionLines(review.transcriptVersionId).map((line) => ({
+    seq: line.seq, speakerTurn: line.speakerTurn, text: line.text,
+  }));
+  const segmentText = (startSeq: number, endSeq: number) => lines
+    .filter((line) => line.seq >= startSeq && line.seq <= endSeq)
+    .map((line) => line.text).join("\n");
+  const items = minutesStore.itemsForReview(review.reviewId).map((raw) => {
+    const source = raw.source as { transcriptVersionId: string; startSeq: number; endSeq: number };
+    return {
+      id: String(raw.id),
+      kind: raw.kind as "decision" | "action_item" | "open_item",
+      description: raw.description,
+      sourceSegment: {
+        transcript_version_id: source.transcriptVersionId,
+        start_seq: source.startSeq,
+        end_seq: source.endSeq,
+      },
+      evidenceQuote: String(raw.evidenceQuote),
+      segment_text: segmentText(source.startSeq, source.endSeq),
+      reviewState: raw.reviewState as ReviewState,
+      attributedAttendeeId: raw.attributedAttendeeId as string | null,
+      ...(raw.kind === "action_item" ? {
+        assigneeAttendeeId: raw.assigneeAttendeeId as string | null,
+        deadline: raw.deadline as string | null,
+        deadlineText: raw.deadlineText as string | null,
+      } : {}),
+    };
+  });
+  return {
+    type: "review", meetingId, reviewId: review.reviewId,
+    transcriptVersionId: review.transcriptVersionId,
+    status: review.status, confirmedAt: review.confirmedAt, confirmedBy: review.confirmedBy,
+    conclusion: conclusionForReview(review.reviewId),
+    attendees: minutesStore.attendeesFor(meetingId).map(({ attendeeId, displayName }) => ({ attendeeId, displayName })),
+    transcript: { lines }, items,
+  };
+}
+
+function reviewMutationIdentity(cmd: WsCommand): ReviewMutationIdentity {
+  const reviewId = typeof cmd.reviewId === "string" && cmd.reviewId.trim() ? cmd.reviewId.trim() : null;
+  const persisted = reviewId === null ? null : minutesStore.review(reviewId);
+  return {
+    mutationAction: cmd.action === "confirmReview" ? "confirmReview" : "updateItem",
+    meetingId: persisted?.meetingId ?? (validMeetingId(cmd.meetingId) ? cmd.meetingId : null),
+    reviewId,
+    ...(cmd.action === "updateItem" ? {
+      itemId: typeof cmd.itemId === "string" && cmd.itemId.trim() ? cmd.itemId.trim() : null,
+    } : {}),
+  };
+}
+
 const reviewRuns = new Map<string, {
   promise: Promise<ReviewUpdate>;
   requesters: Set<ServerWebSocket<undefined>>;
 }>();
-const completedReviews = new Map<string, ReviewUpdate>();
 
 const handleStartReview: WsActionHandler = ({ ws, cmd }) => {
   if (capturing) {
     requestError(ws, new Error("capture must be stopped before starting review"));
     return;
   }
-  if (currentMeetingId === null) {
-    requestError(ws, new Error("no current meeting to review"));
+  if (!validMeetingId(cmd.meetingId)) {
+    requestError(ws, new Error("검토할 회의 ID가 올바르지 않습니다"));
     return;
   }
 
-  const meetingId = currentMeetingId;
+  const meetingId = cmd.meetingId;
   const meta = minutesStore.meetingMeta(meetingId);
+  if (!meta) {
+    requestError(ws, new Error("검토할 회의를 찾을 수 없습니다"));
+    return;
+  }
   if (meta?.phase !== "ended") {
     requestError(ws, new Error(`meeting ${meetingId} must be ended before review`));
     return;
@@ -582,9 +724,9 @@ const handleStartReview: WsActionHandler = ({ ws, cmd }) => {
     return;
   }
   const key = `${meetingId}:${canonical.transcriptVersionId}`;
-  const completed = completedReviews.get(key);
-  if (completed) {
-    broadcast(completed);
+  const persisted = reviewSnapshotForMeeting(meetingId);
+  if (persisted) {
+    ws.send(JSON.stringify(persisted));
     return;
   }
   const active = reviewRuns.get(key);
@@ -593,18 +735,23 @@ const handleStartReview: WsActionHandler = ({ ws, cmd }) => {
     return;
   }
 
-  broadcast({ type: "status", text: "회의록 정리 중…" });
+  ws.send(JSON.stringify({ type: "status" as const, text: "회의록 정리 중…" }));
   const promise = startReview({
     meetingId,
     store: minutesStore,
     extractor: new MinutesExtractor(extractionTransport),
     ...(typeof cmd.notes === "string" && cmd.notes.trim() ? { notes: cmd.notes.trim() } : {}),
+  }).then(() => {
+    const snapshot = reviewSnapshotForMeeting(meetingId);
+    if (!snapshot) throw new Error(`review snapshot for meeting ${meetingId} was not persisted`);
+    return snapshot;
   });
   const run = { promise, requesters: new Set([ws]) };
   reviewRuns.set(key, run);
   void promise.then((review) => {
-    completedReviews.set(key, review);
-    broadcast(review);
+    for (const requester of run.requesters) {
+      try { requester.send(JSON.stringify(review)); } catch { /* requester disconnected */ }
+    }
   }).catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[review] 추출 실패: ${message}`);
@@ -636,7 +783,14 @@ const handleReset: WsActionHandler = ({ ws }) => {
 const handleSetAttendees: WsActionHandler = ({ cmd }) => {
   const attendees = parseAttendees(cmd.attendees);
   const purpose = parsePurpose(cmd.purpose);
-  const meetingId = currentMeetingId ?? minutesStore.ensurePreparedMeeting(currentProviderId, purpose ?? null);
+  const currentPhase = currentMeetingId === null ? null : minutesStore.meetingMeta(currentMeetingId)?.phase;
+  if (currentMeetingId !== null && currentPhase === "capturing") {
+    throw new Error(`meeting ${currentMeetingId} is not prepared`);
+  }
+  const reusableMeetingId = currentMeetingId !== null && currentPhase === "prepared"
+    ? currentMeetingId
+    : null;
+  const meetingId = reusableMeetingId ?? minutesStore.ensurePreparedMeeting(currentProviderId, purpose ?? null);
   const meta = minutesStore.meetingMeta(meetingId);
   if (!meta) throw new Error(`unknown meeting ${meetingId}`);
   if (meta.phase !== "prepared") throw new Error(`meeting ${meetingId} is not prepared`);
@@ -660,11 +814,12 @@ const handleSetAttendees: WsActionHandler = ({ cmd }) => {
  * 읽기 전용이라 브로드캐스트하지 않고 요청한 소켓에만 답한다.
  */
 const handleAttendeesQuery: WsActionHandler = ({ ws }) => {
-  const meetingId = currentMeetingId;
+  const restoredId = currentMeetingId;
+  const canReuse = restoredId !== null && minutesStore.meetingMeta(restoredId)?.phase === "prepared";
   ws.send(JSON.stringify({
     type: "attendees" as const,
-    meeting_id: meetingId,
-    attendees: meetingId === null ? [] : minutesStore.attendeesFor(meetingId).map((attendee) => ({
+    meeting_id: canReuse ? restoredId : null,
+    attendees: !canReuse || restoredId === null ? [] : minutesStore.attendeesFor(restoredId).map((attendee) => ({
       attendee_id: attendee.attendeeId,
       display_name: attendee.displayName,
       ...(attendee.crmPersonEntityId === null ? {} : { crm_person_entity_id: attendee.crmPersonEntityId }),
@@ -677,12 +832,23 @@ const handleUpdateItem: WsActionHandler = ({ cmd }) => {
   const itemId = parseReviewId(cmd.itemId, "itemId");
   const kind = parseReviewKind(cmd.kind);
   const patch = parseReviewPatch(cmd.patch, kind);
+  const review = minutesStore.review(reviewId);
+  if (review && cmd.meetingId !== undefined && cmd.meetingId !== review.meetingId) {
+    throw reviewRequestError("REVIEW_MEETING_MISMATCH", `review ${reviewId} does not belong to meeting ${String(cmd.meetingId)}`);
+  }
   minutesStore.updateItem(reviewId, kind, itemId, patch);
-  broadcast({ type: "reviewItemUpdated", reviewId, itemId, kind });
+  const updated = minutesStore.review(reviewId)!;
+  broadcast({ type: "reviewItemUpdated", meetingId: updated.meetingId, reviewId, itemId, kind });
+  const snapshot = reviewSnapshotForMeeting(updated.meetingId);
+  if (snapshot) broadcast(snapshot);
 };
 
 const handleConfirmReview: WsActionHandler = ({ ws, cmd }) => {
   const reviewId = parseReviewId(cmd.reviewId, "reviewId");
+  const initialReview = minutesStore.review(reviewId);
+  if (initialReview && cmd.meetingId !== undefined && cmd.meetingId !== initialReview.meetingId) {
+    throw reviewRequestError("REVIEW_MEETING_MISMATCH", `review ${reviewId} does not belong to meeting ${String(cmd.meetingId)}`);
+  }
   void concludeMeeting(reviewId, {
     store: minutesStore,
     outputRoot: bundleOutputRoot,
@@ -692,15 +858,19 @@ const handleConfirmReview: WsActionHandler = ({ ws, cmd }) => {
     const review = minutesStore.review(reviewId)!;
     broadcast({
       type: "reviewConfirmed",
+      meetingId: review.meetingId,
       reviewId,
       transcriptVersionId: review.transcriptVersionId,
       confirmedAt: review.confirmedAt!,
     });
     broadcast(conclusion);
-  }).catch((error: unknown) => requestError(ws, error));
+    const snapshot = reviewSnapshotForMeeting(review.meetingId);
+    if (snapshot) broadcast(snapshot);
+  }).catch((error: unknown) => requestError(ws, error, reviewMutationIdentity(cmd)));
 };
 
-const askRuns = new Map<string, Set<ServerWebSocket<undefined>>>();
+const askRuns = new Map<string, { question: string; requesters: Set<ServerWebSocket<undefined>>; run: Promise<void> }>();
+const completedAsks = new Map<string, { question: string; update: AskUpdate }>();
 
 const handleAsk: WsActionHandler = ({ ws, cmd }) => {
   const meetingId = Number(cmd.meeting_id ?? cmd.meetingId ?? 0);
@@ -719,12 +889,30 @@ const handleAsk: WsActionHandler = ({ ws, cmd }) => {
     return;
   }
   const key = `${meetingId}:${requestId}`;
-  const requesters = askRuns.get(key) ?? new Set<ServerWebSocket<undefined>>();
-  requesters.add(ws);
-  askRuns.set(key, requesters);
-  void askMeeting(minutesStore, meetingId, question, extractionTransport, { timeoutMs: 60_000 })
+  const completed = completedAsks.get(key);
+  if (completed) {
+    if (completed.question !== question) {
+      ws.send(JSON.stringify({ type: "ask" as const, requestId, answer: "", matchedCount: 0, error: "requestId가 다른 질문에 이미 사용되었습니다" }));
+    } else {
+      ws.send(JSON.stringify(completed.update));
+    }
+    return;
+  }
+  const existing = askRuns.get(key);
+  if (existing) {
+    if (existing.question !== question) {
+      ws.send(JSON.stringify({ type: "ask" as const, requestId, answer: "", matchedCount: 0, error: "requestId가 다른 질문에 이미 사용되었습니다" }));
+    } else {
+      existing.requesters.add(ws);
+    }
+    return;
+  }
+  const requesters = new Set<ServerWebSocket<undefined>>([ws]);
+  const run = askMeeting(minutesStore, meetingId, question, extractionTransport, { timeoutMs: 60_000 })
     .then((result) => {
       const update: AskUpdate = { type: "ask", requestId, answer: result.answer, matchedCount: result.matchedSegments.length };
+      completedAsks.set(key, { question, update });
+      setTimeout(() => completedAsks.delete(key), 5 * 60_000).unref();
       for (const requester of requesters) {
         try { requester.send(JSON.stringify(update)); } catch { /* requester disconnected */ }
       }
@@ -732,13 +920,14 @@ const handleAsk: WsActionHandler = ({ ws, cmd }) => {
     .catch((error: unknown) => {
       const message = error instanceof Error ? error.message : String(error);
       const update: AskUpdate = { type: "ask", requestId, answer: "", matchedCount: 0, error: `질문 처리 실패: ${message}` };
+      completedAsks.set(key, { question, update });
+      setTimeout(() => completedAsks.delete(key), 5 * 60_000).unref();
       for (const requester of requesters) {
         try { requester.send(JSON.stringify(update)); } catch { /* requester disconnected */ }
       }
     })
-    .finally(() => {
-      askRuns.delete(key);
-    });
+    .finally(() => { askRuns.delete(key); });
+  askRuns.set(key, { question, requesters, run });
 };
 
 const handleStatus: WsActionHandler = ({ ws, cmd }) => {
@@ -988,8 +1177,7 @@ const handleSetProviderKey: WsActionHandler = ({ ws, cmd }) => {
       process.env[envKey] = key;
       try {
         const envPath = join(import.meta.dir, ".env");
-        const current = existsSync(envPath) ? readFileSync(envPath, "utf-8") : "";
-        writeFileSync(envPath, upsertEnvText(current, { [envKey]: key }), { mode: 0o600 });
+        persistProviderKey(envPath, envKey, key);
       } catch {
         broadcast({ type: "status", text: "(.env 기록 실패 — 이번 세션에만 적용됩니다)" });
       }
@@ -1055,13 +1243,18 @@ const httpServer = Bun.serve({
       ws.send(JSON.stringify(captureMessage()));
       ws.send(JSON.stringify(session.snapshot()));
       ws.send(JSON.stringify(session.transcript("snapshot")));
+      if (activeExportUpdate) ws.send(JSON.stringify(activeExportUpdate));
+      else if (activeJob) ws.send(JSON.stringify({
+        type: "compile", status: "started", jobId: activeJob.id, meetingId: activeJob.meetingId,
+      }));
       if (lastSavedPath) {
         ws.send(JSON.stringify({ type: "saved" as const, path: lastSavedPath }));
       }
     },
     message(ws: ServerWebSocket<undefined>, data: string | Buffer) {
+      let parsedCmd: WsCommand | undefined;
       try {
-        const cmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as WsCommand & {
+        const cmd = parsedCmd = JSON.parse(typeof data === "string" ? data : data.toString("utf-8")) as WsCommand & {
           id?: string;
           key?: string;
           model?: string;
@@ -1069,7 +1262,7 @@ const httpServer = Bun.serve({
           modelId?: unknown;
           meetingId?: unknown;
         };
-        if (["startReview", "setAttendees", "attendees", "updateItem", "confirmReview", "ask"].includes(cmd.action ?? "")) {
+        if (["startCapture", "startReview", "setAttendees", "attendees", "updateItem", "confirmReview", "ask"].includes(cmd.action ?? "")) {
           handlerMap.get(cmd.action ?? "")?.({ ws, cmd });
           return;
         }
@@ -1094,9 +1287,24 @@ const httpServer = Bun.serve({
             ws.send(JSON.stringify({ type: "status" as const, text: "meetingId must be a number" }));
           } else {
             const detail = store.meetingDetail(cmd.meetingId);
+            const publication = detail === null ? null : scenePublication(store.databaseHandle(), cmd.meetingId);
+            const slidePlan = detail === null ? null : slidePlanStore.latest(cmd.meetingId);
+            const review = detail === null ? null : reviewSnapshotForMeeting(cmd.meetingId);
+            const conclusion = review?.conclusion ?? null;
             ws.send(JSON.stringify(detail === null
               ? { type: "status" as const, text: `회의 ${cmd.meetingId}을 찾을 수 없습니다` }
-              : { type: "meeting" as const, ...detail }));
+              : { type: "meeting" as const, ...detail, review, conclusion,
+                  ...(publication ? { scene: publication.scene } : {}),
+                  ...(slidePlan ? {
+                    slidePlan: {
+                      plan: slidePlan.plan,
+                      path: slidePlan.path,
+                      publicationSha256: slidePlan.publicationSha256,
+                      publishedAt: slidePlan.publishedAt,
+                      ...(slidePlan.reviewId === undefined ? {} : { reviewId: slidePlan.reviewId }),
+                      ...(slidePlan.reviewedItemIds === undefined ? {} : { reviewedItemIds: slidePlan.reviewedItemIds }),
+                    },
+                  } : {}) }));
           }
         }
         else if (cmd.action === "deleteMeeting") {
@@ -1117,6 +1325,137 @@ const httpServer = Bun.serve({
         }
         else if (cmd.action === "transcript") {
           ws.send(JSON.stringify(session.transcript("export")));
+        }
+        else if (cmd.action === "persistSlidePlan") {
+          const jobId: CompileJobId = `compile-${randomUUID()}`;
+          const requestedMeetingId = validMeetingId(cmd.meetingId)
+            ? cmd.meetingId
+            : cmd.meetingId === undefined ? store.latestMeeting()?.id : undefined;
+          if (cmd.meetingId !== undefined && !validMeetingId(cmd.meetingId)) {
+            broadcast({ type: "compile", status: "error", jobId, error: "meetingId must be a number" });
+          } else if (requestedMeetingId === undefined || store.meeting(requestedMeetingId) === null) {
+            broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId, error: "meeting not found" });
+          } else if (activeJob !== null) {
+            broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId, error: `A conflicting ${activeJob.action} job is already in progress` });
+          } else {
+            const canonical = minutesStore.canonicalVersion(requestedMeetingId);
+            const review = canonical === null
+              ? null
+              : minutesStore.reviewForMeeting(requestedMeetingId, canonical.transcriptVersionId);
+            const confirmedReview = canonical === null
+              ? undefined
+              : confirmedReviewEvidence(
+                  review,
+                  review?.status === "confirmed" ? minutesStore.itemsForReview(review.reviewId) : [],
+                  canonical.transcriptVersionId,
+                );
+            const transcript: SlidePlanTranscriptInput = canonical?.contentSha256
+              ? {
+                  state: "finalized",
+                  transcriptVersionId: canonical.transcriptVersionId,
+                  contentSha256: canonical.contentSha256,
+                  ...(confirmedReview === undefined ? {} : { confirmedReview }),
+                  lines: minutesStore.transcriptVersionLines(canonical.transcriptVersionId).map((line) => ({
+                    seq: line.seq, speaker: line.speakerTurn === null ? null : String(line.speakerTurn), text: line.text,
+                  })),
+                }
+              : {
+                  state: "live",
+                  lines: store.lines(requestedMeetingId).map((line) => ({
+                    seq: line.seq, speaker: line.speaker === null ? null : String(line.speaker), text: line.text,
+                  })),
+                };
+            activeJob = { id: jobId, meetingId: requestedMeetingId, action: cmd.action };
+            let persistPlan: SlidePlan | undefined;
+            try { persistPlan = parseSlidePlan(JSON.stringify((cmd as { plan?: unknown }).plan)); }
+            catch (error) {
+              broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId, error: error instanceof Error ? error.message : "invalid SlidePlan" });
+            }
+            if (persistPlan === undefined) {
+              /* invalid plan already reported */
+            } else void runSlidePlanServerAction({
+              jobId, meetingId: requestedMeetingId, transcript, persistPlan, transport: extractionTransport,
+              outputRoot: join(import.meta.dir, "exports", "slide-plans"),
+              cacheRoot: join(import.meta.dir, "exports", ".slide-plan-cache"),
+              fontSourcePath: join(import.meta.dir, "public", "fonts", "pretendard-variable.woff2"),
+              tools: {
+                slidesGrabPath: join(import.meta.dir, "node_modules", ".bin", "slides-grab"),
+                playwrightBrowsersPath: process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(import.meta.dir, "vendor", "ms-playwright"),
+                sandboxExecutable: "/usr/bin/sandbox-exec",
+                sandboxProfile: "(version 1)(allow default)(deny network*)",
+                timeoutMs: 120_000,
+              },
+              createId: () => persistPlan.planId, now: () => new Date().toISOString(), send: broadcast,
+            }).then((result) => {
+              slidePlanStore.save(result);
+              lastSavedPath = result.directory;
+              broadcast({ type: "saved", path: result.directory });
+            }).catch((error) => {
+              console.error(`[slide-plan] ${error instanceof Error ? error.message : String(error)}`);
+            }).finally(() => { if (activeJob?.id === jobId) activeJob = null; });
+          }
+        }
+        else if (cmd.action === "compileSlidePlan") {
+          const jobId: CompileJobId = `compile-${randomUUID()}`;
+          const requestedMeetingId = validMeetingId(cmd.meetingId)
+            ? cmd.meetingId
+            : cmd.meetingId === undefined ? store.latestMeeting()?.id : undefined;
+          if (cmd.meetingId !== undefined && !validMeetingId(cmd.meetingId)) {
+            broadcast({ type: "compile", status: "error", jobId, error: "meetingId must be a number" });
+          } else if (requestedMeetingId === undefined || store.meeting(requestedMeetingId) === null) {
+            broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId, error: "meeting not found" });
+          } else if (activeJob !== null) {
+            broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId, error: `A conflicting ${activeJob.action} job is already in progress` });
+          } else {
+            const canonical = minutesStore.canonicalVersion(requestedMeetingId);
+            const review = canonical === null
+              ? null
+              : minutesStore.reviewForMeeting(requestedMeetingId, canonical.transcriptVersionId);
+            const confirmedReview = canonical === null
+              ? undefined
+              : confirmedReviewEvidence(
+                  review,
+                  review?.status === "confirmed" ? minutesStore.itemsForReview(review.reviewId) : [],
+                  canonical.transcriptVersionId,
+                );
+            const transcript: SlidePlanTranscriptInput = canonical?.contentSha256
+              ? {
+                  state: "finalized",
+                  transcriptVersionId: canonical.transcriptVersionId,
+                  contentSha256: canonical.contentSha256,
+                  ...(confirmedReview === undefined ? {} : { confirmedReview }),
+                  lines: minutesStore.transcriptVersionLines(canonical.transcriptVersionId).map((line) => ({
+                    seq: line.seq, speaker: line.speakerTurn === null ? null : String(line.speakerTurn), text: line.text,
+                  })),
+                }
+              : {
+                  state: "live",
+                  lines: store.lines(requestedMeetingId).map((line) => ({
+                    seq: line.seq, speaker: line.speaker === null ? null : String(line.speaker), text: line.text,
+                  })),
+                };
+            activeJob = { id: jobId, meetingId: requestedMeetingId, action: cmd.action };
+            void runSlidePlanServerAction({
+              jobId, meetingId: requestedMeetingId, transcript, transport: extractionTransport,
+              outputRoot: join(import.meta.dir, "exports", "slide-plans"),
+              cacheRoot: join(import.meta.dir, "exports", ".slide-plan-cache"),
+              fontSourcePath: join(import.meta.dir, "public", "fonts", "pretendard-variable.woff2"),
+              tools: {
+                slidesGrabPath: join(import.meta.dir, "node_modules", ".bin", "slides-grab"),
+                playwrightBrowsersPath: process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(import.meta.dir, "vendor", "ms-playwright"),
+                sandboxExecutable: "/usr/bin/sandbox-exec",
+                sandboxProfile: "(version 1)(allow default)(deny network*)",
+                timeoutMs: 120_000,
+              },
+              createId: randomUUID, now: () => new Date().toISOString(), send: broadcast,
+            }).then((result) => {
+              slidePlanStore.save(result);
+              lastSavedPath = result.directory;
+              broadcast({ type: "saved", path: result.directory });
+            }).catch((error) => {
+              console.error(`[slide-plan] ${error instanceof Error ? error.message : String(error)}`);
+            }).finally(() => { if (activeJob?.id === jobId) activeJob = null; });
+          }
         }
         else if (cmd.action === "compileDeck" || cmd.action === "compileTranscriptSnapshot" || cmd.action === "exportDeck" || cmd.action === "exportPptx") {
           const jobId: CompileJobId = `compile-${randomUUID()}`;
@@ -1179,7 +1518,10 @@ const httpServer = Bun.serve({
             const jobId = `${prefix}-${randomUUID()}` as ExportJobId;
             activeJob = { id: jobId, meetingId: requestedMeetingId, action: cmd.action };
             void runImageExport(cmd.action, requestedMeetingId, jobId)
-              .finally(() => { if (activeJob?.id === jobId) activeJob = null; });
+              .finally(() => {
+                if (activeJob?.id === jobId) activeJob = null;
+                if (activeExportUpdate?.jobId === jobId) activeExportUpdate = null;
+              });
           }
         }
         else if (cmd.action === "saveNotes" || cmd.action === "saveTranscript" || cmd.action === "saveJson") {
@@ -1284,8 +1626,7 @@ const httpServer = Bun.serve({
             process.env[envKey] = key;
             try {
               const envPath = join(import.meta.dir, ".env");
-              const current = existsSync(envPath) ? readFileSync(envPath, "utf-8") : "";
-              writeFileSync(envPath, upsertEnvText(current, { [envKey]: key }), { mode: 0o600 });
+              persistProviderKey(envPath, envKey, key);
             } catch {
               broadcast({ type: "status", text: "(.env 기록 실패 — 이번 세션에만 적용됩니다)" });
             }
@@ -1303,7 +1644,8 @@ const httpServer = Bun.serve({
         const message = e instanceof Error ? e.message : String(e);
         console.error("[ws] 메시지 처리 실패:", message);
         try {
-          ws.send(JSON.stringify({ type: "status" as const, text: `요청 처리 실패: ${message}` }));
+          requestError(ws, e, parsedCmd?.action === "updateItem" || parsedCmd?.action === "confirmReview"
+            ? reviewMutationIdentity(parsedCmd) : undefined);
         } catch { /* ws 이미 닫힘 */ }
       }
     },
@@ -1319,34 +1661,64 @@ const httpServer = Bun.serve({
     const url = new URL(req.url);
     if (url.pathname === "/ws") {
       const origin = req.headers.get("origin");
-      if (origin && !ALLOWED_WS_ORIGINS.has(origin)) {
-        return new Response("Forbidden origin", { status: 403 });
+      const allowOriginless = process.env.NODE_ENV === "test" || process.env.MEETING_SLIDES_ALLOW_ORIGINLESS_WS === "true";
+      if ((origin === null && !allowOriginless) || (origin !== null && !ALLOWED_WS_ORIGINS.has(origin))) {
+        return secureResponse("Forbidden origin", { status: 403 });
       }
       const ok = server.upgrade(req);
       if (ok) return undefined;
       return new Response("Upgrade failed", { status: 426 });
     }
+    if (url.pathname === "/favicon.ico") return secureResponse(null, { status: 204 });
     // Meeting Slides.app WKWebView는 /app 을 엔트리로 로드한다.
     const path = (url.pathname === "/" || url.pathname === "/app" || url.pathname === "/app/")
       ? "/index.html"
       : url.pathname;
     // 캘린더 연동: launcher가 회의 시작 전에 알리면 자동으로 녹음을 시작한다.
     if (url.pathname === "/api/auto-capture" && req.method === "POST") {
+      if (!automationToken) return secureResponse("Automation API disabled", { status: 503 });
+      if (!isTrustedAutomationRequest(req) || !req.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
+        return secureResponse("Forbidden", { status: 403 });
+      }
       if (!capturing) {
         void startCapture().catch((error) => {
           console.error(`[auto-capture] 시작 실패: ${error instanceof Error ? error.message : String(error)}`);
         });
       }
-      return new Response(JSON.stringify({ ok: true, capturing }), {
+      return secureResponse(JSON.stringify({ ok: true, capturing }), {
         headers: { "content-type": "application/json" },
       });
     }
     if (url.pathname === "/api/auto-stop" && req.method === "POST") {
+      if (!automationToken) return secureResponse("Automation API disabled", { status: 503 });
+      if (!isTrustedAutomationRequest(req) || !req.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
+        return secureResponse("Forbidden", { status: 403 });
+      }
       if (capturing) {
         void stopCapture();
       }
-      return new Response(JSON.stringify({ ok: true, capturing: false }), {
+      return secureResponse(JSON.stringify({ ok: true, capturing: false }), {
         headers: { "content-type": "application/json" },
+      });
+    }
+    if (url.pathname.startsWith("/slide-plan-artifacts/")) {
+      if (req.method !== "GET" && req.method !== "HEAD") {
+        return secureResponse("Method Not Allowed", { status: 405, headers: { allow: "GET, HEAD" } });
+      }
+      return resolveSlidePlanArtifact(url.pathname, slidePlanStore).then((artifact) => secureResponse(
+        req.method === "HEAD" ? null : Bun.file(artifact.filePath),
+        {
+          headers: {
+            "content-type": artifact.contentType,
+            "content-disposition": `${artifact.disposition}; filename="${basename(artifact.filePath)}"`,
+          },
+        },
+      )).catch((error) => {
+        if (error instanceof SlidePlanArtifactError) {
+          return secureResponse(error.message, { status: error.status });
+        }
+        console.error(`[slide-plan-artifact] ${error instanceof Error ? error.message : String(error)}`);
+        return secureResponse("Artifact unavailable", { status: 500 });
       });
     }
     const publicDir = join(import.meta.dir, "public");
@@ -1356,10 +1728,10 @@ const httpServer = Bun.serve({
     }
     const f = Bun.file(filePath);
     return f.exists().then((exists) => {
-      if (!exists) return new Response("Not Found", { status: 404 });
+      if (!exists) return secureResponse("Not Found", { status: 404 });
       const ext = path.split(".").pop() ?? "";
       const mime = MIME[ext] ?? "application/octet-stream";
-      return new Response(f, { headers: { "content-type": mime, "x-content-type-options": "nosniff" } });
+      return secureResponse(f, { headers: { "content-type": mime } });
     });
   },
 });

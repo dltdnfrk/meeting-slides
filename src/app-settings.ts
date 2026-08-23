@@ -19,13 +19,11 @@ const PROVIDER_IDS = new Set<ProviderId>([
   "cli:grok",
   "cli:claude",
   "cli:gemini",
-  "alibaba",
   "openai",
   "local",
 ]);
 
 const HTTP_MODELS: Partial<Record<ProviderId, readonly string[]>> = {
-  alibaba: ["glm-5.2", "glm-5.1", "glm-4.7"],
   openai: ["gpt-4o-mini", "gpt-4o"],
 };
 

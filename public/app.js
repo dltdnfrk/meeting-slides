@@ -28,6 +28,9 @@ const btnExportPngEl = /** @type {HTMLButtonElement} */ ($("btn-export-png"));
 const btnSettingsEl = /** @type {HTMLButtonElement} */ ($("btn-settings"));
 const providerPanelEl = $("provider-panel");
 const providerListEl = $("provider-list");
+const providerDetailEl = $("provider-detail");
+const providerDetailContentEl = $("provider-detail-content");
+const providerBackEl = /** @type {HTMLButtonElement} */ ($("provider-back"));
 const btnRecheckEl = $("btn-recheck");
 const btnSettingsCloseEl = $("btn-settings-close");
 const btnRecheckSttEl = $("btn-recheck-stt");
@@ -66,6 +69,7 @@ let jobControlsBusy = false;
 
 // 글랜서블 상태 스트립
 const appEl = document.querySelector(".app");
+const slidePlanWorkspace = window.__slidePlanWorkspace ?? null;
 // The shell module (operator-surface.js) owns the canonical UI/transcript
 // reducers and every explicit state attribute. It is an ES module and therefore
 // runs before this deferred script, so the handle is always present in the
@@ -88,6 +92,7 @@ const lastSavedEl = $("last-saved");
 const docTitleEl = $("doc-title");
 const docMetaEl = $("doc-meta");
 const pillMetaEl = $("pill-meta");
+const providerConfigEl = $("provider-config");
 const selectModelEl = /** @type {HTMLSelectElement} */ ($("select-model"));
 const selectEffortEl = /** @type {HTMLSelectElement} */ ($("select-effort"));
 const effortRowEl = $("effort-row");
@@ -165,6 +170,7 @@ let activeMeetingTitle = "";
 const GATE_REASON_DISCONNECTED = "앱 서버에 연결되어야 사용할 수 있습니다";
 const GATE_REASON_JOB_BUSY = "진행 중인 슬라이드 작업이 끝나야 사용할 수 있습니다";
 const GATE_REASON_CAPTURING = "녹음을 중지한 뒤 사용할 수 있습니다";
+const GATE_REASON_SLIDE_PLAN_DIRTY = "로컬 편집으로 내보내기가 오래되었습니다";
 
 /** Each gated control's purpose, captured from the markup before any override. */
 const controlPurpose = new WeakMap();
@@ -215,10 +221,12 @@ function syncActionAvailability() {
   applyGate(btnRecordEl, connected ? null : GATE_REASON_DISCONNECTED);
   applyGate(btnAttendeesEl, !connected ? GATE_REASON_DISCONNECTED : capturing ? GATE_REASON_CAPTURING : null);
   for (const control of [btnExportMdEl, btnExportJsonEl, btnExportTranscriptEl, btnExportDeckEl]) {
-    applyGate(control, connected ? null : GATE_REASON_DISCONNECTED);
+    const stale = control === btnExportDeckEl && slidePlanWorkspace?.isDirty();
+    applyGate(control, !connected ? GATE_REASON_DISCONNECTED : stale ? GATE_REASON_SLIDE_PLAN_DIRTY : null);
   }
   for (const control of conflictingJobControls) {
-    applyGate(control, !connected ? GATE_REASON_DISCONNECTED : jobControlsBusy ? GATE_REASON_JOB_BUSY : null);
+    const stale = control !== btnCompileDeckEl && slidePlanWorkspace?.isDirty();
+    applyGate(control, !connected ? GATE_REASON_DISCONNECTED : stale ? GATE_REASON_SLIDE_PLAN_DIRTY : jobControlsBusy ? GATE_REASON_JOB_BUSY : null);
   }
   applyGate(btnResetEl, !connected ? GATE_REASON_DISCONNECTED : capturing ? GATE_REASON_CAPTURING : null);
 }
@@ -309,6 +317,7 @@ function showFreshWorkspace() {
   viewingCompiled = false;
   compiledPreviewTitle = "";
   activeMeetingTitle = "";
+  slidePlanWorkspace?.clear();
   renderTranscriptBacklog([]);
   renderMain();
   renderThumbnails([]);
@@ -753,18 +762,25 @@ function exportTranscript(entries) {
 
 // ── 슬라이드 생성 모델 설정 ──
 let currentProvider = "";
+let providerMessage = null;
+let providerDetailId = "";
+let providerKeyPendingId = "";
 
 const PROVIDER_COPY = {
-  "cli:codex": { name: "ChatGPT", detail: "구독 계정" },
-  "cli:grok": { name: "Grok", detail: "xAI 계정" },
-  "cli:claude": { name: "Claude", detail: "Claude Pro 또는 Max 계정" },
-  "cli:gemini": { name: "Gemini", detail: "Google 계정" },
-  openai: { name: "OpenAI", detail: "API 키로 연결" },
-  local: { name: "로컬 모델", detail: "이 Mac에서 실행" },
+  "cli:codex": { name: "ChatGPT", detail: "구독 계정", mark: "O" },
+  "cli:grok": { name: "Grok", detail: "xAI 계정", mark: "X" },
+  "cli:claude": { name: "Claude", detail: "Claude Pro 또는 Max 계정", mark: "C" },
+  "cli:gemini": { name: "Gemini", detail: "Google 계정", mark: "G" },
+  openai: { name: "OpenAI API", detail: "직접 결제 API 키", mark: "O" },
+  local: { name: "로컬 모델", detail: "이 Mac에서 실행", mark: "L" },
 };
 
 function providerCopy(provider) {
-  return PROVIDER_COPY[provider?.id] ?? { name: provider?.label ?? "AI 모델", detail: provider?.detail ?? "" };
+  return PROVIDER_COPY[provider?.id] ?? {
+    name: provider?.label ?? "AI 모델",
+    detail: provider?.detail ?? "",
+    mark: String(provider?.label ?? "AI").slice(0, 1).toUpperCase(),
+  };
 }
 
 function displayModelName(model) {
@@ -777,6 +793,7 @@ function displayModelName(model) {
 const EFFORT_COPY = { low: "낮음", medium: "보통", high: "높음" };
 
 function renderProviders(msg) {
+  providerMessage = msg;
   currentProvider = msg.current ?? "";
   const curRow = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === currentProvider);
   const currentCopy = providerCopy(curRow);
@@ -788,33 +805,88 @@ function renderProviders(msg) {
     contextAiStatusEl.dataset.tone = curRow?.available ? "positive" : "warning";
   }
   glanceProviderEl.textContent = providerLabelCur || "—";
-  renderProviderConfig(msg);
   renderDocHead();
   renderPill();
-  const list = Array.isArray(msg.list) ? msg.list : [];
-  providerListEl.innerHTML = list.map((p) => {
-    const isCli = p.id.startsWith("cli:");
-    const keyBased = p.id === "openai";
-    const status = providerStatus(p);
-    const copy = providerCopy(p);
-    const showActions = isCli || !status.selectable;
+  const pending = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === providerKeyPendingId);
+  if (pending?.available) {
+    providerKeyPendingId = "";
+    providerDetailId = "";
+  }
+  renderProviderViews();
+}
+
+function providerMark(copy) {
+  return `<span class="provider-mark" aria-hidden="true">${escapeHtml(copy.mark)}</span>`;
+}
+
+function renderProviderViews() {
+  if (!providerMessage) return;
+  const list = Array.isArray(providerMessage.list) ? providerMessage.list : [];
+  const detail = list.find((provider) => provider.id === providerDetailId);
+  providerListEl.dataset.view = detail ? "detail" : "gallery";
+  providerListEl.hidden = Boolean(detail);
+  providerDetailEl.hidden = !detail;
+  providerDetailEl.dataset.provider = detail?.id ?? "";
+
+  providerListEl.innerHTML = list.map((provider) => {
+    const status = providerStatus(provider);
+    const copy = providerCopy(provider);
     return `
-    <div class="provider-row${p.id === currentProvider ? " provider-row--current" : ""}${status.selectable ? "" : " provider-row--disabled"}" data-id="${escapeHtml(p.id)}" data-auth="${escapeHtml(status.auth)}" data-installed="${status.installed ? "true" : "false"}">
-      <button type="button" class="provider-row__select" ${status.selectable ? "" : "disabled"} aria-pressed="${p.id === currentProvider ? "true" : "false"}">
-        <span class="provider-row__name">${escapeHtml(copy.name)}</span>
-        <span class="provider-row__detail">${escapeHtml(copy.detail)}</span>
-        <span class="provider-row__badge provider-row__badge--${status.tone}">${escapeHtml(status.badge)}</span>
-      </button>
-      ${showActions ? `
-        <div class="provider-row__actions">
-          ${isCli ? `<button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">${escapeHtml(status.connectLabel)}</button>` : ""}
-          ${keyBased && !status.selectable ? `
-            <button type="button" class="provider-row__connect" data-id="${escapeHtml(p.id)}">키 발급</button>
-            <input class="provider-row__key" type="password" placeholder="${escapeHtml(copy.name)} API 키" aria-label="${escapeHtml(copy.name)} API 키" autocomplete="off">
-            <button type="button" class="provider-row__save" data-id="${escapeHtml(p.id)}">API 키 저장</button>` : ""}
-        </div>` : ""}
-    </div>`;
+      <article class="provider-row${provider.id === currentProvider ? " provider-row--current" : ""}" data-id="${escapeHtml(provider.id)}" data-auth="${escapeHtml(status.auth)}" data-installed="${status.installed ? "true" : "false"}">
+        <button type="button" class="provider-row__open" aria-label="${escapeHtml(copy.name)} 설정 열기">
+          ${providerMark(copy)}
+          <span class="provider-row__copy">
+            <span class="provider-row__name">${escapeHtml(copy.name)}</span>
+            <span class="provider-row__badge provider-row__badge--${status.tone}">${escapeHtml(provider.id === currentProvider ? "현재 사용" : status.badge)}</span>
+          </span>
+          <span class="provider-row__chevron" aria-hidden="true">›</span>
+        </button>
+      </article>`;
   }).join("");
+
+  if (!detail) {
+    providerDetailContentEl.innerHTML = "";
+    providerConfigEl.hidden = true;
+    return;
+  }
+
+  const status = providerStatus(detail);
+  const copy = providerCopy(detail);
+  const isCli = detail.id.startsWith("cli:");
+  const isKeyBased = detail.id === "openai";
+  const isCurrent = detail.id === currentProvider;
+  const pending = providerKeyPendingId === detail.id;
+  const providerActions = `
+    <div class="provider-detail__actions">
+      ${isCli ? `<button type="button" class="provider-row__connect provider-detail__button provider-detail__button--quiet" data-id="${escapeHtml(detail.id)}">${escapeHtml(status.connectLabel)}</button>` : ""}
+      ${status.selectable && !isCurrent ? `<button type="button" class="provider-row__select provider-detail__button" data-id="${escapeHtml(detail.id)}">이 모델 사용</button>` : ""}
+      ${isCurrent ? `<span class="provider-detail__current">현재 사용 중</span>` : ""}
+    </div>`;
+  providerDetailContentEl.innerHTML = `
+    <header class="provider-detail__brand">
+      ${providerMark(copy)}
+      <span class="provider-detail__brand-copy">
+        <span class="provider-detail__title" id="provider-detail-title">${escapeHtml(copy.name)}</span>
+        <span class="provider-row__badge provider-row__badge--${status.tone}">${escapeHtml(isCurrent ? "현재 사용" : status.badge)}</span>
+      </span>
+    </header>
+    <p class="provider-detail__blurb">${escapeHtml(copy.detail)}</p>
+    ${isKeyBased ? `
+      <div class="provider-key-form">
+        <label class="provider-key-form__label" for="provider-key">API key</label>
+        <div class="provider-key-form__control">
+          <input id="provider-key" class="provider-key-form__input" type="password" placeholder="${detail.available ? "새 키를 입력해 교체" : "sk-…"}" autocomplete="off" spellcheck="false">
+          <button id="provider-key-reveal" class="provider-key-form__reveal" type="button" aria-pressed="false">표시</button>
+        </div>
+        <p class="provider-key-form__help">키는 이 Mac의 프로젝트 설정에만 저장되며 화면에 다시 표시되지 않습니다.</p>
+        <div class="provider-key-form__actions">
+          <button type="button" class="provider-row__connect provider-detail__button provider-detail__button--quiet" data-id="${escapeHtml(detail.id)}">OpenAI에서 키 만들기</button>
+          <button id="provider-key-save" class="provider-detail__button" type="button" data-id="${escapeHtml(detail.id)}" disabled>${pending ? "확인 중…" : "저장 및 연결"}</button>
+        </div>
+        <div id="provider-key-feedback" class="provider-key-form__feedback" aria-live="polite">${pending ? "연결 상태를 확인하고 있습니다" : ""}</div>
+      </div>` : providerActions}
+  `;
+  renderProviderConfig(providerMessage);
 }
 
 /**
@@ -851,6 +923,7 @@ function providerStatus(p) {
 function renderProviderConfig(msg) {
   const entry = (Array.isArray(msg.list) ? msg.list : []).find((p) => p.id === msg.current);
   const models = entry?.models ?? [];
+  providerConfigEl.hidden = !entry || entry.id !== providerDetailId;
   selectModelEl.disabled = models.length === 0;
   selectModelEl.innerHTML = `<option value="">기본 모델</option>` + models.map((m) =>
     `<option value="${escapeHtml(m)}"${m === msg.currentModel ? " selected" : ""}>${escapeHtml(displayModelName(m))}</option>`,
@@ -990,6 +1063,9 @@ function setProviderPanelOpen(open, restoreFocus = false) {
     // DESIGN 9.12: Tab/Shift+Tab stay inside the open sheet (focus-trap.js).
     window.trapFocus?.(providerPanelEl);
   } else {
+    providerDetailId = "";
+    providerKeyPendingId = "";
+    renderProviderViews();
     if (window.closeDialog) window.closeDialog(providerPanelEl, () => {
       if (restoreFocus) btnSettingsEl.focus({ preventScroll: true });
     }); else {
@@ -1008,26 +1084,65 @@ btnSettingsCloseEl.onclick = () => setProviderPanelOpen(false, true);
 
 providerListEl.addEventListener("click", (ev) => {
   if (!(ev.target instanceof Element)) return;
+  const openBtn = ev.target.closest(".provider-row__open");
+  const row = openBtn?.closest(".provider-row");
+  if (openBtn instanceof HTMLElement && row instanceof HTMLElement) {
+    providerDetailId = row.dataset.id ?? "";
+    renderProviderViews();
+    focusFirstControl(providerDetailEl);
+  }
+});
+
+providerBackEl.onclick = () => {
+  providerDetailId = "";
+  providerKeyPendingId = "";
+  renderProviderViews();
+  const firstCard = providerListEl.querySelector(".provider-row__open");
+  if (firstCard instanceof HTMLElement) firstCard.focus({ preventScroll: true });
+};
+
+providerDetailEl.addEventListener("input", (ev) => {
+  if (!(ev.target instanceof HTMLInputElement) || ev.target.id !== "provider-key") return;
+  const save = providerDetailEl.querySelector("#provider-key-save");
+  if (save instanceof HTMLButtonElement) save.disabled = ev.target.value.trim().length === 0;
+});
+
+providerDetailEl.addEventListener("click", (ev) => {
+  if (!(ev.target instanceof Element)) return;
+  const revealBtn = ev.target.closest("#provider-key-reveal");
+  if (revealBtn instanceof HTMLButtonElement) {
+    const input = providerDetailEl.querySelector("#provider-key");
+    if (input instanceof HTMLInputElement) {
+      const reveal = input.type === "password";
+      input.type = reveal ? "text" : "password";
+      revealBtn.textContent = reveal ? "숨김" : "표시";
+      revealBtn.setAttribute("aria-pressed", String(reveal));
+      input.focus({ preventScroll: true });
+    }
+    return;
+  }
   const connectBtn = ev.target.closest(".provider-row__connect");
   if (connectBtn instanceof HTMLElement && ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ action: "connectProvider", id: connectBtn.dataset.id }));
     return;
   }
-  const saveBtn = ev.target.closest(".provider-row__save");
-  if (saveBtn instanceof HTMLElement && ws && ws.readyState === WebSocket.OPEN) {
-    const row = saveBtn.closest(".provider-row");
-    const input = row?.querySelector(".provider-row__key");
+  const saveBtn = ev.target.closest("#provider-key-save");
+  if (saveBtn instanceof HTMLButtonElement && ws && ws.readyState === WebSocket.OPEN) {
+    const input = providerDetailEl.querySelector("#provider-key");
     if (input instanceof HTMLInputElement && input.value.trim()) {
       ws.send(JSON.stringify({ action: "setProviderKey", id: saveBtn.dataset.id, key: input.value.trim() }));
+      providerKeyPendingId = saveBtn.dataset.id ?? "";
       input.value = "";
+      saveBtn.disabled = true;
+      saveBtn.textContent = "확인 중…";
+      const feedback = providerDetailEl.querySelector("#provider-key-feedback");
+      if (feedback) feedback.textContent = "연결 상태를 확인하고 있습니다";
     }
     return;
   }
   const selectBtn = ev.target.closest(".provider-row__select");
-  const row = selectBtn?.closest(".provider-row");
-  if (selectBtn instanceof HTMLButtonElement && row instanceof HTMLElement &&
-      !selectBtn.disabled && ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "setProvider", id: row.dataset.id }));
+  if (selectBtn instanceof HTMLButtonElement && !selectBtn.disabled && ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: "setProvider", id: selectBtn.dataset.id }));
   }
 });
 
@@ -1040,7 +1155,8 @@ btnRecheckEl.onclick = () => {
 
 document.addEventListener("click", (ev) => {
   if (!(ev.target instanceof Element)) return;
-  if (!providerPanelEl.hidden && !ev.target.closest("#provider-panel") && !ev.target.closest("#btn-settings")) {
+  const path = ev.composedPath();
+  if (!providerPanelEl.hidden && !path.includes(providerPanelEl) && !path.includes(btnSettingsEl)) {
     setProviderPanelOpen(false, true);
   }
 });
@@ -1414,9 +1530,10 @@ function sendCaptureToggle() {
     setAttendeeError("저장하지 않은 참석자가 있습니다. 참석자를 저장한 뒤 녹음을 시작해 주세요");
   }
   // 참석자는 하드 게이트가 아니다 — 지정하지 않아도 캡처는 시작된다.
-  ws.send(JSON.stringify(attendeeState.meetingId === null
-    ? { action: "startCapture" }
-    : { action: "startCapture", meeting_id: attendeeState.meetingId }));
+  ws.send(JSON.stringify({
+    action: "startCapture",
+    meeting_id: attendeeState.meetingId ?? undefined,
+  }));
   requestMeetings();
 }
 
@@ -1581,7 +1698,12 @@ btnCompileDeckEl.onclick = () => {
     return;
   }
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ action: "compileTranscriptSnapshot", ...meetingTarget() }));
+    if (slidePlanWorkspace?.isDirty()) {
+globalThis.plan = slidePlanWorkspace.currentPlan();
+      ws.send(JSON.stringify({ action: "persistSlidePlan", ...meetingTarget(), plan }));
+    } else {
+      ws.send(JSON.stringify({ action: "compileSlidePlan", ...meetingTarget() }));
+    }
     setJobControlsBusy(true);
     compileStatusEl.hidden = false;
     compileStatusEl.dataset.state = "started";
@@ -1664,6 +1786,9 @@ function renderCompileStatus(msg) {
         ? (hasCount ? `AI 사용량 한도로 기본 형식 ${countText}을 만들었습니다` : "AI 사용량 한도로 기본 형식 슬라이드를 만들었습니다")
         : (hasCount ? `AI 구성이 원활하지 않아 기본 형식으로 ${countText}을 만들었습니다` : "AI 구성이 원활하지 않아 기본 형식으로 슬라이드를 만들었습니다"))
       : (hasCount ? `슬라이드 ${countText}을 만들었습니다` : "슬라이드를 만들었습니다"));
+    if (selectedMeetingId !== null && ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ action: "selectMeeting", meetingId: selectedMeetingId }));
+    }
   } else {
     setJobControlsBusy(false);
     activeJobId = null;
@@ -1671,7 +1796,7 @@ function renderCompileStatus(msg) {
       ? "슬라이드 생성 시간이 초과되었습니다"
       : `슬라이드를 만들지 못했습니다: ${friendlyStatus(msg.error || "알 수 없는 오류")}`;
     renderStatus(compileStatusEl.textContent);
-    showRetry("compileTranscriptSnapshot", msg.meetingId);
+    showRetry("compileSlidePlan", msg.meetingId);
   }
 }
 
@@ -1903,11 +2028,17 @@ function connect() {
         compiledPreviewTitle = "";
         activeMeetingTitle = msg.title || `회의 #${msg.meetingId}`;
         renderTranscriptBacklog(msg.transcript);
-        if (msg.scene) {
+        const showingSlidePlan = slidePlanWorkspace?.initialize(msg.slidePlan) ?? false;
+        if (!showingSlidePlan && msg.scene) {
           showCompiledScene(msg.scene);
-        } else {
+        } else if (!showingSlidePlan) {
           renderMain();
           renderThumbnails(slideHistory);
+          renderDocHead();
+        } else {
+          viewingCompiled = false;
+          appEl?.classList.remove("app--compiled-preview");
+          renderThumbnails([], false);
           renderDocHead();
         }
         if (msg.compiled) {
@@ -1973,6 +2104,7 @@ function connect() {
         const serverOwnsCapture = !!msg.capturing || phase === "stopping";
         const endedNow = capturing && !serverOwnsCapture;
         capturing = serverOwnsCapture;
+        if (endedNow) clearPreparedMeeting();
         if (capturing) {
           if (Number.isFinite(msg.startedAt) && msg.startedAt > 0) captureStartedAt = msg.startedAt;
           awaitingInitialCaptureState = false;

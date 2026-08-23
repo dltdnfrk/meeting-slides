@@ -536,7 +536,30 @@ reference.
 - Accessibility: semantic `main`, one `h1`, selectable command text, at least a 20px gutter,
   no overflow at 320px or wider.
 
-### 9.17 Accepted operator debt
+### 9.17 BYOK provider setup
+
+The AI model sheet adopts OpenWorker's gallery-to-detail interaction without copying its
+branding or adding providers the Meeting Slides runtime cannot actually use.
+
+- The first view is a two-column provider gallery. Every card shows a provider mark, provider
+  name, truthful server-reported state, and a disclosure chevron. Unavailable providers remain
+  inspectable; lack of credentials must never make the detail view unreachable.
+- Activating a card replaces the gallery with one provider detail view. The Back action restores
+  the gallery and returns keyboard focus to its first card.
+- Subscription providers expose their real login/re-login action and, when selectable, an
+  explicit `이 모델 사용` action. Opening a card never changes the active model by itself.
+- Direct-key providers use a labelled secret field with a local show/hide control, a provider
+  console action, a disabled-until-nonempty `저장 및 연결` action, and a fixed-height status line.
+  A save shows a pending state immediately; the authoritative `providers` frame decides whether
+  the UI returns to the gallery and displays `사용 가능`.
+- Secret values are never rendered back into the DOM. Helper copy names the actual project-local
+  storage boundary instead of implying cloud or keychain storage the runtime does not provide.
+- Model and reasoning selectors live only in the detail view for the currently active provider.
+  Their existing IDs and `setProvider` wire action remain unchanged.
+- The gallery collapses to one column below 420px as graceful degradation. Meeting Slides remains
+  a desktop-first Mac product; there is no separate mobile settings experience.
+
+### 9.18 Accepted operator debt
 
 | Item | Location | Why accepted | Owner / Exit |
 | --- | --- | --- | --- |

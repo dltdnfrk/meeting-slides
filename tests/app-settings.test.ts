@@ -37,6 +37,7 @@ describe("AppSettingsStore", () => {
       const store = new AppSettingsStore(root);
       expect(() => store.save({ providerId: "cli:gemini", effort: "high" })).toThrow();
       expect(() => store.save({ providerId: "cli:codex", model: "made-up" })).toThrow();
+      expect(() => store.save({ providerId: "alibaba" })).toThrow();
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

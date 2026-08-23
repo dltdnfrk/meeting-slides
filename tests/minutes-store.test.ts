@@ -126,12 +126,14 @@ describe("MinutesStore SQLite contracts", () => {
       transcriptVersionId,
       decisions: [{
         description: "Ship Friday",
+        evidenceQuote: "Ship on Friday.",
         source: { transcriptVersionId, startSeq: 1, endSeq: 1 },
         attributedAttendeeId: "alice-local",
         reviewState: "confirmed",
       }],
       actionItems: [{
         description: "Run QA",
+        evidenceQuote: "Alice owns QA.",
         source: { transcriptVersionId, startSeq: 1, endSeq: 2 },
         assigneeAttendeeId: "alice-local",
         attributedAttendeeId: "bob-local",
@@ -140,6 +142,7 @@ describe("MinutesStore SQLite contracts", () => {
       }],
       openItems: [{
         description: "Resolve budget",
+        evidenceQuote: "Budget remains open.",
         source: { transcriptVersionId, startSeq: 3, endSeq: 3 },
         attributedAttendeeId: "bob-local",
         reviewState: "rejected",
@@ -147,10 +150,10 @@ describe("MinutesStore SQLite contracts", () => {
     });
     selectCanonical(minutes, meetingId, transcriptVersionId);
 
-    expect(minutes.itemsForReview(reviewId).map((item) => [item.kind, item.description])).toEqual([
-      ["decision", "Ship Friday"],
-      ["action_item", "Run QA"],
-      ["open_item", "Resolve budget"],
+    expect(minutes.itemsForReview(reviewId).map((item) => [item.kind, item.description, item.evidenceQuote])).toEqual([
+      ["decision", "Ship Friday", "Ship on Friday."],
+      ["action_item", "Run QA", "Alice owns QA."],
+      ["open_item", "Resolve budget", "Budget remains open."],
     ]);
     minutes.confirmReview(reviewId, "reviewer-local");
     expect(minutes.review(reviewId)).toMatchObject({ status: "confirmed", confirmedBy: "reviewer-local" });
@@ -229,6 +232,34 @@ describe("MinutesStore SQLite contracts", () => {
     expect(minutes.findMeetingByAudioHash(hash)).toBe(meetingId);
     expect(() => minutes.addAudioSource(meetingId, { originalAudioSha256: "bad" })).toThrow(/64-character/);
     expect(minutes.findMeetingByAudioHash("c".repeat(64))).toBeNull();
+    legacy.close();
+  });
+
+  test("migrates legacy review rows and backfills evidence quotes from immutable source lines", () => {
+    const { legacy, minutes } = stores();
+    const { meetingId, transcriptVersionId } = preparedTranscript(minutes);
+    const reviewId = minutes.saveCandidates({
+      meetingId, transcriptVersionId,
+      decisions: [{ id: "legacy-decision", description: "Ship Friday", source: { transcriptVersionId, startSeq: 1, endSeq: 2 } }],
+    });
+    const db = minutes.databaseHandle();
+    db.run("PRAGMA foreign_keys = OFF");
+    db.run(`
+      CREATE TABLE decisions_legacy AS
+      SELECT decision_id, meeting_id, review_id, description, source_transcript_version_id,
+        source_start_seq, source_end_seq, attributed_attendee_id, origin, review_state,
+        created_at, updated_at
+      FROM decisions
+    `);
+    db.run("DROP TABLE decisions");
+    db.run("ALTER TABLE decisions_legacy RENAME TO decisions");
+
+    const reopened = new MinutesStore(db);
+    expect(db.query("PRAGMA table_info(decisions)").all()).toContainEqual(expect.objectContaining({ name: "evidence_quote" }));
+    expect(reopened.itemsForReview(reviewId)[0]).toMatchObject({
+      id: "legacy-decision",
+      evidenceQuote: "Ship on Friday.\nAlice owns QA.",
+    });
     legacy.close();
   });
 

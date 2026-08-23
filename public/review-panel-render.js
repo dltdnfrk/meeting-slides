@@ -35,6 +35,7 @@ function reviewNormalizeItem(raw) {
     assigneeAttendeeId: typeof raw.assigneeAttendeeId === "string" ? raw.assigneeAttendeeId : "",
     deadline: typeof raw.deadline === "string" ? raw.deadline : "",
     deadlineText: typeof raw.deadlineText === "string" ? raw.deadlineText : "",
+    reviewState: ["candidate", "confirmed", "rejected"].includes(raw.reviewState) ? raw.reviewState : "candidate",
   };
 }
 
@@ -46,8 +47,12 @@ function reviewPanelNormalizeReview(msg) {
       && typeof attendee.displayName === "string" && attendee.displayName.trim())
     .map((attendee) => ({ attendeeId: attendee.attendeeId, displayName: attendee.displayName }));
   return {
+    meetingId: reviewIsFiniteInt(msg.meetingId) && msg.meetingId > 0 ? msg.meetingId : null,
     reviewId: msg.reviewId,
     transcriptVersionId: typeof msg.transcriptVersionId === "string" ? msg.transcriptVersionId : "",
+    status: msg.status === "confirmed" ? "confirmed" : "draft",
+    confirmedAt: reviewIsFiniteInt(msg.confirmedAt) ? msg.confirmedAt : null,
+    conclusion: msg.conclusion && msg.conclusion.concluded === true ? msg.conclusion : null,
     attendees,
     items: msg.items.map(reviewNormalizeItem).filter((item) => item !== null),
   };
@@ -65,17 +70,17 @@ function reviewOptionsHtml(review, selectedId, hasAttendees) {
 
 function reviewItemHtml(input) {
   const { item, review, itemState, description, attributionId, assigneeId, deadlineValue,
-    editing, hasAttendees, complete } = input;
+    editing, hasAttendees, complete, locked } = input;
   const dropped = itemState === "rejected";
   const confirmed = itemState === "confirmed";
-  const disabled = dropped || !hasAttendees ? " disabled" : "";
+  const disabled = locked || dropped || !hasAttendees ? " disabled" : "";
   const range = item.startSeq === item.endSeq
     ? `${item.startSeq}번째 문장`
     : `${item.startSeq}~${item.endSeq}번째 문장`;
   const deadline = item.kind === "action_item"
     ? `<label class="review-item__field review-item__deadline"><span class="review-item__field-label">기한</span>
          <input class="review-item__deadline-input" type="date" value="${reviewEscapeHtml(deadlineValue)}"
-           aria-label="${reviewEscapeHtml(description)} 기한"${dropped ? " disabled" : ""}>
+           aria-label="${reviewEscapeHtml(description)} 기한"${locked || dropped ? " disabled" : ""}>
          ${item.deadlineText ? `<span class="review-item__deadline-text">${reviewEscapeHtml(item.deadlineText)}</span>` : ""}
        </label>`
     : "";
@@ -114,12 +119,12 @@ function reviewItemHtml(input) {
         <span class="review-item__spacer"></span>
         ${!dropped ? `<button type="button" class="review-item__action review-item__confirm"
           aria-label="${reviewEscapeHtml(description)} ${confirmed ? "확인 취소" : "확인"}"
-          ${!confirmed && !complete ? " disabled" : ""}>${confirmed ? "확인 취소" : "확인"}</button>` : ""}
+          ${locked || (!confirmed && !complete) ? " disabled" : ""}>${confirmed ? "확인 취소" : "확인"}</button>` : ""}
         ${editing
           ? `<button type="button" class="review-item__action review-item__save" aria-label="${reviewEscapeHtml(description)} 수정 저장">저장</button>
              <button type="button" class="review-item__action review-item__cancel" aria-label="${reviewEscapeHtml(description)} 수정 취소">취소</button>`
-          : `<button type="button" class="review-item__action review-item__edit" aria-label="${reviewEscapeHtml(description)} 수정"${dropped ? " disabled" : ""}>수정</button>`}
-        <button type="button" class="review-item__action review-item__drop" aria-label="${reviewEscapeHtml(description)} ${dropped ? "복원" : "제외"}">${dropped ? "복원" : "제외"}</button>
+          : `<button type="button" class="review-item__action review-item__edit" aria-label="${reviewEscapeHtml(description)} 수정"${locked || dropped ? " disabled" : ""}>수정</button>`}
+        <button type="button" class="review-item__action review-item__drop" aria-label="${reviewEscapeHtml(description)} ${dropped ? "복원" : "제외"}"${locked ? " disabled" : ""}>${dropped ? "복원" : "제외"}</button>
       </footer>
     </article>`;
 }
@@ -135,14 +140,17 @@ function reviewPanelRender(input) {
     return;
   }
   const hasAttendees = review.attendees.length > 0;
-  versionEl.textContent = "원문 연결됨";
-  versionEl.title = "검토 항목이 전사 원문과 연결되어 있습니다";
+  const locked = review.status === "confirmed";
+  versionEl.textContent = locked ? "검토 확정됨" : "원문 연결됨";
+  versionEl.title = locked
+    ? "확정된 검토 결과를 서버에서 복원했습니다"
+    : "검토 항목이 전사 원문과 연결되어 있습니다";
   listEl.innerHTML = review.items.length === 0
     ? `<p class="review-list__empty">확인할 결정 사항이나 할 일을 찾지 못했습니다</p>`
     : review.items.map((item) => reviewItemHtml({
       item, review, itemState: itemState(item), description: description(item),
       attributionId: attribution(item), assigneeId: assignee(item), deadlineValue: deadline(item),
-      editing: editingId === item.id, hasAttendees, complete: complete(item),
+      editing: !locked && editingId === item.id, hasAttendees, complete: complete(item), locked,
     })).join("");
   noticeEl.textContent = hasAttendees || review.items.length === 0
     ? "" : "참석자를 먼저 추가하면 발언자와 담당자를 연결할 수 있습니다";
@@ -151,5 +159,5 @@ function reviewPanelRender(input) {
   confirmCountEl.textContent = String(kept);
   countEl.textContent = String(kept);
   countEl.hidden = kept === 0;
-  confirmEl.disabled = !canConfirm() || !isOpen();
+  confirmEl.disabled = locked || !canConfirm() || !isOpen();
 }

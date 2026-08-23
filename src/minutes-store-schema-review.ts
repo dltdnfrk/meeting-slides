@@ -1,3 +1,5 @@
+import type { Database } from "bun:sqlite";
+
 export const REVIEW_SCHEMA = `
 CREATE TABLE IF NOT EXISTS meeting_reviews (
   review_id TEXT PRIMARY KEY,
@@ -20,6 +22,7 @@ CREATE TABLE IF NOT EXISTS decisions (
   meeting_id INTEGER NOT NULL,
   review_id TEXT NOT NULL,
   description TEXT NOT NULL CHECK (trim(description) <> ''),
+  evidence_quote TEXT NOT NULL CHECK (trim(evidence_quote) <> ''),
   source_transcript_version_id TEXT NOT NULL,
   source_start_seq INTEGER NOT NULL,
   source_end_seq INTEGER NOT NULL CHECK (source_start_seq <= source_end_seq),
@@ -42,6 +45,7 @@ CREATE TABLE IF NOT EXISTS action_items (
   meeting_id INTEGER NOT NULL,
   review_id TEXT NOT NULL,
   description TEXT NOT NULL CHECK (trim(description) <> ''),
+  evidence_quote TEXT NOT NULL CHECK (trim(evidence_quote) <> ''),
   source_transcript_version_id TEXT NOT NULL,
   source_start_seq INTEGER NOT NULL,
   source_end_seq INTEGER NOT NULL CHECK (source_start_seq <= source_end_seq),
@@ -68,6 +72,7 @@ CREATE TABLE IF NOT EXISTS open_items (
   meeting_id INTEGER NOT NULL,
   review_id TEXT NOT NULL,
   description TEXT NOT NULL CHECK (trim(description) <> ''),
+  evidence_quote TEXT NOT NULL CHECK (trim(evidence_quote) <> ''),
   source_transcript_version_id TEXT NOT NULL,
   source_start_seq INTEGER NOT NULL,
   source_end_seq INTEGER NOT NULL CHECK (source_start_seq <= source_end_seq),
@@ -112,3 +117,35 @@ CREATE TABLE IF NOT EXISTS referenced_materials (
     REFERENCES transcript_version_lines(meeting_id, transcript_version_id, seq)
 );
 `;
+
+
+const REVIEW_ITEM_TABLES = ["decisions", "action_items", "open_items"] as const;
+
+/** Upgrade pre-evidence databases in place and preserve a truthful, non-empty quote. */
+export function migrateReviewSchema(db: Database): void {
+  db.transaction(() => {
+    for (const table of REVIEW_ITEM_TABLES) {
+      const columns = db.query(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+      if (!columns.some((column) => column.name === "evidence_quote")) {
+        // SQLite requires a default when adding a NOT NULL column to a populated table.
+        // New writes never use the default; the update below immediately backfills old rows.
+        db.run(`ALTER TABLE ${table} ADD COLUMN evidence_quote TEXT NOT NULL DEFAULT ''`);
+      }
+      db.run(`
+        UPDATE ${table}
+        SET evidence_quote = coalesce((
+          SELECT group_concat(source.text, char(10))
+          FROM (
+            SELECT line.text AS text
+            FROM transcript_version_lines line
+            WHERE line.meeting_id = ${table}.meeting_id
+              AND line.transcript_version_id = ${table}.source_transcript_version_id
+              AND line.seq BETWEEN ${table}.source_start_seq AND ${table}.source_end_seq
+            ORDER BY line.seq
+          ) source
+        ), description)
+        WHERE trim(evidence_quote) = ''
+      `);
+    }
+  })();
+}

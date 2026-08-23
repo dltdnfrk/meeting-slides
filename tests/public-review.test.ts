@@ -32,6 +32,7 @@ const VERSION_ID = "tv-9f2c-canonical";
 function reviewMessage(overrides: Record<string, unknown> = {}) {
   return {
     type: "review",
+    meetingId: 7,
     reviewId: "rev-001",
     transcriptVersionId: VERSION_ID,
     attendees: [
@@ -209,7 +210,7 @@ describe("review panel shell", () => {
     });
     expect(await page.$eval("#btn-review", (button) => (button as HTMLElement).hidden)).toBe(false);
     await page.click("#btn-review");
-    expect(await sent()).toEqual([{ action: "startReview" }]);
+    expect(await sent()).toEqual([{ action: "startReview", meetingId: 7 }]);
     expect(await page.evaluate(() => ({
       hidden: (document.getElementById("review-panel") as HTMLElement).hidden,
       state: (document.getElementById("review-panel") as HTMLElement).dataset.state,
@@ -314,6 +315,7 @@ describe("attendee dropdown attribution", () => {
     await page.select('.review-item[data-item-id="dec-1"] .review-item__attribution', "att-2");
     expect(await sent()).toEqual([{
       action: "updateItem",
+      meetingId: 7,
       reviewId: "rev-001",
       itemId: "dec-1",
       kind: "decision",
@@ -327,6 +329,7 @@ describe("attendee dropdown attribution", () => {
     await page.select('.review-item[data-item-id="act-1"] .review-item__assignee', "att-1");
     expect(await sent()).toEqual([{
       action: "updateItem",
+      meetingId: 7,
       reviewId: "rev-001",
       itemId: "act-1",
       kind: "action_item",
@@ -366,6 +369,7 @@ describe("edit and drop controls", () => {
     await page.click('.review-item[data-item-id="dec-1"] .review-item__save');
     expect(await sent()).toEqual([{
       action: "updateItem",
+      meetingId: 7,
       reviewId: "rev-001",
       itemId: "dec-1",
       kind: "decision",
@@ -398,6 +402,7 @@ describe("edit and drop controls", () => {
     await page.click('.review-item[data-item-id="open-1"] .review-item__drop');
     expect(await sent()).toEqual([{
       action: "updateItem",
+      meetingId: 7,
       reviewId: "rev-001",
       itemId: "open-1",
       kind: "open_item",
@@ -420,6 +425,7 @@ describe("edit and drop controls", () => {
     await page.click('.review-item[data-item-id="open-1"] .review-item__drop');
     expect(await sent()).toEqual([{
       action: "updateItem",
+      meetingId: 7,
       reviewId: "rev-001",
       itemId: "open-1",
       kind: "open_item",
@@ -449,14 +455,14 @@ describe("confirm action", () => {
     expect(await page.$eval("#btn-review-confirm", (button) => (button as HTMLButtonElement).disabled)).toBe(false);
     await page.click("#btn-review-confirm");
     expect(await sent()).toEqual([
-      { action: "updateItem", reviewId: "rev-001", itemId: "dec-1", kind: "decision", patch: { reviewState: "confirmed" } },
-      { action: "updateItem", reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { attributedAttendeeId: "att-1" } },
-      { action: "updateItem", reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { assigneeAttendeeId: "att-2" } },
-      { action: "updateItem", reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { deadline: "2026-08-14" } },
-      { action: "updateItem", reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { reviewState: "confirmed" } },
-      { action: "updateItem", reviewId: "rev-001", itemId: "open-1", kind: "open_item", patch: { attributedAttendeeId: "att-2" } },
-      { action: "updateItem", reviewId: "rev-001", itemId: "open-1", kind: "open_item", patch: { reviewState: "confirmed" } },
-      { action: "confirmReview", reviewId: "rev-001" },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "dec-1", kind: "decision", patch: { reviewState: "confirmed" } },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { attributedAttendeeId: "att-1" } },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { assigneeAttendeeId: "att-2" } },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { deadline: "2026-08-14" } },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "act-1", kind: "action_item", patch: { reviewState: "confirmed" } },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "open-1", kind: "open_item", patch: { attributedAttendeeId: "att-2" } },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "open-1", kind: "open_item", patch: { reviewState: "confirmed" } },
+      { action: "confirmReview", meetingId: 7, reviewId: "rev-001" },
     ]);
   });
 
@@ -472,7 +478,7 @@ describe("confirm action", () => {
     await page.click('.review-item[data-item-id="dec-1"] .review-item__drop');
     await clearSent();
     await page.click("#btn-review-confirm");
-    expect(await sent()).toEqual([{ action: "confirmReview", reviewId: "rev-001" }]);
+    expect(await sent()).toEqual([{ action: "confirmReview", meetingId: 7, reviewId: "rev-001" }]);
   });
 });
 
@@ -503,10 +509,24 @@ describe("empty, error, and loading states", () => {
     expect(await page.evaluate(() => ({
       state: (document.getElementById("review-panel") as HTMLElement).dataset.state,
       busy: document.getElementById("review-panel")?.getAttribute("aria-busy"),
-    }))).toEqual({ state: "ready", busy: "false" });
+      globalStatus: document.getElementById("status-text")?.textContent?.trim(),
+    }))).toEqual({
+      state: "ready",
+      busy: "false",
+      globalStatus: "회의록 정리가 완료되었습니다",
+    });
   });
 
   test("an extraction failure status shows a retry affordance instead of stale cards", async () => {
+    await emit({ type: "meetings", items: [
+      { id: 7, title: "완료된 회의", started_at: 1_700_000_000_000, status: "ended" },
+    ] });
+    await page.click('.session-row[data-meeting-id="7"]');
+    await clearSent();
+    await emit({
+      type: "meeting", meetingId: 7, title: "완료된 회의", transcript: [],
+      current: null, history: [], compiled: null,
+    });
     await emit({ type: "status", text: "회의록을 정리하지 못했습니다" });
     await page.waitForSelector("#review-panel:not([hidden])");
     expect(await page.evaluate(() => ({
@@ -521,7 +541,7 @@ describe("empty, error, and loading states", () => {
 
     await clearSent();
     await page.click("#btn-review-retry");
-    expect(await sent()).toEqual([{ action: "startReview" }]);
+    expect(await sent()).toEqual([{ action: "startReview", meetingId: 7 }]);
   });
 });
 
@@ -577,6 +597,39 @@ describe("keyboard accessibility", () => {
 });
 
 describe("reconnect and update handling", () => {
+  test("meeting selection restores an authoritative confirmed review without allowing new mutations", async () => {
+    await emit({ type: "meetings", items: [{ id: 7, title: "복원 회의", started_at: Date.now(), status: "ended" }] });
+    await page.click('.session-row[data-meeting-id="7"]');
+    const snapshot = reviewMessage({
+      status: "confirmed",
+      confirmedAt: 1_700_000_000_000,
+      conclusion: {
+        type: "meetingConcluded", concluded: true, meetingId: 7, reviewId: "rev-001",
+        transcriptVersionId: VERSION_ID, bundleId: "bundle-1", bundlePath: "/tmp/bundle-1",
+        manifest: { sha256: "a".repeat(64), targetCommit: "b".repeat(40) }, concludedAt: 1_700_000_000_001,
+      },
+      items: reviewMessage().items.map((item) => ({ ...item, reviewState: item.id === "open-1" ? "rejected" : "confirmed" })),
+    });
+    await emit({
+      type: "meeting", meetingId: 7, title: "복원 회의", transcript: [], current: null,
+      history: [], compiled: null, review: snapshot, conclusion: snapshot.conclusion,
+    });
+
+    expect(await page.$eval("#review-panel", (panel) => (panel as HTMLElement).hidden)).toBe(true);
+    await page.click("#btn-review");
+    expect(await page.evaluate(() => ({
+      states: Array.from(document.querySelectorAll(".review-item")).map((row) => (row as HTMLElement).dataset.reviewState),
+      version: document.getElementById("review-version")?.textContent,
+      confirmDisabled: (document.getElementById("btn-review-confirm") as HTMLButtonElement).disabled,
+      enabledMutations: document.querySelectorAll(".review-item button:not(:disabled), .review-item select:not(:disabled), .review-item input:not(:disabled)").length,
+    }))).toEqual({
+      states: ["confirmed", "confirmed", "rejected"],
+      version: "검토 확정됨",
+      confirmDisabled: true,
+      enabledMutations: 0,
+    });
+  });
+
   test("a second review message replaces the previous candidates rather than appending", async () => {
     await openReview();
     await emit(reviewMessage({
@@ -603,9 +656,9 @@ describe("reconnect and update handling", () => {
     await page.click('.review-item[data-item-id="dec-9"] .review-item__confirm');
     await page.click("#btn-review-confirm");
     expect(await sent()).toEqual([
-      { action: "updateItem", reviewId: "rev-002", itemId: "dec-9", kind: "decision", patch: { attributedAttendeeId: "att-1" } },
-      { action: "updateItem", reviewId: "rev-002", itemId: "dec-9", kind: "decision", patch: { reviewState: "confirmed" } },
-      { action: "confirmReview", reviewId: "rev-002" },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-002", itemId: "dec-9", kind: "decision", patch: { attributedAttendeeId: "att-1" } },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-002", itemId: "dec-9", kind: "decision", patch: { reviewState: "confirmed" } },
+      { action: "confirmReview", meetingId: 7, reviewId: "rev-002" },
     ]);
   });
 
@@ -622,7 +675,7 @@ describe("reconnect and update handling", () => {
     await page.waitForFunction(() => !(document.getElementById("btn-review-confirm") as HTMLButtonElement).disabled);
     await clearSent();
     await page.click("#btn-review-confirm");
-    expect(await sent()).toEqual([{ action: "confirmReview", reviewId: "rev-001" }]);
+    expect(await sent()).toEqual([{ action: "confirmReview", meetingId: 7, reviewId: "rev-001" }]);
   }, 20_000);
 
   test("local edits survive a re-render triggered by an unrelated message", async () => {
@@ -718,9 +771,9 @@ describe("hostile payloads", () => {
     await page.click('.review-item[data-item-id="ok-1"] .review-item__confirm');
     await page.click("#btn-review-confirm");
     expect(await sent()).toEqual([
-      { action: "updateItem", reviewId: "rev-001", itemId: "ok-1", kind: "decision", patch: { attributedAttendeeId: "att-1" } },
-      { action: "updateItem", reviewId: "rev-001", itemId: "ok-1", kind: "decision", patch: { reviewState: "confirmed" } },
-      { action: "confirmReview", reviewId: "rev-001" },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "ok-1", kind: "decision", patch: { attributedAttendeeId: "att-1" } },
+      { action: "updateItem", meetingId: 7, reviewId: "rev-001", itemId: "ok-1", kind: "decision", patch: { reviewState: "confirmed" } },
+      { action: "confirmReview", meetingId: 7, reviewId: "rev-001" },
     ]);
   });
 

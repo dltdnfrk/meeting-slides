@@ -135,7 +135,14 @@ test("real WebSocket ask dispatch invokes transport and returns exactly one term
   });
   await sendAndWait({ action: "status" }, (message) => message.type === "status" && message.text === "서버 정상");
   expect(messages.slice(start).filter((message) => message.type === "ask" && message.requestId === requestId)).toHaveLength(1);
+  const replay = await sendAndWait(
+    { action: "ask", meetingId: 1, question: "배포일과 담당자는 누구인가요?", requestId },
+    (message) => message.type === "ask" && message.requestId === requestId,
+  );
+  expect(replay).toEqual(response);
   const calls = readFileSync(transportLog, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line));
-  expect(calls).toHaveLength(1);
-  expect(calls[0].args).toEqual(expect.arrayContaining(["-p", "--output-format", "text"]));
+  // Stop flush may independently run the production topic detector. The Ask question itself must still invoke transport exactly once.
+  const askCalls = calls.filter((call) => call.args.some((arg: string) => arg.includes("배포일과 담당자는 누구인가요?")));
+  expect(askCalls).toHaveLength(1);
+  expect(askCalls[0].args).toEqual(expect.arrayContaining(["-p", "--output-format", "text"]));
 }, 30_000);

@@ -1,6 +1,15 @@
 import { describe, expect, test } from "bun:test";
+import { chmodSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
-import { buildProviderEntries, buildProviderEntriesFromStates, createDetector, upsertEnvText } from "../src/providers.ts";
+import {
+  buildProviderEntries,
+  buildProviderEntriesFromStates,
+  createDetector,
+  persistProviderKey,
+  upsertEnvText,
+} from "../src/providers.ts";
 
 describe("buildProviderEntries", () => {
   test("구독 CLI 가용성은 주입된 탐지 결과를 따른다", () => {
@@ -23,20 +32,20 @@ describe("buildProviderEntries", () => {
     expect(list.find((p) => p.id === "cli:codex")?.selectable).toBe(false);
   });
 
-  test("HTTP 프로바이더는 키/URL 존재로 가용 판정", () => {
+  test("HTTP 프로바이더는 OpenAI와 로컬만 노출한다", () => {
     const list = buildProviderEntries(
       { ALIBABA_TOKEN_PLAN_API_KEY: "sk-x", OPENAI_API_KEY: "", LOCAL_LLM_BASE_URL: "" } as NodeJS.ProcessEnv,
       {},
     );
-    expect(list.find((p) => p.id === "alibaba")?.available).toBe(true);
+    expect(list.find((p) => p.id === "alibaba")).toBeUndefined();
     expect(list.find((p) => p.id === "openai")?.available).toBe(false);
     expect(list.find((p) => p.id === "local")?.available).toBe(false);
   });
 
-  test("7개 카드를 순서대로 제공 (구독 4 + API 3)", () => {
+  test("6개 카드를 순서대로 제공 (구독 4 + API 2)", () => {
     const list = buildProviderEntries({}, {});
     expect(list.map((p) => p.id)).toEqual([
-      "cli:codex", "cli:grok", "cli:claude", "cli:gemini", "alibaba", "openai", "local",
+      "cli:codex", "cli:grok", "cli:claude", "cli:gemini", "openai", "local",
     ]);
   });
 
@@ -47,7 +56,8 @@ describe("buildProviderEntries", () => {
     expect(list.find((p) => p.id === "cli:codex")?.efforts).toEqual(["low", "medium", "high"]);
     expect(list.find((p) => p.id === "cli:claude")?.models).toEqual(["opus", "sonnet", "haiku"]);
     expect(list.find((p) => p.id === "cli:claude")?.efforts).toBeUndefined();
-    expect(list.find((p) => p.id === "alibaba")?.models).toContain("glm-5.2");
+    expect(list.find((p) => p.id === "openai")?.models).toContain("gpt-4o-mini");
+    expect(list.find((p) => p.id === "alibaba")).toBeUndefined();
   });
 });
 
@@ -71,6 +81,24 @@ describe("upsertEnvText", () => {
   test("키 주변 공백이 있어도 매칭", () => {
     const after = upsertEnvText("FOO = old\nBAR=keep", { FOO: "new" });
     expect(after).toBe("FOO=new\nBAR=keep");
+  });
+});
+
+describe("persistProviderKey", () => {
+  test("기존 env 파일 권한도 API 키 저장 후 0600으로 강제", () => {
+    const directory = mkdtempSync(join(tmpdir(), "meeting-slides-provider-key-"));
+    const envPath = join(directory, ".env");
+    try {
+      writeFileSync(envPath, "OPENAI_API_KEY=old\nOTHER=keep\n", { mode: 0o644 });
+      chmodSync(envPath, 0o644);
+
+      persistProviderKey(envPath, "OPENAI_API_KEY", "replacement");
+
+      expect(statSync(envPath).mode & 0o777).toBe(0o600);
+      expect(readFileSync(envPath, "utf-8")).toBe("OPENAI_API_KEY=replacement\nOTHER=keep\n");
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
   });
 });
 

@@ -35,6 +35,10 @@ function providers(overrides: Partial<ProvidersUpdate> = {}): ProvidersUpdate {
         id: "cli:gemini", label: "Gemini (subscription)", detail: "Gemini CLI",
         available: false, installed: false, auth: "unavailable", models: ["gemini-2.5-pro"],
       },
+      {
+        id: "openai", label: "OpenAI API", detail: "직접 결제 API 키",
+        available: false, installed: true, auth: "disconnected", models: ["gpt-4o-mini", "gpt-4o"],
+      },
     ],
     ...overrides,
   };
@@ -125,28 +129,37 @@ describe("AI 모델 설정 UI", () => {
       id: node.getAttribute("data-id"),
       auth: node.getAttribute("data-auth"),
       badge: node.querySelector(".provider-row__badge")?.textContent?.trim(),
-      disabled: (node.querySelector(".provider-row__select") as HTMLButtonElement).disabled,
-      connect: node.querySelector(".provider-row__connect")?.textContent?.trim(),
+      disabled: (node.querySelector(".provider-row__open") as HTMLButtonElement).disabled,
     })));
     const byId = Object.fromEntries(rows.map((row) => [row.id, row]));
 
     // 네 개의 구독형 CLI 카드가 모두 보인다.
     expect(Object.keys(byId)).toEqual(expect.arrayContaining(["cli:codex", "cli:grok", "cli:claude", "cli:gemini"]));
 
-    expect(byId["cli:codex"]).toMatchObject({ badge: "사용 가능", disabled: false, connect: "다시 로그인" });
+    expect(byId["cli:codex"]).toMatchObject({ badge: "현재 사용", disabled: false });
 
     // auth=unknown은 사용 가능으로 속이지 않지만 설치되어 있으므로 선택은 가능하다.
     expect(byId["cli:grok"].badge).toBe("로그인 확인 필요");
     expect(byId["cli:grok"].badge).not.toBe("사용 가능");
     expect(byId["cli:grok"].disabled).toBe(false);
 
-    expect(byId["cli:claude"]).toMatchObject({ badge: "로그인 필요", disabled: false, connect: "로그인" });
-    expect(byId["cli:gemini"]).toMatchObject({ badge: "설치 필요", disabled: true });
+    expect(byId["cli:claude"]).toMatchObject({ badge: "로그인 필요", disabled: false });
+    // OpenWorker 방식에서는 설정이 덜 된 카드도 detail을 열 수 있다.
+    expect(byId["cli:gemini"]).toMatchObject({ badge: "설치 필요", disabled: false });
 
     // 저장된 현재 선택이 모델/effort 셀렉트에 반영된다.
+    await page.evaluate(() => {
+      const panel = document.getElementById("provider-panel");
+      if (panel?.hidden) (document.getElementById("btn-settings") as HTMLButtonElement).click();
+    });
+    await page.click('.provider-row[data-id="cli:codex"] .provider-row__open');
     expect(await page.$eval("#select-model", (el) => (el as HTMLSelectElement).value)).toBe("gpt-5.6-sol");
     expect(await page.$eval("#select-effort", (el) => (el as HTMLSelectElement).value)).toBe("high");
+    await page.click("#provider-back");
     expect(await page.$eval('.provider-row[data-id="cli:codex"]', (el) => el.className)).toContain("provider-row--current");
+    await armPanelClosedWithTriggerFocus();
+    await page.click("#btn-settings-close");
+    await awaitPanelClosedWithTriggerFocus();
   });
 
   test("연결·재검사·프로바이더/모델 선택 액션을 프로토콜대로 보낸다", async () => {
@@ -155,25 +168,78 @@ describe("AI 모델 설정 UI", () => {
     await page.evaluate(() => {
       const panel = document.getElementById("provider-panel");
       if (panel?.hidden) (document.getElementById("btn-settings") as HTMLButtonElement).click();
+      const back = document.getElementById("provider-back");
+      if (back && !back.closest("#provider-detail")?.hasAttribute("hidden")) (back as HTMLButtonElement).click();
     });
 
+    await page.click('.provider-row[data-id="cli:claude"] .provider-row__open');
     const connect = harness.nextClientMessage();
-    await page.click('.provider-row[data-id="cli:claude"] .provider-row__connect');
+    await page.click('#provider-detail .provider-row__connect');
     expect(await connect).toEqual({ action: "connectProvider", id: "cli:claude" });
 
+    await page.click("#provider-back");
+    await page.click('.provider-row[data-id="cli:grok"] .provider-row__open');
     const select = harness.nextClientMessage();
-    await page.click('.provider-row[data-id="cli:grok"] .provider-row__select');
+    await page.click('#provider-detail .provider-row__select');
     expect(await select).toEqual({ action: "setProvider", id: "cli:grok" });
 
     const recheck = harness.nextClientMessage();
     await page.click("#btn-recheck");
     expect(await recheck).toEqual({ action: "recheckProviders" });
 
+    await page.click("#provider-back");
+    await page.click('.provider-row[data-id="cli:codex"] .provider-row__open');
     const model = harness.nextClientMessage();
     await page.select("#select-model", "gpt-5.6-luna");
     expect(await model).toEqual({
       action: "setProvider", id: "cli:codex", model: "gpt-5.6-luna", effort: "high",
     });
+    await armPanelClosedWithTriggerFocus();
+    await page.click("#btn-settings-close");
+    await awaitPanelClosedWithTriggerFocus();
+  });
+
+  test("OpenWorker 방식 갤러리에서 API 키를 확인하고 저장한 뒤 연결 상태로 돌아간다", async () => {
+    harness.pushMessage(providers());
+    await waitForProviderAuth("openai", "disconnected");
+    await page.evaluate(() => {
+      const panel = document.getElementById("provider-panel");
+      if (panel?.hidden) (document.getElementById("btn-settings") as HTMLButtonElement).click();
+      const detail = document.getElementById("provider-detail");
+      if (detail && !detail.hidden) (document.getElementById("provider-back") as HTMLButtonElement).click();
+    });
+
+    expect(await page.$eval("#provider-list", (el) => el.getAttribute("data-view"))).toBe("gallery");
+    await page.click('.provider-row[data-id="openai"] .provider-row__open');
+    await page.waitForSelector('#provider-detail[data-provider="openai"]:not([hidden])');
+
+    expect(await page.$eval("#provider-detail-title", (el) => el.textContent?.trim())).toBe("OpenAI API");
+    expect(await page.$eval("#provider-key", (el) => (el as HTMLInputElement).type)).toBe("password");
+    expect(await page.$eval("#provider-key-save", (el) => (el as HTMLButtonElement).disabled)).toBe(true);
+
+    await page.click("#provider-key-reveal");
+    expect(await page.$eval("#provider-key", (el) => (el as HTMLInputElement).type)).toBe("text");
+
+    await page.type("#provider-key", "sk-openworker-test");
+    expect(await page.$eval("#provider-key-save", (el) => (el as HTMLButtonElement).disabled)).toBe(false);
+    const save = harness.nextClientMessage();
+    await page.click("#provider-key-save");
+    expect(await save).toEqual({ action: "setProviderKey", id: "openai", key: "sk-openworker-test" });
+    expect(await page.$eval("#provider-key-save", (el) => el.textContent?.trim())).toBe("확인 중…");
+
+    const connected = providers({
+      list: providers().list.map((provider) =>
+        provider.id === "openai"
+          ? { ...provider, available: true, auth: "connected" as const }
+          : provider),
+    });
+    harness.pushMessage(connected);
+    await page.waitForFunction(() => document.getElementById("provider-detail")?.hasAttribute("hidden"));
+    expect(await page.$eval("#provider-list", (el) => el.getAttribute("data-view"))).toBe("gallery");
+    expect(await page.$eval('.provider-row[data-id="openai"] .provider-row__badge', (el) => el.textContent?.trim())).toBe("사용 가능");
+    await armPanelClosedWithTriggerFocus();
+    await page.click("#btn-settings-close");
+    await awaitPanelClosedWithTriggerFocus();
   });
 });
 
@@ -221,6 +287,10 @@ describe("STT 모델 설정 UI", () => {
       disabled: (node.querySelector(".stt-row__actions button") as HTMLButtonElement).disabled,
     }));
     expect(selected).toEqual({ badge: "사용 중", current: true, disabled: true });
+    expect(await page.$eval("#context-stt-status", (node) => ({
+      text: node.textContent?.trim(),
+      tone: (node as HTMLElement).dataset.tone,
+    }))).toEqual({ text: "Medium (Q8_0)", tone: "positive" });
   });
 
   test("실패 상태는 오류와 재시도를 노출한다", async () => {

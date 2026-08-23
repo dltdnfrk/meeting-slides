@@ -80,4 +80,25 @@ describe("전사 피드 다줄 표시", () => {
     expect(shown.length).toBeLessThanOrEqual(160);
     expect(shown.startsWith("whisper stderr")).toBe(true);
   });
+
+  test("장시간 snapshot은 전체 문장 수를 유지하면서 DOM을 최근 1,000줄로 제한한다", async () => {
+    const entries = Array.from({ length: 1_205 }, (_, i) => ({
+      text: `장시간 문장 ${i + 1}`, ts: 1_800_000_000_000 + i, speaker: null,
+    }));
+    harness.pushMessage({ type: "capture", capturing: true, mode: "mic", phase: "capturing", startedAt: Date.now() });
+    await page.waitForFunction(() => document.querySelector(".app")?.getAttribute("data-capture-phase") === "capturing");
+    harness.pushMessage({ type: "transcript", reason: "snapshot", entries, truncated: false });
+    await page.waitForFunction(() =>
+      document.querySelectorAll("#transcript-stream .feed-line").length === 1_000 &&
+      document.getElementById("transcript-count")?.textContent === "1205",
+    { timeout: 20_000 });
+    const state = await page.evaluate(() => ({
+      count: document.querySelectorAll("#transcript-stream .feed-line").length,
+      total: document.getElementById("transcript-count")?.textContent,
+      first: document.querySelector("#transcript-stream .feed-line__text")?.textContent,
+      truncationVisible: !(document.getElementById("transcript-trunc") as HTMLElement).hidden,
+    }));
+    expect(state).toEqual({ count: 1_000, total: "1205", first: "장시간 문장 206", truncationVisible: true });
+  }, 30_000);
+
 });

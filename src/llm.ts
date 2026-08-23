@@ -4,10 +4,6 @@
 // 어떤 프로바이더든 동일한 chat/completions 인터페이스로 호출.
 // 한국어 회의 컨텍스트에서 주제 블록을 감지하고 슬라이드를 생성한다.
 //
-// 주의: Alibaba Token Plan은 /v1이 아니라 /compatible-mode/v1 사용.
-// config.ts에서 baseURL은 /compatible-mode/v1까지 포함한다.
-// 주의: GLM-5.2는 reasoning 모델 — thinking 토큰이 별도 소모되므로
-// max_tokens를 충분히 잡고, content가 비면 reasoning_content에서 JSON 추출.
 
 import { LLMProviderConfig } from "./config.js";
 import { parseLiveMeetingCard, type LiveMeetingCard } from "./slide-spec.js";
@@ -275,8 +271,8 @@ export class LLMClient implements MeetingLLM, ChatTransport {
       body: JSON.stringify({
         model: this.cfg.model,
         messages,
-        temperature: options.temperature ?? 0,
-        max_tokens: options.maxTokens ?? 6000,
+        temperature: options.temperature ?? 0.3,
+        max_tokens: options.maxTokens ?? 4000,
       }),
       signal: AbortSignal.timeout(options.timeoutMs ?? CHAT_TIMEOUT_MS),
     });

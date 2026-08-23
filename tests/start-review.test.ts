@@ -103,8 +103,13 @@ describe("startReview", () => {
     });
     expect(payload).toEqual({
       type: "review",
+      meetingId: fx.meetingId,
       reviewId: expect.any(String),
       transcriptVersionId: fx.transcriptVersionId,
+      status: "draft",
+      confirmedAt: null,
+      confirmedBy: null,
+      conclusion: null,
       attendees: request!.attendees,
       transcript: { lines: request!.lines },
       items: [
@@ -114,6 +119,7 @@ describe("startReview", () => {
           description: "Ship Friday",
           sourceSegment: { transcript_version_id: fx.transcriptVersionId, start_seq: 1, end_seq: 2 },
           evidenceQuote: "Ship Friday was confirmed.",
+          reviewState: "candidate",
           segment_text: "We discussed the rollout.\nShip Friday was confirmed.",
           attributedAttendeeId: "bob",
         },
@@ -123,6 +129,7 @@ describe("startReview", () => {
           description: "Share the checklist",
           sourceSegment: { transcript_version_id: fx.transcriptVersionId, start_seq: 3, end_seq: 3 },
           evidenceQuote: "Alice will share the checklist.",
+          reviewState: "candidate",
           segment_text: "Alice will share the checklist.",
           attributedAttendeeId: "alice",
           assigneeAttendeeId: "alice",
@@ -138,8 +145,8 @@ describe("startReview", () => {
       status: "draft",
     });
     expect(fx.store.itemsForReview(payload.reviewId)).toEqual([
-      expect.objectContaining({ id: "decision-1", kind: "decision", reviewState: "candidate" }),
-      expect.objectContaining({ id: "action-1", kind: "action_item", reviewState: "candidate" }),
+      expect.objectContaining({ id: "decision-1", kind: "decision", evidenceQuote: "Ship Friday was confirmed.", reviewState: "candidate" }),
+      expect.objectContaining({ id: "action-1", kind: "action_item", evidenceQuote: "Alice will share the checklist.", reviewState: "candidate" }),
     ]);
     fx.legacy.close();
   });

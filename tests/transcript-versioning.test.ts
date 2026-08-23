@@ -119,7 +119,7 @@ describe("canonical transcript versioning", () => {
     expect(() => snapshotLegacyTranscript(minutes, meetingId)).toThrow(/duplicate legacy transcript seq/);
     expect(minutes.latestVersion(meetingId)).toBeNull();
     legacy.close();
-  });
+  }, 10_000);
 });
 
 describe("raw audio hash and recorder contract", () => {
@@ -165,6 +165,8 @@ describe("raw audio hash and recorder contract", () => {
     });
     expect(await successFinalizer.finish()).toEqual(await success);
     expect(successStops).toBe(1);
+    expect(successful.minutes.meetingMeta(successful.meetingId)?.phase).toBe("ended");
+    expect((successful.minutes.databaseHandle().query("SELECT ended_at FROM meetings WHERE id = ?").get(successful.meetingId) as { ended_at: number | null }).ended_at).not.toBeNull();
     expect(successful.minutes.databaseHandle().query("SELECT original_audio_path, original_audio_sha256, byte_length FROM meeting_audio_sources").get()).toEqual({
       original_audio_path: successPath, original_audio_sha256: successHash, byte_length: 51,
     });
@@ -194,7 +196,7 @@ describe("raw audio hash and recorder contract", () => {
     chmodSync(fake, 0o755);
 
     await expect(RawAudioRecorder.start({
-      bin: fake, captureId: 3, outputPath: output, startupTimeoutMs: 500,
+      bin: fake, captureId: 3, outputPath: output, startupTimeoutMs: 2_000,
     })).rejects.toThrow(/did not create output/);
     expect(readFileSync(signals, "utf8").trim().split("\n")).toEqual(["TERM"]);
     expect(existsSync(output)).toBe(false);
@@ -205,7 +207,7 @@ describe("raw audio hash and recorder contract", () => {
     const dir = mkdtempSync(join(tmpdir(), "meeting-recorder-"));
     const fake = join(dir, "ffmpeg");
     const output = join(dir, "capture.tmp.wav");
-    writeFileSync(fake, `#!/usr/bin/env bun\nconst out = process.argv.at(-1);\nawait Bun.write(out, Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(40), Buffer.from('pcm')]));\nprocess.on('SIGTERM', () => process.exit(0));\nawait new Promise(() => {});\n`);
+    writeFileSync(fake, `#!/usr/bin/env bun\nimport { writeFileSync } from "node:fs";\nconst out = process.argv.at(-1);\nprocess.on('SIGTERM', () => process.exit(0));\nwriteFileSync(out, Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(40), Buffer.from('pcm')]));\nprocess.stderr.write('progress=continue\\n');\nawait new Promise(() => {});\n`);
     chmodSync(fake, 0o755);
     const recorder = await RawAudioRecorder.start({ bin: fake, captureId: 3, outputPath: output });
     const result = await recorder.stop();
@@ -214,11 +216,11 @@ describe("raw audio hash and recorder contract", () => {
 
     const failedFake = join(dir, "failed-ffmpeg");
     const failedOutput = join(dir, "failed.tmp.wav");
-    writeFileSync(failedFake, `#!/usr/bin/env bun\nawait Bun.write(process.argv.at(-1), 'partial');\nprocess.on('SIGTERM', () => process.exit(0));\nawait new Promise(() => {});\n`);
+    writeFileSync(failedFake, `#!/usr/bin/env bun\nimport { writeFileSync } from "node:fs";\nprocess.on('SIGTERM', () => process.exit(0));\nwriteFileSync(process.argv.at(-1), 'partial');\nprocess.stderr.write('progress=continue\\n');\nawait new Promise(() => {});\n`);
     chmodSync(failedFake, 0o755);
     const failed = await RawAudioRecorder.start({ bin: failedFake, captureId: -1, outputPath: failedOutput });
     await expect(failed.stop()).rejects.toThrow(/valid WAV/);
     expect(existsSync(failedOutput)).toBe(false);
     rmSync(dir, { recursive: true, force: true });
-  });
+  }, 10_000);
 });

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { spawn, type ChildProcess } from "node:child_process";
-import { createReadStream, existsSync, readFileSync, rmSync, statSync, watch } from "node:fs";
+import { closeSync, createReadStream, existsSync, openSync, readSync, rmSync, statSync, watch } from "node:fs";
 import { basename, dirname } from "node:path";
 
 import type { MinutesStore } from "./minutes-store.ts";
@@ -16,7 +16,19 @@ export interface AudioRecorderHandle {
 }
 
 export function sha256File(path: string): string {
-  return createHash("sha256").update(readFileSync(path)).digest("hex");
+  const hash = createHash("sha256");
+  const fd = openSync(path, "r");
+  const buffer = Buffer.allocUnsafe(1024 * 1024);
+  try {
+    for (;;) {
+      const bytesRead = readSync(fd, buffer, 0, buffer.length, null);
+      if (bytesRead === 0) break;
+      hash.update(buffer.subarray(0, bytesRead));
+    }
+  } finally {
+    closeSync(fd);
+  }
+  return hash.digest("hex");
 }
 
 export function claimFileAudioSource(store: MinutesStore, meetingId: number, path: string): {
@@ -42,7 +54,8 @@ function recorderArgs(bin: string, captureId: number, outputPath: string): strin
   const name = basename(bin).toLowerCase();
   if (name.includes("ffmpeg")) {
     const input = captureId < 0 ? ":default" : `:${captureId}`;
-    return ["-nostdin", "-hide_banner", "-loglevel", "error", "-f", "avfoundation", "-i", input,
+    return ["-nostdin", "-hide_banner", "-loglevel", "error", "-progress", "pipe:2", "-nostats",
+      "-f", "avfoundation", "-i", input,
       "-acodec", "pcm_s16le", "-y", outputPath];
   }
   if (name === "rec" || name.includes("sox")) return ["-q", "-d", outputPath];
@@ -96,11 +109,25 @@ export class RawAudioRecorder implements AudioRecorderHandle {
     const proc = spawn(input.bin, recorderArgs(input.bin, input.captureId, input.outputPath), {
       stdio: ["ignore", "ignore", "pipe"],
     });
+    let stderrTail = "";
+    proc.stderr?.on("data", (chunk: Buffer) => {
+      const text = chunk.toString("utf8");
+      stderrTail = `${stderrTail}${text}`.slice(-2_000);
+      if (/^progress=(?:continue|end)$/m.test(text)
+          && existsSync(input.outputPath)
+          && statSync(input.outputPath).size > 0) {
+        created();
+      }
+    });
+    const stderrReason = () => stderrTail.trim() ? `: ${stderrTail.trim()}` : "";
+    const outputState = () => existsSync(input.outputPath)
+      ? `output exists (${statSync(input.outputPath).size} bytes)`
+      : "output missing";
     try {
       await new Promise<void>((resolve, reject) => {
         const timeoutMs = input.startupTimeoutMs ?? 5_000;
         const timer = setTimeout(() => reject(
-          new Error(`audio recorder did not create output within ${timeoutMs}ms`),
+          new Error(`audio recorder did not create output within ${timeoutMs}ms; ${outputState()}${stderrReason()}`),
         ), timeoutMs);
         const finish = (fn: () => void) => {
           clearTimeout(timer);
@@ -110,7 +137,9 @@ export class RawAudioRecorder implements AudioRecorderHandle {
           fn();
         };
         const onError = (error: Error) => finish(() => reject(error));
-        const onClose = () => finish(() => reject(new Error("audio recorder exited before creating output")));
+        const onClose = () => finish(() => reject(
+          new Error(`audio recorder exited before creating output${stderrReason()}`),
+        ));
         proc.once("error", onError);
         proc.once("close", onClose);
         outputCreated.then(() => finish(resolve), (error) => finish(() => reject(error)));

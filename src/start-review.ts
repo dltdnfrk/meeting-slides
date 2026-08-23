@@ -37,6 +37,7 @@ function itemPayload(
       description: item.description,
       sourceSegment: item.sourceSegment,
       evidenceQuote: item.evidenceQuote,
+      reviewState: "candidate" as const,
       segment_text: segmentText(item.sourceSegment),
       attributedAttendeeId: item.suggestedAttributionAttendeeId,
     })),
@@ -46,6 +47,7 @@ function itemPayload(
       description: item.description,
       sourceSegment: item.sourceSegment,
       evidenceQuote: item.evidenceQuote,
+      reviewState: "candidate" as const,
       segment_text: segmentText(item.sourceSegment),
       attributedAttendeeId: item.suggestedAttributionAttendeeId,
       assigneeAttendeeId: item.suggestedAssigneeAttendeeId,
@@ -58,6 +60,7 @@ function itemPayload(
       description: item.description,
       sourceSegment: item.sourceSegment,
       evidenceQuote: item.evidenceQuote,
+      reviewState: "candidate" as const,
       segment_text: segmentText(item.sourceSegment),
       attributedAttendeeId: item.suggestedAttributionAttendeeId,
     })),
@@ -101,6 +104,7 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
     decisions: result.decisions.map((item) => ({
       id: item.id,
       description: item.description,
+      evidenceQuote: item.evidenceQuote,
       source: {
         transcriptVersionId: item.sourceSegment.transcript_version_id,
         startSeq: item.sourceSegment.start_seq,
@@ -112,6 +116,7 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
     actionItems: result.actionItems.map((item) => ({
       id: item.id,
       description: item.description,
+      evidenceQuote: item.evidenceQuote,
       source: {
         transcriptVersionId: item.sourceSegment.transcript_version_id,
         startSeq: item.sourceSegment.start_seq,
@@ -126,6 +131,7 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
     openItems: result.openItems.map((item) => ({
       id: item.id,
       description: item.description,
+      evidenceQuote: item.evidenceQuote,
       source: {
         transcriptVersionId: item.sourceSegment.transcript_version_id,
         startSeq: item.sourceSegment.start_seq,
@@ -138,8 +144,13 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
 
   return {
     type: "review",
+    meetingId: input.meetingId,
     reviewId,
     transcriptVersionId: canonical.transcriptVersionId,
+    status: "draft",
+    confirmedAt: null,
+    confirmedBy: null,
+    conclusion: null,
     items: itemPayload(result, lines),
     attendees,
     transcript: { lines },

@@ -24,14 +24,14 @@ describe("existing LLM detectBlock transport behavior", () => {
       async fetch(request) {
         requestBody = await request.json() as Record<string, unknown>;
         return Response.json({ choices: [{ message: { content:
-          '{"shouldAdvance":true,"blockTitle":"실제 HTTP","bullets":["원문"]}' } }] });
+          '{"shouldAdvance":true,"title":"실제 HTTP","bullets":["원문"]}' } }] });
       },
     });
     try {
       const client = new LLMClient({ baseURL: server.url.toString(), apiKey: "stub-key", model: "stub-model" });
       await expect(client.detectBlock(["첫 문장"])).resolves.toEqual({
         shouldAdvance: true,
-        blockTitle: "실제 HTTP",
+        title: "실제 HTTP",
         bullets: ["원문"],
       });
       expect(requestBody).toMatchObject({
@@ -61,12 +61,12 @@ describe("existing LLM detectBlock transport behavior", () => {
 
   test("CLI sends the unchanged combined prompt and returns parsed stdout", async () => {
     const capture = join(tempDir, "detect-prompt.txt");
-    const bin = cliStub("detect-ok", `printf '%s' "$2" > "${capture}"\nprintf '%s' '{"shouldAdvance":false,"blockTitle":"실제 CLI","bullets":["원문"]}'`);
+    const bin = cliStub("detect-ok", `printf '%s' "$2" > "${capture}"\nprintf '%s' '{"shouldAdvance":true,"title":"실제 CLI","bullets":["원문"]}'`);
     const client = new CliLLMClient({ bin, preset: "claude", timeoutMs: 1000 });
 
     await expect(client.detectBlock(["CLI 문장"])).resolves.toEqual({
-      shouldAdvance: false,
-      blockTitle: "실제 CLI",
+      shouldAdvance: true,
+      title: "실제 CLI",
       bullets: ["원문"],
     });
     expect(await Bun.file(capture).text()).toBe(`${SYSTEM_PROMPT}\n\n최근 회의 문장들:\n1. CLI 문장\n\nJSON으로만 응답하세요.`);

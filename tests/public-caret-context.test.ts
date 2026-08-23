@@ -226,6 +226,16 @@ async function openSession(width: number, height: number): Promise<Session> {
   };
 }
 
+async function settleFiniteAnimations(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const animations = document.getAnimations().filter((animation) => {
+      const iterations = animation.effect?.getTiming().iterations;
+      return iterations !== Infinity && animation.playState !== "finished";
+    });
+    await Promise.all(animations.map((animation) => animation.finished.catch(() => undefined)));
+  });
+}
+
 /**
  * Library with one selected meeting: the "meeting selected" context of 9.11.
  *
@@ -634,6 +644,7 @@ describe("Todo 13 · DESIGN 9.11 capability placement", () => {
         await session.page.evaluate(() => {
           for (const d of document.querySelectorAll<HTMLDetailsElement>(".dock details")) d.open = true;
         });
+        await settleFiniteAnimations(session.page);
         const rows = await session.page.evaluate(readControls, DOCK_CAPABILITIES);
         // Reachability is the contract for EVERY capability: a disabled control
         // must still be painted and hit-testable so its reason can be read.
@@ -822,6 +833,7 @@ describe("Todo 13 · disabled controls carry their exact machine reason", () => 
       await session.page.evaluate(() => {
         for (const d of document.querySelectorAll<HTMLDetailsElement>("details")) d.open = true;
       });
+      await settleFiniteAnimations(session.page);
       // A real transport loss, not a synthetic attribute flip.
       await session.act(
         'document.documentElement.dataset.connection === "disconnected"',
@@ -877,7 +889,7 @@ describe("Todo 13 · re-homed controls still send their frozen actions", () => {
       });
 
       const cases = [
-        { id: "btn-compile-deck", action: "compileTranscriptSnapshot" },
+        { id: "btn-compile-deck", action: "compileSlidePlan" },
         { id: "btn-export-md", action: "saveNotes" },
         { id: "btn-export-json", action: "saveJson" },
         { id: "btn-export-transcript", action: "saveTranscript" },
@@ -976,7 +988,7 @@ describe("Todo 13 · re-homed controls still send their frozen actions", () => {
         el.click();
       });
       const one = await first as { action?: string };
-      expect(one.action).toBe("compileTranscriptSnapshot");
+      expect(one.action).toBe("compileSlidePlan");
       // The second activation must NOT produce a second outbound compile: the
       // control disables itself while its job is in flight. Any later frame is
       // therefore something else entirely, so this drives a control the compile
@@ -1121,7 +1133,7 @@ describe("Todo 13 · exactly one Stop and one timer", () => {
       const inbound = harness.nextClientMessage();
       await session.page.evaluate(() =>
         (document.getElementById("btn-compile-deck") as HTMLElement).click());
-      expect((await inbound as { action?: string }).action).toBe("compileTranscriptSnapshot");
+      expect((await inbound as { action?: string }).action).toBe("compileSlidePlan");
       const s = await session.page.evaluate(readCaptureSurfaces, IDS);
       expect(s.perceivableStops).toEqual([LIVE_STOP_ID]);
       expect(s.perceivableTimers).toEqual([LIVE_TIMER_ID]);

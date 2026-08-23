@@ -133,7 +133,7 @@ export function runCliPrompt(
       proc.stdout?.destroy();
       proc.stderr?.destroy();
       cleanup();
-      reject(new Error(`CLI timeout (${cfg.timeoutMs}ms): ${cfg.bin}`));
+      reject(new Error(`CLI 타임아웃 (${cfg.timeoutMs}ms): ${cfg.bin}`));
     }, cfg.timeoutMs);
 
     proc.stdout?.on("data", (data: Buffer) => { stdout += data.toString("utf-8"); });
@@ -153,7 +153,7 @@ export function runCliPrompt(
       clearTimeout(timer);
       try {
         if (code !== 0) {
-          reject(new Error(`${cfg.bin} exited with code ${code}: ${stderrTail.trim() || "(no stderr)"}`));
+          reject(new Error(`${cfg.bin} 종료 코드 ${code}: ${stderrTail.trim() || "(stderr 없음)"}`));
           return;
         }
         const raw = outFile ? readFileSync(outFile, "utf-8") : stdout;

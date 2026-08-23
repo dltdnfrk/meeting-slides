@@ -8,7 +8,7 @@ export type SubscriptionProviderId =
   | "cli:claude"
   | "cli:gemini";
 
-export type ProviderId = SubscriptionProviderId | "alibaba" | "openai" | "local";
+export type ProviderId = SubscriptionProviderId | "openai" | "local";
 export type ProviderCliPreset = "codex" | "grok" | "claude" | "gemini";
 export type ProviderAuthState = "connected" | "disconnected" | "unknown" | "unavailable";
 

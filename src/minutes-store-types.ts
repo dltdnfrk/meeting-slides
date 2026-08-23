@@ -18,6 +18,8 @@ export interface SourceRange {
 interface CandidateBase {
   id?: string;
   description: string;
+  /** Verbatim extraction evidence; legacy/manual callers fall back to the source segment. */
+  evidenceQuote?: string;
   source: SourceRange;
   attributedAttendeeId?: string | null;
   origin?: CandidateOrigin;
