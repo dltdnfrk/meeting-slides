@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { providerAdapter, type ProviderId } from "./provider-adapters.js";
+import type { ProviderId } from "./provider-adapters.js";
+import { isProviderId, providerEfforts, providerModels } from "./provider-catalog.js";
 
 export interface ProviderSelection {
   providerId: ProviderId;
@@ -13,19 +14,6 @@ export interface ProviderSelection {
 export interface AppSettings extends ProviderSelection {
   version: 1;
 }
-
-const PROVIDER_IDS = new Set<ProviderId>([
-  "cli:codex",
-  "cli:grok",
-  "cli:claude",
-  "cli:gemini",
-  "openai",
-  "local",
-]);
-
-const HTTP_MODELS: Partial<Record<ProviderId, readonly string[]>> = {
-  openai: ["gpt-4o-mini", "gpt-4o"],
-};
 
 function nonEmptyOptional(value: unknown, field: string): string | undefined {
   if (value === undefined) return undefined;
@@ -40,19 +28,18 @@ export function validateProviderSelection(value: unknown): ProviderSelection {
     throw new Error("Invalid provider settings object");
   }
   const candidate = value as Record<string, unknown>;
-  if (typeof candidate.providerId !== "string" || !PROVIDER_IDS.has(candidate.providerId as ProviderId)) {
+  if (!isProviderId(candidate.providerId)) {
     throw new Error(`Unknown provider: ${String(candidate.providerId)}`);
   }
-  const providerId = candidate.providerId as ProviderId;
+  const providerId = candidate.providerId;
   const model = nonEmptyOptional(candidate.model, "model");
   const effort = nonEmptyOptional(candidate.effort, "effort");
-  const adapter = providerAdapter(providerId);
 
-  const allowedModels = adapter?.models.map((entry) => entry.id) ?? HTTP_MODELS[providerId];
+  const allowedModels = providerModels(providerId);
   if (model && allowedModels && !allowedModels.includes(model)) {
     throw new Error(`Unsupported model for ${providerId}: ${model}`);
   }
-  const allowedEfforts = adapter?.efforts.map((entry) => entry.id) ?? [];
+  const allowedEfforts = providerEfforts(providerId);
   if (effort && !allowedEfforts.includes(effort)) {
     throw new Error(`Unsupported effort for ${providerId}: ${effort}`);
   }

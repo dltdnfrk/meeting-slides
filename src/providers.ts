@@ -17,10 +17,17 @@ import {
   type ProviderRuntimeState,
   type SubscriptionProviderId,
 } from "./provider-adapters.js";
+import {
+  HTTP_PROVIDER_DEFINITIONS,
+  KEY_BY_PROVIDER,
+  PROVIDER_PROBE_TIMEOUT_MS,
+  providerModels,
+} from "./provider-catalog.js";
 import type { ProviderInfo } from "./session.js";
 
 export {
   PROVIDER_ADAPTERS,
+  KEY_BY_PROVIDER,
   inspectSubscriptionProviders,
   providerAdapter,
   providerConnectCommand,
@@ -37,7 +44,7 @@ export function checkCliBin(
     const result = spawnSync(executable, ["--version"], {
       env: cliProcessEnvironment(executable, environment),
       stdio: "ignore",
-      timeout: 5_000,
+      timeout: PROVIDER_PROBE_TIMEOUT_MS,
     });
     return result.status === 0;
   } catch {
@@ -60,23 +67,14 @@ export function buildProviderEntries(
       ? { efforts: adapter.efforts.map((effort) => effort.id) }
       : {}),
   }));
-  return [
-    ...subscriptions,
-    {
-      id: "openai",
-      label: "OpenAI API",
-      detail: env.OPENAI_MODEL ?? "gpt-4o-mini",
-      available: Boolean(env.OPENAI_API_KEY),
-      models: PROVIDER_MODELS.openai,
-    },
-    {
-      id: "local",
-      label: "로컬 모델",
-      detail: env.LOCAL_LLM_BASE_URL ?? "설정 필요",
-      available: Boolean(env.LOCAL_LLM_BASE_URL),
-      models: [],
-    },
-  ];
+  const httpProviders = HTTP_PROVIDER_DEFINITIONS.map((definition) => ({
+    id: definition.id,
+    label: definition.label,
+    detail: env[definition.detailEnvironment] ?? definition.defaultDetail,
+    available: Boolean(env[definition.availabilityEnvironment]),
+    models: [...(providerModels(definition.id) ?? [])],
+  }));
+  return [...subscriptions, ...httpProviders];
 }
 
 /** Projects typed runtime states into the legacy provider-card protocol. */
@@ -126,25 +124,6 @@ export function createDetector(
     return null;
   }
 }
-
-export const PROVIDER_MODELS: Record<string, string[]> = {
-  ...Object.fromEntries(PROVIDER_ADAPTERS.map((adapter) => [
-    adapter.id,
-    adapter.models.map((model) => model.id),
-  ])),
-  openai: ["gpt-4o-mini", "gpt-4o"],
-  local: [],
-};
-
-export const PROVIDER_EFFORTS: Record<string, string[]> = Object.fromEntries(
-  PROVIDER_ADAPTERS
-    .filter((adapter) => adapter.efforts.length > 0)
-    .map((adapter) => [adapter.id, adapter.efforts.map((effort) => effort.id)]),
-);
-
-export const KEY_BY_PROVIDER: Record<string, string> = {
-  openai: "OPENAI_API_KEY",
-};
 
 /** Upserts API-key settings while preserving unrelated .env lines. Subscription auth is never stored here. */
 export function upsertEnvText(text: string, entries: Record<string, string>): string {

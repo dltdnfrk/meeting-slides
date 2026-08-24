@@ -70,6 +70,8 @@ export type ProviderCommandRunner = (
   environment: NodeJS.ProcessEnv,
 ) => CommandResult;
 
+export const PROVIDER_PROBE_TIMEOUT_MS = 5_000;
+
 function parseClaudeAuth(result: CommandResult): Exclude<ProviderAuthState, "unavailable"> {
   if (result.error) return "unknown";
   if (result.status !== 0) return "disconnected";
@@ -152,7 +154,7 @@ const defaultCommandRunner: ProviderCommandRunner = (executable, args, environme
   const result = spawnSync(executable, [...args], {
     env: cliProcessEnvironment(executable, environment),
     encoding: "utf-8",
-    timeout: 5_000,
+    timeout: PROVIDER_PROBE_TIMEOUT_MS,
     maxBuffer: 1024 * 1024,
   });
   return {
