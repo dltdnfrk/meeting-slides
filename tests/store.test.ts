@@ -57,6 +57,16 @@ describe("MeetingStore", () => {
     store.close();
   });
 
+  test("회의 종료 시각은 후속 reset/end 호출에도 최초 값으로 유지된다", () => {
+    const store = new MeetingStore(":memory:");
+    const id = store.startMeeting("cli:codex");
+    store.databaseHandle().run("UPDATE meetings SET ended_at = ? WHERE id = ?", [1234, id]);
+    store.endMeeting();
+    const row = store.databaseHandle().query("SELECT ended_at FROM meetings WHERE id = ?").get(id) as { ended_at: number };
+    expect(row.ended_at).toBe(1234);
+    store.close();
+  });
+
   test("회의가 열려있지 않으면 라인/슬라이드 무시", () => {
     const store = new MeetingStore(":memory:");
     store.addLine({ ts: 1, text: "버려짐" });

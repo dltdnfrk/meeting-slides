@@ -212,6 +212,40 @@ describe("MinutesExtractor", () => {
     });
   });
 
+  test("chunks a long transcript, preserves source seq, and de-duplicates overlap", async () => {
+    const longRequest: MinutesExtractionInput = {
+      ...request,
+      lines: Array.from({ length: 30 }, (_, index) => ({
+        seq: index + 1,
+        speakerTurn: index % 2,
+        text: `근거 ${index + 1}: ${"긴 회의 발언 ".repeat(14)}결정했습니다.`,
+      })),
+    };
+    const seenChunks: number[][] = [];
+    const extractor = new MinutesExtractor({
+      async chat(prompt) {
+        const json = prompt.slice(prompt.indexOf("\n") + 1).split("\n\nMeeting notes")[0]!;
+        const chunk = JSON.parse(json) as MinutesExtractionInput;
+        seenChunks.push(chunk.lines.map((line) => line.seq));
+        return payload({
+          decisions: chunk.lines.map((line) => ({
+            description: line.text,
+            sourceSegment: { transcript_version_id: "tv-1", start_seq: line.seq, end_seq: line.seq },
+            evidenceQuote: line.text,
+            suggestedAttributionAttendeeId: null,
+          })),
+        });
+      },
+    }, 3_000);
+    const result = await extractor.extract(longRequest);
+    expect(seenChunks.length).toBeGreaterThan(1);
+    expect(seenChunks.every((seqs) => seqs.length < longRequest.lines.length)).toBe(true);
+    expect(result.decisions.map((item) => item.sourceSegment.start_seq)).toEqual(
+      Array.from({ length: 30 }, (_, index) => index + 1),
+    );
+    expect(result.usedFallback).toBe(false);
+  });
+
   test("falls back on transport failure and batch failure, while valid empty JSON succeeds", async () => {
     const failures = [
       { chat: async () => { throw new Error("timeout"); } },

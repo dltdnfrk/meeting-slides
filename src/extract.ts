@@ -214,22 +214,167 @@ export function localRuleExtraction(request: MinutesExtractionInput): MinutesExt
   return result;
 }
 
-export class MinutesExtractor {
-  constructor(private readonly transport: ChatTransport) {}
+export const DEFAULT_EXTRACTION_CHUNK_CHARS = 48_000;
+const EXTRACTION_CONTEXT_LINES = 4;
+const MAX_NOTES_PROMPT_CHARS = 12_000;
 
-  async extract(request: MinutesExtractionInput): Promise<MinutesExtractionResult> {
+interface ExtractionChunk {
+  request: MinutesExtractionInput;
+  ownedStartSeq: number;
+  ownedEndSeq: number;
+  oversized: boolean;
+}
+
+function extractionPrompt(request: MinutesExtractionInput): string {
+  const notes = request.notes?.trim();
+  const notesBlock = notes
+    ? `
+
+Meeting notes taken by the user during the call:
+${notes.slice(0, MAX_NOTES_PROMPT_CHARS)}${notes.length > MAX_NOTES_PROMPT_CHARS ? "\n[notes truncated to prompt budget]" : ""}
+
+Use the notes as a guide: candidates that appear in the notes but lack direct transcript evidence must still be grounded in a verbatim quote; if no evidence exists, do not emit them.`
+    : "";
+  const { notes: _notes, ...promptRequest } = request;
+  return `Extract candidates from this request without changing any seq values. Use the smallest contiguous evidence range:
+${JSON.stringify(promptRequest)}${notesBlock}`;
+}
+
+function extractionPromptBytes(request: MinutesExtractionInput): number {
+  return Buffer.byteLength(EXTRACTION_SYSTEM_PROMPT, "utf8") + Buffer.byteLength(extractionPrompt(request), "utf8");
+}
+
+function planExtractionChunks(request: MinutesExtractionInput, maxBytes: number): ExtractionChunk[] {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1_000) throw new TypeError("maxBytes must be an integer >= 1000");
+  if (request.lines.length === 0 || extractionPromptBytes(request) <= maxBytes) {
+    return [{
+      request,
+      ownedStartSeq: request.lines[0]?.seq ?? 0,
+      ownedEndSeq: request.lines.at(-1)?.seq ?? 0,
+      oversized: false,
+    }];
+  }
+
+  const chunks: ExtractionChunk[] = [];
+  const coreBudget = Math.floor(maxBytes * 0.8);
+  let start = 0;
+  while (start < request.lines.length) {
+    const single = { ...request, lines: request.lines.slice(start, start + 1) };
+    if (extractionPromptBytes(single) > maxBytes) {
+      chunks.push({
+        request: single,
+        ownedStartSeq: request.lines[start]!.seq,
+        ownedEndSeq: request.lines[start]!.seq,
+        oversized: true,
+      });
+      start += 1;
+      continue;
+    }
+
+    let end = start + 1;
+    while (end < request.lines.length) {
+      const candidate = { ...request, lines: request.lines.slice(start, end + 1) };
+      if (extractionPromptBytes(candidate) > coreBudget) break;
+      end += 1;
+    }
+    let contextStart = Math.max(0, start - EXTRACTION_CONTEXT_LINES);
+    let contextEnd = Math.min(request.lines.length, end + EXTRACTION_CONTEXT_LINES);
+    let chunkRequest = { ...request, lines: request.lines.slice(contextStart, contextEnd) };
+    while (extractionPromptBytes(chunkRequest) > maxBytes && (contextStart < start || contextEnd > end)) {
+      if (contextEnd > end) contextEnd -= 1;
+      else contextStart += 1;
+      chunkRequest = { ...request, lines: request.lines.slice(contextStart, contextEnd) };
+    }
+    chunks.push({
+      request: chunkRequest,
+      ownedStartSeq: request.lines[start]!.seq,
+      ownedEndSeq: request.lines[end - 1]!.seq,
+      oversized: false,
+    });
+    start = end;
+  }
+  return chunks;
+}
+
+export function chunkMinutesExtractionInput(
+  request: MinutesExtractionInput,
+  maxBytes = DEFAULT_EXTRACTION_CHUNK_CHARS,
+): MinutesExtractionInput[] {
+  return planExtractionChunks(request, maxBytes).map((chunk) => chunk.request);
+}
+
+function ownedExtractionResult(result: MinutesExtractionResult, chunk: ExtractionChunk): MinutesExtractionResult {
+  const owned = <T extends ExtractedBase>(values: readonly T[]) => values.filter((value) =>
+    value.sourceSegment.start_seq >= chunk.ownedStartSeq && value.sourceSegment.start_seq <= chunk.ownedEndSeq
+  );
+  return {
+    ...result,
+    decisions: owned(result.decisions),
+    actionItems: owned(result.actionItems),
+    openItems: owned(result.openItems),
+  };
+}
+
+function mergeExtractionResults(
+  request: MinutesExtractionInput,
+  results: readonly MinutesExtractionResult[],
+): MinutesExtractionResult {
+  const merged = emptyResult(request);
+  const seen = new Set<string>();
+  const append = <T extends ExtractedBase>(kind: CandidateKind, target: T[], values: readonly T[]) => {
+    for (const value of values) {
+      const source = value.sourceSegment;
+      const key = JSON.stringify([kind, source.transcript_version_id, source.start_seq, source.end_seq, value.evidenceQuote]);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      target.push(value);
+    }
+  };
+  for (const result of results) {
+    append("decision", merged.decisions, result.decisions);
+    append("action_item", merged.actionItems, result.actionItems);
+    append("open_item", merged.openItems, result.openItems);
+    merged.rejections.push(...result.rejections);
+    merged.batchFailed ||= result.batchFailed;
+    merged.usedFallback ||= result.usedFallback;
+  }
+  const bySource = (a: ExtractedBase, b: ExtractedBase) =>
+    a.sourceSegment.start_seq - b.sourceSegment.start_seq || a.sourceSegment.end_seq - b.sourceSegment.end_seq;
+  merged.decisions.sort(bySource);
+  merged.actionItems.sort(bySource);
+  merged.openItems.sort(bySource);
+  return merged;
+}
+
+export class MinutesExtractor {
+  constructor(
+    private readonly transport: ChatTransport,
+    private readonly maxChunkChars = DEFAULT_EXTRACTION_CHUNK_CHARS,
+  ) {}
+
+  private async extractChunk(chunk: ExtractionChunk): Promise<MinutesExtractionResult> {
+    const request = chunk.request;
+    if (chunk.oversized) return localRuleExtraction(request);
+    let result: MinutesExtractionResult;
     try {
-      const notesBlock = request.notes?.trim()
-        ? `\n\nMeeting notes taken by the user during the call:\n${request.notes.trim()}\n\nUse the notes as a guide: candidates that appear in the notes but lack direct transcript evidence must still be grounded in a verbatim quote; if no evidence exists, do not emit them.`
-        : "";
-      const prompt = `Extract candidates from this request without changing any seq values:\n${JSON.stringify(request)}${notesBlock}`;
-      const parsed = parseMinutesExtractionJson(await this.transport.chat(prompt, {
+      const parsed = parseMinutesExtractionJson(await this.transport.chat(extractionPrompt(request), {
         system: EXTRACTION_SYSTEM_PROMPT, temperature: 0, maxTokens: 4000,
       }), request);
-      if (!parsed.batchFailed) return parsed;
-      return { ...localRuleExtraction(request), batchFailed: true, rejections: parsed.rejections };
+      result = !parsed.batchFailed
+        ? parsed
+        : { ...localRuleExtraction(request), batchFailed: true, rejections: parsed.rejections };
     } catch {
-      return localRuleExtraction(request);
+      result = localRuleExtraction(request);
     }
+    return ownedExtractionResult(result, chunk);
+  }
+
+  async extract(request: MinutesExtractionInput): Promise<MinutesExtractionResult> {
+    const chunks = planExtractionChunks(request, this.maxChunkChars);
+    if (chunks.length === 1) return this.extractChunk(chunks[0]!);
+    const results: MinutesExtractionResult[] = [];
+    // Sequential calls avoid multiplying provider rate-limit pressure for long meetings.
+    for (const chunk of chunks) results.push(await this.extractChunk(chunk));
+    return mergeExtractionResults(request, results);
   }
 }

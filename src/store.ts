@@ -140,7 +140,7 @@ export class MeetingStore {
 
   endMeeting(): void {
     if (this.meetingId === null) return;
-    this.db.run("UPDATE meetings SET ended_at = ? WHERE id = ?", [Date.now(), this.meetingId]);
+    this.db.run("UPDATE meetings SET ended_at = coalesce(ended_at, ?) WHERE id = ?", [Date.now(), this.meetingId]);
   }
 
   /** 회의가 열려 있지 않으면 무시 (파일 모드/수동 라인 대비) */
