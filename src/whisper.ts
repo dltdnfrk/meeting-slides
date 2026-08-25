@@ -223,6 +223,14 @@ abstract class WhisperBase {
 
   constructor(protected config: WhisperConfig) {}
 
+  /** Reset parser and diarization state at the boundary of each capture run. */
+  protected resetRunState(): void {
+    this.buf = "";
+    this.recentSentences = [];
+    this.speakerTurn = 0;
+    this.assembler = new SentenceAssembler();
+  }
+
   abstract start(opts: WhisperOptions): Promise<void>;
 
   /** diarize 모드면 tdrz 모델로, 아니면 기본 모델로. */
@@ -400,6 +408,7 @@ abstract class WhisperBase {
 
 export class WhisperStream extends WhisperBase {
   async start(opts: WhisperOptions): Promise<void> {
+    this.resetRunState();
     this.assertDiarizeReady();
     rawLogReset();
     const args = [
@@ -439,6 +448,7 @@ export class WhisperCLI extends WhisperBase {
   }
 
   async start(opts: WhisperOptions): Promise<void> {
+    this.resetRunState();
     this.assertDiarizeReady();
     // -nt: 타임스탬프 포함, -l ko: 한국어, -m: 모델
     const args = [

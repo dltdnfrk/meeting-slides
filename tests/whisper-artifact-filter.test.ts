@@ -10,6 +10,7 @@ class FilterHarness extends WhisperStream {
     this.drain((chunk) => chunks.push(chunk));
     return chunks;
   }
+  restartParser(): void { this.resetRunState(); }
 }
 
 const config: WhisperConfig = {
@@ -39,5 +40,13 @@ describe("existing Whisper artifact filters", () => {
     expect(whisper.feed("[00:00:00.000 --> 00:00:02.000] 실제 회의 발언입니다.")).toEqual([
       expect.objectContaining({ text: "실제 회의 발언입니다." }),
     ]);
+  });
+
+  test("a new capture resets duplicate and speaker parser state", () => {
+    const whisper = new FilterHarness({ ...config, diarize: true });
+    expect(whisper.feed("첫 회의 문장입니다. [SPEAKER_TURN]")[0]).toMatchObject({ speaker: 1 });
+    expect(whisper.feed("두 번째 화자입니다.")[0]).toMatchObject({ speaker: 2 });
+    whisper.restartParser();
+    expect(whisper.feed("첫 회의 문장입니다.")[0]).toMatchObject({ speaker: 1, text: "첫 회의 문장입니다." });
   });
 });

@@ -21,18 +21,59 @@ export interface TranscribeConfig {
   ffmpegBin: string;
 }
 
-const modelCache = new Map<string, Promise<TranscribeModel>>();
+interface ModelCacheEntry {
+  promise: Promise<TranscribeModel>;
+  refs: number;
+}
 
-function loadModel(modelPath: string, gpu: boolean): Promise<TranscribeModel> {
-  const key = `${modelPath}:${gpu ? "gpu" : "cpu"}`;
-  let cached = modelCache.get(key);
-  if (!cached) {
-    const backend: Backend = gpu ? "auto" : "cpu";
-    cached = TranscribeModel.load(modelPath, { backend });
-    cached.catch(() => modelCache.delete(key));
-    modelCache.set(key, cached);
+const modelCache = new Map<string, ModelCacheEntry>();
+let preferredModelKey: string | null = null;
+
+function evictUnusedModels(): void {
+  for (const [key, entry] of modelCache) {
+    if (key === preferredModelKey || entry.refs > 0) continue;
+    modelCache.delete(key);
+    void entry.promise.then((model) => model.dispose(), () => undefined);
   }
-  return cached;
+}
+
+async function acquireModel(modelPath: string, gpu: boolean): Promise<{ model: TranscribeModel; release: () => void }> {
+  const key = `${modelPath}:${gpu ? "gpu" : "cpu"}`;
+  const previousPreferred = preferredModelKey;
+  preferredModelKey = key;
+  let entry = modelCache.get(key);
+  if (!entry) {
+    const backend: Backend = gpu ? "auto" : "cpu";
+    entry = { promise: TranscribeModel.load(modelPath, { backend }), refs: 0 };
+    modelCache.set(key, entry);
+  }
+  entry.refs += 1; // Reserve before awaiting so a concurrent model switch cannot dispose it.
+  let model: TranscribeModel;
+  try {
+    model = await entry.promise;
+  } catch (error) {
+    entry.refs -= 1;
+    if (modelCache.get(key) === entry) modelCache.delete(key);
+    if (preferredModelKey === key) preferredModelKey = previousPreferred;
+    evictUnusedModels();
+    throw error;
+  }
+  evictUnusedModels();
+  let released = false;
+  return {
+    model,
+    release: () => {
+      if (released) return;
+      released = true;
+      entry!.refs -= 1;
+      evictUnusedModels();
+    },
+  };
+}
+
+export function disposeTranscribeModelCache(): void {
+  preferredModelKey = null;
+  evictUnusedModels();
 }
 
 function koreanLocale(languages: readonly string[]): string | undefined {
@@ -47,44 +88,71 @@ function pcmArgs(config: TranscribeConfig, filePath: string | null): string[] {
   return [...base, ...input, "-ar", "16000", "-ac", "1", "-acodec", "pcm_f32le", "-f", "f32le", "pipe:1"];
 }
 
-class PcmReader {
+export const PCM_READER_HIGH_WATER_CHUNKS = 16;
+export const PCM_READER_LOW_WATER_CHUNKS = 8;
+const PCM_CHUNK_SAMPLES = 8_000;
+const PCM_CHUNK_BYTES = PCM_CHUNK_SAMPLES * Float32Array.BYTES_PER_ELEMENT;
+
+export class PcmReader {
   private carry = Buffer.alloc(0);
-  private readonly queue: Float32Array[] = [];
+  private queue: Array<Float32Array | undefined> = [];
+  private head = 0;
   private waiter: ((chunk: Float32Array | null) => void) | null = null;
   private done = false;
+  private paused = false;
 
   constructor(private readonly proc: ChildProcess, onError: (err: Error) => void) {
-    proc.stdout?.on("data", (data: Buffer) => {
-      this.push(data);
-    });
+    proc.stdout?.on("data", (data: Buffer) => this.push(data));
+    proc.stdout?.once("end", () => this.finish());
     proc.stderr?.on("data", (data: Buffer) => {
       const line = data.toString("utf-8").trim();
       if (line) onError(new Error(`[ffmpeg] ${line.slice(0, 300)}`));
     });
-    proc.on("close", () => this.finish());
-    proc.on("error", () => this.finish());
+    if (!proc.stdout) proc.once("close", () => this.finish());
+    proc.once("error", () => this.finish());
+  }
+
+  private unread(): number { return this.queue.length - this.head; }
+
+  private samples(bytes: Buffer, count: number): Float32Array {
+    const values = new Float32Array(count);
+    Buffer.from(values.buffer).set(bytes.subarray(0, count * Float32Array.BYTES_PER_ELEMENT));
+    return values;
   }
 
   private push(data: Buffer): void {
-    this.carry = Buffer.concat([this.carry, data]);
-    // 0.5초 단위(8000샘플)로 나눠 세션에 공급
-    const chunkBytes = 8000 * Float32Array.BYTES_PER_ELEMENT;
-    while (this.carry.byteLength >= chunkBytes) {
-      const slice = this.carry.subarray(0, chunkBytes);
-      this.carry = this.carry.subarray(chunkBytes);
-      this.enqueue(new Float32Array(slice.buffer, slice.byteOffset, 8000));
+    if (this.done) return;
+    this.carry = this.carry.length === 0 ? Buffer.from(data) : Buffer.concat([this.carry, data]);
+    this.drainCarry();
+  }
+
+  private drainCarry(): void {
+    while (this.carry.byteLength >= PCM_CHUNK_BYTES && this.unread() < PCM_READER_HIGH_WATER_CHUNKS) {
+      const slice = this.carry.subarray(0, PCM_CHUNK_BYTES);
+      this.carry = this.carry.subarray(PCM_CHUNK_BYTES);
+      this.enqueue(this.samples(slice, PCM_CHUNK_SAMPLES));
+    }
+    if (!this.done && this.unread() >= PCM_READER_HIGH_WATER_CHUNKS && !this.paused) {
+      this.proc.stdout?.pause();
+      this.paused = true;
     }
   }
 
   private finish(): void {
-    // 잔여 바이트는 4바이트 정렬까지만 사용 (f32 정수 배수)
-    const aligned = this.carry.byteLength - (this.carry.byteLength % Float32Array.BYTES_PER_ELEMENT);
-    if (aligned > 0) {
-      const slice = this.carry.subarray(0, aligned);
-      this.enqueue(new Float32Array(slice.buffer, slice.byteOffset, aligned / Float32Array.BYTES_PER_ELEMENT));
-    }
+    if (this.done) return;
     this.done = true;
-    this.waiter?.(null);
+    while (this.carry.byteLength >= PCM_CHUNK_BYTES) {
+      this.enqueue(this.samples(this.carry, PCM_CHUNK_SAMPLES));
+      this.carry = this.carry.subarray(PCM_CHUNK_BYTES);
+    }
+    const aligned = this.carry.byteLength - (this.carry.byteLength % Float32Array.BYTES_PER_ELEMENT);
+    if (aligned > 0) this.enqueue(this.samples(this.carry, aligned / Float32Array.BYTES_PER_ELEMENT));
+    this.carry = Buffer.alloc(0);
+    if (this.waiter) {
+      const waiter = this.waiter;
+      this.waiter = null;
+      waiter(null);
+    }
   }
 
   private enqueue(chunk: Float32Array): void {
@@ -97,12 +165,28 @@ class PcmReader {
     this.queue.push(chunk);
   }
 
+  private resumeIfNeeded(): void {
+    if (this.paused && this.unread() <= PCM_READER_LOW_WATER_CHUNKS) {
+      this.paused = false;
+      this.proc.stdout?.resume();
+      this.drainCarry();
+    }
+  }
+
   next(): Promise<Float32Array | null> {
-    if (this.queue.length > 0) return Promise.resolve(this.queue.shift()!);
+    if (this.unread() > 0) {
+      const chunk = this.queue[this.head]!;
+      this.queue[this.head] = undefined;
+      this.head += 1;
+      if (this.head >= 1_024 || this.head * 2 >= this.queue.length) {
+        this.queue = this.queue.slice(this.head);
+        this.head = 0;
+      }
+      this.resumeIfNeeded();
+      return Promise.resolve(chunk);
+    }
     if (this.done) return Promise.resolve(null);
-    return new Promise((resolve) => {
-      this.waiter = resolve;
-    });
+    return new Promise((resolve) => { this.waiter = resolve; });
   }
 }
 
@@ -148,28 +232,29 @@ abstract class TranscribeBase {
 
 export class TranscribeStream extends TranscribeBase {
   async start(opts: WhisperOptions): Promise<void> {
-    const model = await loadModel(this.config.modelPath, this.config.gpu);
-    const language = koreanLocale(model.capabilities.languages);
-    if (!model.capabilities.supportsStreaming) {
-      throw new Error(`모델이 스트리밍을 지원하지 않습니다: ${model.variant}`);
-    }
-    opts.onStatus?.(
-      `transcribe.cpp 시작: ${model.variant} (backend=${model.backend}, lang=${language ?? "auto"})`,
-    );
-    this.session = model.createSession({ nThreads: this.config.threads });
-    this.stream = await this.session.stream({
-      commitPolicy: "stable_prefix",
-      ...(language ? { language } : {}),
-      timestamps: "segment",
-    });
-
-    const args = pcmArgs(this.config, null);
-    this.proc = spawn(this.config.ffmpegBin, args, { stdio: ["ignore", "pipe", "pipe"] });
-    const reader = new PcmReader(this.proc, (err) => opts.onError?.(err));
-    this.proc.on("error", (err) => opts.onError?.(err));
-
-    let committed = "";
+    const lease = await acquireModel(this.config.modelPath, this.config.gpu);
+    const model = lease.model;
     try {
+      const language = koreanLocale(model.capabilities.languages);
+      if (!model.capabilities.supportsStreaming) {
+        throw new Error(`모델이 스트리밍을 지원하지 않습니다: ${model.variant}`);
+      }
+      opts.onStatus?.(
+        `transcribe.cpp 시작: ${model.variant} (backend=${model.backend}, lang=${language ?? "auto"})`,
+      );
+      this.session = model.createSession({ nThreads: this.config.threads });
+      this.stream = await this.session.stream({
+        commitPolicy: "stable_prefix",
+        ...(language ? { language } : {}),
+        timestamps: "segment",
+      });
+
+      const args = pcmArgs(this.config, null);
+      this.proc = spawn(this.config.ffmpegBin, args, { stdio: ["ignore", "pipe", "pipe"] });
+      const reader = new PcmReader(this.proc, (err) => opts.onError?.(err));
+      this.proc.on("error", (err) => opts.onError?.(err));
+
+      let committed = "";
       for (;;) {
         const chunk = await reader.next();
         if (chunk === null) break;
@@ -189,6 +274,7 @@ export class TranscribeStream extends TranscribeBase {
       }
     } finally {
       await this.stop();
+      lease.release();
     }
   }
 }
@@ -203,42 +289,54 @@ export class TranscribeCLI extends TranscribeBase {
   }
 
   async start(opts: WhisperOptions): Promise<void> {
-    const model = await loadModel(this.config.modelPath, this.config.gpu);
-    const language = koreanLocale(model.capabilities.languages);
-    opts.onStatus?.(`transcribe.cpp 파일 전사 (파일: ${this.filePath}, backend=${model.backend})`);
+    const lease = await acquireModel(this.config.modelPath, this.config.gpu);
+    const model = lease.model;
+    try {
+      const language = koreanLocale(model.capabilities.languages);
+      opts.onStatus?.(`transcribe.cpp 파일 전사 (파일: ${this.filePath}, backend=${model.backend})`);
 
-    const args = pcmArgs(this.config, this.filePath);
-    this.proc = spawn(this.config.ffmpegBin, args, { stdio: ["ignore", "pipe", "pipe"] });
-    const reader = new PcmReader(this.proc, (err) => opts.onError?.(err));
-    this.proc.on("error", (err) => opts.onError?.(err));
+      const args = pcmArgs(this.config, this.filePath);
+      this.proc = spawn(this.config.ffmpegBin, args, { stdio: ["ignore", "pipe", "pipe"] });
+      const reader = new PcmReader(this.proc, (err) => opts.onError?.(err));
+      this.proc.on("error", (err) => opts.onError?.(err));
 
-    const parts: Float32Array[] = [];
-    for (;;) {
-      const chunk = await reader.next();
-      if (chunk === null) break;
-      parts.push(chunk);
-    }
-    if (parts.length === 0) throw new Error("디코드된 오디오가 없습니다");
-    const total = parts.reduce((sum, part) => sum + part.length, 0);
-    const pcm = new Float32Array(total);
-    let offset = 0;
-    for (const part of parts) {
-      pcm.set(part, offset);
-      offset += part.length;
-    }
+      const parts: Float32Array[] = [];
+      for (;;) {
+        const chunk = await reader.next();
+        if (chunk === null) break;
+        parts.push(chunk);
+      }
+      if (parts.length === 0) throw new Error("디코드된 오디오가 없습니다");
+      const total = parts.reduce((sum, part) => sum + part.length, 0);
+      const pcm = new Float32Array(total);
+      let offset = 0;
+      for (const part of parts) {
+        pcm.set(part, offset);
+        offset += part.length;
+      }
+      parts.length = 0;
 
-    this.session = model.createSession({ nThreads: this.config.threads });
-    const result = await this.session.run(pcm, {
-      ...(language ? { language } : {}),
-      timestamps: "segment",
-    });
-    for (const segment of result.segments) {
-      const text = segment.text.trim();
-      if (!text) continue;
-      opts.onChunk({ text, ts: Date.now() });
-    }
-    if (result.segments.length === 0 && result.text.trim()) {
-      opts.onChunk({ text: result.text.trim(), ts: Date.now() });
+      this.session = model.createSession({ nThreads: this.config.threads });
+      const maxAudioMs = this.session.limits.effectiveMaxAudioMs;
+      const durationMs = (pcm.length / 16_000) * 1_000;
+      if (maxAudioMs > 0 && durationMs > maxAudioMs) {
+        throw new Error(`오디오가 모델 처리 한도를 초과합니다: ${Math.ceil(durationMs)}ms > ${maxAudioMs}ms`);
+      }
+      const result = await this.session.run(pcm, {
+        ...(language ? { language } : {}),
+        timestamps: "segment",
+      });
+      for (const segment of result.segments) {
+        const text = segment.text.trim();
+        if (!text) continue;
+        opts.onChunk({ text, ts: Date.now() });
+      }
+      if (result.segments.length === 0 && result.text.trim()) {
+        opts.onChunk({ text: result.text.trim(), ts: Date.now() });
+      }
+    } finally {
+      await this.stop();
+      lease.release();
     }
   }
 }

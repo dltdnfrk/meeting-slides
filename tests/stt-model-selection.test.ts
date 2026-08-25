@@ -22,7 +22,7 @@ function artifact(id: "small" | "medium", fileName: `${string}.bin`): SttModelAr
 }
 
 describe("STT selection controller", () => {
-  test("serializes concurrent selects, persists the installed model, and restarts active capture once per change", async () => {
+  function fixture() {
     const root = mkdtempSync(join(tmpdir(), "meeting-stt-select-"));
     const modelDir = join(root, "models", "stt");
     const settings = new SttModelSettingsStore(root);
@@ -31,58 +31,37 @@ describe("STT selection controller", () => {
     mkdirSync(modelDir, { recursive: true });
     writeFileSync(join(modelDir, small.fileName), "small");
     writeFileSync(join(modelDir, medium.fileName), "mediu");
-    const manager = new SttModelManager(modelDir, settings, [small, medium]);
+    return { root, modelDir, settings, manager: new SttModelManager(modelDir, settings, [small, medium]) };
+  }
 
-    const releases: Array<() => void> = [];
-    let resolveStopInvocation: ((value: void | PromiseLike<void>) => void) | null = null;
-    let concurrentStops = 0;
-    let maxConcurrentStops = 0;
+  test("rejects model changes during capture without splitting the meeting", async () => {
+    const value = fixture();
     const events: string[] = [];
-    const selectSttModel = createSelectSttModel(manager, {
+    const select = createSelectSttModel(value.manager, {
       isCapturing: () => true,
-      stopCapture: async () => {
-        events.push("stop");
-        concurrentStops += 1;
-        maxConcurrentStops = Math.max(maxConcurrentStops, concurrentStops);
-        resolveStopInvocation?.();
-        await new Promise<void>((resolve) => { releases.push(resolve); });
-        concurrentStops -= 1;
-      },
-      startCapture: async () => {
-        events.push("start");
-      },
-      rebuildCapture: () => {
-        events.push("rebuild");
-      },
+      stopCapture: async () => { events.push("stop"); },
+      startCapture: async () => { events.push("start"); },
+      rebuildCapture: () => { events.push("rebuild"); },
     });
+    await expect(select("medium")).rejects.toThrow("녹음을 중지");
+    expect(events).toEqual([]);
+    expect(value.settings.load()).toBeNull();
+    rmSync(value.root, { recursive: true, force: true });
+  });
 
-    const waitForNextStopInvocation = async () =>
-      await Promise.race([
-        new Promise<void>((resolve) => {
-          resolveStopInvocation = resolve;
-        }),
-        new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error("stopCapture invocation timeout")), 5_000);
-        }),
-      ]);
-
-    const firstStopInvoked = waitForNextStopInvocation();
-    const first = selectSttModel("medium");
-    await firstStopInvoked;
-    releases.shift()?.();
-
-    const secondStopInvoked = waitForNextStopInvocation();
-    const second = selectSttModel("small");
-    await secondStopInvoked;
-    releases.shift()?.();
-
-    await first;
-    await second;
-
-    expect(maxConcurrentStops).toBe(1);
-    expect(settings.load()).toEqual({ version: 1, selectedModelId: "small" });
-    expect(manager.selectedPath()).toBe(join(modelDir, small.fileName));
-    expect(events).toEqual(["stop", "rebuild", "start", "stop", "rebuild", "start"]);
-    rmSync(root, { recursive: true, force: true });
+  test("serializes idle selections and persists the latest installed model", async () => {
+    const value = fixture();
+    const events: string[] = [];
+    const select = createSelectSttModel(value.manager, {
+      isCapturing: () => false,
+      stopCapture: async () => { events.push("stop"); },
+      startCapture: async () => { events.push("start"); },
+      rebuildCapture: () => { events.push("rebuild"); },
+    });
+    await Promise.all([select("medium"), select("small")]);
+    expect(value.settings.load()).toEqual({ version: 1, selectedModelId: "small" });
+    expect(value.manager.selectedPath()).toBe(join(value.modelDir, "small.bin"));
+    expect(events).toEqual(["rebuild", "rebuild"]);
+    rmSync(value.root, { recursive: true, force: true });
   });
 });

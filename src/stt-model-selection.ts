@@ -17,16 +17,12 @@ export function createSelectSttModel(
   return (id: SttModelId) => {
     const next = chain.then(async () => {
       const currentPath = sttManager.selectedPath();
+      if (capture.isCapturing()) {
+        throw new Error("녹음을 중지한 뒤 음성 인식 모델을 변경해 주세요");
+      }
       const nextPath = sttManager.select(id);
       if (currentPath === nextPath) return;
-      const wasCapturing = capture.isCapturing();
-      if (wasCapturing) {
-        await capture.stopCapture();
-      }
       capture.rebuildCapture();
-      if (wasCapturing) {
-        await capture.startCapture();
-      }
     });
     chain = next.then(() => undefined, () => undefined);
     return next;
