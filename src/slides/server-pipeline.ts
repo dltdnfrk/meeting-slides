@@ -122,8 +122,12 @@ export async function runSlidePlanPipeline(
     const snapshot = deepFreeze(structuredClone(input.snapshot));
     let plan = input.existingPlan ?? await planTranscriptToSlides(snapshot, input.planner);
     if (input.existingPlan !== undefined) {
-      if (input.existingPlan.snapshot.meetingId !== snapshot.meetingId) {
-        throw new SlidePlanPipelineError("planning", "existing plan meeting does not match transcript snapshot");
+      const identity = input.existingPlan.snapshot;
+      if (identity.meetingId !== snapshot.meetingId ||
+          identity.transcriptVersionId !== snapshot.transcriptVersionId ||
+          identity.contentSha256 !== snapshot.contentSha256 ||
+          identity.lineCount !== snapshot.lines.length) {
+        throw new SlidePlanPipelineError("planning", "existing plan does not match the exact transcript snapshot");
       }
       plan = input.existingPlan;
     }
@@ -138,7 +142,9 @@ export async function runSlidePlanPipeline(
     plan = assets.plan;
     emit(input, 2);
 
-    assertSevenLayouts(plan);
+    // The planner contract starts with one representative of every primary
+    // family. Human revisions may reorder, delete, insert, or change layouts.
+    if (input.existingPlan === undefined) assertSevenLayouts(plan);
     const drafts = plan.slides.map(draftLayout);
     emit(input, 3);
 

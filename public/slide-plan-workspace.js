@@ -10,10 +10,10 @@ const EXPORT_FILES = Object.freeze({
   pdf: "raster/deck.pdf", png: "raster/png/slide-01.png",
 });
 
-const SCHEMA_KEYS = new Set(["variant"]);
+const SCHEMA_KEYS = new Set(["variant", "mode"]);
 
 function textValues(value, output = []) {
-  if (typeof value === "string" && value.trim() && !SCHEMA_KEYS.has(value)) output.push(value);
+  if (typeof value === "string" && value.trim()) output.push(value);
   else if (Array.isArray(value)) value.forEach((item) => textValues(item, output));
   else if (value && typeof value === "object") {
     for (const [key, item] of Object.entries(value)) {
@@ -30,7 +30,7 @@ function button(selector, root) {
 }
 
 export function createSlidePlanWorkspace(options) {
-  const { root, fallback, keyboardTarget = window, exportControls = [] } = options ?? {};
+  const { root, fallback, keyboardTarget, exportControls = [] } = options ?? {};
   if (!(root instanceof HTMLElement) || !(fallback instanceof HTMLElement)) {
     throw new TypeError("SlidePlan workspace root and fallback are required");
   }
@@ -51,6 +51,7 @@ export function createSlidePlanWorkspace(options) {
   let editor = null;
   let controller = null;
   let dirty = false;
+  let busy = false;
   let exportHrefs = new Map();
 
   const adaptedSlides = () => editor.deck.slides.map((slide) => ({
@@ -65,10 +66,10 @@ export function createSlidePlanWorkspace(options) {
   const syncExports = () => {
     for (const link of exports) {
       const href = exportHrefs.get(link);
-      if (dirty) {
+      if (dirty || busy) {
         link.removeAttribute("href");
         link.setAttribute("aria-disabled", "true");
-        link.setAttribute("title", "로컬 편집으로 내보내기가 오래되었습니다");
+        link.setAttribute("title", busy ? "슬라이드 저장 작업이 진행 중입니다" : "로컬 편집으로 내보내기가 오래되었습니다");
       } else {
         link.setAttribute("href", href);
         link.removeAttribute("aria-disabled");
@@ -76,10 +77,11 @@ export function createSlidePlanWorkspace(options) {
       }
     }
     for (const control of exportControls) {
-      control.disabled = dirty;
-      if (dirty) {
-        control.setAttribute("title", "로컬 편집으로 내보내기가 오래되었습니다");
-        control.setAttribute("aria-label", "로컬 편집으로 내보내기가 오래되었습니다");
+      control.disabled = dirty || busy;
+      if (dirty || busy) {
+        const reason = busy ? "슬라이드 저장 작업이 진행 중입니다" : "로컬 편집으로 내보내기가 오래되었습니다";
+        control.setAttribute("title", reason);
+        control.setAttribute("aria-label", reason);
       }
     }
   };
@@ -102,16 +104,18 @@ export function createSlidePlanWorkspace(options) {
       const candidate = editor.deck.slides.find((item) => item.id === option.dataset.slideId);
       if (candidate) option.textContent = candidate.title;
     }
-    button("[data-deck-undo]", root).disabled = editor.past.length === 0;
-    button("[data-deck-redo]", root).disabled = editor.future.length === 0;
-    status.textContent = dirty
+    titleInput.disabled = busy;
+    layoutSelect.disabled = busy;
+    button("[data-deck-undo]", root).disabled = busy || editor.past.length === 0;
+    button("[data-deck-redo]", root).disabled = busy || editor.future.length === 0;
+    status.textContent = busy ? "슬라이드 초안을 저장하는 중…" : dirty
       ? `Local draft · revision ${editor.revision} · exports stale`
       : `Saved revision ${editor.revision} · exports current`;
     syncExports();
   };
 
   const dispatchEdit = (command) => {
-    if (!editor) return false;
+    if (!editor || busy) return false;
     const result = applyDeckEditorCommand(editor, { ...command, expectedRevision: editor.revision });
     if (!result.ok) {
       status.textContent = `Local edit rejected · ${result.error.code}`;
@@ -164,7 +168,7 @@ export function createSlidePlanWorkspace(options) {
     root.hidden = false;
     fallback.hidden = true;
     fallback.style.display = "none";
-    controller = createDeckStageController({ root, slides: adaptedSlides(), keyboardTarget,
+    controller = createDeckStageController({ root, slides: adaptedSlides(), keyboardTarget: keyboardTarget ?? root,
       onChange: render });
     render();
     return true;
@@ -178,17 +182,23 @@ export function createSlidePlanWorkspace(options) {
     root.hidden = true;
     fallback.hidden = false;
     fallback.style.removeProperty("display");
-    for (const control of exportControls) control.disabled = false;
+    syncExports();
     return false;
   }
 
-  return Object.freeze({ initialize, clear, isActive: () => !root.hidden, isDirty: () => dirty, currentPlan: () => editor?.deck ?? null });
+  const setBusy = (value) => {
+    busy = Boolean(value);
+    if (editor) render();
+    else syncExports();
+  };
+
+  return Object.freeze({ initialize, clear, setBusy, isActive: () => !root.hidden, isDirty: () => dirty, currentPlan: () => editor?.deck ?? null });
 }
 
 const root = document.querySelector("[data-slide-plan-workspace]");
 const fallback = document.getElementById("current-slide");
 window.__slidePlanWorkspace = root && fallback ? createSlidePlanWorkspace({
-  root, fallback, keyboardTarget: window,
+  root, fallback,
   exportControls: ["btn-export-deck", "btn-export-pdf", "btn-export-png"]
     .map((id) => document.getElementById(id)).filter(Boolean),
 }) : null;

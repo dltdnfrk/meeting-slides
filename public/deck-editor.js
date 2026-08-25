@@ -111,11 +111,64 @@ function editText(state, command, index) {
   for (const part of parts.slice(0, -1)) target = target[part];
   target[parts.at(-1)] = command.text;
   if (!editorial) slide.bindings[bindingPath] = claimIds;
+  validateSlide(slide, "editedSlide", knownIds(state.deck, "claims"), knownIds(state.deck, "assets"));
   return deepFreeze(slide);
 }
 
 function replaceOne(slides, index, slide) {
   const next = slides.slice(); next[index] = slide; return Object.freeze(next);
+}
+
+function uniqueClaimIds(slide) {
+  return [...new Set(Object.values(slide.bindings).flat())];
+}
+
+function convertLayout(deck, slide, layout) {
+  const claimById = new Map(deck.claims.map((claim) => [claim.id, claim]));
+  const ids = uniqueClaimIds(slide).filter((id) => claimById.has(id));
+  const fallbackIds = slide.bindings.title?.filter((id) => claimById.has(id)) ?? [];
+  const usableIds = ids.length > 0 ? ids : fallbackIds;
+  if (usableIds.length === 0) throw Object.freeze({ code: "CLAIM_IDS_REQUIRED", path: "layout" });
+  const fact = (index) => {
+    const id = usableIds[index % usableIds.length];
+    return { text: claimById.get(id).text, ids: [id] };
+  };
+  const bindings = { title: [...slide.bindings.title] };
+  let payload;
+  let editorialPaths = [];
+  if (layout === "hero") {
+    const value = fact(0); payload = { variant: "statement", statement: value.text };
+    bindings.statement = value.ids;
+  } else if (layout === "summary") {
+    const values = usableIds.map((_, index) => fact(index));
+    payload = { mode: "takeaways", items: values.map((value) => value.text) };
+    values.forEach((value, index) => { bindings[`items[${index}]`] = value.ids; });
+  } else if (layout === "decision") {
+    const decision = fact(0); const rationale = fact(1);
+    payload = { decision: decision.text, rationale: [rationale.text] };
+    bindings.decision = decision.ids; bindings["rationale[0]"] = rationale.ids;
+  } else if (layout === "comparison") {
+    const left = fact(0); const right = fact(1);
+    payload = { sides: [{ label: "관점 A", items: [left.text] }, { label: "관점 B", items: [right.text] }] };
+    bindings["sides[0].items[0]"] = left.ids; bindings["sides[1].items[0]"] = right.ids;
+    editorialPaths = ["sides[0].label", "sides[1].label"];
+  } else if (layout === "timeline") {
+    const values = usableIds.map((_, index) => fact(index));
+    payload = { mode: "process", events: values.map((value, index) => ({ label: `단계 ${index + 1}`, text: value.text })) };
+    values.forEach((value, index) => { bindings[`events[${index}].text`] = value.ids; });
+    editorialPaths = values.map((_, index) => `events[${index}].label`);
+  } else if (layout === "metrics") {
+    const label = fact(0); const value = fact(1); const detail = fact(2);
+    payload = { mode: "cards", metrics: [{ label: label.text, value: value.text, detail: detail.text }] };
+    bindings["metrics[0].label"] = label.ids; bindings["metrics[0].value"] = value.ids; bindings["metrics[0].detail"] = detail.ids;
+  } else {
+    const task = fact(0); const owner = fact(1); const due = fact(2);
+    payload = { items: [{ task: task.text, owner: owner.text, due: due.text }] };
+    bindings["items[0].task"] = task.ids; bindings["items[0].owner"] = owner.ids; bindings["items[0].due"] = due.ids;
+  }
+  const converted = { ...slide, layout, payload, bindings, editorialPaths };
+  validateSlide(converted, "convertedSlide", knownIds(deck, "claims"), knownIds(deck, "assets"));
+  return deepFreeze(converted);
 }
 
 function editedState(state, slides) {
@@ -151,7 +204,10 @@ function execute(state, command) {
   if (command.type === "setText") return editedState(state, replaceOne(state.deck.slides, index, editText(state, command, index)));
   if (command.type === "chooseLayout") {
     oneOf(command.layout, "command.layout", LAYOUTS);
-    return editedState(state, replaceOne(state.deck.slides, index, deepFreeze({ ...state.deck.slides[index], layout: command.layout })));
+    if (command.layout === state.deck.slides[index].layout) return state;
+    return editedState(state, replaceOne(
+      state.deck.slides, index, convertLayout(state.deck, state.deck.slides[index], command.layout),
+    ));
   }
   if (command.type === "replaceAsset") {
     stableId(command.assetId, "command.assetId"); stableId(command.replacementAssetId, "command.replacementAssetId");

@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import { createReadStream } from "node:fs";
 import { readFile, realpath, stat } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
@@ -15,6 +17,11 @@ const MIME: Readonly<Record<string, string>> = Object.freeze({
 interface ArtifactPublication {
   readonly path: string;
   readonly publicationSha256: string;
+}
+
+interface ManifestFile {
+  readonly sha256: string;
+  readonly byteLength: number;
 }
 
 export interface SlidePlanArtifactStore {
@@ -70,7 +77,7 @@ function decodeRoute(pathname: string): { planId: string; relativePath: string }
   return { planId, relativePath };
 }
 
-function manifestPaths(raw: string, expectedPlanId: string, expectedSha256: string): Set<string> {
+function manifestFiles(raw: string, expectedPlanId: string, expectedSha256: string): Map<string, ManifestFile | null> {
   let decoded: unknown;
   try {
     decoded = JSON.parse(raw);
@@ -80,26 +87,50 @@ function manifestPaths(raw: string, expectedPlanId: string, expectedSha256: stri
   const publication = object(decoded, "publication manifest must be an object");
   if (publication.publicationSha256 !== expectedSha256) return fail(409, "publication receipt hash mismatch");
   const { publicationSha256: _, ...manifest } = publication;
-  if (pipelineHash(`${JSON.stringify(manifest)}\n`) !== expectedSha256) {
+  if (pipelineHash(`${JSON.stringify(manifest)}
+`) !== expectedSha256) {
     return fail(409, "publication manifest hash mismatch");
   }
   const identity = object(manifest.identity, "publication identity is invalid");
   if (identity.planId !== expectedPlanId) return fail(409, "publication plan identity mismatch");
   if (!Array.isArray(manifest.artifacts)) return fail(409, "publication artifacts are invalid");
 
-  const allowed = new Set(["publication.json", "slide-plan.json", "asset-manifest.json"]);
+  const planSha256 = manifest.planSha256;
+  const assetManifestSha256 = manifest.assetManifestSha256;
+  if (typeof planSha256 !== "string" || typeof assetManifestSha256 !== "string") {
+    return fail(409, "publication root hashes are invalid");
+  }
+  const allowed = new Map<string, ManifestFile | null>([
+    ["publication.json", null],
+    ["slide-plan.json", { sha256: planSha256, byteLength: -1 }],
+    ["asset-manifest.json", { sha256: assetManifestSha256, byteLength: -1 }],
+  ]);
   for (const artifact of manifest.artifacts) {
     const entry = object(artifact, "publication artifact is invalid");
     if (!Array.isArray(entry.files)) return fail(409, "publication files are invalid");
     for (const file of entry.files) {
-      const relativePath = object(file, "publication file is invalid").relativePath;
-      if (typeof relativePath !== "string" || !safeRelativePath(relativePath)) {
-        return fail(409, "publication file path is invalid");
+      const value = object(file, "publication file is invalid");
+      const relativePath = value.relativePath;
+      if (typeof relativePath !== "string" || !safeRelativePath(relativePath) ||
+          typeof value.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(value.sha256) ||
+          !Number.isSafeInteger(value.byteLength) || (value.byteLength as number) < 0) {
+        return fail(409, "publication file metadata is invalid");
       }
-      allowed.add(relativePath);
+      allowed.set(relativePath, { sha256: value.sha256, byteLength: value.byteLength as number });
     }
   }
   return allowed;
+}
+
+async function sha256File(path: string): Promise<string> {
+  const hash = createHash("sha256");
+  await new Promise<void>((resolve, reject) => {
+    const stream = createReadStream(path);
+    stream.on("data", (chunk) => hash.update(chunk));
+    stream.once("error", reject);
+    stream.once("end", resolve);
+  });
+  return hash.digest("hex");
 }
 
 export async function resolveSlidePlanArtifact(
@@ -112,14 +143,18 @@ export async function resolveSlidePlanArtifact(
   const root = await realpath(resolve(publication.path)).catch(() => fail(404, "publication directory not found"));
   const manifestPath = resolve(root, "publication.json");
   const manifest = await readFile(manifestPath, "utf8").catch(() => fail(404, "publication manifest not found"));
-  if (!manifestPaths(manifest, route.planId, publication.publicationSha256).has(route.relativePath)) {
-    return fail(404, "artifact is not in the publication manifest");
-  }
+  const metadata = manifestFiles(manifest, route.planId, publication.publicationSha256).get(route.relativePath);
+  if (metadata === undefined) return fail(404, "artifact is not in the publication manifest");
   const candidate = resolve(root, route.relativePath);
   if (!within(root, candidate)) return fail(403, "artifact escapes publication directory");
   const canonical = await realpath(candidate).catch(() => fail(404, "artifact not found"));
-  if (!within(root, canonical) || !(await stat(canonical)).isFile()) {
+  const fileStat = await stat(canonical);
+  if (!within(root, canonical) || !fileStat.isFile()) {
     return fail(403, "artifact is not a regular publication file");
+  }
+  if (metadata !== null &&
+      ((metadata.byteLength >= 0 && fileStat.size !== metadata.byteLength) || await sha256File(canonical) !== metadata.sha256)) {
+    return fail(409, "artifact bytes do not match the publication manifest");
   }
   const extension = route.relativePath.split(".").at(-1)?.toLowerCase() ?? "";
   return Object.freeze({

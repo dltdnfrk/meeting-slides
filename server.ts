@@ -28,6 +28,7 @@ import { concludeMeeting } from "./src/conclusion.ts";
 import { runSceneCompileAction } from "./src/scene-compile-action.ts";
 import { scenePublication } from "./src/scene-store.ts";
 import { resolveSlidePlanArtifact, SlidePlanArtifactError } from "./src/slide-plan-artifacts.ts";
+import { validateSlidePlanRevision } from "./src/slide-plan-revision.ts";
 import { SlidePlanStore } from "./src/slide-plan-store.ts";
 import { parseSlidePlan, type SlidePlan } from "./src/slides/model/plan-parser.ts";
 import { runSlidePlanServerAction, type SlidePlanTranscriptInput } from "./src/slides/server-action.ts";
@@ -37,6 +38,8 @@ import { buildPassAReport, buildPassBReport } from "./src/grab.ts";
 import { askMeeting } from "./src/ask.ts";
 import { buildReviewPrompt, runVisualReview } from "./src/visual-review.ts";
 import { publishPngDirectory } from "./src/png-artifact.ts";
+import { publishPdfFile } from "./src/pdf-artifact.ts";
+import { GrabProcessExitError, GrabProcessTimeoutError, runGrabProcess } from "./src/grab-process.ts";
 import { createHash, randomUUID } from "node:crypto";
 import type { CompileJobId, ExportJobId } from "./src/session.ts";
 import { basename, join, sep } from "node:path";
@@ -111,6 +114,12 @@ const session = new MeetingSession(
   { automaticDetection: true },
 );
 
+function activateDetector(detector: MeetingLLM & ChatTransport): void {
+  llm = detector;
+  extractionTransport = detector;
+  session.setDetector(detector);
+}
+
 // ── 프로바이더 런타임 선택 (사용자가 UI에서 교체) ──
 const appSettings = new AppSettingsStore(process.env.MEETING_SLIDES_SETTINGS_ROOT ?? import.meta.dir);
 let providerStates: ProviderRuntimeState[] = inspectSubscriptionProviders();
@@ -132,9 +141,7 @@ try {
   if (saved) {
     const restored = createDetector(saved.providerId, { cliTimeoutMs, model: saved.model, effort: saved.effort });
     if (restored) {
-      llm = restored;
-      session.setDetector(restored);
-      extractionTransport = restored;
+      activateDetector(restored);
       currentProviderId = saved.providerId;
       currentModel = saved.model;
       currentEffort = saved.effort;
@@ -150,6 +157,91 @@ let lastSavedPath: string | null = null;
 type ActiveJob = { id: CompileJobId | ExportJobId; meetingId: number; action: "compileDeck" | "compileSlidePlan" | "persistSlidePlan" | "compileTranscriptSnapshot" | "exportDeck" | "exportPptx" | "exportPdf" | "exportPng" };
 let activeJob: ActiveJob | null = null;
 let activeExportUpdate: ExportUpdate | null = null;
+
+const slidePlanRuntime = Object.freeze({
+  outputRoot: join(import.meta.dir, "exports", "slide-plans"),
+  cacheRoot: join(import.meta.dir, "exports", ".slide-plan-cache"),
+  fontSourcePath: join(import.meta.dir, "public", "fonts", "pretendard-variable.woff2"),
+  tools: Object.freeze({
+    slidesGrabPath: join(import.meta.dir, "node_modules", ".bin", "slides-grab"),
+    playwrightBrowsersPath: process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(import.meta.dir, "vendor", "ms-playwright"),
+    sandboxExecutable: "/usr/bin/sandbox-exec",
+    sandboxProfile: "(version 1)(allow default)(deny network*)",
+    timeoutMs: 120_000,
+  }),
+});
+
+function slidePlanTranscriptFor(meetingId: number): SlidePlanTranscriptInput {
+  const canonical = minutesStore.canonicalVersion(meetingId);
+  const review = canonical === null
+    ? null
+    : minutesStore.reviewForMeeting(meetingId, canonical.transcriptVersionId);
+  const confirmedReview = canonical === null
+    ? undefined
+    : confirmedReviewEvidence(
+        review,
+        review?.status === "confirmed" ? minutesStore.itemsForReview(review.reviewId) : [],
+        canonical.transcriptVersionId,
+      );
+  if (canonical?.contentSha256) {
+    return {
+      state: "finalized",
+      transcriptVersionId: canonical.transcriptVersionId,
+      contentSha256: canonical.contentSha256,
+      ...(confirmedReview === undefined ? {} : { confirmedReview }),
+      lines: minutesStore.transcriptVersionLines(canonical.transcriptVersionId).map((line) => ({
+        seq: line.seq, speaker: line.speakerTurn === null ? null : String(line.speakerTurn), text: line.text,
+      })),
+    };
+  }
+  return {
+    state: "live",
+    lines: store.lines(meetingId).map((line) => ({
+      seq: line.seq, speaker: line.speaker === null ? null : String(line.speaker), text: line.text,
+    })),
+  };
+}
+
+function startSlidePlanJob(
+  action: "compileSlidePlan" | "persistSlidePlan",
+  jobId: CompileJobId,
+  meetingId: number,
+  persistPlan?: SlidePlan,
+): void {
+  let transcript: SlidePlanTranscriptInput;
+  try {
+    transcript = slidePlanTranscriptFor(meetingId);
+    if (persistPlan !== undefined) {
+      validateSlidePlanRevision(slidePlanStore.one(persistPlan.planId), persistPlan, transcript);
+    }
+  } catch (error) {
+    broadcast({ type: "compile", status: "error", jobId, meetingId,
+      error: error instanceof Error ? error.message : String(error) });
+    return;
+  }
+  activeJob = { id: jobId, meetingId, action };
+  broadcast({ type: "compile", status: "started", jobId, meetingId, stage: "planning" });
+  void runSlidePlanServerAction({
+    jobId,
+    meetingId,
+    transcript,
+    ...(persistPlan === undefined ? {} : { persistPlan }),
+    transport: extractionTransport,
+    ...slidePlanRuntime,
+    createId: randomUUID,
+    now: () => new Date().toISOString(),
+    send: broadcast,
+    commit: (result) => {
+      slidePlanStore.save(result);
+      lastSavedPath = result.directory;
+      broadcast({ type: "saved", path: result.directory });
+    },
+  }).catch((error) => {
+    console.error(`[slide-plan] ${error instanceof Error ? error.message : String(error)}`);
+  }).finally(() => {
+    if (activeJob?.id === jobId) activeJob = null;
+  });
+}
 
 function providersMessage(): ProvidersUpdate {
   return {
@@ -183,36 +275,27 @@ function validMeetingId(value: unknown): value is number {
   return typeof value === "number" && Number.isSafeInteger(value) && value > 0;
 }
 
-function runGrab(args: string[], timeoutMs: number): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const { FORCE_COLOR: _forceColor, ...grabEnv } = process.env;
-    const proc = spawn(process.execPath, ["x", "slides-grab", ...args], {
+async function runGrab(args: string[], timeoutMs: number): Promise<void> {
+  const { FORCE_COLOR: _forceColor, ...grabEnv } = process.env;
+  try {
+    await runGrabProcess(process.execPath, ["x", "slides-grab", ...args], {
+      timeoutMs: Math.max(1, timeoutMs),
       env: { ...grabEnv, NO_COLOR: "1", PLAYWRIGHT_BROWSERS_PATH: join(import.meta.dir, "vendor", "ms-playwright") },
-      stdio: ["ignore", "pipe", "pipe"],
     });
-    let tail = "";
-    let settled = false;
-    const timer = setTimeout(() => {
-      if (settled) return;
-      settled = true;
-      proc.kill("SIGTERM");
-      reject(new ExportJobError("timeout", `slides-grab ${args[0]} timed out`));
-    }, Math.max(1, timeoutMs));
-    proc.stderr?.on("data", (data: Buffer) => { tail = (tail + data.toString("utf-8")).slice(-400); });
-    proc.on("error", (error) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      reject(new ExportJobError("process-failed", error.message));
-    });
-    proc.on("close", (code) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      if (code === 0) resolve();
-      else reject(new ExportJobError("process-failed", `${args[0]} failed: ${tail.trim() || `exit ${code}`}`));
-    });
-  });
+  } catch (error) {
+    if (error instanceof GrabProcessTimeoutError) {
+      throw new ExportJobError("timeout", `slides-grab ${args[0]} timed out`);
+    }
+    if (error instanceof GrabProcessExitError) {
+      throw new ExportJobError("process-failed", error.message);
+    }
+    throw error;
+  }
+}
+
+function savedArtifactPath(path: string): string {
+  const rootPrefix = `${import.meta.dir}${sep}`;
+  return path.startsWith(rootPrefix) ? path.slice(rootPrefix.length) : path;
 }
 
 async function beforeDeadline<T>(work: Promise<T>, deadline: number, label: string): Promise<T> {
@@ -268,7 +351,7 @@ async function runImageExport(action: "exportPdf" | "exportPng", meetingId: numb
         rmSync(temporaryOut, { recursive: true, force: true });
         throw error;
       }
-      lastSavedPath = `${out.startsWith(import.meta.dir) ? `${out.slice(import.meta.dir.length + 1)}` : out}`;
+      lastSavedPath = savedArtifactPath(out);
       broadcast({ type: "saved", path: lastSavedPath });
       send({ status: "success", stage: "publish", completed: material.slideCount, total: material.slideCount, path: lastSavedPath });
       return;
@@ -302,10 +385,18 @@ async function runImageExport(action: "exportPdf" | "exportPng", meetingId: numb
       "design-gate", "--slides-dir", slidesDir, "--verdict", "proceed",
       "--pass-a-report", join(slidesDir, ".pass-a.md"), "--pass-b-report", join(slidesDir, ".pass-b.md"),
     ], deadline - Date.now());
-    const out = join(import.meta.dir, "exports", `deck-${stamp}.pdf`);
+    const finalName = `deck-${stamp}.pdf`;
+    const out = join(bundleOutputRoot, finalName);
+    const temporaryOut = join(bundleOutputRoot, `.${finalName}.tmp-${randomUUID()}`);
     send({ status: "progress", stage: "render", completed: 0, total: material.slideCount });
-    await runGrab(["pdf", "--slides-dir", slidesDir, "--output", out], deadline - Date.now());
-    lastSavedPath = `exports/deck-${stamp}.pdf`;
+    try {
+      await runGrab(["pdf", "--slides-dir", slidesDir, "--output", temporaryOut], deadline - Date.now());
+      publishPdfFile(temporaryOut, out);
+    } catch (error) {
+      rmSync(temporaryOut, { force: true });
+      throw error;
+    }
+    lastSavedPath = savedArtifactPath(out);
     broadcast({ type: "saved", path: lastSavedPath });
     send({ status: "success", stage: "publish", completed: material.slideCount, total: material.slideCount, path: lastSavedPath });
   } catch (error) {
@@ -352,8 +443,7 @@ async function recheckProviders(): Promise<void> {
       effort: currentEffort,
     });
     if (candidate && await candidate.ping()) {
-      llm = candidate;
-      session.setDetector(candidate);
+      activateDetector(candidate);
       const state = providerStates.find((candidateState) => candidateState.id === currentProviderId);
       if (state) state.auth = "connected";
     }
@@ -1144,8 +1234,7 @@ const handleSetProvider: WsActionHandler = ({ ws, cmd }) => {
         : undefined;
       const detector = createDetector(entry.id, { cliTimeoutMs, model, effort });
       if (detector) {
-        session.setDetector(detector);
-        extractionTransport = detector;
+        activateDetector(detector);
         currentProviderId = entry.id;
         currentModel = model;
         currentEffort = effort;
@@ -1338,61 +1427,13 @@ const httpServer = Bun.serve({
           } else if (activeJob !== null) {
             broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId, error: `A conflicting ${activeJob.action} job is already in progress` });
           } else {
-            const canonical = minutesStore.canonicalVersion(requestedMeetingId);
-            const review = canonical === null
-              ? null
-              : minutesStore.reviewForMeeting(requestedMeetingId, canonical.transcriptVersionId);
-            const confirmedReview = canonical === null
-              ? undefined
-              : confirmedReviewEvidence(
-                  review,
-                  review?.status === "confirmed" ? minutesStore.itemsForReview(review.reviewId) : [],
-                  canonical.transcriptVersionId,
-                );
-            const transcript: SlidePlanTranscriptInput = canonical?.contentSha256
-              ? {
-                  state: "finalized",
-                  transcriptVersionId: canonical.transcriptVersionId,
-                  contentSha256: canonical.contentSha256,
-                  ...(confirmedReview === undefined ? {} : { confirmedReview }),
-                  lines: minutesStore.transcriptVersionLines(canonical.transcriptVersionId).map((line) => ({
-                    seq: line.seq, speaker: line.speakerTurn === null ? null : String(line.speakerTurn), text: line.text,
-                  })),
-                }
-              : {
-                  state: "live",
-                  lines: store.lines(requestedMeetingId).map((line) => ({
-                    seq: line.seq, speaker: line.speaker === null ? null : String(line.speaker), text: line.text,
-                  })),
-                };
-            activeJob = { id: jobId, meetingId: requestedMeetingId, action: cmd.action };
-            let persistPlan: SlidePlan | undefined;
-            try { persistPlan = parseSlidePlan(JSON.stringify((cmd as { plan?: unknown }).plan)); }
-            catch (error) {
-              broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId, error: error instanceof Error ? error.message : "invalid SlidePlan" });
+            try {
+              const persistPlan = parseSlidePlan((cmd as { plan?: unknown }).plan);
+              startSlidePlanJob("persistSlidePlan", jobId, requestedMeetingId, persistPlan);
+            } catch (error) {
+              broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId,
+                error: error instanceof Error ? error.message : "invalid SlidePlan" });
             }
-            if (persistPlan === undefined) {
-              /* invalid plan already reported */
-            } else void runSlidePlanServerAction({
-              jobId, meetingId: requestedMeetingId, transcript, persistPlan, transport: extractionTransport,
-              outputRoot: join(import.meta.dir, "exports", "slide-plans"),
-              cacheRoot: join(import.meta.dir, "exports", ".slide-plan-cache"),
-              fontSourcePath: join(import.meta.dir, "public", "fonts", "pretendard-variable.woff2"),
-              tools: {
-                slidesGrabPath: join(import.meta.dir, "node_modules", ".bin", "slides-grab"),
-                playwrightBrowsersPath: process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(import.meta.dir, "vendor", "ms-playwright"),
-                sandboxExecutable: "/usr/bin/sandbox-exec",
-                sandboxProfile: "(version 1)(allow default)(deny network*)",
-                timeoutMs: 120_000,
-              },
-              createId: () => persistPlan.planId, now: () => new Date().toISOString(), send: broadcast,
-            }).then((result) => {
-              slidePlanStore.save(result);
-              lastSavedPath = result.directory;
-              broadcast({ type: "saved", path: result.directory });
-            }).catch((error) => {
-              console.error(`[slide-plan] ${error instanceof Error ? error.message : String(error)}`);
-            }).finally(() => { if (activeJob?.id === jobId) activeJob = null; });
           }
         }
         else if (cmd.action === "compileSlidePlan") {
@@ -1407,54 +1448,7 @@ const httpServer = Bun.serve({
           } else if (activeJob !== null) {
             broadcast({ type: "compile", status: "error", jobId, meetingId: requestedMeetingId, error: `A conflicting ${activeJob.action} job is already in progress` });
           } else {
-            const canonical = minutesStore.canonicalVersion(requestedMeetingId);
-            const review = canonical === null
-              ? null
-              : minutesStore.reviewForMeeting(requestedMeetingId, canonical.transcriptVersionId);
-            const confirmedReview = canonical === null
-              ? undefined
-              : confirmedReviewEvidence(
-                  review,
-                  review?.status === "confirmed" ? minutesStore.itemsForReview(review.reviewId) : [],
-                  canonical.transcriptVersionId,
-                );
-            const transcript: SlidePlanTranscriptInput = canonical?.contentSha256
-              ? {
-                  state: "finalized",
-                  transcriptVersionId: canonical.transcriptVersionId,
-                  contentSha256: canonical.contentSha256,
-                  ...(confirmedReview === undefined ? {} : { confirmedReview }),
-                  lines: minutesStore.transcriptVersionLines(canonical.transcriptVersionId).map((line) => ({
-                    seq: line.seq, speaker: line.speakerTurn === null ? null : String(line.speakerTurn), text: line.text,
-                  })),
-                }
-              : {
-                  state: "live",
-                  lines: store.lines(requestedMeetingId).map((line) => ({
-                    seq: line.seq, speaker: line.speaker === null ? null : String(line.speaker), text: line.text,
-                  })),
-                };
-            activeJob = { id: jobId, meetingId: requestedMeetingId, action: cmd.action };
-            void runSlidePlanServerAction({
-              jobId, meetingId: requestedMeetingId, transcript, transport: extractionTransport,
-              outputRoot: join(import.meta.dir, "exports", "slide-plans"),
-              cacheRoot: join(import.meta.dir, "exports", ".slide-plan-cache"),
-              fontSourcePath: join(import.meta.dir, "public", "fonts", "pretendard-variable.woff2"),
-              tools: {
-                slidesGrabPath: join(import.meta.dir, "node_modules", ".bin", "slides-grab"),
-                playwrightBrowsersPath: process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(import.meta.dir, "vendor", "ms-playwright"),
-                sandboxExecutable: "/usr/bin/sandbox-exec",
-                sandboxProfile: "(version 1)(allow default)(deny network*)",
-                timeoutMs: 120_000,
-              },
-              createId: randomUUID, now: () => new Date().toISOString(), send: broadcast,
-            }).then((result) => {
-              slidePlanStore.save(result);
-              lastSavedPath = result.directory;
-              broadcast({ type: "saved", path: result.directory });
-            }).catch((error) => {
-              console.error(`[slide-plan] ${error instanceof Error ? error.message : String(error)}`);
-            }).finally(() => { if (activeJob?.id === jobId) activeJob = null; });
+            startSlidePlanJob("compileSlidePlan", jobId, requestedMeetingId);
           }
         }
         else if (cmd.action === "compileDeck" || cmd.action === "compileTranscriptSnapshot" || cmd.action === "exportDeck" || cmd.action === "exportPptx") {
@@ -1571,7 +1565,7 @@ const httpServer = Bun.serve({
         }
         else if (cmd.action === "selectSttModel") {
           if (!isSttModelId(cmd.modelId)) ws.send(JSON.stringify({ type: "status" as const, text: "알 수 없는 STT 모델입니다" }));
-          else void selectSttModel(cmd.modelId);
+          else void selectSttModel(cmd.modelId).catch((error) => requestError(ws, error));
         }
         else if (cmd.action === "recheckSttModels") {
           broadcast(sttModelsMessage(sttManager.recheck()));
@@ -1598,8 +1592,7 @@ const httpServer = Bun.serve({
               : adapter?.defaultEffort;
             const detector = createDetector(entry.id, { cliTimeoutMs, model, effort });
             if (detector) {
-              session.setDetector(detector);
-              llm = detector;
+              activateDetector(detector);
               currentProviderId = entry.id;
               currentModel = model;
               currentEffort = effort;

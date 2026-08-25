@@ -137,6 +137,9 @@ function selectMeeting(meetingId) {
     renderStatus("현재 진행 중인 회의를 보고 있습니다");
     return;
   }
+  if (slidePlanWorkspace?.isDirty() &&
+      !window.confirm("저장되지 않은 슬라이드 편집을 버리고 다른 회의로 이동할까요?")) return;
+  slidePlanWorkspace?.clear();
   selectedMeetingId = meetingId;
   documentSurfaceEl.setAttribute("aria-busy", "true");
   documentSurfaceEl.dataset.loading = "true";
@@ -939,6 +942,7 @@ function renderProviderConfig(msg) {
 // ── 음성 인식(whisper.cpp) 모델 관리 ──
 // 서버가 디스크 기준의 진실을 보내주므로 클라이언트는 상태를 추측하지 않고 그대로 반영한다.
 let sttSelectedModelId = null;
+let latestSttModelsMessage = null;
 
 function formatBytes(bytes) {
   const value = Number(bytes);
@@ -963,8 +967,11 @@ function sttActions(model) {
   switch (model.status) {
     case "downloading":
       return `<button type="button" class="stt-btn stt-btn--quiet stt-row__cancel" data-id="${id}" aria-label="${label} 내려받기 취소">취소</button>`;
-    case "installed":
-      return `<button type="button" class="stt-btn stt-row__select" data-id="${id}" aria-label="${label} 사용">사용</button>`;
+    case "installed": {
+      const disabled = capturing ? ` disabled title="녹음을 중지한 뒤 모델을 변경할 수 있습니다"` : "";
+      const actionLabel = capturing ? `${label} 선택 불가: 녹음 중` : `${label} 사용`;
+      return `<button type="button" class="stt-btn stt-row__select" data-id="${id}" aria-label="${actionLabel}"${disabled}>사용</button>`;
+    }
     case "selected":
       return `<button type="button" class="stt-btn stt-row__select" data-id="${id}" aria-label="${label} 사용 중" disabled>사용 중</button>`;
     case "failed":
@@ -975,6 +982,7 @@ function sttActions(model) {
 }
 
 function renderSttModels(msg) {
+  latestSttModelsMessage = msg;
   const models = Array.isArray(msg.models) ? msg.models : [];
   sttSelectedModelId = msg.selectedModelId ?? null;
   if (contextSttStatusEl) {
@@ -1699,7 +1707,7 @@ btnCompileDeckEl.onclick = () => {
   }
   if (ws && ws.readyState === WebSocket.OPEN) {
     if (slidePlanWorkspace?.isDirty()) {
-globalThis.plan = slidePlanWorkspace.currentPlan();
+      const plan = slidePlanWorkspace.currentPlan();
       ws.send(JSON.stringify({ action: "persistSlidePlan", ...meetingTarget(), plan }));
     } else {
       ws.send(JSON.stringify({ action: "compileSlidePlan", ...meetingTarget() }));
@@ -1717,6 +1725,7 @@ globalThis.plan = slidePlanWorkspace.currentPlan();
 let activeJobId = null;
 function setJobControlsBusy(busy) {
   jobControlsBusy = busy;
+  slidePlanWorkspace?.setBusy(busy);
   syncActionAvailability();
 }
 function clearJobRetry() {
@@ -2104,6 +2113,7 @@ function connect() {
         const serverOwnsCapture = !!msg.capturing || phase === "stopping";
         const endedNow = capturing && !serverOwnsCapture;
         capturing = serverOwnsCapture;
+        if (latestSttModelsMessage) renderSttModels(latestSttModelsMessage);
         if (endedNow) clearPreparedMeeting();
         if (capturing) {
           if (Number.isFinite(msg.startedAt) && msg.startedAt > 0) captureStartedAt = msg.startedAt;

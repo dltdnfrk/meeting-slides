@@ -104,6 +104,29 @@ describe("server SlidePlan orchestration pipeline", () => {
     await expect(runSlidePlanPipeline({ ...noisy.input, snapshot: { ...noisy.input.snapshot, lines: [{ seq: 1, speaker: null, text: "um... thanks" }] } })).rejects.toThrow("no substantive"); expect(noisy.seen).toHaveLength(0);
   });
 
+  test("rejects a persisted plan from a stale transcript snapshot", async () => {
+    const source = fixture("finalized");
+    const published = await runSlidePlanPipeline(source.input);
+    const stale = fixture("finalized");
+    await expect(runSlidePlanPipeline({
+      ...stale.input,
+      snapshot: { ...stale.input.snapshot, contentSha256: "b".repeat(64) },
+      existingPlan: JSON.parse(published.planJson),
+    })).rejects.toThrow("exact transcript snapshot");
+    expect(stale.seen).toHaveLength(0);
+  });
+
+  test("allows a valid human revision to change the generated seven-layout mix", async () => {
+    const source = fixture("finalized");
+    const published = await runSlidePlanPipeline(source.input);
+    const revised = JSON.parse(published.planJson);
+    revised.slides = revised.slides.slice(0, -1);
+    const run = fixture("finalized");
+    const result = await runSlidePlanPipeline({ ...run.input, existingPlan: revised });
+    expect(JSON.parse(result.planJson).slides).toHaveLength(6);
+    expect(result.identity.slideIds).toEqual(revised.slides.map((entry: PlanSlide) => entry.id));
+  });
+
   test("uses a deterministic managed fallback for a missing informative asset", async () => {
     const missing: PlanAsset = { id: "asset-hero", purpose: "informative", kind: "image", localPath: `assets/${"b".repeat(64)}.png`, mediaType: "image/png", width: 20, height: 20, byteLength: 99, sha256: "b".repeat(64), altDescription: "Launch evidence", source: { kind: "local", originalPath: "missing.png" }, claimIds: ["claim-launch"] };
     const run = fixture("finalized", modelContent(missing)); let calls = 0;

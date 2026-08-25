@@ -91,6 +91,51 @@ describe("SlidePlanStore additive persistence migration", () => {
     db.close();
   });
 
+  test("migrates the v1 plan_id primary-key table without losing its publication", () => {
+    const db = new Database(":memory:");
+    db.run(`CREATE TABLE slide_plan_publications (
+      plan_id TEXT PRIMARY KEY, meeting_id INTEGER NOT NULL, identity_json TEXT NOT NULL,
+      plan_json TEXT NOT NULL, plan_sha256 TEXT NOT NULL, publication_sha256 TEXT NOT NULL,
+      publication_path TEXT NOT NULL, review_id TEXT, reviewed_item_ids_json TEXT, published_at INTEGER NOT NULL
+    )`);
+    const value = publication();
+    db.run(`INSERT INTO slide_plan_publications
+      (plan_id, meeting_id, identity_json, plan_json, plan_sha256, publication_sha256,
+       publication_path, review_id, reviewed_item_ids_json, published_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+      value.identity.planId, 1, JSON.stringify(value.identity), value.planJson, value.planSha256,
+      value.publicationSha256, value.directory, value.identity.reviewId,
+      JSON.stringify(value.identity.reviewedItemIds), 42,
+    ]);
+    const store = new SlidePlanStore(db);
+    expect(store.one("plan-store")).toMatchObject({ revision: 0, publishedAt: 42, path: value.directory });
+    const columns = db.query("PRAGMA table_info(slide_plan_publications)").all() as Array<{ name: string }>;
+    expect(columns.map((column) => column.name)).toEqual(expect.arrayContaining(["publication_id", "plan_id", "revision"]));
+    db.close();
+  });
+
+  test("keeps stable plan identity while appending immutable revisions", () => {
+    const db = new Database(":memory:");
+    const store = new SlidePlanStore(db);
+    const first = store.save(publication(plan("stable-plan")), 1);
+    const revisedPlan = structuredClone(plan("stable-plan"));
+    revisedPlan.revision = 1;
+    revisedPlan.slides[0].title = "Revised opening";
+    revisedPlan.updatedAt = "2026-08-15T11:00:00.000Z";
+    const revisedPublication = publication(revisedPlan);
+    const second = store.save({ ...revisedPublication, directory: "/published/stable-plan-r1" }, 2);
+    expect(second.plan.planId).toBe(first.plan.planId);
+    expect(second.revision).toBe(1);
+    expect(second.publicationId).not.toBe(first.publicationId);
+    expect(store.one("stable-plan")).toEqual(second);
+    expect(store.list(1)).toEqual([second, first]);
+    expect(store.save({ ...revisedPublication, directory: "/published/stable-plan-r1" }, 99)).toEqual(second);
+    const conflictPlan = structuredClone(revisedPlan);
+    conflictPlan.slides[0].title = "Conflicting revision";
+    expect(() => store.save({ ...publication(conflictPlan), directory: "/conflict" }, 3)).toThrow(/conflicting.*revision/i);
+    db.close();
+  });
+
   test("parses every persisted read and rejects malformed stored plan JSON", () => {
     const db = new Database(":memory:");
     const store = new SlidePlanStore(db);

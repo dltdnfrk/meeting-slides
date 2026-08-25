@@ -100,18 +100,42 @@ describe("production SlidePlan server action", () => {
   }, 120_000);
 
 
-  test("re-publishes an edited persistPlan without calling the planner", async () => {
-globalThis.first = fixture({ state: "live", lines });
-globalThis.published = await runSlidePlanServerAction(first.input);
-globalThis.edited = structuredClone(JSON.parse(published.planJson));
+  test("re-publishes an edited plan in the same production root with stable plan identity", async () => {
+    const first = fixture({ state: "live", lines });
+    const published = await runSlidePlanServerAction(first.input);
+    const edited = structuredClone(JSON.parse(published.planJson));
     edited.slides[0].title = "Edited Friday launch";
-globalThis.planner = { chat: async () => { throw new Error("planner must not run"); } };
-globalThis.second = fixture({ state: "live", lines }, false, planner);
-    second.input = { ...second.input, persistPlan: edited, createId: () => edited.planId };
-globalThis.result = await runSlidePlanServerAction(second.input);
-    expect(JSON.parse(result.planJson).slides[0].title).toBe("Edited Friday launch");
+    edited.revision += 1;
+    const planner = { chat: async () => { throw new Error("planner must not run"); } };
+    const second = fixture({ state: "live", lines }, false, planner);
+    second.input = {
+      ...second.input,
+      outputRoot: first.input.outputRoot,
+      cacheRoot: first.input.cacheRoot,
+      persistPlan: edited,
+      createId: () => "plan-server-action-revision-2",
+    };
+    const result = await runSlidePlanServerAction(second.input);
+    const revisedPlan = JSON.parse(result.planJson);
+    expect(revisedPlan.planId).toBe(edited.planId);
+    expect(revisedPlan.revision).toBe(1);
+    expect(revisedPlan.slides[0].title).toBe("Edited Friday launch");
     expect(result.directory).not.toBe(published.directory);
+    expect(existsSync(published.directory)).toBe(true);
+    expect(existsSync(result.directory)).toBe(true);
   }, 20_000);
+  test("emits success only after durable commit and removes an orphan when commit fails", async () => {
+    const run = fixture({ state: "live", lines });
+    const expectedDirectory = join(run.input.outputRoot, `meeting-41-${sha(JSON.stringify(lines.map(({ seq, speaker, text }) => ({ seq, speaker, text }))))}-${sha("plan-server-action").slice(0, 12)}`);
+    await expect(runSlidePlanServerAction({
+      ...run.input,
+      commit: () => { throw new Error("database commit failed"); },
+    })).rejects.toThrow("database commit failed");
+    expect(run.events.filter((event) => event.status === "success")).toEqual([]);
+    expect(run.events.filter((event) => event.status === "error")).toHaveLength(1);
+    expect(existsSync(expectedDirectory)).toBe(false);
+  }, 20_000);
+
   test("broadcasts one error and publishes nothing when the provider omits confirmed Review evidence", async () => {
     const transcript = { state: "finalized", lines, transcriptVersionId: "final-v41", contentSha256: "c".repeat(64), confirmedReview } as const;
     const run = fixture(transcript, false, { chat: async (prompt) => {

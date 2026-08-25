@@ -16,7 +16,8 @@ function fixture() {
   const root = mkdtempSync(join(tmpdir(), "slide-plan-artifacts-"));
   roots.push(root);
   mkdirSync(join(root, "standalone"), { recursive: true });
-  writeFileSync(join(root, "standalone", "index.html"), "<!doctype html><title>Deck</title>");
+  const html = "<!doctype html><title>Deck</title>";
+  writeFileSync(join(root, "standalone", "index.html"), html);
   const manifestValue = {
     schemaVersion: 1,
     identity: { planId: "plan-safe" },
@@ -24,7 +25,7 @@ function fixture() {
     assetManifestSha256: "b".repeat(64),
     artifacts: [{
       format: "standalone-html",
-      files: [{ relativePath: "standalone/index.html", byteLength: 34, sha256: "c".repeat(64) }],
+      files: [{ relativePath: "standalone/index.html", byteLength: Buffer.byteLength(html), sha256: hash(html) }],
     }],
   };
   const manifest = `${JSON.stringify(manifestValue)}\n`;
@@ -73,6 +74,12 @@ describe("SlidePlan artifact route", () => {
       "/slide-plan-artifacts/unknown/standalone/index.html",
       store,
     )).rejects.toMatchObject({ status: 404 });
+
+    writeFileSync(join(root, "standalone", "index.html"), "tampered");
+    await expect(resolveSlidePlanArtifact(
+      "/slide-plan-artifacts/plan-safe/standalone/index.html",
+      store,
+    )).rejects.toMatchObject({ status: 409 });
 
     writeFileSync(join(root, "publication.json"), "{}");
     await expect(resolveSlidePlanArtifact(

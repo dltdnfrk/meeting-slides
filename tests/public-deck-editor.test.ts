@@ -204,12 +204,24 @@ describe("direct slide commands", () => {
     expect(edited.deck.slides[1]!.bindings).not.toHaveProperty("sides[0].label");
   });
 
+  test("setText rejects an empty title without creating a schema-invalid plan", () => {
+    const initial = createDeckEditorState(strictDeck());
+    const result = apply(initial, {
+      type: "setText", expectedRevision: 7, slideId: "slide-hero",
+      path: "title", text: "", claimIds: ["claim-launch"],
+    });
+    expect(result).toMatchObject({ ok: false, error: { code: "INVALID_COMMAND" } });
+    expect(result.state).toBe(initial);
+  });
+
   test("chooseLayout, replaceAsset, reorderSlide, insertSlide, and deleteSlide are revisioned immutable edits", () => {
     const initial = createDeckEditorState(strictDeck());
     const chosen = next(initial, {
       type: "chooseLayout", expectedRevision: 7, slideId: "slide-hero", layout: "summary",
     });
     expect(chosen.deck.slides[0]!.layout).toBe("summary");
+    expect(chosen.deck.slides[0]!.payload).toEqual({ mode: "takeaways", items: ["The beta launches Friday."] });
+    expect(() => createDeckEditorState(chosen.deck)).not.toThrow();
 
     const replaced = next(chosen, {
       type: "replaceAsset", expectedRevision: 8, slideId: "slide-comparison",

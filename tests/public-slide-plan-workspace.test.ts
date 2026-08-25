@@ -103,9 +103,27 @@ globalThis.dockBox = dock.getBoundingClientRect();
     await page.keyboard.press("ArrowLeft");
     expect(await page.$eval("[data-slide-counter]", (node) => node.textContent)).toBe("1 / 2");
     await page.keyboard.press("ArrowRight");
+    const beforeOutsideKey = await page.$eval("[data-slide-counter]", (node) => node.textContent);
+    await page.evaluate(() => {
+      const outside = document.createElement("div");
+      outside.id = "outside-slide-plan-key-target";
+      outside.tabIndex = 0;
+      document.body.append(outside);
+      outside.focus();
+    });
+    expect(await page.evaluate(() => document.activeElement?.id)).toBe("outside-slide-plan-key-target");
+    await page.keyboard.press("PageUp");
+    expect(await page.$eval("[data-slide-counter]", (node) => node.textContent)).toBe(beforeOutsideKey);
+
+    await page.evaluate(() => window.__slidePlanWorkspace?.setBusy(true));
+    await page.click("[data-deck-previous]");
+    expect(await page.$eval("#btn-export-pdf", (node) => (node as HTMLButtonElement).disabled)).toBe(true);
+    expect(await page.$eval("#btn-export-png", (node) => (node as HTMLButtonElement).disabled)).toBe(true);
+    await page.evaluate(() => window.__slidePlanWorkspace?.setBusy(false));
   });
 
   test("keeps edits local, supports layout/undo/redo, and gates stale exports", async () => {
+    await page.$eval('[data-slide-id="decision"]', (node) => (node as HTMLButtonElement).click());
     await page.select("[data-slide-layout]", "timeline");
 
     expect(await page.evaluate(() => ({
@@ -125,12 +143,16 @@ globalThis.dockBox = dock.getBoundingClientRect();
 
   test("persists a dirty local draft instead of compiling a new plan", async () => {
     await page.select("[data-slide-layout]", "timeline");
+    await page.evaluate(() => { (window as typeof window & { plan?: unknown }).plan = { sentinel: true }; });
     await page.$eval("#dock-more", (node) => { (node as HTMLDetailsElement).open = true; });
-const persist = harness.nextClientMessage();
+    const persist = harness.nextClientMessage();
     await page.click("#btn-compile-deck");
-const message = await persist;
+    const message = await persist;
     expect(message.action).toBe("persistSlidePlan");
     expect(message.plan?.slides?.some((slide: { layout?: string }) => slide.layout === "timeline")).toBe(true);
+    expect(await page.evaluate(() => (window as typeof window & { plan?: unknown }).plan)).toEqual({ sentinel: true });
+    expect(await page.$eval("[data-slide-title-input]", (node) => (node as HTMLInputElement).disabled)).toBe(true);
+    expect(await page.$eval("[data-slide-layout]", (node) => (node as HTMLSelectElement).disabled)).toBe(true);
     harness.pushMessage({ type: "compile", status: "error", meetingId: 7, error: "persist test complete" });
     await page.waitForFunction(() => !(document.getElementById("btn-compile-deck") as HTMLButtonElement).disabled);
   });

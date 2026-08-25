@@ -197,7 +197,10 @@ export function projectDeckStage(root, state) {
     if (selected) option.setAttribute("aria-current", "true");
     else option.removeAttribute("aria-current");
     option.setAttribute("aria-selected", String(selected));
-    if (index >= 0) option.setAttribute("aria-label", `Slide ${index + 1} of ${projection.slideCount}`);
+    if (index >= 0) {
+      const title = option.textContent?.trim();
+      option.setAttribute("aria-label", title ? `${title}, Slide ${index + 1} of ${projection.slideCount}` : `Slide ${index + 1} of ${projection.slideCount}`);
+    }
     else option.removeAttribute("aria-label");
   }
 
