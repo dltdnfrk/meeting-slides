@@ -128,7 +128,25 @@ enum LauncherIO {
 
     /// 캘린더에서 다음 회의 시작을 감지해 서버에 자동 녹음 시작을 알린다.
     /// EventKit 권한이 없거나 캘린더 항목이 없으면 조용히 무시한다.
-    static func calendarAutoCapture(port: Int) {
+    static func loadCalendarCaptureRequest(plan: ServerLaunchPlan, port: Int) throws -> URLRequest? {
+        let loader = Process()
+        loader.executableURL = URL(fileURLWithPath: plan.executablePath)
+        loader.arguments = CalendarAutomation.tokenLoadArguments
+        loader.currentDirectoryURL = URL(fileURLWithPath: plan.workingDirectory)
+        loader.environment = ProcessInfo.processInfo.environment.merging(plan.environmentOverlay) {
+            _, overlay in overlay
+        }
+        let output = Pipe()
+        loader.standardOutput = output
+        loader.standardError = FileHandle.standardError
+        try loader.run()
+        let tokenJSON = output.fileHandleForReading.readDataToEndOfFile()
+        loader.waitUntilExit()
+        guard loader.terminationStatus == 0 else { throw LauncherFailure.automationTokenLoadFailed }
+        return try CalendarAutomation.captureRequest(port: port, tokenJSON: tokenJSON)
+    }
+
+    static func calendarAutoCapture(request: URLRequest) {
         let store = EKEventStore()
         let sem = DispatchSemaphore(value: 0)
         var granted = false
@@ -148,7 +166,6 @@ enum LauncherIO {
             log("캘린더 권한 없음 — 자동 녹음 비활성 (시스템 설정 > 개인정보 보호 > 캘린더)")
             return
         }
-        let base = URL(string: "http://127.0.0.1:\(port)")!
         var lastTriggered = Date(timeIntervalSince1970: 0)
         let calendar = Calendar.current
         while true {
@@ -162,9 +179,7 @@ enum LauncherIO {
                 if delta > 0, delta <= 60, event.startDate.timeIntervalSince(lastTriggered) > 60 {
                     lastTriggered = event.startDate
                     log("캘린더 감지: \(event.title ?? "(제목 없음)") — 자동 녹음 시작")
-                    var req = URLRequest(url: base.appendingPathComponent("api/auto-capture"))
-                    req.httpMethod = "POST"
-                    URLSession.shared.dataTask(with: req).resume()
+                    URLSession.shared.dataTask(with: request).resume()
                 }
             }
             Thread.sleep(forTimeInterval: 15)
@@ -270,9 +285,18 @@ enum MeetingSlidesLauncher {
         }
 
         // ── 3. 캘린더 자동 녹음 (백그라운드 폴링) ──
-        let calendarThread = Thread { LauncherIO.calendarAutoCapture(port: port) }
-        calendarThread.name = "calendar-auto-capture"
-        calendarThread.start()
+        do {
+            if let request = try LauncherIO.loadCalendarCaptureRequest(plan: plan, port: port) {
+                let calendarThread = Thread { LauncherIO.calendarAutoCapture(request: request) }
+                calendarThread.name = "calendar-auto-capture"
+                calendarThread.start()
+            } else {
+                LauncherIO.log("캘린더 자동 녹음 비활성 — MEETING_SLIDES_AUTOMATION_TOKEN 설정 필요")
+            }
+        } catch {
+            // Never log the loader output or decoding error: either can contain the token.
+            LauncherIO.log("캘린더 자동 녹음 비활성 — 자동화 토큰 로드 실패")
+        }
 
         // ── 4. 마이크 권한 (번들 이름 = Meeting Slides) ──
         let micOK = LauncherIO.requestMicAccess()

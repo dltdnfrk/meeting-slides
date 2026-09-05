@@ -105,6 +105,23 @@ func runBunCandidates(_ input: [String: Any]) throws -> Any {
     ["paths": LauncherEnvironment.bunCandidatePaths(homeDirectory: try requireString(input, "home"))]
 }
 
+func runAutomationRequest(_ input: [String: Any]) throws -> Any {
+    let request = try CalendarAutomation.captureRequest(
+        port: try requireInt(input, "port"),
+        tokenJSON: Data(try requireString(input, "tokenJSON").utf8)
+    )
+    guard let request else { return ["enabled": false] }
+    return [
+        "enabled": true,
+        "url": request.url!.absoluteString,
+        "method": request.httpMethod ?? "",
+        "authorization": request.value(forHTTPHeaderField: "Authorization") ?? "",
+        "contentType": request.value(forHTTPHeaderField: "Content-Type") ?? "",
+        "origin": request.value(forHTTPHeaderField: "Origin") as Any? ?? NSNull(),
+        "body": try JSONSerialization.jsonObject(with: request.httpBody ?? Data()),
+    ]
+}
+
 func runLogPath(_ input: [String: Any]) throws -> Any {
     ["path": LauncherEnvironment.logFilePath(homeDirectory: try requireString(input, "home"))]
 }
@@ -265,6 +282,8 @@ func runScenario(_ raw: Any) -> ScenarioResult {
     do {
         switch kind {
         case "port": return .success(name, try runPort(input))
+        case "automationRequest": return .success(name, try runAutomationRequest(input))
+        case "automationTokenArguments": return .success(name, CalendarAutomation.tokenLoadArguments)
         case "bunCandidates": return .success(name, try runBunCandidates(input))
         case "logPath": return .success(name, try runLogPath(input))
         case "launchPlan": return .success(name, try runLaunchPlan(input))

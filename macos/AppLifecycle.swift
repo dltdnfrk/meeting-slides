@@ -22,6 +22,7 @@ public enum LauncherFailure: String, Error, Equatable {
     case bunNotFound
     case portOccupiedByForeignServer
     case projectDirectoryNotFound
+    case automationTokenLoadFailed
 }
 
 /// Which project directory the launcher runs Bun in.
@@ -170,6 +171,26 @@ public enum LauncherEnvironment {
 }
 
 // MARK: - Startup decision
+
+/// Ask the same Bun runtime that starts the server to resolve its environment.
+/// This preserves inherited overrides, layered dotenv files and expansion.
+public enum CalendarAutomation {
+    public static let tokenLoadArguments = [
+        "--print", "JSON.stringify(process.env.MEETING_SLIDES_AUTOMATION_TOKEN?.trim() ?? '')",
+    ]
+
+    public static func captureRequest(port: Int, tokenJSON: Data) throws -> URLRequest? {
+        let token = try JSONDecoder().decode(String.self, from: tokenJSON)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !token.isEmpty else { return nil }
+        var request = URLRequest(url: URL(string: "http://127.0.0.1:\(port)/api/auto-capture")!)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Data("{}".utf8)
+        return request
+    }
+}
 
 public enum StartupDecision: String, Equatable {
     /// Nothing is listening: this launcher starts and owns the Bun session.

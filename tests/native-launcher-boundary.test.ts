@@ -9,7 +9,7 @@
 // modeled as pure values so every state transition is deterministic.
 
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync, existsSync, readFileSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -34,6 +34,7 @@ interface DriverOutput {
 }
 
 let buildDir = "";
+const evidenceDir = process.env.NATIVE_LAUNCHER_EVIDENCE_DIR;
 let compileLog = "";
 let compileExit = -1;
 let driverStdout = "";
@@ -51,6 +52,17 @@ const HEALTHY_BODY =
  */
 const SCENARIOS = {
   scenarios: [
+    { name: "automation-token-arguments", kind: "automationTokenArguments", input: {} },
+    ...[
+      ["configured", '" fixture-token "'],
+      ["empty", '""'],
+      ["whitespace", '"  \\n "'],
+      ["malformed", 'not-json'],
+    ].map(([name, tokenJSON]) => ({
+      name: `automation-${name}`,
+      kind: "automationRequest",
+      input: { port: 9123, tokenJSON },
+    })),
     // ── project + port resolution ──
     {
       name: "port-from-env-file",
@@ -331,9 +343,10 @@ const SCENARIOS = {
   ],
 };
 
-function run(cmd: string[], opts: { stdin?: string; cwd?: string } = {}) {
+function run(cmd: string[], opts: { stdin?: string; cwd?: string; env?: NodeJS.ProcessEnv } = {}) {
   const proc = Bun.spawnSync(cmd, {
     cwd: opts.cwd ?? ROOT,
+    env: opts.env,
     stdin: opts.stdin === undefined ? undefined : new TextEncoder().encode(opts.stdin),
     stdout: "pipe",
     stderr: "pipe",
@@ -346,7 +359,7 @@ function run(cmd: string[], opts: { stdin?: string; cwd?: string } = {}) {
 }
 
 beforeAll(() => {
-  buildDir = mkdtempSync(join(tmpdir(), "native-launcher-seam-"));
+  buildDir = mkdtempSync(join(evidenceDir ?? tmpdir(), "native-launcher-seam-"));
   const binary = join(buildDir, "native-launcher-driver");
 
   const compiled = run([
@@ -370,6 +383,10 @@ beforeAll(() => {
   driverExit = ran.exitCode;
   driverStdout = ran.stdout;
   driverStderr = ran.stderr;
+  if (evidenceDir) {
+    writeFileSync(join(buildDir, "driver-output.json"), driverStdout);
+    writeFileSync(join(buildDir, "compile.log"), compileLog);
+  }
 
   try {
     output = JSON.parse(driverStdout) as DriverOutput;
@@ -384,7 +401,7 @@ beforeAll(() => {
 }, 120_000);
 
 afterAll(() => {
-  if (buildDir) rmSync(buildDir, { recursive: true, force: true });
+  if (buildDir && !evidenceDir) rmSync(buildDir, { recursive: true, force: true });
 });
 
 function result(name: string): DriverResult {
@@ -472,6 +489,66 @@ describe("native launcher seam: Bun launch plan", () => {
     const missing = result("launch-plan-missing-bun");
     expect(missing.ok).toBe(false);
     expect(missing.error?.kind).toBe("bunNotFound");
+  });
+});
+
+describe("native calendar automation request", () => {
+  test.each([
+    { name: "quoted base dotenv", files: { ".env": 'MEETING_SLIDES_AUTOMATION_TOKEN=" base-token "\n' }, inherited: {}, expected: "base-token" },
+    { name: "dotenv expansion", files: { ".env": 'PREFIX=expanded\nMEETING_SLIDES_AUTOMATION_TOKEN=$PREFIX-token\n' }, inherited: {}, expected: "expanded-token" },
+    { name: "production and local precedence", files: { ".env": 'MEETING_SLIDES_AUTOMATION_TOKEN=base\n', ".env.production": 'MEETING_SLIDES_AUTOMATION_TOKEN=production\n', ".env.local": 'MEETING_SLIDES_AUTOMATION_TOKEN=local-token\n' }, inherited: {}, expected: "local-token" },
+    { name: "inherited override", files: { ".env": 'MEETING_SLIDES_AUTOMATION_TOKEN=base\n', ".env.local": 'MEETING_SLIDES_AUTOMATION_TOKEN=local\n' }, inherited: { MEETING_SLIDES_AUTOMATION_TOKEN: "inherited-token" }, expected: "inherited-token" },
+    { name: "missing token", files: {}, inherited: {}, expected: "" },
+    { name: "explicit empty inherited override", files: { ".env": 'MEETING_SLIDES_AUTOMATION_TOKEN=base\n' }, inherited: { MEETING_SLIDES_AUTOMATION_TOKEN: "" }, expected: "" },
+  ])("Bun-loaded $name reaches the real Swift URLRequest", ({ files, inherited, expected }) => {
+    // Given: isolated dotenv files, no inherited user secrets, and production argv.
+    const cwd = mkdtempSync(join(buildDir, "dotenv-"));
+    for (const [name, text] of Object.entries(files)) {
+      if (text !== undefined) writeFileSync(join(cwd, name), text);
+    }
+    const args = result("automation-token-arguments").value;
+    if (!Array.isArray(args) || !args.every((arg): arg is string => typeof arg === "string")) {
+      throw new Error("Swift driver did not emit token loader arguments");
+    }
+    // When: the real Bun dotenv loader feeds its JSON directly into the Swift builder.
+    const loaded = run([process.execPath, ...args], {
+      cwd,
+      env: { NODE_ENV: "production", OPEN_BROWSER: "false", HTTP_PORT: "9123", ...inherited },
+    });
+    expect(loaded.exitCode).toBe(0);
+    expect(loaded.stderr).toBe("");
+    expect(JSON.parse(loaded.stdout)).toBe(expected);
+    const built = run([join(buildDir, "native-launcher-driver")], {
+      stdin: JSON.stringify({ scenarios: [{ name: "loaded", kind: "automationRequest", input: { port: 9123, tokenJSON: loaded.stdout } }] }),
+    });
+    // Then: inspect the actual Foundation request, not source spelling.
+    expect(built.exitCode).toBe(0);
+    expect(built.stderr).toBe("");
+    expect(JSON.parse(built.stdout).results[0]).toMatchObject({
+      ok: true,
+      value: expected ? { enabled: true, authorization: `Bearer ${expected}`, contentType: "application/json", body: {} } : { enabled: false },
+    });
+  });
+
+  test("configured token produces an authenticated JSON POST to the configured port", () => {
+    expect(value("automation-configured")).toEqual({
+      enabled: true,
+      url: "http://127.0.0.1:9123/api/auto-capture",
+      method: "POST",
+      authorization: "Bearer fixture-token",
+      contentType: "application/json",
+      origin: null,
+      body: {},
+    });
+  });
+
+  test("empty and whitespace tokens disable automation without creating a request", () => {
+    expect(value("automation-empty")).toEqual({ enabled: false });
+    expect(value("automation-whitespace")).toEqual({ enabled: false });
+  });
+
+  test("malformed token loader output is an explicit failure", () => {
+    expect(result("automation-malformed").ok).toBe(false);
   });
 });
 
@@ -697,7 +774,7 @@ describe("native launcher seam: launcher entry point and build wiring", () => {
     const source = launcher();
     expect(source).toMatch(/AVCaptureDevice/);
     expect(source).toMatch(/EKEventStore/);
-    expect(source).toMatch(/api\/auto-capture/);
+    expect(source).toMatch(/LauncherIO\.calendarAutoCapture\(request: request\)/);
     // The bun invocation, including OPEN_BROWSER=false, now comes from the plan.
     expect(source).toMatch(/plan\.environmentOverlay/);
     expect(source).toMatch(/plan\.arguments/);
