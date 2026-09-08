@@ -21,7 +21,7 @@ import type {
   GeometryPreflightResult,
   GeometrySlide,
 } from "../../src/slides/geometry/contract.ts";
-import type { Theme } from "../../src/slides/model/plan.ts";
+import type { SlidePlan, Theme } from "../../src/slides/model/plan.ts";
 import {
   EditablePptxError,
   publishEditablePptx,
@@ -29,6 +29,8 @@ import {
   type EditablePptxArtifact,
   type EditablePptxRenderRequest,
 } from "../../src/slides/render/editable-pptx.ts";
+import type { PipelinePublisherRequest } from "../../src/slides/server-pipeline-types.ts";
+import { createEditablePptxPublisher } from "../../src/slides/server-publishers.ts";
 
 const temporaryDirectories: string[] = [];
 const PNG_BYTES = Buffer.from(
@@ -359,6 +361,84 @@ function textRuns(shapeXml: string): string[] {
   return [...shapeXml.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map((match) => xmlDecode(match[1]!));
 }
 
+function notesPlaceholderText(notesXml: string): string {
+  const body = notesXml.match(/<p:ph type="body"[^/]*\/>[\s\S]*?<a:t>([\s\S]*?)<\/a:t>/);
+  if (body === null || body[1] === undefined) {
+    throw new Error("missing notes body placeholder text");
+  }
+  return xmlDecode(body[1]).replace(/\r\n/g, "\n");
+}
+
+function drawingMlFontSize(fitPx: number): number {
+  return Math.round(fitPx * 0.75 * 100);
+}
+
+function publicationRequest(source: Fixture, speakerNotes: string): PipelinePublisherRequest {
+  const alpha = source.request.slides[0];
+  const beta = source.request.slides[1];
+  if (alpha === undefined || beta === undefined) {
+    throw new Error("fixture must contain two slides");
+  }
+  const plan: SlidePlan = {
+    schemaVersion: 1,
+    planId: "plan-editable",
+    revision: 1,
+    snapshot: {
+      meetingId: 1,
+      transcriptVersionId: "transcript-v1",
+      contentSha256: "a".repeat(64),
+      lineCount: 1,
+    },
+    title: "Editable fixture",
+    theme: source.request.theme,
+    claims: [],
+    assets: [],
+    slides: [
+      {
+        id: alpha.geometry.slide.slideId,
+        layout: "hero",
+        storyRole: "opening",
+        title: "Alpha decision",
+        payload: { variant: "cover", statement: "Alpha decision" },
+        bindings: {},
+        editorialPaths: [],
+        assetIds: [],
+        notes: speakerNotes,
+      },
+      {
+        id: beta.geometry.slide.slideId,
+        layout: "summary",
+        storyRole: "argument",
+        title: "Beta actions",
+        payload: { mode: "overview", items: ["Owner Mina"] },
+        bindings: {},
+        editorialPaths: [],
+        assetIds: [],
+      },
+    ],
+    createdAt: "2026-08-15T10:00:00.000Z",
+    updatedAt: "2026-08-15T10:00:00.000Z",
+  };
+  return {
+    identity: {
+      planId: plan.planId,
+      deckId: source.request.deckId,
+      snapshot: plan.snapshot,
+      slideIds: [alpha.geometry.slide.slideId, beta.geometry.slide.slideId],
+      geometryIds: [alpha.geometry.slide.id, beta.geometry.slide.id],
+      claimIds: ["claim-alpha"],
+    },
+    plan,
+    assetManifest: { schemaVersion: 1, assets: [] },
+    drafts: [],
+    slides: [alpha.geometry, beta.geometry],
+    assetLayers: [alpha.assets, beta.assets],
+    managedAssetRoot: source.rootDirectory,
+    priorArtifacts: [],
+    outputDirectory: source.rootDirectory,
+  };
+}
+
 describe("editable Geometry/Assets PPTX renderer", () => {
   test("emits a valid wide OPC package in exact slide order with editable DrawingML and local image relationships", async () => {
     const source = fixture();
@@ -403,8 +483,8 @@ describe("editable Geometry/Assets PPTX renderer", () => {
     const alphaAccent = namedShapeXml(first, "slide-alpha:accent");
     expect(textRuns(alphaTitle)).toEqual(["Alpha decision"]);
     expect(textRuns(alphaBody)).toEqual(["First resolved line", "Second resolved line"]);
-    expect(alphaTitle).toMatch(/<a:rPr\b[^>]*\bsz="3600"/);
-    expect(alphaBody.match(/<a:rPr\b[^>]*\bsz="2200"/g)).toHaveLength(2);
+    expect(alphaTitle).toMatch(new RegExp(`<a:rPr\\b[^>]*\\bsz="${drawingMlFontSize(36)}"`));
+    expect(alphaBody.match(new RegExp(`<a:rPr\\b[^>]*\\bsz="${drawingMlFontSize(22)}"`, "g"))).toHaveLength(2);
     expect(alphaBody).toMatch(/<a:br\s*\/>|<\/a:p>\s*<a:p>/);
     expect(alphaAccent).toContain('<a:prstGeom prst="rect">');
     expect(alphaAccent).toContain('<a:srgbClr val="AD4B2F"');
@@ -433,6 +513,20 @@ describe("editable Geometry/Assets PPTX renderer", () => {
       expect(xml, entry.name).not.toMatch(/\b(?:fit|autofit|shrinkText)="(?:shrink|true|1)"/i);
     }
     await assertClosedInternalRelationshipGraph(archive);
+  });
+
+  test("marks slide text run properties as ko-KR when the deck is compiled", async () => {
+    const source = fixture();
+    const artifact = await renderEditablePptx(source.request);
+    const archive = await JSZip.loadAsync(artifact.bytes, { checkCRC32: true });
+    const first = await textPart(archive, "ppt/slides/slide1.xml");
+    const title = namedShapeXml(first, "slide-alpha:title");
+    const body = namedShapeXml(first, "slide-alpha:body");
+    const runProps = [...title.matchAll(/<a:rPr\b([^>]*)\/?>/g), ...body.matchAll(/<a:rPr\b([^>]*)\/?>/g)];
+    expect(runProps.length).toBeGreaterThan(0);
+    for (const match of runProps) {
+      expect(match[1]).toMatch(/\blang="ko-KR"/);
+    }
   });
 
   test("binds notes to slide IDs and evidence, applies theme fonts/colors, and returns a deterministic semantic manifest and receipt", async () => {
@@ -526,6 +620,20 @@ describe("editable Geometry/Assets PPTX renderer", () => {
     expect(first.receiptJson).toBe(`${JSON.stringify(first.receipt)}\n`);
     expect(first.receiptJson).toBe(second.receiptJson);
     expect(Buffer.from(first.bytes)).toEqual(Buffer.from(second.bytes));
+  });
+
+  test("keeps PlanSlide speaker notes before the identity string in the notes slide", async () => {
+    const source = fixture();
+    const speakerNotes = "State the Friday launch decision.";
+    const published = await createEditablePptxPublisher()(publicationRequest(source, speakerNotes));
+    const pptx = published.files.find((file) => file.relativePath === "editable/deck.pptx");
+    if (pptx === undefined) throw new Error("publisher did not emit editable/deck.pptx");
+    const archive = await JSZip.loadAsync(pptx.bytes, { checkCRC32: true });
+    const notesXml = await textPart(archive, "ppt/notesSlides/notesSlide1.xml");
+    const identity = "plan-editable; slide-alpha:geometry; slide-alpha";
+    const [firstLine, secondLine] = notesPlaceholderText(notesXml).split("\n");
+    expect(firstLine).toBe(speakerNotes);
+    expect(secondLine).toBe(identity);
   });
 
   test("rejects blocked geometry, missing or mutated assets, unsupported media, duplicate IDs, and unresolved fonts with typed paths", async () => {

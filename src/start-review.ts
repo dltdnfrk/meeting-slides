@@ -1,6 +1,7 @@
-import type { MinutesExtractionInput, MinutesExtractionResult } from "./extract.ts";
+import type { MinutesExtractionInput, MinutesExtractionResult } from "./minutes-extraction-types.ts";
 import type { MinutesStore } from "./minutes-store.ts";
-import type { ReviewUpdate } from "./session.ts";
+import type { ReviewUpdate } from "./protocol.ts";
+import { reviewSnapshotForMeeting } from "./review-snapshot.ts";
 
 interface Extractor {
   extract(request: MinutesExtractionInput): Promise<MinutesExtractionResult>;
@@ -20,51 +21,6 @@ function meetingDateFor(store: MinutesStore, meetingId: number): string {
     { started_at: number } | null;
   if (!row) throw new Error(`unknown meeting ${meetingId}`);
   return new Date(row.started_at).toISOString().slice(0, 10);
-}
-
-function itemPayload(
-  result: MinutesExtractionResult,
-  lines: MinutesExtractionInput["lines"],
-): ReviewUpdate["items"] {
-  const segmentText = (source: { start_seq: number; end_seq: number }): string => lines
-    .filter((line) => line.seq >= source.start_seq && line.seq <= source.end_seq)
-    .map((line) => line.text)
-    .join("\n");
-  return [
-    ...result.decisions.map((item) => ({
-      id: item.id,
-      kind: "decision" as const,
-      description: item.description,
-      sourceSegment: item.sourceSegment,
-      evidenceQuote: item.evidenceQuote,
-      reviewState: "candidate" as const,
-      segment_text: segmentText(item.sourceSegment),
-      attributedAttendeeId: item.suggestedAttributionAttendeeId,
-    })),
-    ...result.actionItems.map((item) => ({
-      id: item.id,
-      kind: "action_item" as const,
-      description: item.description,
-      sourceSegment: item.sourceSegment,
-      evidenceQuote: item.evidenceQuote,
-      reviewState: "candidate" as const,
-      segment_text: segmentText(item.sourceSegment),
-      attributedAttendeeId: item.suggestedAttributionAttendeeId,
-      assigneeAttendeeId: item.suggestedAssigneeAttendeeId,
-      deadline: item.deadline,
-      deadlineText: item.deadlineText,
-    })),
-    ...result.openItems.map((item) => ({
-      id: item.id,
-      kind: "open_item" as const,
-      description: item.description,
-      sourceSegment: item.sourceSegment,
-      evidenceQuote: item.evidenceQuote,
-      reviewState: "candidate" as const,
-      segment_text: segmentText(item.sourceSegment),
-      attributedAttendeeId: item.suggestedAttributionAttendeeId,
-    })),
-  ];
 }
 
 export async function startReview(input: StartReviewInput): Promise<ReviewUpdate> {
@@ -98,7 +54,7 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
     throw new Error(`extractor returned wrong transcript version ${result.transcriptVersionId}`);
   }
 
-  const reviewId = input.store.saveCandidates({
+  input.store.replaceDraft({
     meetingId: input.meetingId,
     transcriptVersionId: canonical.transcriptVersionId,
     decisions: result.decisions.map((item) => ({
@@ -140,19 +96,10 @@ export async function startReview(input: StartReviewInput): Promise<ReviewUpdate
       attributedAttendeeId: item.suggestedAttributionAttendeeId,
       origin: item.origin,
     })),
+    summary: result.summary,
   });
 
-  return {
-    type: "review",
-    meetingId: input.meetingId,
-    reviewId,
-    transcriptVersionId: canonical.transcriptVersionId,
-    status: "draft",
-    confirmedAt: null,
-    confirmedBy: null,
-    conclusion: null,
-    items: itemPayload(result, lines),
-    attendees,
-    transcript: { lines },
-  };
+  const snapshot = reviewSnapshotForMeeting(input.store, input.meetingId);
+  if (!snapshot) throw new Error(`review snapshot for meeting ${input.meetingId} was not persisted`);
+  return result.usedFallback ? { ...snapshot, usedFallback: true } : snapshot;
 }

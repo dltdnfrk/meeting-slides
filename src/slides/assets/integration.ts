@@ -135,18 +135,24 @@ function validateAccessibility(asset: PlanAsset, planIndex: number): void {
   }
 }
 
+export const ASSET_PLACEMENT_BOXES = {
+  heroImage: { x: 704, y: 0, width: 576, height: 720 },
+  summaryMark: { x: 880, y: 160, width: 240, height: 240 },
+  metricsChart: { x: 480, y: 152, width: 720, height: 480 },
+} as const;
+
 function placementSpec(slide: PlanSlide, kind: AssetKind, path: string): {
   readonly box: { x: number; y: number; width: number; height: number };
   readonly fit: "contain" | "cover";
 } {
   if (slide.layout === "hero" && kind === "image") {
-    return { box: { x: 704, y: 0, width: 576, height: 720 }, fit: "cover" };
+    return { box: { ...ASSET_PLACEMENT_BOXES.heroImage }, fit: "cover" };
   }
   if (slide.layout === "summary" && (kind === "icon" || kind === "diagram")) {
-    return { box: { x: 880, y: 160, width: 240, height: 240 }, fit: "contain" };
+    return { box: { ...ASSET_PLACEMENT_BOXES.summaryMark }, fit: "contain" };
   }
   if (slide.layout === "metrics" && slide.payload.mode === "chart" && kind === "chart") {
-    return { box: { x: 480, y: 152, width: 720, height: 480 }, fit: "contain" };
+    return { box: { ...ASSET_PLACEMENT_BOXES.metricsChart }, fit: "contain" };
   }
   const variant = slide.layout === "metrics" ? ` (${slide.payload.mode})` : "";
   fail("ASSET_PLACEMENT_UNSUPPORTED", path, `${slide.layout}${variant} does not support ${kind} asset placement`);

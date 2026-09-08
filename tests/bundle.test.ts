@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
+import JSZip from "jszip";
 
 import { exportBundle, type BundleManifest } from "../src/bundle.ts";
 import { MinutesStore } from "../src/minutes-store.ts";
@@ -90,7 +91,53 @@ afterEach(() => {
 });
 
 describe("exportBundle", () => {
-  test("publishes six logical outputs atomically and records four required artifacts only after validation", async () => {
+  test.each(["minutes.pdf", "minutes.docx", "transcript.v1.jsonl"])("refuses tampered published %s on deduplication", async (path) => {
+    const fx = fixture();
+    fx.store.confirmReview(fx.reviewId);
+    const original = await run(fx);
+    const bytes = readFileSync(join(original.bundlePath, path));
+    bytes[bytes.length - 1] ^= 1;
+    await Bun.write(join(original.bundlePath, path), bytes);
+
+    await expect(run(fx)).rejects.toThrow(`[BUNDLE_HASH_MISMATCH] ${path}`);
+
+    expect(existsSync(original.bundlePath)).toBe(true);
+    fx.legacy.close();
+  });
+
+  test.each([
+    ["minutes.pdf", "[INVALID_MINUTES_PDF]"],
+    ["minutes.docx", "[INVALID_MINUTES_DOCX]"],
+  ])("rejects invalid %s signatures even when manifest hashes match", async (path, code) => {
+    const fx = fixture();
+    fx.store.confirmReview(fx.reviewId);
+    const original = await run(fx);
+    const bytes = readFileSync(join(original.bundlePath, path));
+    bytes[0] ^= 1;
+    await Bun.write(join(original.bundlePath, path), bytes);
+    for (const entry of original.manifest.entries) {
+      if (entry.path === path) entry.sha256 = sha256(bytes);
+    }
+    await Bun.write(join(original.bundlePath, "manifest.json"), JSON.stringify(original.manifest));
+
+    await expect(run(fx)).rejects.toThrow(code);
+
+    expect(existsSync(original.bundlePath)).toBe(true);
+    fx.legacy.close();
+  });
+
+  test("retains the bundle-specific unsafe path error before reading entries", async () => {
+    const fx = fixture();
+    fx.store.confirmReview(fx.reviewId);
+    const original = await run(fx);
+    original.manifest.entries.push({ ...original.manifest.entries[0], path: "../outside" });
+    await Bun.write(join(original.bundlePath, "manifest.json"), JSON.stringify(original.manifest));
+
+    await expect(run(fx)).rejects.toThrow("[UNSAFE_BUNDLE_PATH] ../outside");
+    fx.legacy.close();
+  });
+
+  test("publishes seven logical outputs atomically and records five required artifacts only after validation", async () => {
     const fx = fixture();
     const externalAudio = join(fx.root, "external-source.wav");
     await Bun.write(externalAudio, "RIFF external audio stays outside the bundle");
@@ -106,7 +153,7 @@ describe("exportBundle", () => {
 
     expect(outputNames(fx.outputRoot)).toEqual([basename(result.bundlePath)]);
     expect(outputNames(result.bundlePath)).toEqual([
-      "audio.ref.json", "deck", "manifest.json", "minutes.json", "minutes.pdf", "transcript.v1.jsonl",
+      "audio.ref.json", "deck", "manifest.json", "minutes.docx", "minutes.json", "minutes.pdf", "transcript.v1.jsonl",
     ]);
     expect(basename(result.bundlePath)).toMatch(/^bundle-\d+-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z$/);
     expect(outputNames(fx.outputRoot).some((name) => name.endsWith(".tmp"))).toBe(false);
@@ -117,19 +164,29 @@ describe("exportBundle", () => {
     });
     expect(readFileSync(externalAudio)).toEqual(audioBytes);
     expect(fx.store.databaseHandle().query("SELECT status FROM artifact_bundles").get()).toEqual({ status: "complete" });
+    expect(Buffer.from(readFileSync(join(result.bundlePath, "minutes.docx")).subarray(0, 4)).toString("latin1")).toBe("PK\x03\x04");
+    const archivalMarker = '<meta name="meeting-slides-artifact-role" content="archival-minutes-companion" />';
+    expect(readFileSync(join(result.bundlePath, "deck", "index.html"), "utf8")).toContain(archivalMarker);
+    const bundledSlides = readdirSync(join(result.bundlePath, "deck", "slides"))
+      .filter((name) => name.endsWith(".html"));
+    expect(bundledSlides).not.toHaveLength(0);
+    for (const name of bundledSlides) {
+      expect(readFileSync(join(result.bundlePath, "deck", "slides", name), "utf8"))
+        .toContain(archivalMarker);
+    }
     expect(fx.store.databaseHandle().query("SELECT artifact_type FROM artifacts ORDER BY artifact_type").all()).toEqual([
-      { artifact_type: "canonical_transcript" }, { artifact_type: "minutes_json" },
+      { artifact_type: "canonical_transcript" }, { artifact_type: "minutes_docx" }, { artifact_type: "minutes_json" },
       { artifact_type: "minutes_pdf" }, { artifact_type: "slide_deck" },
     ]);
   });
 
   test("mirrors the minutes ontology and keeps every source tuple equal to JSONL coordinates", async () => {
     const fx = fixture();
-    fx.store.confirmReview(fx.reviewId, "reviewer");
+    fx.store.confirmReview(fx.reviewId);
     let renderedHtml = "";
     const result = await run(fx, { renderPdf: async (html) => { renderedHtml = html; return fakePdf; } });
     const minutes = JSON.parse(readFileSync(join(result.bundlePath, "minutes.json"), "utf8"));
-    const transcript = readFileSync(join(result.bundlePath, "transcript.v1.jsonl"), "utf8").trim().split("\n").map(JSON.parse);
+    const transcript = readFileSync(join(result.bundlePath, "transcript.v1.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line));
     const seqs = new Set(transcript.map((line) => line.seq));
 
     expect(minutes.attendees).toEqual([
@@ -145,6 +202,15 @@ describe("exportBundle", () => {
       for (let seq = source.start_seq; seq <= source.end_seq; seq++) expect(seqs.has(seq)).toBe(true);
       expect(renderedHtml).toContain(`(${source.transcript_version_id},${source.start_seq},${source.end_seq})`);
     }
+
+    // DOCX는 확정된 minutes와 동일한 데이터에서 생성되어야 한다: 같은 좌표 튜플과 항목 설명을 포함한다.
+    const archive = await JSZip.loadAsync(readFileSync(join(result.bundlePath, "minutes.docx")));
+    const documentXml = await archive.file("word/document.xml")!.async("string");
+    for (const item of [...minutes.decisions, ...minutes.action_items, ...minutes.open_items]) {
+      expect(documentXml).toContain(item.description);
+      const source = item.source;
+      expect(documentXml).toContain(`(${source.transcript_version_id},${source.start_seq},${source.end_seq})`);
+    }
   });
 
   test("writes canonical four-field JSONL and binds its exact bytes to content_sha256 and manifest hashes", async () => {
@@ -152,7 +218,7 @@ describe("exportBundle", () => {
     fx.store.confirmReview(fx.reviewId);
     const result = await run(fx);
     const transcriptBytes = readFileSync(join(result.bundlePath, "transcript.v1.jsonl"));
-    const lines = transcriptBytes.toString("utf8").trim().split("\n").map(JSON.parse);
+    const lines = transcriptBytes.toString("utf8").trim().split("\n").map((line) => JSON.parse(line));
     const minutes = JSON.parse(readFileSync(join(result.bundlePath, "minutes.json"), "utf8"));
     const manifest = JSON.parse(readFileSync(join(result.bundlePath, "manifest.json"), "utf8")) as BundleManifest;
 
@@ -235,6 +301,6 @@ describe("exportBundle", () => {
     expect(retried.deduplicated).toBe(true);
     expect(basename(retried.bundlePath)).toBe(published[0]);
     expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles").get()).toEqual({ count: 1 });
-    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 4 });
+    expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 5 });
   });
 });

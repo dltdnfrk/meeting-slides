@@ -8,6 +8,7 @@ import type {
   GeometryCompilerOptions,
   GeometryElement,
   TextFitPolicy,
+  TextMeasurer,
 } from "./contract.ts";
 import { fitText } from "./text-fit.ts";
 
@@ -47,7 +48,40 @@ function resolveTokens(
       ));
     }
   }
+  const sizeToken = element.tokens.size;
+  if (typeof sizeToken === "string" && sizeToken.endsWith(".size")) {
+    const lineHeightToken = `${sizeToken.slice(0, -".size".length)}.lineHeight`;
+    try {
+      resolved.lineHeight = resolveThemeToken(theme, lineHeightToken);
+    } catch (error) {
+      if (!(error instanceof ThemeTokenError)) throw error;
+      issues.push(issue(
+        "invalid-token",
+        `elements[${index}].tokens.lineHeight`,
+        element.id,
+        error.message,
+      ));
+    }
+  }
   return resolved;
+}
+
+function lineBoxMeasurer(
+  measurer: TextMeasurer,
+  lineHeight: string | number | undefined,
+  nominalSize: number,
+): TextMeasurer {
+  if (typeof lineHeight !== "number" || !Number.isFinite(lineHeight) || lineHeight <= 0) {
+    return measurer;
+  }
+  return {
+    measure(input) {
+      const height = input.fontSize === nominalSize || nominalSize <= 0
+        ? lineHeight
+        : lineHeight * (input.fontSize / nominalSize);
+      return { width: measurer.measure(input).width, height };
+    },
+  };
 }
 
 function tokenTypeIssue(
@@ -101,7 +135,13 @@ function compileElement(
       ? resolvedSize
       : theme.typography.body.size,
     policy: options.textPolicies[element.role] ?? FALLBACK_POLICY,
-    measurer: options.textMeasurer,
+    measurer: lineBoxMeasurer(
+      options.textMeasurer,
+      resolvedTokens.lineHeight,
+      typeof resolvedSize === "number" && Number.isFinite(resolvedSize) && resolvedSize > 0
+        ? resolvedSize
+        : theme.typography.body.size,
+    ),
   });
 
   if (fitTrace.outcome === "below-floor") {

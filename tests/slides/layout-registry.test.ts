@@ -1,7 +1,13 @@
 import { describe, expect, test } from "bun:test";
 
+import { compileGeometrySlide } from "../../src/slides/geometry/compiler.ts";
 import type { PlanSlide } from "../../src/slides/model/plan.ts";
-import { THEME_TOKEN_NAMES } from "../../src/slides/theme/theme.ts";
+import {
+  productionTextPolicies,
+  ScriptAwareTextMeasurer,
+} from "../../src/slides/server-action-support.ts";
+import { MEETING_PAPER_STYLE_PROFILE } from "../../src/slides/theme/meeting-paper.ts";
+import { createDeckTheme, THEME_TOKEN_NAMES } from "../../src/slides/theme/theme.ts";
 import {
   LayoutRegistryError,
   type LayoutDraft as SharedLayoutDraft,
@@ -320,9 +326,11 @@ describe("semantic layout registry", () => {
 
     expect(texts(draft)).toEqual([
       comparison.title,
+      "01",
       "Before",
       "No release date",
       "No named owner",
+      "02",
       "After",
       "Friday release",
       "Mina owns release notes",
@@ -330,14 +338,16 @@ describe("semantic layout registry", () => {
     expect(draft.elements.map((element) => element.evidence?.fieldPath ?? null)).toEqual([
       "title",
       null,
+      null,
       "sides[0].items[0]",
       "sides[0].items[1]",
+      null,
       null,
       "sides[1].items[0]",
       "sides[1].items[1]",
     ]);
     expect(draft.elements[0]!.evidence?.claimIds).toEqual(["claim-launch", "claim-action"]);
-    expect(draft.elements[2]!.evidence?.claimIds).toEqual(["claim-launch"]);
+    expect(draft.elements[3]!.evidence?.claimIds).toEqual(["claim-launch"]);
   });
 });
 
@@ -371,7 +381,7 @@ describe("layout-specific semantic structures", () => {
       ...summary,
       id: "slide-summary-quote",
       title: "The release gate is explicit",
-      payload: { mode: "takeaways", items: ["“Quality is the release gate.”"] },
+      payload: { mode: "overview", items: ["“Quality is the release gate.”"] },
       bindings: { title: ["claim-quote"], "items[0]": ["claim-quote"] },
     };
     const statement: Extract<PlanSlide, { layout: "summary" }> = {
@@ -390,7 +400,10 @@ describe("layout-specific semantic structures", () => {
     expect(quoteDraft.variant).toBe("quote");
     expect(statementDraft.variant).toBe("statement");
     expect(listDraft.elements.map((element) => element.role)).toEqual([
-      "title", "summary-item", "summary-item", "summary-item",
+      "title",
+      "summary-marker", "summary-item",
+      "summary-marker", "summary-item",
+      "summary-marker", "summary-item",
     ]);
     expect(quoteDraft.elements.map((element) => element.role)).toEqual(["title", "quote"]);
     expect(statementDraft.elements.map((element) => element.role)).toEqual(["title", "statement"]);
@@ -523,6 +536,27 @@ describe("layout-specific semantic structures", () => {
     expect(byRole(draft, "action-due")[1]!.accessibility.label).toMatch(/due.*Friday 09:00/i);
     expect(byRole(draft, "action-owner")[0]!.evidence?.fieldPath).toBe("items[0].owner");
     expect(byRole(draft, "action-due")[1]!.evidence?.fieldPath).toBe("items[1].due");
+  });
+});
+
+describe("production text-fit policies", () => {
+  test("compiling one quoted summary item under productionTextPolicies yields a fitted quote element", () => {
+    const quote: Extract<PlanSlide, { layout: "summary" }> = {
+      ...summary,
+      id: "slide-summary-quote",
+      title: "The release gate is explicit",
+      payload: { mode: "overview", items: ["“Quality is the release gate.”"] },
+      bindings: { title: ["claim-quote"], "items[0]": ["claim-quote"] },
+    };
+    const result = compileGeometrySlide(compile(quote), createDeckTheme(MEETING_PAPER_STYLE_PROFILE), {
+      textMeasurer: new ScriptAwareTextMeasurer(),
+      textPolicies: productionTextPolicies(),
+    });
+    const quoteElement = result.slide.elements.find((element) => element.role === "quote");
+
+    expect(result.issues).toEqual([]);
+    expect(quoteElement).toBeDefined();
+    expect(quoteElement!.fitTrace).toMatchObject({ policy: "wrap", outcome: "fit" });
   });
 });
 

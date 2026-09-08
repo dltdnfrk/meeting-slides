@@ -8,9 +8,14 @@ export function draftMetrics(value: unknown): LayoutDraft {
   const mode = enumValue(slide.payload.mode, "slide.payload.mode", ["chart", "cards"]);
   const metrics = arrayValue(slide.payload.metrics, "slide.payload.metrics");
   const elements = [titleElement(slide)];
-  const columns = Math.max(1, Math.min(3, metrics.length));
+  // Chart mode reserves the right canvas for the chart asset; the card grid
+  // reflows into a single left column beside it (x 80..448) instead of under it.
+  const chartMode = mode === "chart";
+  const columns = chartMode ? 1 : Math.max(1, Math.min(3, metrics.length));
   const rows = Math.ceil(metrics.length / columns);
-  const grid = { x: 80, y: 190, width: 1120, height: 450, columnGap: 32, rowGap: 24 };
+  const grid = chartMode
+    ? { x: 80, y: 190, width: 368, height: 450, columnGap: 32, rowGap: 24 }
+    : { x: 80, y: 190, width: 1120, height: 450, columnGap: 32, rowGap: 24 };
   const slotWidth = (grid.width - grid.columnGap * (columns - 1)) / columns;
   const slotHeight = (grid.height - grid.rowGap * (rows - 1)) / rows;
   metrics.forEach((rawMetric, index) => {

@@ -17,18 +17,31 @@ export function draftComparison(value: unknown): LayoutDraft {
     const items = arrayValue(side.items, `slide.payload.sides[${sideIndex}].items`);
     const x = sideIndex === 0 ? 80 : 680;
     elements.push(element(slide.id, elements.length, {
+      key: `side-${sideIndex}-marker`, role: "comparison-marker",
+      text: String(sideIndex + 1).padStart(2, "0"),
+      box: { x, y: 180, width: 32, height: 54 },
+      tokens: {
+        color: "colors.coral",
+        size: "typography.label.size",
+        font: "font.family",
+      },
+      evidence: null,
+      accessibilityRole: "note",
+      accessibilityLabel: `Comparison side ${sideIndex + 1}: ${String(sideIndex + 1).padStart(2, "0")}`,
+    }));
+    elements.push(element(slide.id, elements.length, {
       key: `side-${sideIndex}-label`, role: "comparison-label", text: label,
-      box: { x, y: 180, width: 520, height: 54 },
+      box: { x: x + 48, y: 180, width: 472, height: 54 },
       tokens: { color: sideIndex === 0 ? "colors.muted" : "colors.blue", size: "typography.label.size", font: "font.family" },
       evidence: null, accessibilityLabel: `Comparison side: ${label}`,
     }));
     items.forEach((rawItem, itemIndex) => {
       const text = textValue(rawItem, `slide.payload.sides[${sideIndex}].items[${itemIndex}]`);
-      const top = Math.floor(itemIndex * 410 / items.length);
-      const bottom = Math.floor((itemIndex + 1) * 410 / items.length);
+      const top = Math.floor(itemIndex * 456 / items.length);
+      const bottom = Math.floor((itemIndex + 1) * 456 / items.length);
       elements.push(element(slide.id, elements.length, {
         key: `side-${sideIndex}-item-${itemIndex}`, role: "comparison-item", text,
-        box: { x, y: 260 + top, width: 520, height: Math.max(1, bottom - top - 12) },
+        box: { x, y: 260 + top, width: 520, height: Math.max(1, bottom - top - 8) },
         tokens: { color: "colors.ink", size: "typography.body.size", font: "font.family" },
         evidence: evidenceFor(slide, `sides[${sideIndex}].items[${itemIndex}]`),
         accessibilityLabel: `${label} item: ${text}`,

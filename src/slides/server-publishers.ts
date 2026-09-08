@@ -12,18 +12,22 @@ export interface SlidePlanPublisherTools extends RasterExportTools {
 }
 
 function deckSlides(request: PipelinePublisherRequest) {
-  return request.slides.map((geometry, index) => ({
-    geometry,
-    assets: request.assetLayers[index]!,
-    notes: `${request.identity.planId}; ${geometry.slide.id}; ${geometry.slide.slideId}`,
-  }));
+  return request.slides.map((geometry, index) => {
+    const identity = `${request.identity.planId}; ${geometry.slide.id}; ${geometry.slide.slideId}`;
+    const speaker = request.plan.slides.find((slide) => slide.id === geometry.slide.slideId)?.notes?.trim();
+    return {
+      geometry,
+      assets: request.assetLayers[index]!,
+      notes: speaker ? `${speaker}\n${identity}` : identity,
+    };
+  });
 }
 
 function standaloneInput(request: PipelinePublisherRequest) {
   return {
     id: request.identity.deckId,
     title: request.plan.title,
-    lang: "und",
+    lang: "ko-KR",
     theme: request.plan.theme,
     resourceRoot: request.managedAssetRoot,
     slides: deckSlides(request),
@@ -72,12 +76,19 @@ function standaloneDocuments(request: PipelinePublisherRequest): RasterSlideDocu
   const standalone = request.priorArtifacts.find((artifact) => artifact.format === "standalone-html");
   if (standalone === undefined) throw new TypeError("raster publisher requires the standalone artifact");
   const decoder = new TextDecoder("utf-8", { fatal: true });
-  return request.identity.slideIds.map((slideId) => {
-    const filename = `${slideId}.html`;
-    const file = standalone.files.find((entry) => entry.relativePath === `standalone/slides/${filename}`);
-    if (file === undefined) throw new TypeError(`standalone artifact is missing '${filename}'`);
+  return request.identity.slideIds.map((slideId, index) => {
+    const sourceFilename = `${slideId}.html`;
+    const file = standalone.files.find((entry) => entry.relativePath === `standalone/slides/${sourceFilename}`);
+    if (file === undefined) throw new TypeError(`standalone artifact is missing '${sourceFilename}'`);
     const html = decoder.decode(file.bytes);
-    return { filename, html, bytes: file.bytes, sha256: pipelineHash(file.bytes) };
+    const renderFilename = `slide-${String(index + 1).padStart(2, "0")}.html`;
+    return {
+      filename: sourceFilename,
+      renderFilename,
+      html,
+      bytes: file.bytes,
+      sha256: pipelineHash(file.bytes),
+    };
   });
 }
 

@@ -100,15 +100,38 @@ function payloadPaths(layout, value, path) {
   return { factual, editorial };
 }
 
+function parseBoxOverrides(value, path) {
+  const items = arrayValue(value, path, true);
+  const seen = new Set();
+  return items.map((item, index) => {
+    const entry = exact(item, `${path}[${index}]`, ["elementId", "box"]);
+    const elementId = stableId(entry.elementId, `${path}[${index}].elementId`);
+    if (seen.has(elementId)) throw new TypeError(`${path}[${index}].elementId: duplicate element ID`);
+    seen.add(elementId);
+    const box = exact(entry.box, `${path}[${index}].box`, ["x", "y", "width", "height"]);
+    for (const key of ["x", "y", "width", "height"]) {
+      if (typeof box[key] !== "number" || !Number.isFinite(box[key])) {
+        throw new TypeError(`${path}[${index}].box.${key}: must be a finite number`);
+      }
+    }
+    if (box.x < 0 || box.y < 0 || box.width <= 0 || box.height <= 0 ||
+        box.x + box.width > 1280 || box.y + box.height > 720) {
+      throw new TypeError(`${path}[${index}].box: must stay inside the 1280x720 canvas`);
+    }
+    return { elementId, box: { x: box.x, y: box.y, width: box.width, height: box.height } };
+  });
+}
+
 export function validateSlide(value, path, claimIds, assetIds) {
   const slide = exact(value, path,
     ["id", "layout", "storyRole", "title", "payload", "bindings", "editorialPaths", "assetIds"],
-    ["notes"]);
+    ["notes", "boxOverrides"]);
   stableId(slide.id, `${path}.id`);
   const layout = oneOf(slide.layout, `${path}.layout`, LAYOUTS);
   oneOf(slide.storyRole, `${path}.storyRole`, ROLES);
   stringValue(slide.title, `${path}.title`);
   if (slide.notes !== undefined) stringValue(slide.notes, `${path}.notes`);
+  if (slide.boxOverrides !== undefined) parseBoxOverrides(slide.boxOverrides, `${path}.boxOverrides`);
   const paths = payloadPaths(layout, slide.payload, `${path}.payload`);
   const bindings = exact(slide.bindings, `${path}.bindings`, ["title", ...paths.factual]);
   for (const fieldPath of ["title", ...paths.factual]) ids(bindings[fieldPath], `${path}.bindings.${fieldPath}`, claimIds, true);

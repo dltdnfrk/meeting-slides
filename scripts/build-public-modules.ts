@@ -24,7 +24,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
 /** Reducer sources that the browser shell imports at runtime. */
-export const PUBLIC_MODULE_SOURCES = ["ui-state-machine.ts", "transcript-state.ts"] as const;
+export const PUBLIC_MODULE_SOURCES = ["ui-state-machine.ts", "transcript-state.ts", "protocol-values.ts"] as const;
 
 /** Directory (relative to public/) that holds every generated artifact. */
 export const GENERATED_DIR = "generated";

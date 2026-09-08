@@ -6,6 +6,7 @@
 // `export`, `meetingId`, numeric `speaker`) are consumed exactly as
 // `src/session.ts` and `tests/fixtures/public-protocol-contract.json` declare them.
 import { describe, expect, test } from "bun:test";
+import type { ServerMessage } from "../src/protocol.ts";
 
 import {
   initialTranscriptState,
@@ -473,6 +474,16 @@ describe("transcript projection — minibar", () => {
 });
 
 describe("transcript parse boundary", () => {
+  test("a valid refine response is a no-op without recording a rejection", () => {
+    const before = reduceTranscriptAll(liveState(), [line("FINAL", ts(0), 1), caption("PROVISIONAL", ts(1), 2)]);
+    const frame = { type: "refine", requestId: "refine-contract", slideId: "s1", path: "title",
+      before: "BEFORE", after: "AFTER", claimIds: [] } satisfies ServerMessage;
+    const parsed = parseTranscriptEvent(frame);
+    const after = reduceTranscript(before, parsed.ok ? parsed.event : { kind: "malformed", reason: parsed.error.reason });
+    expect(after).toEqual(before);
+    expect(parsed).toEqual({ ok: true, event: { kind: "server", message: "other", type: "refine" } });
+  });
+
   test("a well-formed line frame parses into a typed event", () => {
     const result = parseTranscriptEvent({ type: "line", text: KO_LINES[0]!, ts: ts(0), speaker: 1 });
 
@@ -546,6 +557,9 @@ describe("transcript parse boundary", () => {
 
   test.each([
     ["a non-object frame", null],
+    ["an unknown frame", { type: "teleport" }],
+    ["an array frame", []],
+    ["a non-string type", { type: 7 }],
     ["a frame with no type", { text: "x", ts: T0 }],
     ["a line with a non-string text", { type: "line", text: 12, ts: T0 }],
     ["a line with a non-numeric ts", { type: "line", text: "x", ts: "later" }],

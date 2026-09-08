@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
 import { MINUTES_SCHEMA } from "./minutes-store-schema.ts";
+import { migrateArtifactSchema } from "./minutes-store-schema-artifacts.ts";
 import { migrateReviewSchema } from "./minutes-store-schema-review.ts";
 import type { AttendeeInput } from "./minutes-store-types.ts";
 import { nonBlank, validHash } from "./minutes-store-utils.ts";
@@ -19,6 +20,7 @@ export class MeetingStore {
     }
     this.db.run(MINUTES_SCHEMA);
     migrateReviewSchema(this.db);
+    migrateArtifactSchema(this.db);
   }
 
   databaseHandle(): Database {

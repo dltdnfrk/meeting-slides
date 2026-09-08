@@ -645,7 +645,10 @@ describe("native launcher seam: process ownership and shutdown", () => {
 
 describe("native launcher seam: transport boundary", () => {
   test("the transport targets the existing local /ws endpoint", () => {
-    expect(value("transport-url")).toEqual({ url: "ws://127.0.0.1:8787/ws" });
+    expect(value("transport-url")).toEqual({
+      url: "ws://127.0.0.1:8787/ws",
+      origin: "http://127.0.0.1:8787",
+    });
   });
 
   test("an open socket plus a capture snapshot hydrates online state", () => {
@@ -821,6 +824,7 @@ describe("native launcher seam: launcher entry point and build wiring", () => {
     const source = build();
     expect(source).toMatch(/macos\/NativeSurfaceContract\.swift/);
     expect(source).toMatch(/macos\/TransportClient\.swift/);
+    expect(source).toMatch(/macos\/SystemAudioCapture\.swift/);
     expect(source.match(/swiftc -O -o/g) ?? []).toHaveLength(1);
     expect(source).toMatch(/CFBundleExecutable<\/key><string>meeting-slides/);
   });

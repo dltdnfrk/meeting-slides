@@ -6,8 +6,22 @@
 // 두 포맷 모두 같은 TranscriptChunk 스트림으로 변환.
 
 import { spawn, type ChildProcess } from "child_process";
-import { appendFileSync, existsSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import {
+  describeStoppedAudio,
+  type AudioRetranscription,
+  type StoppedAudioRecording,
+} from "./audio-recorder.js";
 import type { WhisperConfig } from "./config.js";
+import { join } from "node:path";
 
 // 디버그: WHISPER_RAW_LOG 경로가 있으면 whisper의 원시 출력을 전부 기록한다.
 // (서버 필터를 통과하지 못하는 SDL/장치 에러를 잡기 위함)
@@ -36,6 +50,8 @@ function rawLogReset(): void {
 export interface TranscriptChunk {
   text: string;
   ts: number;
+  audioStartMs?: number;
+  audioEndMs?: number;
   speaker?: number;  // tinydiarize 활성 시 1부터 시작하는 발화(턴) 번호
 }
 
@@ -43,6 +59,55 @@ export interface WhisperOptions {
   onChunk: (chunk: TranscriptChunk) => void;
   onStatus?: (status: string) => void;
   onError?: (err: Error) => void;
+  /** STT-time vocabulary for whisper-cli `--prompt`. Ignored by whisper-stream. */
+  initialPrompt?: string;
+}
+
+const VOCABULARY_PROMPT_MAX_CHARS = 500;
+
+export function whisperVocabularyPrompt(names: readonly string[]): string | null {
+  const unique: string[] = [];
+  const seen = new Set<string>();
+  for (const name of names) {
+    const trimmed = name.trim();
+    if (trimmed === "") continue;
+    const key = trimmed.toLocaleLowerCase("ko-KR");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(trimmed);
+  }
+  if (unique.length === 0) return null;
+  const joined = unique.join(", ");
+  return joined.length <= VOCABULARY_PROMPT_MAX_CHARS ? joined : joined.slice(0, VOCABULARY_PROMPT_MAX_CHARS);
+}
+
+export function whisperCliArgv(input: {
+  readonly modelPath: string;
+  readonly filePath: string;
+  readonly threads: number;
+  readonly gpu: boolean;
+  readonly diarize: boolean;
+  readonly initialPrompt: string | null;
+}): string[] {
+  const args = [
+    "-m", input.modelPath,
+    "-l", "ko",
+    "-t", String(input.threads),
+    "-f", input.filePath,
+  ];
+  if (!input.gpu) args.push("-ng");
+  if (input.diarize) args.push("-tdrz");
+  const prompt = input.initialPrompt?.trim() ?? "";
+  if (prompt !== "") args.push("--prompt", prompt);
+  return args;
+}
+
+function timestampMs(value: string): number {
+  const match = value.match(/^(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?$/);
+  if (!match) throw new TypeError(`invalid transcript timestamp: ${value}`);
+  const fraction = (match[4] ?? "").padEnd(3, "0").slice(0, 3);
+  return ((Number(match[1]) * 60 * 60 + Number(match[2]) * 60 + Number(match[3])) * 1_000)
+    + Number(fraction || "0");
 }
 
 export interface CaptureDevice {
@@ -175,7 +240,16 @@ export class SentenceAssembler {
    * complete = 구두점으로 끝나는 등 완결 신호.
    */
   push(piece: string, complete: boolean): string[] {
-    const merged = this.pending ? this.pending + piece : piece;
+    let merged = piece;
+    if (this.pending) {
+      const pendingKey = normalizeForSim(this.pending);
+      const pieceKey = normalizeForSim(piece);
+      if (pieceKey.startsWith(pendingKey) || pendingKey.startsWith(pieceKey)) {
+        merged = pieceKey.length >= pendingKey.length ? piece : this.pending;
+      } else {
+        merged = this.pending + piece;
+      }
+    }
     if (!merged) return [];
     if (complete || merged.length >= ASSEMBLER_MAX_HOLD_CHARS) {
       this.pending = "";
@@ -220,6 +294,8 @@ abstract class WhisperBase {
   private speakerTurn = 0;
   // 구두점 없이 잘린 조각 병합기 (문장 분할 품질)
   private assembler = new SentenceAssembler();
+  private pendingAudioStartMs: number | undefined;
+  private pendingAudioEndMs: number | undefined;
 
   constructor(protected config: WhisperConfig) {}
 
@@ -229,6 +305,8 @@ abstract class WhisperBase {
     this.recentSentences = [];
     this.speakerTurn = 0;
     this.assembler = new SentenceAssembler();
+    this.pendingAudioStartMs = undefined;
+    this.pendingAudioEndMs = undefined;
   }
 
   abstract start(opts: WhisperOptions): Promise<void>;
@@ -291,18 +369,20 @@ abstract class WhisperBase {
       line = line.replace(/\s+/g, " ").trim();
       if (!line) continue;
       if (this.isBanner(line)) continue;
-      if (this.isMeta(line)) continue;
 
       // 타임스탬프 라인이면 텍스트만 추출:
       //   [00:00:00.000 --> 00:00:05.000]  안녕하세요
       //   00:00:00.000-->00:00:05.000  안녕하세요
-      const tsMatch = line.match(/^\s*\[?\s*\d{2}:\d{2}:\d{2}[.\d]*\s*-->\s*\d{2}:\d{2}:\d{2}[.\d]*\s*\]?\s*(.+)$/);
-      const rawText = tsMatch ? tsMatch[1].trim() : line;
+      const tsMatch = line.match(/^\s*\[?\s*(\d{2}:\d{2}:\d{2}(?:\.\d+)?)\s*-->\s*(\d{2}:\d{2}:\d{2}(?:\.\d+)?)\s*\]?\s*(.+)$/);
+      const audioStartMs = tsMatch ? timestampMs(tsMatch[1]!) : undefined;
+      const audioEndMs = tsMatch ? timestampMs(tsMatch[2]!) : undefined;
+      const rawText = tsMatch ? tsMatch[3]!.trim() : line;
       if (!rawText) continue;
-      if (this.isMeta(rawText)) continue;
 
+      // [SPEAKER_TURN] is a diarization marker, not idle-hallucination meta.
+      // Honor it before isMeta so a marker-only line still increments the speaker.
       const { text, turn } = extractSpeakerTurn(rawText);
-      if (text) {
+      if (text && !this.isMeta(text)) {
         // 문장 분할 → 미완결 조각은 조립기에 보류했다가 다음 조각과 병합
         const parts = text.split(this.sentenceEnd);
         for (let i = 0; i < parts.length; i += 2) {
@@ -310,16 +390,21 @@ abstract class WhisperBase {
           const sep = parts[i + 1] ?? "";
           const piece = (frag + sep).trim();
           if (!piece) continue;
+          if (audioStartMs !== undefined && this.pendingAudioStartMs === undefined) {
+            this.pendingAudioStartMs = audioStartMs;
+          }
+          if (audioEndMs !== undefined) this.pendingAudioEndMs = audioEndMs;
           for (const sentence of this.assembler.push(piece, sep.length > 0)) {
-            this.emitSentence(sentence, onChunk);
+            this.emitSentence(sentence, onChunk, this.pendingAudioStartMs, this.pendingAudioEndMs);
+            this.pendingAudioStartMs = undefined;
+            this.pendingAudioEndMs = undefined;
           }
         }
       }
       // [SPEAKER_TURN]은 "이 라인 이후"부터 화자가 바뀐다는 마커.
       // 보류 조각은 이전 화자의 것이므로 턴 증가 전에 방출한다.
       if (turn) {
-        const rest = this.assembler.flush();
-        if (rest) this.emitSentence(rest, onChunk);
+        this.flushAssembler(onChunk);
         this.speakerTurn++;
       }
     }
@@ -327,7 +412,19 @@ abstract class WhisperBase {
 
   private static readonly NEAR_DUP_THRESHOLD = 0.5;
 
-  private emitSentence(sentence: string, onChunk: (c: TranscriptChunk) => void): void {
+  private flushAssembler(onChunk: (c: TranscriptChunk) => void): void {
+    const rest = this.assembler.flush();
+    if (rest) this.emitSentence(rest, onChunk, this.pendingAudioStartMs, this.pendingAudioEndMs);
+    this.pendingAudioStartMs = undefined;
+    this.pendingAudioEndMs = undefined;
+  }
+
+  private emitSentence(
+    sentence: string,
+    onChunk: (c: TranscriptChunk) => void,
+    audioStartMs?: number,
+    audioEndMs?: number,
+  ): void {
     if (!sentence || this.isMeta(sentence)) return;
     // 반복 루프 환각 차단 (노이즈/무음 구간의 토큰 연쇄 반복)
     if (isHallucinationLoop(sentence)) return;
@@ -338,6 +435,8 @@ abstract class WhisperBase {
     onChunk({
       text: sentence,
       ts: Date.now(),
+      ...(audioStartMs === undefined ? {} : { audioStartMs }),
+      ...(audioEndMs === undefined ? {} : { audioEndMs }),
       speaker: this.config.diarize ? this.speakerTurn + 1 : undefined,
     });
   }
@@ -347,11 +446,15 @@ abstract class WhisperBase {
       if (prev === sentence) return true;
       // 짧은 문장은 완전 일치만 체크
       if (sentence.length < 8) continue;
-      // 한쪽이 다른 쪽의 prefix/suffix이면 중복 (리비전)
-      if (prev.startsWith(sentence) || sentence.startsWith(prev)) return true;
+      // 짧은 prefix 리비전은 중복. 더 긴 확장은 last-longest로 통과.
+      if (prev.startsWith(sentence)) return true;
+      if (sentence.startsWith(prev)) continue;
       // bigram Jaccard로 어순까지 비교 — 같은 발화의 재전사/부분 수정을 잡는다
       const shorter = prev.length < sentence.length ? prev : sentence;
-      if (shorter.length > 10 && bigramSimilarity(prev, sentence) >= WhisperBase.NEAR_DUP_THRESHOLD) return true;
+      if (shorter.length > 10 && bigramSimilarity(prev, sentence) >= WhisperBase.NEAR_DUP_THRESHOLD) {
+        if (sentence.length < prev.length) return true;
+        continue;
+      }
     }
     return false;
   }
@@ -385,8 +488,7 @@ abstract class WhisperBase {
     proc.on("close", (code) => {
       this.buf += "\n";
       this.drain(opts.onChunk);
-      const rest = this.assembler.flush();
-      if (rest) this.emitSentence(rest, opts.onChunk);
+      this.flushAssembler(opts.onChunk);
       opts.onStatus?.(`${label} 종료 (code=${code})`);
       finish();
     });
@@ -407,6 +509,17 @@ abstract class WhisperBase {
 // ============================================================
 
 export class WhisperStream extends WhisperBase {
+  private readonly audioWorkingDirectory: string | null;
+  private savedRecording: StoppedAudioRecording | null = null;
+
+  constructor(
+    config: WhisperConfig,
+    private readonly audio?: { outputPath: string; initialPrompt?: string },
+  ) {
+    super(config);
+    this.audioWorkingDirectory = audio ? `${audio.outputPath}.capture` : null;
+  }
+
   async start(opts: WhisperOptions): Promise<void> {
     this.resetRunState();
     this.assertDiarizeReady();
@@ -429,10 +542,59 @@ export class WhisperStream extends WhisperBase {
       args.push("-tdrz");
       opts.onStatus?.("⚠️ tinydiarize 모델은 현재 영어 전용입니다 — 한국어 회의는 전사 품질이 크게 떨어집니다");
     }
+    if (this.audioWorkingDirectory) {
+      rmSync(this.audioWorkingDirectory, { recursive: true, force: true });
+      mkdirSync(this.audioWorkingDirectory, { recursive: true });
+      this.savedRecording = null;
+      args.push("-sa");
+    }
     opts.onStatus?.(`whisper-stream 시작: ${this.config.streamBin} ${args.join(" ")}`);
-    this.proc = spawn(this.config.streamBin, args, { stdio: ["ignore", "pipe", "pipe"] });
+    this.proc = spawn(this.config.streamBin, args, {
+      stdio: ["ignore", "pipe", "pipe"],
+      ...(this.audioWorkingDirectory ? { cwd: this.audioWorkingDirectory } : {}),
+    });
     this.attachStdio(this.proc, opts);
     await this.waitForExit(this.proc, opts, "whisper-stream");
+  }
+
+  stoppedAudio(): StoppedAudioRecording {
+    if (this.savedRecording) return this.savedRecording;
+    if (!this.audio || !this.audioWorkingDirectory) {
+      throw new Error("whisper-stream audio saving is not configured");
+    }
+    const wavs = readdirSync(this.audioWorkingDirectory)
+      .filter((name) => name.toLowerCase().endsWith(".wav"));
+    if (wavs.length !== 1) {
+      throw new Error(`whisper-stream saved ${wavs.length} WAV files; expected exactly one`);
+    }
+    rmSync(this.audio.outputPath, { force: true });
+    renameSync(join(this.audioWorkingDirectory, wavs[0]!), this.audio.outputPath);
+    rmSync(this.audioWorkingDirectory, { recursive: true, force: true });
+    this.savedRecording = describeStoppedAudio(this.audio.outputPath);
+    return this.savedRecording;
+  }
+
+  async retranscribe(recording: StoppedAudioRecording): Promise<AudioRetranscription> {
+    const lines: AudioRetranscription["lines"][number][] = [];
+    const cli = new WhisperCLI(this.config, recording.path);
+    await cli.start({
+      initialPrompt: this.audio?.initialPrompt,
+      onChunk: (chunk) => {
+        if (chunk.audioStartMs === undefined || chunk.audioEndMs === undefined) return;
+        lines.push({
+          capturedAtMs: null,
+          audioStartMs: chunk.audioStartMs,
+          audioEndMs: chunk.audioEndMs,
+          speakerTurn: chunk.speaker ?? null,
+          text: chunk.text,
+        });
+      },
+    });
+    return {
+      engine: "whisper.cpp",
+      engineModel: this.config.modelPath,
+      lines,
+    };
   }
 }
 
@@ -450,19 +612,15 @@ export class WhisperCLI extends WhisperBase {
   async start(opts: WhisperOptions): Promise<void> {
     this.resetRunState();
     this.assertDiarizeReady();
-    // -nt: 타임스탬프 포함, -l ko: 한국어, -m: 모델
-    const args = [
-      "-m", this.effectiveModelPath(),
-      "-l", "ko",
-      "-t", String(this.config.threads),
-      "-nt",
-      "-f", this.filePath,
-    ];
-    if (!this.config.gpu) {
-      args.push("-ng");
-    }
+    const args = whisperCliArgv({
+      modelPath: this.effectiveModelPath(),
+      filePath: this.filePath,
+      threads: this.config.threads,
+      gpu: this.config.gpu,
+      diarize: this.config.diarize,
+      initialPrompt: opts.initialPrompt ?? null,
+    });
     if (this.config.diarize) {
-      args.push("-tdrz");
       opts.onStatus?.("⚠️ tinydiarize 모델은 현재 영어 전용입니다 — 한국어 회의는 전사 품질이 크게 떨어집니다");
     }
     opts.onStatus?.(`whisper-cli 시작 (파일: ${this.filePath})`);

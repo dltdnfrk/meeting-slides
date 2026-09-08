@@ -1,16 +1,15 @@
+import { localWebSocket, startMeetingServer, type RunningMeetingServer } from "./helpers/meeting-server.ts";
 import { Database } from "bun:sqlite";
 import { afterAll, beforeAll, expect, test } from "bun:test";
-import { spawn, type ChildProcessByStdio } from "node:child_process";
+
 import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Readable } from "node:stream";
 
 const root = join(import.meta.dir, "..");
 const timeoutMs = 10_000;
-type TestServerProcess = ChildProcessByStdio<null, Readable, Readable>;
 
-let child: TestServerProcess;
+let running: RunningMeetingServer;
 let socket: WebSocket;
 let tempDir: string;
 let dbPath: string;
@@ -27,23 +26,6 @@ function waitFor<T>(subscribe: (done: (value: T) => void, fail: (error: Error) =
       (value) => { clearTimeout(timer); resolve(value); },
       (error) => { clearTimeout(timer); reject(error); },
     );
-  });
-}
-
-function waitForOutput(fragment: string): Promise<void> {
-  return waitFor<void>((done, fail) => {
-    let output = "";
-    const onData = (chunk: Buffer) => {
-      output += chunk.toString("utf8");
-      if (output.includes(fragment)) {
-        child.stdout.off("data", onData);
-        child.stderr.off("data", onData);
-        done();
-      }
-    };
-    child.stdout.on("data", onData);
-    child.stderr.on("data", onData);
-    child.once("error", fail);
   });
 }
 
@@ -80,39 +62,6 @@ function errorFor(payload: Record<string, unknown>, fragment: string): Promise<R
     message.type === "status" && String(message.text).startsWith("요청 처리 실패:") && String(message.text).includes(fragment));
 }
 
-function killProcessTree(pid: number, signal: NodeJS.Signals): void {
-  try {
-    process.kill(-pid, signal);
-  } catch {
-    try {
-      process.kill(pid, signal);
-    } catch {
-      // already gone
-    }
-  }
-}
-
-function waitForProcessExit(proc: TestServerProcess): Promise<void> {
-  return waitFor<void>((done) => {
-    if (proc.exitCode !== null || proc.signalCode !== null) return done();
-    proc.once("close", () => done());
-  });
-}
-
-async function teardownChildTree(proc: TestServerProcess): Promise<void> {
-  if (proc.exitCode !== null || proc.signalCode !== null) return;
-  killProcessTree(proc.pid!, "SIGTERM");
-  try {
-    await Promise.race([
-      waitForProcessExit(proc),
-      new Promise<void>((_, reject) => setTimeout(() => reject(new Error("server teardown timed out")), 2_000)),
-    ]);
-  } catch {
-    killProcessTree(proc.pid!, "SIGKILL");
-    await waitForProcessExit(proc);
-  }
-}
-
 function processExists(pid: number): boolean {
   try {
     process.kill(pid, 0);
@@ -139,26 +88,23 @@ await new Promise(() => {});
   chmodSync(fakeWhisper, 0o755);
 
   port = 19_800 + (process.pid % 500);
-  child = spawn(process.execPath, ["server.ts"], {
-    cwd: root,
-    env: {
-      ...process.env,
-      MEETINGS_DB_PATH: dbPath,
-      MEETING_SLIDES_SETTINGS_ROOT: tempDir,
-      HTTP_PORT: String(port),
-      OPEN_BROWSER: "false",
-      LLM_PROVIDER: "cli",
-      LLM_CLI_BIN: fakeCli,
-      LLM_CLI_PRESET: "claude",
-      WHISPER_INPUT_MODE: "mic",
-      WHISPER_STREAM_BIN: fakeWhisper,
-      WHISPER_MODEL_PATH: join(tempDir, "model.bin"),
-      BLOCK_DETECT_SENTENCE_INTERVAL: "100",
-    },
-    stdio: ["ignore", "pipe", "pipe"],
+  running = startMeetingServer({
+    ...process.env,
+    MEETINGS_DB_PATH: dbPath,
+    MEETING_SLIDES_SETTINGS_ROOT: tempDir,
+    HTTP_PORT: String(port),
+    OPEN_BROWSER: "false",
+    LLM_PROVIDER: "cli",
+    LLM_CLI_BIN: fakeCli,
+    LLM_CLI_PRESET: "claude",
+    WHISPER_INPUT_MODE: "mic",
+    WHISPER_STREAM_BIN: fakeWhisper,
+    WHISPER_MODEL_PATH: join(tempDir, "model.bin"),
+    BLOCK_DETECT_SENTENCE_INTERVAL: "100",
   });
-  await waitForOutput(`HTTP: http://localhost:${port}`);
-  socket = new WebSocket(`ws://127.0.0.1:${port}/ws`);
+  port = running.server.port!;
+
+  socket = localWebSocket(port);
   socket.addEventListener("message", (event) => messages.push(JSON.parse(String(event.data)) as Record<string, unknown>));
   await waitFor<void>((done, fail) => {
     socket.addEventListener("open", () => done(), { once: true });
@@ -168,7 +114,7 @@ await new Promise(() => {});
 
 afterAll(async () => {
   if (socket?.readyState === WebSocket.OPEN) socket.close();
-  if (child) await teardownChildTree(child);
+  await running?.close();
   if (readFileSync && fakeWhisperPidPath) {
     try {
       const fakeWhisperPid = Number(readFileSync(fakeWhisperPidPath, "utf8"));
@@ -280,7 +226,6 @@ test("setAttendees replaces a prepared roster and starts a new draft after an en
     .get(meetingId, "dana-local")).toEqual({ display_name: "Dana" });
   db.close();
 }, 20_000);
-
 
 test("reconnect attendees query does not revive an ended meeting id", async () => {
   const start = messages.length;

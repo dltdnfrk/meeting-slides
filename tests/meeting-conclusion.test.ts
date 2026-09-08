@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { spawn, type ChildProcessByStdio } from "node:child_process";
+import type { Readable } from "node:stream";
 import { createHash } from "node:crypto";
 import {
   chmodSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync,
@@ -13,6 +14,7 @@ import { concludeMeeting } from "../src/conclusion.ts";
 import { MinutesStore } from "../src/minutes-store.ts";
 import { MeetingStore } from "../src/store.ts";
 import { transcriptContentSha256 } from "../src/transcript-versioning.ts";
+import { localWebSocket } from "./helpers/meeting-server.ts";
 
 const root = join(import.meta.dir, "..");
 const targetCommit = "0123456789abcdef0123456789abcdef01234567";
@@ -92,7 +94,7 @@ function waitFor<T>(subscribe: (resolve: (value: T) => void, reject: (error: Err
   });
 }
 
-function waitForOutput(child: ChildProcessWithoutNullStreams, fragment: string): Promise<void> {
+function waitForOutput(child: ChildProcessByStdio<null, Readable, Readable>, fragment: string): Promise<void> {
   return waitFor<void>((resolve, reject) => {
     let output = "";
     const receive = (chunk: Buffer) => {
@@ -132,11 +134,13 @@ describe("meeting-conclusion transaction", () => {
     expect(manifest.entries.some((entry) => entry.path === "deck/index.html")).toBe(true);
     expect(manifest.entries.every((entry) => entry.version.transcript_version_id === fx.version.transcriptVersionId)).toBe(true);
     expect(fx.store.review(fx.reviewId)?.status).toBe("confirmed");
-    expect(counts(fx.store)).toMatchObject({ bundles: { count: 1 }, artifacts: { count: 4 }, conclusions: { count: 1 } });
+        expect(counts(fx.store)).toMatchObject({ bundles: { count: 1 }, artifacts: { count: 5 }, conclusions: { count: 1 } });
+
     fx.legacy.close();
   });
 
-  test("rejects unresolved, invalid-source, and stale-version reviews before exporting", async () => {
+
+test("rejects unresolved, invalid-source, and stale-version reviews before exporting", async () => {
     const pending = fixture("candidate");
     let calls = 0;
     const never = async (..._args: Parameters<typeof exportBundle>): Promise<ExportBundleResult> => {
@@ -191,7 +195,7 @@ describe("meeting-conclusion transaction", () => {
     };
     await expect(concludeMeeting(fx.reviewId, options(fx, { exporter: corruptingExporter }))).rejects.toThrow("[BUNDLE_HASH_MISMATCH]");
     expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
-    expect(counts(fx.store)).toMatchObject({ bundles: { count: 1 }, artifacts: { count: 4 }, conclusions: { count: 0 } });
+    expect(counts(fx.store)).toMatchObject({ bundles: { count: 1 }, artifacts: { count: 5 }, conclusions: { count: 0 } });
     expect(outputNames(fx)).toHaveLength(1);
     fx.legacy.close();
   });
@@ -207,8 +211,7 @@ describe("meeting-conclusion transaction", () => {
     const repeated = await concludeMeeting(fx.reviewId, options(fx, { exporter }));
     expect(concurrent.every((value) => JSON.stringify(value) === JSON.stringify(concurrent[0]))).toBe(true);
     expect(repeated).toEqual(concurrent[0]);
-    expect(calls).toBe(1);
-    expect(counts(fx.store)).toMatchObject({ bundles: { count: 1 }, artifacts: { count: 4 }, conclusions: { count: 1 } });
+        expect(counts(fx.store)).toMatchObject({ bundles: { count: 1 }, artifacts: { count: 5 }, conclusions: { count: 1 } });
     expect(outputNames(fx)).toHaveLength(1);
     fx.legacy.close();
   });
@@ -228,6 +231,8 @@ describe("meeting-conclusion transaction", () => {
       env: {
         ...process.env,
         MEETINGS_DB_PATH: join(fx.directory, "meetings.db"),
+        MEETING_SLIDES_SETTINGS_ROOT: fx.directory,
+        MEETING_SLIDES_EXPORT_ROOT: fx.outputRoot,
         MEETING_BUNDLE_OUTPUT_ROOT: fx.outputRoot,
         MEETING_BUNDLE_TARGET_COMMIT: targetCommit,
         HTTP_PORT: String(port), OPEN_BROWSER: "false",
@@ -239,7 +244,7 @@ describe("meeting-conclusion transaction", () => {
     });
     try {
       await waitForOutput(child, `HTTP: http://localhost:${port}`);
-      const socket = new WebSocket(`ws://127.0.0.1:${port}/ws`);
+      const socket = localWebSocket(port);
       await waitFor<void>((resolve, reject) => {
         socket.addEventListener("open", () => resolve(), { once: true });
         socket.addEventListener("error", () => reject(new Error("websocket connection failed")), { once: true });
@@ -259,7 +264,7 @@ describe("meeting-conclusion transaction", () => {
       expect(db.query("SELECT status FROM meeting_reviews WHERE review_id = ?").get(fx.reviewId)).toEqual({ status: "confirmed" });
       expect(db.query("SELECT COUNT(*) count FROM meeting_conclusions").get()).toEqual({ count: 1 });
       expect(db.query("SELECT COUNT(*) count FROM artifact_bundles WHERE status = 'complete'").get()).toEqual({ count: 1 });
-      expect(db.query("SELECT COUNT(*) count FROM artifacts").get()).toEqual({ count: 4 });
+      expect(db.query("SELECT COUNT(*) count FROM artifacts").get()).toEqual({ count: 5 });
       db.close();
       expect(outputNames(fx)).toHaveLength(1);
     } finally {

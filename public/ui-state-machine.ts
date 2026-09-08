@@ -152,29 +152,7 @@ export type ParseResult =
   | { readonly ok: true; readonly event: ServerEvent }
   | { readonly ok: false; readonly error: ParseFailure };
 
-/** Message types `src/session.ts` declares. Anything else is a typed failure. */
-const KNOWN_MESSAGE_TYPES: readonly string[] = [
-  "slide",
-  "caption",
-  "line",
-  "transcript",
-  "status",
-  "capture",
-  "detect",
-  "providers",
-  "sttModels",
-  "meetings",
-  "meeting",
-  "attendees",
-  "review",
-  "saved",
-  "compile",
-  "export",
-  "ask",
-  "reviewItemUpdated",
-  "reviewConfirmed",
-  "meetingConcluded",
-];
+import { isKnownMessageType } from "./protocol-values.js";
 
 const CAPTURE_PHASES: readonly string[] = ["idle", "starting", "capturing", "stopping", "switching-model"];
 const COMPILE_STATUSES: readonly string[] = ["started", "progress", "success", "error", "timeout"];
@@ -204,7 +182,7 @@ export function parseServerEvent(raw: unknown): ParseResult {
 
   const type = raw["type"];
   if (typeof type !== "string") return fail("frame has no string type");
-  if (!KNOWN_MESSAGE_TYPES.includes(type)) return fail(`unknown message type: ${type}`);
+  if (!isKnownMessageType(type)) return fail(`unknown message type: ${type}`);
 
   if (type === "capture") {
     const capturing = raw["capturing"];

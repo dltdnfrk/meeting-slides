@@ -87,29 +87,7 @@ export type TranscriptParseResult =
   | { readonly ok: true; readonly event: TranscriptServerEvent }
   | { readonly ok: false; readonly error: TranscriptParseFailure };
 
-/** Message types `src/session.ts` declares. Anything else is a typed failure. */
-const KNOWN_MESSAGE_TYPES: readonly string[] = [
-  "slide",
-  "caption",
-  "line",
-  "transcript",
-  "status",
-  "capture",
-  "detect",
-  "providers",
-  "sttModels",
-  "meetings",
-  "meeting",
-  "attendees",
-  "review",
-  "saved",
-  "compile",
-  "export",
-  "ask",
-  "reviewItemUpdated",
-  "reviewConfirmed",
-  "meetingConcluded",
-];
+import { isKnownMessageType } from "./protocol-values.js";
 
 const TRANSCRIPT_REASONS: readonly string[] = ["snapshot", "export"];
 
@@ -167,7 +145,7 @@ export function parseTranscriptEvent(raw: unknown): TranscriptParseResult {
 
   const type = raw["type"];
   if (typeof type !== "string") return fail("frame has no string type");
-  if (!KNOWN_MESSAGE_TYPES.includes(type)) return fail(`unknown message type: ${type}`);
+  if (!isKnownMessageType(type)) return fail(`unknown message type: ${type}`);
 
   if (type === "line" || type === "caption") {
     const entry = parseEntry(raw);

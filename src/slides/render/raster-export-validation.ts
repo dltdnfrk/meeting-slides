@@ -3,7 +3,11 @@ import { existsSync, realpathSync, statSync } from "node:fs";
 import { basename, dirname, isAbsolute, resolve } from "node:path";
 
 import { pngPixelBytes } from "./screenshot-qa-browser.ts";
-import { rasterFailure, type RasterExportRequest } from "./raster-export-types.ts";
+import {
+  rasterFailure,
+  type RasterExportRequest,
+  type RasterSlideDocument,
+} from "./raster-export-types.ts";
 
 export const RASTER_GEOMETRY = Object.freeze({
   source: Object.freeze({ width: 1280 as const, height: 720 as const }),
@@ -31,6 +35,12 @@ export interface VerifiedRasterRequest extends RasterExportRequest {
   readonly publicationRoot: string;
 }
 
+export function rasterRenderFilename(document: RasterSlideDocument, index: number): string {
+  if (document.renderFilename !== undefined) return document.renderFilename;
+  if (document.filename.startsWith("slide-")) return document.filename;
+  return `slide-${String(index + 1).padStart(2, "0")}.html`;
+}
+
 export function validateRasterRequest(request: RasterExportRequest): VerifiedRasterRequest {
   if (typeof request !== "object" || request === null) {
     rasterFailure("RASTER_INVALID_REQUEST", "request", "must be an object");
@@ -46,6 +56,7 @@ export function validateRasterRequest(request: RasterExportRequest): VerifiedRas
   }
 
   const seen = new Set<string>();
+  const renderNames = new Set<string>();
   for (const [index, document] of request.documents.entries()) {
     const slideId = request.identity.slideIds[index];
     const geometryId = request.identity.geometryIds[index];
@@ -53,9 +64,25 @@ export function validateRasterRequest(request: RasterExportRequest): VerifiedRas
     stableId(geometryId, `identity.geometryIds[${index}]`);
     if (seen.has(slideId)) rasterFailure("RASTER_IDENTITY_MISMATCH", `identity.slideIds[${index}]`, `duplicate slide ID '${slideId}'`);
     seen.add(slideId);
-    if (document.filename !== `${slideId}.html` || !/^slide-.*\.html$/i.test(document.filename)) {
+    if (document.filename !== `${slideId}.html`) {
       rasterFailure("RASTER_IDENTITY_MISMATCH", `documents[${index}].filename`, "must be the matching slide ID plus .html");
     }
+    const renderFilename = rasterRenderFilename(document, index);
+    if (!/^slide-[A-Za-z0-9][A-Za-z0-9._-]*\.html$/.test(renderFilename)) {
+      rasterFailure(
+        "RASTER_INVALID_REQUEST",
+        `documents[${index}].renderFilename`,
+        "must be a slides-grab-discoverable slide-*.html name",
+      );
+    }
+    if (renderNames.has(renderFilename)) {
+      rasterFailure(
+        "RASTER_IDENTITY_MISMATCH",
+        `documents[${index}].renderFilename`,
+        `duplicate render filename '${renderFilename}'`,
+      );
+    }
+    renderNames.add(renderFilename);
     const encoded = new TextEncoder().encode(document.html);
     if (!Buffer.from(document.bytes).equals(Buffer.from(encoded))) {
       rasterFailure("RASTER_HTML_HASH_MISMATCH", `documents[${index}].bytes`, "bytes do not exactly encode html as UTF-8");

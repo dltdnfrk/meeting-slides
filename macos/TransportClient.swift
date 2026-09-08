@@ -26,6 +26,12 @@ public enum TransportEndpoint {
     public static func webSocketURL(port: Int) -> String {
         "ws://127.0.0.1:\(port)/ws"
     }
+
+    /// Native URLSession sockets do not add a browser Origin automatically.
+    /// The local server intentionally rejects originless production upgrades.
+    public static func webSocketOrigin(port: Int) -> String {
+        "http://127.0.0.1:\(port)"
+    }
 }
 
 // MARK: - Connection state
@@ -72,7 +78,7 @@ public enum NativeCommandEncoder {
 public struct TransportProjection: Equatable {
     public var connection: ConnectionState = .connecting
     public var capture: CaptureProjection = CaptureProjection(
-        capturing: false, mode: "", phase: .idle, startedAt: nil
+        capturing: false, mode: "", phase: .idle, startedAt: nil, audioSource: ""
     )
     public var statusText: String?
     /// Total socket drops since launch. Never reset: the caller reports how many

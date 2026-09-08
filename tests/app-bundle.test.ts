@@ -13,7 +13,7 @@
 
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync } from "node:fs";
+import { appendFileSync, cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -144,7 +144,7 @@ afterAll(() => {
 
 describe("app bundle: build", () => {
   test("scripts/build-app.sh builds into the requested install dir and exits 0", () => {
-    expect(buildStatus).toBe(0);
+    expect(buildStatus, buildLog).toBe(0);
     expect(existsSync(appPath)).toBe(true);
     expect(buildLog).toContain("OK webapp launcher");
   });
@@ -173,6 +173,7 @@ describe("app bundle: packaged native modules", () => {
     "MinibarProjection", // macos/MinibarProjection.swift
     "MinibarWindowController", // macos/MinibarWindowController.swift
     "MinibarView", // macos/MinibarView.swift
+    "SystemAudioCapture", // macos/SystemAudioCapture.swift
   ];
 
   for (const type of requiredTypes) {
@@ -239,7 +240,7 @@ describe("app bundle: Info.plist identity and permissions", () => {
     expect(plistValue("CFBundlePackageType")).toBe("APPL");
     expect(plistValue("CFBundleShortVersionString")).toBe("0.3.0");
     expect(plistValue("CFBundleVersion")).toBe("3");
-    expect(plistValue("LSMinimumSystemVersion")).toBe("13.0");
+    expect(plistValue("LSMinimumSystemVersion")).toBe("14.2");
   });
 
   test("every TCC facility the launcher actually uses declares a usage string", () => {
@@ -247,12 +248,16 @@ describe("app bundle: Info.plist identity and permissions", () => {
     // full calendar access through EventKit. A missing usage string is a hard
     // crash on the first request, not a warning.
     expect(plistValue("NSMicrophoneUsageDescription").length).toBeGreaterThan(10);
+    expect(plistValue("NSAudioCaptureUsageDescription").length).toBeGreaterThan(10);
     expect(plistValue("NSCalendarsFullAccessUsageDescription").length).toBeGreaterThan(10);
     expect(plistValue("NSCalendarsUsageDescription").length).toBeGreaterThan(10);
 
     const launcher = readFileSync(join(ROOT, "macos", "launcher.swift"), "utf8");
     expect(launcher).toContain("requestFullAccessToEvents");
     expect(launcher).toContain("AVCaptureDevice.requestAccess");
+    const capture = readFileSync(join(ROOT, "macos", "SystemAudioCapture.swift"), "utf8");
+    expect(capture).toContain("AudioHardwareCreateProcessTap");
+    expect(capture).not.toMatch(/ScreenCaptureKit/);
   });
 
   test("the bundle claims no screen recording capability it does not use", () => {
@@ -352,7 +357,7 @@ describe("app bundle: resources", () => {
 describe("app bundle: signing", () => {
   test("codesign --verify --deep --strict passes on the built bundle", () => {
     const verify = run("codesign", ["--verify", "--deep", "--strict", appPath]);
-    expect(verify.status).toBe(0);
+    expect(verify.status, verify.stdout + verify.stderr).toBe(0);
   });
 
   test("the bundle is ad-hoc signed under the product identifier", () => {
@@ -392,7 +397,12 @@ describe("app bundle: verifier rejects an incomplete bundle", () => {
 
   beforeAll(() => {
     damaged = join(installDir, "damaged");
-    cpSync(appPath, join(damaged, APP_NAME), { recursive: true, dereference: false, verbatimSymlinks: true });
+    // Copy Contents rather than the File Provider package root, which can add
+    // FinderInfo to the signed source bundle and invalidate its signature.
+    const copy = join(damaged, APP_NAME);
+    cpSync(contents, join(copy, "Contents"), { recursive: true, dereference: false, verbatimSymlinks: true });
+    const verify = run("codesign", ["--verify", "--deep", "--strict", copy]);
+    expect(verify.status, verify.stdout + verify.stderr).toBe(0);
   });
 
   test("removing the project-path resource fails verification", () => {
@@ -403,8 +413,22 @@ describe("app bundle: verifier rejects an incomplete bundle", () => {
     expect(verify.stdout + verify.stderr).toMatch(/project-path\.txt/);
   });
 
+  test("changing a sealed resource fails strict verification", () => {
+    const copy = join(installDir, "tampered", APP_NAME);
+    cpSync(contents, join(copy, "Contents"), { recursive: true, dereference: false, verbatimSymlinks: true });
+    const intact = run("bash", [join(ROOT, "scripts", "verify-app.sh"), copy]);
+    expect(intact.status, intact.stdout + intact.stderr).toBe(0);
+    appendFileSync(join(copy, "Contents", "Resources", "project-path.txt"), "\n");
+    const signature = run("codesign", ["--verify", "--deep", "--strict", copy]);
+    expect(signature.status, signature.stdout + signature.stderr).not.toBe(0);
+    expect(signature.stderr).toContain(copy);
+    const verify = run("bash", [join(ROOT, "scripts", "verify-app.sh"), copy]);
+    expect(verify.status, verify.stdout + verify.stderr).not.toBe(0);
+    expect(verify.stderr).toContain(copy);
+  });
+
   test("the intact bundle passes the same verifier", () => {
     const verify = run("bash", [join(ROOT, "scripts", "verify-app.sh"), appPath]);
-    expect(verify.status).toBe(0);
+    expect(verify.status, verify.stdout + verify.stderr).toBe(0);
   });
 });

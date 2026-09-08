@@ -26,6 +26,11 @@
     .direct-file-guard__command span { color: #7f7f89; font-size: 12px; font-weight: 600; letter-spacing: .08em; }
     .direct-file-guard code { width: fit-content; padding: 10px 14px; border: 1px solid #27272a; border-radius: 8px; background: #131316; color: #f4f4f5; font: 500 14px/1.4 "DM Mono", ui-monospace, monospace; }
     .direct-file-guard a { width: fit-content; margin-top: 6px; color: #09090b; background: #e85d4c; padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; }
+    /* Dead-capability controls ship with the hidden attribute. The library
+       shell's .output-switcher__item display rule outranks the UA [hidden]
+       rule, so this keeps the attribute authoritative — the same !important
+       pattern caret-operator.css already uses for .action-card. */
+    .output-switcher__item[hidden] { display: none !important; }
   </style>
   <!-- Generated slide/review rendering and the single Caret operator shell. -->
   <link rel="stylesheet" href="/style.css">
@@ -139,6 +144,20 @@
         </div>
         <div class="stt-list" id="stt-list" aria-live="polite"></div>
         <p class="provider-panel__hint" id="stt-hint">선택한 모델은 다음 녹음부터 사용됩니다</p>
+        <fieldset class="capture-source" id="capture-source">
+          <legend class="capture-source__legend">오디오 소스</legend>
+          <div class="capture-source__list" id="capture-source-list" role="radiogroup" aria-label="오디오 소스">
+            <label class="capture-source__option">
+              <input type="radio" name="capture-source" value="mic" checked>
+              <span>마이크</span>
+            </label>
+            <label class="capture-source__option">
+              <input type="radio" name="capture-source" value="system">
+              <span>컴퓨터 소리</span>
+            </label>
+          </div>
+          <p class="provider-panel__hint">컴퓨터 소리는 Meeting Slides 앱의 시스템 오디오 권한이 필요합니다.</p>
+        </fieldset>
       </section>
     </div>
 
@@ -223,6 +242,7 @@
         <div class="doc-head">
           <h1 class="doc-title" id="doc-title">새 회의 준비</h1>
           <p class="doc-meta" id="doc-meta">녹음을 시작하면 발언이 기록됩니다</p>
+          <p class="doc-purpose" id="meeting-purpose" aria-label="회의 목적" hidden></p>
         </div>
         <div class="meeting-chrome__props" aria-label="회의 속성">
           <span class="meeting-chrome__prop" id="meeting-chrome-date">Date</span>
@@ -279,6 +299,8 @@
               <button type="button" data-deck-next aria-label="다음 슬라이드">다음</button>
               <button type="button" data-deck-overview-toggle aria-expanded="false">전체 보기</button>
             </div>
+            <span class="slide-plan-workspace__publication-status"
+              data-slide-plan-publication-status role="status"></span>
             <div class="slide-plan-workspace__modes">
               <button type="button" data-presenter-toggle aria-pressed="false">발표자</button>
               <button type="button" data-speaker-notes-toggle aria-expanded="false">노트</button>
@@ -289,6 +311,7 @@
               <p class="slide-plan-paper__label" data-slide-plan-layout-label></p>
               <h2 data-slide-plan-title></h2>
               <div class="slide-plan-paper__body" data-slide-plan-body></div>
+              <div class="slide-plan-canvas" data-slide-plan-canvas hidden></div>
             </article>
           </div>
           <footer class="slide-plan-workspace__editor">
@@ -299,6 +322,16 @@
               <option value="timeline">Timeline</option><option value="metrics">Metrics</option>
               <option value="actions">Actions</option>
             </select></label>
+            <form class="slide-plan-workspace__refine" data-slide-refine>
+              <label>선택 영역 <input type="text" data-slide-refine-input placeholder="더 짧게, 결정 문장으로" disabled></label>
+              <button type="submit" data-slide-refine-submit disabled>다듬기</button>
+            </form>
+            <div class="slide-plan-workspace__proposal" data-slide-refine-proposal hidden>
+              <p data-slide-refine-before></p>
+              <p data-slide-refine-after></p>
+              <button type="button" data-slide-refine-apply>적용</button>
+              <button type="button" data-slide-refine-dismiss>취소</button>
+            </div>
             <button type="button" data-deck-undo>실행 취소</button>
             <button type="button" data-deck-redo>다시 실행</button>
             <p data-slide-plan-status>저장된 초안이 없습니다</p>
@@ -322,7 +355,7 @@
         </div>
         <div class="meeting-overview__block">
           <h2 class="meeting-overview__label">Actions</h2>
-          <article class="action-card" id="action-followup">
+          <article class="action-card" id="action-followup" hidden>
             <div class="action-card__head">
               <div>
                 <h3 class="action-card__title">Send follow-up</h3>
@@ -392,22 +425,22 @@ Here's a quick recap of the meeting:
           </span>
           <label class="language-field">
             <span class="language-field__label">쓰는 언어</span>
-            <select id="written-language" class="language-field__select" title="번역 모델 연결이 필요합니다" disabled>
+            <select id="written-language" class="language-field__select" title="번역 모델 연결이 필요합니다" disabled hidden>
               <option>한국어</option>
             </select>
           </label>
-          <button id="translation-toggle" class="capability-btn" type="button" disabled
+          <button id="translation-toggle" class="capability-btn" type="button" disabled hidden
             title="번역 모델 연결이 필요합니다" aria-label="실시간 번역. 번역 모델 연결이 필요합니다">
             실시간 번역
             <span>연결 필요</span>
           </button>
         </div>
         <div class="transcript-tools" aria-label="전사 편집 도구">
-          <button id="transcript-speaker-edit" class="capability-btn" type="button" disabled
+          <button id="transcript-speaker-edit" class="capability-btn" type="button" disabled hidden
             title="서버 편집 계약이 필요합니다" aria-label="범위 화자 변경. 서버 편집 계약이 필요합니다">범위 화자 변경</button>
-          <button id="transcript-segment-edit" class="capability-btn" type="button" disabled
+          <button id="transcript-segment-edit" class="capability-btn" type="button" disabled hidden
             title="서버 편집 계약이 필요합니다" aria-label="Enter로 분절. 서버 편집 계약이 필요합니다">Enter 분절</button>
-          <button id="transcript-citation-jump" class="capability-btn" type="button" disabled
+          <button id="transcript-citation-jump" class="capability-btn" type="button" disabled hidden
             title="인용 가능한 회의 결과가 필요합니다" aria-label="인용으로 이동. 인용 가능한 회의 결과가 필요합니다">인용 점프</button>
           <span class="capability-reason">편집 좌표 연결 전</span>
         </div>
@@ -479,7 +512,7 @@ Here's a quick recap of the meeting:
           <a class="output-switcher__item" href="#transcript-pane" data-output-target="transcript-pane">
             <span class="output-switcher__label">전체 전사</span>
           </a>
-          <button class="output-switcher__item" type="button" data-output-target="review-panel"
+          <button class="output-switcher__item" type="button" data-output-target="review-panel" hidden
             disabled title="검토할 회의 결과가 필요합니다" aria-label="회의 결과. 검토할 회의 결과가 필요합니다">
             <span class="output-switcher__label">회의 결과</span>
             <span class="output-switcher__reason" aria-hidden="true">결과 없음</span>
@@ -583,6 +616,18 @@ Here's a quick recap of the meeting:
     </div>
   </div>
 
+  <section class="slide-final-rebuild-dialog" id="slide-final-rebuild-dialog" role="dialog" aria-modal="true"
+    aria-labelledby="slide-final-rebuild-title" aria-describedby="slide-final-rebuild-body" hidden>
+    <div class="slide-final-rebuild-dialog__copy">
+      <h2 id="slide-final-rebuild-title">확정본을 새로 만들까요?</h2>
+      <p id="slide-final-rebuild-body">검토가 확정되어 현재 초안의 로컬 편집은 확정본에 <span class="slide-final-rebuild-dialog__keep">저장할 수 없습니다</span>. 새 확정본은 확정된 검토 내용으로 다시 만들며, 저장된 초안은 그대로 남습니다. 현재 로컬 편집은 확정본에 포함되지 않습니다.</p>
+    </div>
+    <div class="slide-final-rebuild-dialog__actions">
+      <button id="btn-slide-final-rebuild-cancel" type="button">취소</button>
+      <button id="btn-slide-final-rebuild-confirm" type="button">확정본 새로 만들기</button>
+    </div>
+  </section>
+
   <!-- DESIGN §9.12: a re-homed panel is a real dialog - named, Escape-closable,
        and it returns focus to the control that opened it. -->
   <div class="ask-panel" id="ask-panel" role="dialog" aria-modal="true" aria-label="Ask 회의 질문" hidden>
@@ -610,10 +655,8 @@ Here's a quick recap of the meeting:
   <!-- The shell is an ES module: it imports the canonical reducers from the
        generated browser artifacts (scripts/build-public-modules.ts). Modules are
        deferred by definition, so it runs before app.js, which is also deferred. -->
-  <script type="module" src="/slide-plan-workspace.js"></script>
-  <script type="module" src="/operator-surface.js"></script>
   <script src="/review-panel-render.js"></script>
   <script src="/review-panel.js"></script>
-  <script defer src="/app.js"></script>
+  <script type="module" src="/app.js"></script>
 </body>
 </html>

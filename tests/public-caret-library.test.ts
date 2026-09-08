@@ -358,6 +358,7 @@ describe("browser-valid reducer artifacts", () => {
     expect(reports.map((report) => ({ output: report.output, status: report.status }))).toEqual([
       { output: "generated/ui-state-machine.js", status: "ok" },
       { output: "generated/transcript-state.js", status: "ok" },
+      { output: "generated/protocol-values.js", status: "ok" },
     ]);
   });
 
@@ -396,6 +397,7 @@ describe("browser-valid reducer artifacts", () => {
       expect(reports.map((r) => ({ output: r.output, status: r.status }))).toEqual([
         { output: "generated/ui-state-machine.js", status: "ok" },
         { output: "generated/transcript-state.js", status: "stale" },
+        { output: "generated/protocol-values.js", status: "ok" },
       ]);
     } finally {
       await rm(scratch, { recursive: true, force: true });

@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
 
 import { cliProcessEnvironment, resolveCliExecutable } from "./config.js";
 
@@ -68,7 +68,8 @@ export type ProviderCommandRunner = (
   executable: string,
   args: readonly string[],
   environment: NodeJS.ProcessEnv,
-) => CommandResult;
+  signal?: AbortSignal,
+) => Promise<CommandResult>;
 
 export const PROVIDER_PROBE_TIMEOUT_MS = 5_000;
 
@@ -150,37 +151,82 @@ export function providerAdapter(id: string): SubscriptionProviderAdapter | undef
   return ADAPTER_BY_ID.get(id as SubscriptionProviderId);
 }
 
-const defaultCommandRunner: ProviderCommandRunner = (executable, args, environment) => {
-  const result = spawnSync(executable, [...args], {
-    env: cliProcessEnvironment(executable, environment),
-    encoding: "utf-8",
-    timeout: PROVIDER_PROBE_TIMEOUT_MS,
-    maxBuffer: 1024 * 1024,
+const defaultCommandRunner: ProviderCommandRunner = async (executable, args, environment, signal) => {
+  if (signal?.aborted) return { status: null, stdout: "", stderr: "", error: new DOMException("Probe cancelled", "AbortError") };
+  return new Promise<CommandResult>((resolve) => {
+    const child = spawn(executable, [...args], {
+      env: cliProcessEnvironment(executable, environment),
+      stdio: ["ignore", "pipe", "pipe"],
+      detached: process.platform !== "win32",
+    });
+    const stdout: Buffer[] = [];
+    const stderr: Buffer[] = [];
+    let bytes = 0;
+    let error: Error | undefined;
+    // The process group belongs to this probe, including vendor wrapper children.
+    const terminate = () => {
+      if (!child.pid) return;
+      try {
+        if (process.platform === "win32") child.kill("SIGKILL");
+        else process.kill(-child.pid, "SIGKILL");
+      } catch (cause) {
+        if (!(cause instanceof Error)) throw cause;
+        if (!("code" in cause) || cause.code !== "ESRCH") error ??= cause;
+      }
+    };
+    const abort = () => {
+      error ??= new DOMException("Probe cancelled", "AbortError");
+      terminate();
+    };
+    const timer = setTimeout(() => {
+      error ??= new DOMException("Provider probe timed out", "TimeoutError");
+      terminate();
+    }, PROVIDER_PROBE_TIMEOUT_MS);
+    signal?.addEventListener("abort", abort, { once: true });
+    const collect = (chunks: Buffer[], chunk: Buffer) => {
+      const remaining = 1024 * 1024 - bytes;
+      const accepted = Math.min(remaining, chunk.length);
+      if (accepted > 0) chunks.push(Buffer.from(chunk.subarray(0, accepted)));
+      bytes += accepted;
+      if (chunk.length > remaining) {
+        error ??= new RangeError("Provider probe output exceeds 1 MiB");
+        terminate();
+      }
+    };
+    child.stdout.on("data", (chunk: Buffer) => collect(stdout, chunk));
+    child.stderr.on("data", (chunk: Buffer) => collect(stderr, chunk));
+    child.on("error", (cause) => { error ??= cause; terminate(); });
+    // `exit` is too early: pipe output can still be draining, or held by children.
+    // Keep the deadline alive until close, then reap any remaining group members.
+    child.once("close", (status, exitSignal) => {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", abort);
+      terminate();
+      if (exitSignal) error ??= new Error(`Provider probe exited with ${exitSignal}`);
+      resolve({ status, stdout: Buffer.concat(stdout).toString("utf-8"), stderr: Buffer.concat(stderr).toString("utf-8"), ...(error ? { error } : {}) });
+    });
+    if (signal?.aborted) abort();
   });
-  return {
-    status: result.status,
-    stdout: result.stdout ?? "",
-    stderr: result.stderr ?? "",
-    ...(result.error ? { error: result.error } : {}),
-  };
 };
 
-export function inspectSubscriptionProviders(
+export async function inspectSubscriptionProviders(
   environment: NodeJS.ProcessEnv = process.env,
   run: ProviderCommandRunner = defaultCommandRunner,
-): ProviderRuntimeState[] {
-  return PROVIDER_ADAPTERS.map((adapter) => {
+  signal?: AbortSignal,
+): Promise<ProviderRuntimeState[]> {
+  return Promise.all(PROVIDER_ADAPTERS.map(async (adapter): Promise<ProviderRuntimeState> => {
     const executable = resolveCliExecutable(adapter.executable, environment);
-    const versionResult = run(executable, ["--version"], environment);
+    if (signal?.aborted) return { id: adapter.id, installed: false, auth: "unavailable", executable };
+    const versionResult = await run(executable, ["--version"], environment, signal);
     const installed = !versionResult.error && versionResult.status === 0;
     if (!installed) return { id: adapter.id, installed: false, auth: "unavailable", executable };
 
     const version = versionResult.stdout.trim() || versionResult.stderr.trim() || undefined;
-    const auth = adapter.authProbe
-      ? adapter.authProbe.parse(run(executable, adapter.authProbe.args, environment))
+    const auth = adapter.authProbe && !signal?.aborted
+      ? adapter.authProbe.parse(await run(executable, adapter.authProbe.args, environment, signal))
       : "unknown";
     return { id: adapter.id, installed: true, auth, executable, ...(version ? { version } : {}) };
-  });
+  }));
 }
 
 export function providerConnectCommand(

@@ -1,9 +1,20 @@
 import { randomUUID } from "node:crypto";
 
 import { parseSlidePlan, SlidePlanParseError } from "../model/plan-parser.ts";
-import type { SlidePlan, SnapshotIdentity } from "../model/plan.ts";
+import { findLayoutSelectionFailure } from "../layouts/selection.ts";
+import type { SlidePlan, SnapshotIdentity, Theme } from "../model/plan.ts";
 import { findEvidenceMismatch } from "./evidence.ts";
+import {
+  EditorialCopyingError,
+  EditorialProvenanceError,
+  EditorialStatusError,
+  findEditorialCopying,
+  findEditorialProvenanceFailure,
+  findEditorialStatusFailure,
+} from "./editorial-validation.ts";
+import { sanitizeModelContent } from "./model-output.ts";
 import { buildSlidePlannerUserPrompt, SLIDE_PLANNER_SYSTEM_PROMPT } from "./prompt.ts";
+import { hasUsableTranscript } from "./transcript-quality.ts";
 import {
   validateConfirmedReview,
   type ConfirmedReviewEvidence,
@@ -31,7 +42,8 @@ export interface TranscriptSnapshot {
 export type SlidePlannerAttempt = "initial" | "repair";
 
 export interface SlidePlannerValidationFailure {
-  readonly kind: "contract-invalid" | "evidence-mismatch" | "completion-failed";
+  readonly kind: "contract-invalid" | "evidence-mismatch" | "editorial-copying" |
+    "editorial-status" | "editorial-provenance" | "completion-failed";
   readonly message: string;
   readonly path?: string;
   readonly details?: Readonly<Record<string, unknown>>;
@@ -54,6 +66,8 @@ export interface SlidePlannerOptions {
   readonly complete: SlidePlannerCompletion;
   readonly createId?: () => string;
   readonly now?: () => string;
+  /** Server-owned style profile; when supplied it replaces whatever theme the model emitted. */
+  readonly theme?: Theme;
 }
 
 export type SlidePlannerErrorCode = "insufficient-transcript" | "model-output-invalid";
@@ -75,15 +89,6 @@ export class SlidePlannerError extends Error {
     this.attempts = attempts;
     this.validationFailure = validationFailure;
   }
-}
-
-const NOISE = /^(?:[\s\p{P}\p{S}]|um+|uh+|hmm+|mm+|ok(?:ay)?|yes|yeah|yep|no|thanks?|thank\s+you|hello|hi|bye|네+|예+|음+|어+|아+|감사합니다?|고맙습니다?|안녕하세요|좋아요|알겠습니다)+$/iu;
-
-function hasUsableTranscript(snapshot: TranscriptSnapshot): boolean {
-  return snapshot.lines.some((line) => {
-    const text = line.text.trim();
-    return text.length > 0 && /[\p{L}\p{N}]/u.test(text) && !NOISE.test(text);
-  });
 }
 
 function deepFreeze<T>(value: T): T {
@@ -125,11 +130,24 @@ function validationFailure(error: unknown): SlidePlannerValidationFailure {
 
 function parseBoundPlan(
   output: string,
-  metadata: Pick<SlidePlan, "planId" | "snapshot" | "createdAt" | "updatedAt">,
+  metadata: Pick<SlidePlan, "planId" | "snapshot" | "createdAt" | "updatedAt"> & Partial<Pick<SlidePlan, "theme">>,
   snapshot: TranscriptSnapshot,
 ): SlidePlan {
-  const content = decodeModelObject(output);
+  const content = sanitizeModelContent(decodeModelObject(output));
   const plan = parseSlidePlan({ ...content, ...metadata });
+  validateSlidePlanAgainstSnapshot(plan, snapshot);
+  return plan;
+}
+
+export function validateSlidePlanAgainstSnapshot(
+  plan: SlidePlan,
+  snapshot: TranscriptSnapshot,
+): void {
+  validateConfirmedReview(snapshot);
+  const layoutFailure = findLayoutSelectionFailure(plan.slides);
+  if (layoutFailure !== undefined) {
+    throw new SlidePlanParseError("slides", layoutFailure.message);
+  }
   const mismatch = findEvidenceMismatch(plan, snapshot);
   if (mismatch !== undefined) {
     const error = new Error(
@@ -140,10 +158,52 @@ function parseBoundPlan(
     Object.assign(error, { evidenceMismatch: mismatch });
     throw error;
   }
-  return plan;
+  const copying = findEditorialCopying(plan, [
+    ...snapshot.lines.map((line) => line.text),
+    ...(snapshot.confirmedReview?.items.map((item) => item.description) ?? []),
+    ...plan.claims.flatMap((claim) => claim.sources.map((source) => source.evidenceQuote)),
+  ]);
+  if (copying !== undefined) throw new EditorialCopyingError(copying);
+  const openClaimIds = snapshot.confirmedReview?.items
+    .filter((item) => item.kind === "open_item")
+    .map((item) => item.id) ?? [];
+  const statusFailure = findEditorialStatusFailure(plan.slides, openClaimIds);
+  if (statusFailure !== undefined) throw new EditorialStatusError(statusFailure);
+  const provenanceFailure = findEditorialProvenanceFailure(plan);
+  if (provenanceFailure !== undefined) throw new EditorialProvenanceError(provenanceFailure);
 }
 
 function failureFrom(error: unknown): SlidePlannerValidationFailure {
+  if (error instanceof EditorialProvenanceError) {
+    return {
+      kind: "editorial-provenance",
+      message: error.message,
+      path: error.failure.path,
+      details: {
+        unsupportedAtoms: error.failure.unsupportedAtoms,
+        claimIds: error.failure.claimIds,
+      },
+    };
+  }
+  if (error instanceof EditorialStatusError) {
+    return {
+      kind: "editorial-status",
+      message: error.message,
+      path: error.failure.path,
+      details: { openClaimIds: error.failure.openClaimIds },
+    };
+  }
+  if (error instanceof EditorialCopyingError) {
+    return {
+      kind: "editorial-copying",
+      message: error.message,
+      details: {
+        copiedPaths: error.failure.copiedPaths,
+        copiedFields: error.failure.copiedFields,
+        eligibleFields: error.failure.eligibleFields,
+      },
+    };
+  }
   if (error instanceof Error && "evidenceMismatch" in error) {
     const details = error.evidenceMismatch;
     if (typeof details === "object" && details !== null) {
@@ -157,7 +217,7 @@ export async function planTranscriptToSlides(
   suppliedSnapshot: TranscriptSnapshot,
   options: SlidePlannerOptions,
 ): Promise<SlidePlan> {
-  if (!hasUsableTranscript(suppliedSnapshot)) {
+  if (!hasUsableTranscript(suppliedSnapshot.lines)) {
     throw new SlidePlannerError(
       "insufficient-transcript",
       0,
@@ -173,6 +233,7 @@ export async function planTranscriptToSlides(
     snapshot: snapshotIdentity(snapshot),
     createdAt: now(),
     updatedAt: now(),
+    ...(options.theme === undefined ? {} : { theme: structuredClone(options.theme) }),
   };
   let previousOutput: string | undefined;
   let failure: SlidePlannerValidationFailure | undefined;

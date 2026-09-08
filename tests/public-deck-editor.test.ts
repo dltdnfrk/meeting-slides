@@ -193,6 +193,55 @@ describe("direct slide commands", () => {
     }), initial, "UNKNOWN_CLAIM_ID", "claimIds[0]");
   });
 
+  test("setBox stores a canvas-bounded override and chooseLayout drops it", () => {
+    const initial = createDeckEditorState(strictDeck());
+    const moved = next(initial, {
+      type: "setBox", expectedRevision: 7, slideId: "slide-hero",
+      elementId: "slide-hero:title", box: { x: 140, y: 96, width: 500, height: 180 },
+    });
+    expect(moved.deck.slides[0]!.boxOverrides).toEqual([
+      { elementId: "slide-hero:title", box: { x: 140, y: 96, width: 500, height: 180 } },
+    ]);
+    const converted = next(moved, {
+      type: "chooseLayout", expectedRevision: 8, slideId: "slide-hero", layout: "summary",
+    });
+    expect(converted.deck.slides[0]!.boxOverrides).toBeUndefined();
+    const rejected = apply(initial, {
+      type: "setBox", expectedRevision: 7, slideId: "slide-hero",
+      elementId: "slide-hero:title", box: { x: 1200, y: 0, width: 200, height: 40 },
+    });
+    expect(rejected).toMatchObject({ ok: false, error: { code: "INVALID_BOX" } });
+  });
+
+  test("setBoxes stores several canvas-bounded overrides in one revision", () => {
+    const initial = createDeckEditorState(strictDeck());
+    const moved = next(initial, {
+      type: "setBoxes", expectedRevision: 7, slideId: "slide-hero",
+      boxes: [
+        { elementId: "slide-hero:title", box: { x: 140, y: 96, width: 500, height: 180 } },
+        { elementId: "slide-hero:statement", box: { x: 140, y: 300, width: 640, height: 120 } },
+      ],
+    });
+    expect(moved.revision).toBe(8);
+    expect(moved.deck.slides[0]!.boxOverrides).toEqual([
+      { elementId: "slide-hero:title", box: { x: 140, y: 96, width: 500, height: 180 } },
+      { elementId: "slide-hero:statement", box: { x: 140, y: 300, width: 640, height: 120 } },
+    ]);
+    expect(next(moved, { type: "undo", expectedRevision: 8 }).deck.slides[0]!.boxOverrides)
+      .toBeUndefined();
+    expect(apply(initial, {
+      type: "setBoxes", expectedRevision: 7, slideId: "slide-hero",
+      boxes: [
+        { elementId: "slide-hero:title", box: { x: 140, y: 96, width: 500, height: 180 } },
+        { elementId: "slide-hero:title", box: { x: 160, y: 96, width: 500, height: 180 } },
+      ],
+    })).toMatchObject({ ok: false, error: { code: "DUPLICATE_ELEMENT_ID" } });
+    expect(apply(initial, {
+      type: "setBoxes", expectedRevision: 7, slideId: "slide-hero",
+      boxes: [{ elementId: "slide-hero:title", box: { x: 1200, y: 0, width: 200, height: 40 } }],
+    })).toMatchObject({ ok: false, error: { code: "INVALID_BOX" } });
+  });
+
   test("setText permits a declared editorial path to remain unbound", () => {
     const initial = createDeckEditorState(strictDeck());
     const edited = next(initial, {
@@ -302,6 +351,10 @@ describe("direct slide commands", () => {
     const initial = createDeckEditorState(strictDeck());
     const commands = [
       { type: "setText", slideId: "slide-hero", path: "title", text: "Stale", claimIds: ["claim-launch"] },
+      { type: "setBox", slideId: "slide-hero", elementId: "slide-hero:title", box: { x: 140, y: 96, width: 500, height: 180 } },
+      { type: "setBoxes", slideId: "slide-hero", boxes: [
+        { elementId: "slide-hero:title", box: { x: 140, y: 96, width: 500, height: 180 } },
+      ] },
       { type: "chooseLayout", slideId: "slide-hero", layout: "summary" },
       { type: "replaceAsset", slideId: "slide-comparison", assetId: "asset-chart", replacementAssetId: "asset-photo" },
       { type: "reorderSlide", slideId: "slide-close", toIndex: 0 },
@@ -385,7 +438,7 @@ describe("command safety and persistence protocol", () => {
 
   test("exposes only semantic commands: no freeform drag, move, resize, or geometry command exists", () => {
     expect(DECK_EDITOR_COMMAND_TYPES).toEqual([
-      "setText", "chooseLayout", "replaceAsset", "reorderSlide", "insertSlide",
+      "setText", "setBox", "setBoxes", "chooseLayout", "replaceAsset", "reorderSlide", "insertSlide",
       "deleteSlide", "regenerateSlide", "undo", "redo",
     ]);
     const initial = createDeckEditorState(strictDeck());

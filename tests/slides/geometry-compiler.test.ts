@@ -9,9 +9,14 @@ import type {
   TextMeasurer,
   TextFitPolicy,
 } from "../../src/slides/geometry/contract.ts";
+import type { ResolvedAssetLayer } from "../../src/slides/assets/integration.ts";
 import { compileGeometrySlide } from "../../src/slides/geometry/compiler.ts";
 import { preflightGeometrySlide } from "../../src/slides/geometry/preflight.ts";
-import { createDeckTheme } from "../../src/slides/theme/theme.ts";
+import { renderSlideSection } from "../../src/slides/render/standalone-presentation.ts";
+import type { EmbeddedResources } from "../../src/slides/render/standalone-resources.ts";
+import type { StandaloneDeckInput } from "../../src/slides/render/standalone-types.ts";
+import { ScriptAwareTextMeasurer } from "../../src/slides/server-action-support.ts";
+import { createDeckTheme, resolveThemeToken } from "../../src/slides/theme/theme.ts";
 import { MEETING_PAPER_STYLE_PROFILE } from "../../src/slides/theme/meeting-paper.ts";
 
 const theme = createDeckTheme(MEETING_PAPER_STYLE_PROFILE);
@@ -174,7 +179,7 @@ describe("deterministic geometry compiler contract", () => {
     for (const [index, entry] of result.slide.elements.entries()) {
       for (const value of Object.values(entry.box)) expect(Number.isInteger(value)).toBe(true);
       expect(entry.tokens).toEqual(source.elements[index]!.tokens);
-      expect(entry.resolvedTokens).toEqual(Object.fromEntries(
+      const expectedResolvedTokens: Record<string, string | number> = Object.fromEntries(
         Object.entries(entry.tokens).map(([property, token]) => [
           property,
           token === "colors.ink" ? "14213D"
@@ -182,7 +187,14 @@ describe("deterministic geometry compiler contract", () => {
             : token === "typography.body.size" ? 22
             : "Pretendard Variable",
         ]),
-      ));
+      );
+      const sizeToken = entry.tokens.size;
+      if (sizeToken.endsWith(".size")) {
+        expectedResolvedTokens.lineHeight = resolveThemeToken(
+          theme, `${sizeToken.slice(0, -".size".length)}.lineHeight`,
+        );
+      }
+      expect(entry.resolvedTokens).toEqual(expectedResolvedTokens);
       expect(entry.evidence).toEqual(source.elements[index]!.evidence);
       expect(entry.accessibility).toEqual(source.elements[index]!.accessibility);
       expect(entry.lines.length).toBeGreaterThan(0);
@@ -279,6 +291,59 @@ describe("deterministic geometry compiler contract", () => {
     expect(result.slide.elements[0]!.lines).toEqual(["출시 결정은", "금요일 확정"]);
     expect(result.slide.elements[1]!.lines).toEqual(["ABCDEF", "GHIJKL"]);
     expect(result.slide.elements.map((entry) => entry.fitTrace.outcome)).toEqual(["fit", "fit"]);
+  });
+});
+
+describe("theme line-height measurement and rendering", () => {
+  test("measures each body line box with the theme lineHeight token", () => {
+    const result = compileGeometrySlide(draft([
+      element("0-body", "body", "alpha beta gamma", { x: 80, y: 180, width: 120, height: 60 }),
+    ]), theme, {
+      textMeasurer: new ScriptAwareTextMeasurer(),
+      textPolicies: policies,
+    });
+    const body = result.slide.elements[0]!;
+
+    expect(result.issues).toEqual([]);
+    expect(body.lines).toEqual(["alpha beta", "gamma"]);
+    expect(body.resolvedTokens.lineHeight).toBe(theme.typography.body.lineHeight);
+    expect(body.fitTrace.attempts.at(-1)!.height).toBe(
+      theme.typography.body.lineHeight * body.lines.length,
+    );
+  });
+
+  test("standalone HTML carries a line-height matching the theme lineHeight token", () => {
+    const result = compileGeometrySlide(draft([
+      element("0-body", "body", "alpha beta gamma", { x: 80, y: 180, width: 120, height: 60 }),
+    ]), theme, {
+      textMeasurer: new ScriptAwareTextMeasurer(),
+      textPolicies: policies,
+    });
+    const assets: ResolvedAssetLayer = {
+      id: "geometry-fixture:assets",
+      slideId: "geometry-fixture",
+      canvas: { width: 1280, height: 720 },
+      placements: [],
+    };
+    const input: StandaloneDeckInput = {
+      id: "geometry-fixture:deck",
+      title: "Geometry fixture",
+      lang: "en",
+      theme,
+      resourceRoot: "/",
+      slides: [{
+        geometry: { slide: result.slide, issues: [], status: "publishable" },
+        assets,
+      }],
+    };
+    const resources: EmbeddedResources = {
+      fontDataUrl: "data:font/woff2;base64,",
+      slides: [{ placements: [] }],
+    };
+
+    const section = renderSlideSection(input, resources, 0);
+
+    expect(section).toContain(`font-size:22px;line-height:${theme.typography.body.lineHeight}px`);
   });
 });
 

@@ -35,4 +35,19 @@ describe("SentenceAssembler", () => {
     expect(a.flush()).toBe("말하던 중이었는데");
     expect(a.flush()).toBeNull(); // 두 번은 안 나옴
   });
+
+  test("a prefix-extension revision replaces the pending sentence", () => {
+    const a = new SentenceAssembler();
+    expect(a.push("오늘 회의는 출시 일정", false)).toEqual([]);
+    expect(a.push("오늘 회의는 출시 일정부터 시작합니다.", true)).toEqual([
+      "오늘 회의는 출시 일정부터 시작합니다.",
+    ]);
+  });
+
+  test("a longer pending sentence is kept when a shorter prefix arrives", () => {
+    const a = new SentenceAssembler();
+    expect(a.push("오늘 회의는 출시 일정부터", false)).toEqual([]);
+    expect(a.push("오늘 회의는", false)).toEqual([]);
+    expect(a.flush()).toBe("오늘 회의는 출시 일정부터");
+  });
 });

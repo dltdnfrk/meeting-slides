@@ -11,6 +11,7 @@
 // never persists a meeting or transcript, and never becomes a second engine.
 
 import AppKit
+import AVFoundation
 import Foundation
 
 // MARK: - Saved frame
@@ -127,16 +128,24 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
     private var presentation = MinibarPresentationState()
     private var socket: URLSessionWebSocketTask?
     private var session: URLSession?
-    private let endpoint: URL
+    private let webSocketRequest: URLRequest
+    private var isStopping = false
     private var reconnectTimer: Timer?
     private var renderTimer: Timer?
     private var statusItem: NSStatusItem?
+    private var systemAudioCapture: SystemAudioCapture?
 
     private let panel: MinibarPanel
     private let contentView: MinibarView
 
     init(port: Int) {
-        endpoint = URL(string: TransportEndpoint.webSocketURL(port: port))!
+        let endpoint = URL(string: TransportEndpoint.webSocketURL(port: port))!
+        var request = URLRequest(url: endpoint)
+        request.setValue(
+            TransportEndpoint.webSocketOrigin(port: port),
+            forHTTPHeaderField: "Origin"
+        )
+        webSocketRequest = request
         workspaceURL = URL(string: "http://localhost:\(port)/")!
 
         let size = SurfaceMode.collapsed.size
@@ -215,13 +224,13 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
     }
 
     func connect() {
+        isStopping = false
         let session = URLSession(configuration: .default)
         self.session = session
-        let task = session.webSocketTask(with: endpoint)
+        let task = session.webSocketTask(with: webSocketRequest)
         socket = task
         task.resume()
         receiveNext()
-        apply(transport.handle(.opened))
         startRenderTimer()
     }
 
@@ -232,6 +241,7 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
     }
 
     func stopConnection() {
+        isStopping = true
         renderTimer?.invalidate()
         renderTimer = nil
         reconnectTimer?.invalidate()
@@ -250,6 +260,9 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
             DispatchQueue.main.async {
                 switch result {
                 case let .success(message):
+                    if self.transport.projection.connection != .online {
+                        self.apply(self.transport.handle(.opened))
+                    }
                     if case let .string(payload) = message { self.ingest(payload) }
                     if case let .data(data) = message,
                        let payload = String(data: data, encoding: .utf8) {
@@ -257,6 +270,7 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
                     }
                     self.receiveNext()
                 case .failure:
+                    guard !self.isStopping else { return }
                     self.apply(self.transport.handle(.closed))
                 }
             }
@@ -271,6 +285,7 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
         if !failed, let event = try? NativeSurfaceDecoder.decode(payload),
            case .capture = event {
             projection.applyCapture(transport.projection.capture)
+            syncSystemAudioCapture(transport.projection.capture)
         }
         render()
     }
@@ -294,12 +309,12 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
         reconnectTimer = Timer.scheduledTimer(withTimeInterval: seconds, repeats: false) {
             [weak self] _ in
             guard let self else { return }
+            guard !self.isStopping else { return }
             self.socket?.cancel()
-            let task = self.session?.webSocketTask(with: self.endpoint)
+            let task = self.session?.webSocketTask(with: self.webSocketRequest)
             self.socket = task
             task?.resume()
             self.receiveNext()
-            self.apply(self.transport.handle(.opened))
         }
     }
 
@@ -325,6 +340,57 @@ final class MinibarWindowController: NSObject, MinibarViewDelegate, NSWindowDele
         contentView.render(model)
         statusItem?.button?.title = model.glyph
         statusItem?.button?.setAccessibilityLabel("Meeting Slides — \(model.title)")
+    }
+
+    private func syncSystemAudioCapture(_ capture: CaptureProjection) {
+        let wantsSystem = capture.audioSource == "system"
+            && (capture.phase == .capturing || capture.phase == .starting)
+        if wantsSystem {
+            startSystemAudioCapture()
+        } else {
+            stopSystemAudioCapture()
+        }
+    }
+
+    private func startSystemAudioCapture() {
+        guard systemAudioCapture == nil else { return }
+        let capture = SystemAudioCapture(
+            onAudio: { [weak self] data in
+                Task { @MainActor [weak self] in
+                    self?.sendAudioSamples(data)
+                }
+            },
+            onError: { [weak self] message in
+                Task { @MainActor [weak self] in
+                    self?.stopSystemAudioCapture()
+                    LauncherIO.log("시스템 오디오 캡처 실패: \(message)")
+                }
+            }
+        )
+        systemAudioCapture = capture
+        Task {
+            do {
+                try await capture.start()
+            } catch {
+                await MainActor.run {
+                    self.stopSystemAudioCapture()
+                    LauncherIO.log("시스템 오디오 캡처 시작 실패: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    private func stopSystemAudioCapture() {
+        guard let capture = systemAudioCapture else { return }
+        systemAudioCapture = nil
+        Task { await capture.stop() }
+    }
+
+    private func sendAudioSamples(_ data: Data) {
+        guard transport.projection.capture.audioSource == "system",
+              transport.projection.capture.phase == .capturing else { return }
+        let payload = "{\"action\":\"audio\",\"data\":\"\(data.base64EncodedString())\"}"
+        socket?.send(.string(payload)) { _ in }
     }
 
     // MARK: - Controls

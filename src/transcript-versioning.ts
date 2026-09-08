@@ -1,6 +1,9 @@
-import { createHash } from "node:crypto";
-
-import type { AudioRecorderHandle, StoppedAudioRecording } from "./audio-recorder.ts";
+import { hashCanonicalTranscript, serializeCanonicalTranscript } from "./canonical-transcript.ts";
+import type {
+  AudioRecorderHandle,
+  CanonicalAudioCaptureHandle,
+  StoppedAudioRecording,
+} from "./audio-recorder.ts";
 import { MinutesStore, type TranscriptSourceKind } from "./minutes-store.ts";
 
 export {
@@ -11,7 +14,9 @@ export {
 export type { AudioRecorderHandle, StoppedAudioRecording } from "./audio-recorder.ts";
 
 export interface VersionedTranscriptEntry {
-  ts: number;
+  ts: number | null;
+  audioStartMs?: number | null;
+  audioEndMs?: number | null;
   speaker?: number;
   text: string;
 }
@@ -21,27 +26,12 @@ export interface FinalizedTranscriptVersion {
   contentSha256: string;
 }
 
-function canonicalLineJson(line: {
-  seq: number;
-  capturedAtMs: number | null;
-  speakerTurn: number | null;
-  text: string;
-}): string {
-  return JSON.stringify({
-    seq: line.seq,
-    ts: line.capturedAtMs,
-    speaker_turn: line.speakerTurn,
-    text: line.text,
-  });
-}
-
 export function canonicalTranscriptJsonl(store: MinutesStore, transcriptVersionId: string): string {
-  const lines = store.transcriptVersionLines(transcriptVersionId);
-  return lines.map(canonicalLineJson).join("\n") + (lines.length > 0 ? "\n" : "");
+  return serializeCanonicalTranscript(store.transcriptVersionLines(transcriptVersionId));
 }
 
 export function transcriptContentSha256(store: MinutesStore, transcriptVersionId: string): string {
-  return createHash("sha256").update(canonicalTranscriptJsonl(store, transcriptVersionId)).digest("hex");
+  return hashCanonicalTranscript(store.transcriptVersionLines(transcriptVersionId));
 }
 
 export class TranscriptVersionWriter {
@@ -65,6 +55,8 @@ export class TranscriptVersionWriter {
     if (!this.active) throw new Error("no active transcript version");
     return this.store.appendTranscriptLine(this.active.transcriptVersionId, {
       capturedAtMs: entry.ts,
+      audioStartMs: entry.audioStartMs ?? null,
+      audioEndMs: entry.audioEndMs ?? null,
       speakerTurn: entry.speaker ?? null,
       text: entry.text,
     }, this.active.dualWriteLegacy);
@@ -93,42 +85,56 @@ export type FinalizedAudio =
   | { status: "available"; path: string; sha256: string; byteLength: number }
   | { status: "unavailable"; reason: "recorder_failed" };
 
+export type FinalizedRetranscription =
+  | { status: "completed" }
+  | { status: "not_requested" }
+  | { status: "failed"; error: string };
+
 export class CaptureFinalizer {
-  private completion: Promise<FinalizedTranscriptVersion & { audio: FinalizedAudio }> | null = null;
+  private completion: Promise<FinalizedTranscriptVersion & {
+    audio: FinalizedAudio;
+    retranscription: FinalizedRetranscription;
+  }> | null = null;
 
   constructor(
     private readonly store: MinutesStore,
     private readonly writer: TranscriptVersionWriter,
     private readonly meetingId: number,
-    private readonly recorder: AudioRecorderHandle | null,
+    private readonly recorder: AudioRecorderHandle | CanonicalAudioCaptureHandle | null,
   ) {}
 
-  finish(): Promise<FinalizedTranscriptVersion & { audio: FinalizedAudio }> {
+  finish(): Promise<FinalizedTranscriptVersion & {
+    audio: FinalizedAudio;
+    retranscription: FinalizedRetranscription;
+  }> {
     this.completion ??= this.finishOnce();
     return this.completion;
   }
 
-  private async finishOnce(): Promise<FinalizedTranscriptVersion & { audio: FinalizedAudio }> {
+  private async finishOnce(): Promise<FinalizedTranscriptVersion & {
+    audio: FinalizedAudio;
+    retranscription: FinalizedRetranscription;
+  }> {
     let audio: FinalizedAudio = { status: "unavailable", reason: "recorder_failed" };
     let duplicateError: Error | null = null;
+    let stoppedRecording: StoppedAudioRecording | null = null;
     if (this.recorder) {
-      let recording: StoppedAudioRecording | null = null;
       try {
-        recording = await this.recorder.stop();
-        const duplicateMeetingId = this.store.findMeetingByAudioHash(recording.sha256);
+        stoppedRecording = await this.recorder.stop();
+        const duplicateMeetingId = this.store.findMeetingByAudioHash(stoppedRecording.sha256);
         if (duplicateMeetingId !== null && duplicateMeetingId !== this.meetingId) {
           duplicateError = new Error(`[DUPLICATE_AUDIO] audio already belongs to meeting ${duplicateMeetingId}`);
         } else {
           this.store.addAudioSource(this.meetingId, {
-            originalAudioPath: recording.path,
-            originalAudioSha256: recording.sha256,
-            byteLength: recording.byteLength,
+            originalAudioPath: stoppedRecording.path,
+            originalAudioSha256: stoppedRecording.sha256,
+            byteLength: stoppedRecording.byteLength,
           });
-          audio = { status: "available", ...recording };
+          audio = { status: "available", ...stoppedRecording };
         }
       } catch {
-        if (recording) {
-          const duplicateMeetingId = this.store.findMeetingByAudioHash(recording.sha256);
+        if (stoppedRecording) {
+          const duplicateMeetingId = this.store.findMeetingByAudioHash(stoppedRecording.sha256);
           if (duplicateMeetingId !== null && duplicateMeetingId !== this.meetingId) {
             duplicateError = new Error(`[DUPLICATE_AUDIO] audio already belongs to meeting ${duplicateMeetingId}`);
           }
@@ -136,18 +142,47 @@ export class CaptureFinalizer {
         // Recorder failures leave no row; transcript finalization remains independent.
       }
     }
-    // Canonical selection and both meeting lifecycle rows commit together. If the
-    // process crashes before this transaction, startup recovery completes it; if
-    // it commits, no observer can see an ended meeting without canonical truth.
-    const finishTranscript = this.store.databaseHandle().transaction(() => {
-      const transcript = this.writer.finalize({ selectCanonical: true });
+    const live = this.writer.finalize();
+    let transcript = live;
+    let retranscription: FinalizedRetranscription = { status: "not_requested" };
+    if (stoppedRecording && this.recorder && "retranscribe" in this.recorder) {
+      try {
+        const secondPass = await this.recorder.retranscribe(stoppedRecording);
+        if (secondPass.lines.length === 0) throw new Error("second-pass transcript is empty");
+        this.writer.begin(this.meetingId, {
+          sourceKind: "retranscription",
+          engine: secondPass.engine,
+          engineModel: secondPass.engineModel,
+        });
+        for (const line of secondPass.lines) {
+          this.writer.append({
+            ts: line.capturedAtMs,
+            audioStartMs: line.audioStartMs,
+            audioEndMs: line.audioEndMs,
+            speaker: line.speakerTurn ?? undefined,
+            text: line.text,
+          });
+        }
+        transcript = this.writer.finalize();
+        retranscription = { status: "completed" };
+      } catch (error) {
+        this.writer.abort();
+        transcript = live;
+        retranscription = {
+          status: "failed",
+          error: error instanceof Error ? error.message : String(error),
+        };
+      }
+    }
+    // Canonical selection and both meeting lifecycle rows commit together.
+    const finishMeeting = this.store.databaseHandle().transaction(() => {
+      this.store.setCanonical(this.meetingId, transcript.transcriptVersionId);
       this.store.databaseHandle().run("UPDATE meetings SET ended_at = coalesce(ended_at, ?) WHERE id = ?", [Date.now(), this.meetingId]);
       if (this.store.meetingMeta(this.meetingId)?.phase === "capturing") this.store.endMeeting(this.meetingId);
-      return transcript;
     });
-    const transcript = finishTranscript.immediate();
+    finishMeeting.immediate();
     if (duplicateError) throw duplicateError;
-    return { ...transcript, audio };
+    return { ...transcript, audio, retranscription };
   }
 }
 

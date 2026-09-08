@@ -3,28 +3,7 @@
 // Generator: scripts/build-public-modules.ts
 // Rebuild: bun run scripts/build-public-modules.ts
 export const MINIBAR_LINE_LIMIT = 3;
-const KNOWN_MESSAGE_TYPES = [
-  "slide",
-  "caption",
-  "line",
-  "transcript",
-  "status",
-  "capture",
-  "detect",
-  "providers",
-  "sttModels",
-  "meetings",
-  "meeting",
-  "attendees",
-  "review",
-  "saved",
-  "compile",
-  "export",
-  "ask",
-  "reviewItemUpdated",
-  "reviewConfirmed",
-  "meetingConcluded"
-];
+import { isKnownMessageType } from "./protocol-values.js";
 const TRANSCRIPT_REASONS = ["snapshot", "export"];
 function isRecord(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -74,7 +53,7 @@ export function parseTranscriptEvent(raw) {
   const type = raw["type"];
   if (typeof type !== "string")
     return fail("frame has no string type");
-  if (!KNOWN_MESSAGE_TYPES.includes(type))
+  if (!isKnownMessageType(type))
     return fail(`unknown message type: ${type}`);
   if (type === "line" || type === "caption") {
     const entry = parseEntry(raw);

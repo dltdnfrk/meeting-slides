@@ -29,7 +29,7 @@
 
   /** 지금 실제로 탭 순서에 들어가는가 (숨김/disabled/0 크기 제외). */
   const isTabbable = (el) => {
-    if (el.hasAttribute("disabled")) return false;
+    if (el.matches(":disabled")) return false;
     if (el.getAttribute("tabindex") === "-1") return false;
     if (el.closest("[inert]")) return false;
     for (let node = el; node; node = node.parentElement) {
@@ -41,8 +41,30 @@
     return rect.width > 0 && rect.height > 0;
   };
 
-  const tabbablesOf = (root) =>
-    [...root.querySelectorAll(TABBABLE_SELECTOR)].filter(isTabbable);
+  // Native radio groups are scoped by name, form owner and tree, not by their
+  // immediate container. Unnamed radios remain independent tab stops.
+  const sameRadioGroup = (left, right) =>
+    left instanceof HTMLInputElement && right instanceof HTMLInputElement
+    && left.type === "radio" && right.type === "radio" && left.name !== ""
+    && left.name === right.name && left.form === right.form
+    && left.getRootNode() === right.getRootNode();
+
+  const tabbablesOf = (root, backwards) => {
+    const candidates = [...root.querySelectorAll(TABBABLE_SELECTOR)].filter(isTabbable);
+    return candidates.filter((el) => {
+      if (!(el instanceof HTMLInputElement) || el.type !== "radio" || !el.name) return true;
+      const group = candidates.filter((peer) => sameRadioGroup(el, peer));
+      // A disabled/hidden checked input is not a tab stop. Without an eligible
+      // checked member Chrome enters the group at its first/last enabled input
+      // for forward/reverse Tab respectively.
+      const target = group.find((peer) => peer.checked)
+        ?? group[backwards ? group.length - 1 : 0];
+      return el === target;
+    });
+  };
+
+  const sameTabStop = (active, boundary) =>
+    active === boundary || sameRadioGroup(active, boundary);
 
   /** 활성 트랩 스택. 마지막 항목이 키를 받는다. */
   const stack = [];
@@ -73,7 +95,7 @@
     const root = activeRoot();
     if (!root) return;
 
-    const items = tabbablesOf(root);
+    const items = tabbablesOf(root, ev.shiftKey);
     if (items.length === 0) return;
 
     const first = items[0];
@@ -87,12 +109,12 @@
       (ev.shiftKey ? last : first).focus({ preventScroll: true });
       return;
     }
-    if (ev.shiftKey && active === first) {
+    if (ev.shiftKey && sameTabStop(active, first)) {
       ev.preventDefault();
       last.focus({ preventScroll: true });
       return;
     }
-    if (!ev.shiftKey && active === last) {
+    if (!ev.shiftKey && sameTabStop(active, last)) {
       ev.preventDefault();
       first.focus({ preventScroll: true });
     }

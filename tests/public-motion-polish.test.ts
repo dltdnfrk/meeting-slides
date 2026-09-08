@@ -1,38 +1,94 @@
-import { expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-const css = readFileSync(join(import.meta.dir, "..", "public", "caret-operator.css"), "utf8");
-const app = readFileSync(join(import.meta.dir, "..", "public", "app.js"), "utf8");
+import { afterAll, beforeAll, expect, test } from "bun:test";
+import puppeteer, { type Browser, type Page } from "puppeteer";
+import { createPublicTestHarness } from "./public-test-harness.ts";
 
-test("interaction polish covers navigation, content, controls and status with compositor-safe motion", () => {
-  for (const selector of [".session-row", ".detail-tabs__btn", ".detail-panel:not([hidden])", "#current-slide > .slide__inner", ".thumbnail", ".dock__btn", ".feed-line", "#status-text[data-motion-key]"]) {
-    expect(css).toContain(selector);
+const harness = createPublicTestHarness();
+let browser: Browser;
+let page: Page;
+beforeAll(async () => {
+  browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+  console.log(`motion browser pid=${browser.process()?.pid}`);
+  page = await browser.newPage();
+  await page.goto(harness.origin, { waitUntil: "load" });
+  await harness.clientConnected;
+});
+afterAll(async () => { await browser?.close(); harness.stop(); });
+
+async function deliver(frames: readonly unknown[]) {
+  const marker = `motion-${harness.sentSequence}`;
+  const receipt = await page.evaluateHandle((marker) => ({ done: new Promise<void>((resolve, reject) => {
+    const node = document.getElementById("status-text");
+    if (!node) throw new TypeError("status surface missing");
+    const timeout = setTimeout(() => { observer.disconnect(); reject(new Error("frame timeout")); }, 5000);
+    const observer = new MutationObserver(() => {
+      if (node.textContent !== marker) return;
+      clearTimeout(timeout); observer.disconnect(); resolve();
+    });
+    observer.observe(node, { childList: true, characterData: true, subtree: true });
+  }) }), marker);
+  for (const frame of frames) harness.pushMessage(frame);
+  harness.pushMessage({ type: "status", text: marker });
+  await receipt.evaluate((receipt) => receipt.done);
+  await receipt.dispose();
+}
+
+test("navigation exposes loading and status feedback uses compositor-safe animation", async () => {
+  await deliver([{ type: "capture", capturing: false, mode: "mic", phase: "idle" }, {
+    type: "meetings", items: [{ id: 7, title: "Fixture", started_at: 1000, status: "ended" }],
+  }]);
+  const selected = harness.nextClientMessage();
+  await page.click('.session-row[data-meeting-id="7"]');
+  expect(await selected).toEqual({ action: "selectMeeting", meetingId: 7 });
+  expect(await page.$eval("#document-surface", (node) => node.getAttribute("aria-busy"))).toBe("true");
+  const motion = await page.$eval("#status-text", (node) => node.getAnimations().map((animation) => {
+    const effect = animation.effect;
+    return effect instanceof KeyframeEffect ? {
+      duration: effect.getTiming().duration,
+      fields: [...new Set(effect.getKeyframes().flatMap((frame) => Object.keys(frame)))],
+    } : null;
+  }));
+  expect(motion.length).toBeGreaterThan(0);
+  for (const effect of motion) {
+    expect(effect?.duration).toBeGreaterThan(0);
+    expect(effect?.duration).toBeLessThanOrEqual(250);
+    expect(effect?.fields.filter((field) => !["opacity", "transform", "offset", "computedOffset", "easing", "composite"].includes(field))).toEqual([]);
   }
-  expect(css).toContain("cubic-bezier(0.22, 1, 0.36, 1)");
-  expect(css).not.toMatch(/@keyframes cf-[^{]+\{[^}]*(?:width|height|top|left|margin|padding):/s);
-  expect(app).toContain("statusTextEl.dataset.motionKey");
-  expect(app).toContain('documentSurfaceEl.setAttribute("aria-busy", "true")');
+  await deliver([{ type: "meeting", meetingId: 7, title: "Fixture", current: null, history: [], transcript: [] }]);
+  expect(await page.$eval("#document-surface", (node) => node.hasAttribute("aria-busy"))).toBe(false);
 });
 
-test("motion remains brief and has a complete reduced-motion token override", () => {
-  expect(css).toContain("--cf-motion-quick: 160ms");
-  expect(css).toContain("--cf-motion-state: 200ms");
-  expect(css).toContain("--cf-motion-enter: 200ms");
-  const reduced = css.slice(css.lastIndexOf("@media (prefers-reduced-motion: reduce)"));
-  expect(reduced).toContain("--cf-motion-quick: 0ms");
-  expect(reduced).toContain("--cf-motion-state: 0ms");
-  expect(reduced).toContain("--cf-motion-enter: 0ms");
+test("reduced motion disables nonessential shell animation", async () => {
+  await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+  await deliver([]);
+  const durations = await page.$eval("#status-text", (node) =>
+    getComputedStyle(node).animationDuration.split(",").map((value) => parseFloat(value)));
+  expect(durations.every((seconds) => seconds <= 0.001)).toBe(true);
 });
 
-test("all four shipped dialogs share a symmetric open and close transition helper", () => {
-  const focus = readFileSync(join(import.meta.dir, "..", "public", "focus-trap.js"), "utf8");
-  const review = readFileSync(join(import.meta.dir, "..", "public", "review-panel.js"), "utf8");
-  expect(focus).toContain("function openDialog(root)");
-  expect(focus).toContain("function closeDialog(root, onClosed)");
-  expect(focus).toContain('root.dataset.motionState = "closing"');
-  for (const panel of ["providerPanelEl", "attendeePanelEl", "askPanelEl"]) {
-    expect(app).toContain(`window.closeDialog(${panel}`);
+test("all four dialog controls close on Escape and restore their trigger focus", async () => {
+  await deliver([{ type: "review", meetingId: 7, reviewId: "motion-review", transcriptVersionId: "motion-version",
+    status: "draft", items: [], attendees: [], transcript: { lines: [] } }]);
+  for (const [trigger, panel] of [["btn-settings", "provider-panel"], ["btn-attendees", "attendee-panel"],
+    ["btn-ask", "ask-panel"], ["btn-review", "review-panel"]]) {
+    if (!trigger || !panel) throw new TypeError("dialog fixture incomplete");
+    await page.$eval(`#${trigger}`, (node) => { if (node instanceof HTMLButtonElement) node.click(); });
+    expect(await page.$eval(`#${panel}`, (node) => node.hasAttribute("hidden"))).toBe(false);
+    const receipt = await page.evaluateHandle(({ panel, trigger }) => ({ done: new Promise<void>((resolve, reject) => {
+      const root = document.getElementById(panel);
+      if (!root) throw new TypeError("dialog missing");
+      const finish = () => {
+        if (!root.hidden || document.activeElement?.id !== trigger) return;
+        clearTimeout(timeout); observer.disconnect(); document.removeEventListener("focusin", finish); resolve();
+      };
+      const timeout = setTimeout(() => {
+        observer.disconnect(); document.removeEventListener("focusin", finish); reject(new Error(`dialog close timeout: ${panel}`));
+      }, 5000);
+      const observer = new MutationObserver(finish);
+      observer.observe(root, { attributes: true, attributeFilter: ["hidden"] });
+      document.addEventListener("focusin", finish);
+    }) }), { panel, trigger });
+    await page.keyboard.press("Escape");
+    await receipt.evaluate((receipt) => receipt.done);
+    await receipt.dispose();
   }
-  expect(review).toContain("window.closeDialog(panelEl");
-  expect(css).toContain('[data-motion-state="closing"]');
 });

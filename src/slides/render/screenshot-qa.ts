@@ -102,7 +102,9 @@ export async function captureStandaloneScreenshot(browser: Browser, options: Cap
     await page.setViewport({ width: options.viewport.width, height: options.viewport.height, deviceScaleFactor: 1 });
     await page.setContent(options.html, { waitUntil: "load", timeout: options.timeoutMs });
     const selectorId = options.slideId.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
-    await page.addStyleTag({ content: `html,body{margin:0!important;padding:0!important;width:${options.viewport.width}px!important;height:${options.viewport.height}px!important;min-height:0!important;overflow:hidden!important;display:block!important}.deck{position:fixed!important;left:0!important;top:0!important;width:1280px!important;height:720px!important;transform:scale(${options.viewport.scale})!important;transform-origin:top left!important}.slide{display:none!important;box-shadow:none!important}.slide[data-slide-id="${selectorId}"]{display:block!important}.controls,[data-presenter-notes]{display:none!important}` });
+    // This geometry-comparison surface owns scaling at .deck. Do not multiply
+    // it by a document's independent slides-grab viewport transform.
+    await page.addStyleTag({ content: `html,body{margin:0!important;padding:0!important;width:${options.viewport.width}px!important;height:${options.viewport.height}px!important;min-height:0!important;overflow:hidden!important;display:block!important}.deck{position:fixed!important;left:0!important;top:0!important;width:1280px!important;height:720px!important;transform:scale(${options.viewport.scale})!important;transform-origin:top left!important}.slide{display:none!important;box-shadow:none!important;transform:none!important}.slide[data-slide-id="${selectorId}"]{display:block!important}.controls,[data-presenter-notes]{display:none!important}` });
     const inspection = await bounded(page.evaluate(readyAndInspect, options.slideId, options.viewport.scale), options.timeoutMs, page);
     const png = new Uint8Array(await page.screenshot({ type: "png", captureBeyondViewport: false }));
     writeFileSync(pngPath, png);

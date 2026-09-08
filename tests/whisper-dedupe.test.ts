@@ -1,6 +1,27 @@
 import { describe, expect, test } from "bun:test";
 
-import { bigramSimilarity } from "../src/whisper.ts";
+import type { WhisperConfig } from "../src/config.ts";
+import { bigramSimilarity, WhisperStream, type TranscriptChunk } from "../src/whisper.ts";
+
+class DedupeHarness extends WhisperStream {
+  feed(text: string): TranscriptChunk[] {
+    const chunks: TranscriptChunk[] = [];
+    this.buf += `${text}\n`;
+    this.drain((chunk) => chunks.push(chunk));
+    return chunks;
+  }
+}
+
+const config: WhisperConfig = {
+  streamBin: "whisper-stream",
+  cliBin: "whisper-cli",
+  modelPath: "model.bin",
+  captureId: 0,
+  threads: 1,
+  stepMs: 3000,
+  diarize: false,
+  tdrzModelPath: "tdrz.bin",
+};
 
 describe("bigramSimilarity", () => {
   test("완전히 같은 문장은 1", () => {
@@ -41,5 +62,27 @@ describe("bigramSimilarity", () => {
   test("빈 문자열·한 글자는 0", () => {
     expect(bigramSimilarity("", "안녕")).toBe(0);
     expect(bigramSimilarity("가", "나")).toBe(0);
+  });
+});
+
+describe("overlapping whisper windows", () => {
+  test("a window that extends the previous sentence replaces it instead of appending", () => {
+    const whisper = new DedupeHarness(config);
+    expect(whisper.feed("오늘 회의는 출시 일정")).toEqual([]);
+    expect(whisper.feed("오늘 회의는 출시 일정부터 시작합니다.")).toEqual([
+      expect.objectContaining({ text: "오늘 회의는 출시 일정부터 시작합니다." }),
+    ]);
+  });
+
+  test("a longer revision replaces a shorter emitted prefix instead of being dropped", () => {
+    const whisper = new DedupeHarness(config);
+    const prefix = "오늘 회의에서 출시 일정과 마케팅 예산을 함께 정리합니다.";
+    const revision = "오늘 회의에서 출시 일정과 마케팅 예산을 함께 정리합니다만 배포는 금요일입니다.";
+    expect(whisper.feed(prefix)).toEqual([
+      expect.objectContaining({ text: prefix }),
+    ]);
+    expect(whisper.feed(revision)).toEqual([
+      expect.objectContaining({ text: revision }),
+    ]);
   });
 });

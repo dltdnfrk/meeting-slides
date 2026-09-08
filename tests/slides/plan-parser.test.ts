@@ -296,6 +296,22 @@ describe("parseSlidePlan source-bound contract", () => {
     expectContractError(payloadKey, /slides\[0\]\.payload\.rawColor.*not allowed/i);
   });
 
+  test("accepts a box override that stays on the 1280x720 canvas and rejects one that does not", () => {
+    const ok = clonePlan();
+    ok.slides[0]!.boxOverrides = [
+      { elementId: "slide-hero:title", box: { x: 120, y: 96, width: 500, height: 180 } },
+    ];
+    expect(parseSlidePlan(ok).slides[0]?.boxOverrides?.[0]?.box).toEqual({
+      x: 120, y: 96, width: 500, height: 180,
+    });
+
+    const overflow = clonePlan();
+    overflow.slides[0]!.boxOverrides = [
+      { elementId: "slide-hero:title", box: { x: 1200, y: 0, width: 200, height: 40 } },
+    ];
+    expectContractError(overflow, /boxOverrides/i);
+  });
+
   test("rejects unsupported schema versions", () => {
     const plan = clonePlan();
     (plan as { schemaVersion: number }).schemaVersion = 2;

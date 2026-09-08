@@ -2,6 +2,16 @@ import { toCssCustomProperties } from "../theme/css-tokens.ts";
 import type { StandaloneDeckInput } from "./standalone-types.ts";
 import type { EmbeddedResources } from "./standalone-resources.ts";
 
+const GRAB_VIEWPORT_MEDIA = "@media (width: 960px) and (height: 540px)";
+const LEGACY_GRAB_VIEWPORT_MEDIA =
+  `${GRAB_VIEWPORT_MEDIA} and (min-resolution: 1.3dppx) and (max-resolution: 1.4dppx)`;
+
+/** Adapt a verified legacy document only in the renderer's staging copy. */
+export function fitSlidesGrabViewport(html: string): string {
+  return html.replace(/<style>[\s\S]*?<\/style>/, stylesheet =>
+    stylesheet.replace(LEGACY_GRAB_VIEWPORT_MEDIA, GRAB_VIEWPORT_MEDIA));
+}
+
 export function escapeHtml(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
@@ -31,7 +41,7 @@ html, body { width: ${width}px; height: ${height}px; min-height: ${height}px; ov
 body[data-slides-grab] { display: block; padding: 0; }
 body[data-slides-grab] .deck { width: ${width}px; height: ${height}px; }
 body[data-slides-grab] .slide { display: block; box-shadow: none; }
-@media (width: 960px) and (height: 540px) and (min-resolution: 1.3dppx) and (max-resolution: 1.4dppx) {
+${GRAB_VIEWPORT_MEDIA} {
   body[data-slides-grab] .slide { transform: scale(.75); transform-origin: top left; }
 }`
     : "";
@@ -73,10 +83,13 @@ function elementHtml(element: StandaloneDeckInput["slides"][number]["geometry"][
     return `<div class="geometry-decoration" data-element-id="${escapeHtml(element.id)}" style="${base};color:${escapeHtml(color)}" role="presentation" aria-hidden="true"></div>`;
   }
   const size = element.fitTrace.finalFontSize;
+  const lineHeight = element.resolvedTokens.lineHeight;
+  const lineHeightCss = typeof lineHeight === "number" && Number.isFinite(lineHeight)
+    ? `;line-height:${px(lineHeight)}` : "";
   const color = typeof element.resolvedTokens.color === "string" ? `#${element.resolvedTokens.color}` : "inherit";
   const font = typeof element.resolvedTokens.font === "string" ? element.resolvedTokens.font : "inherit";
   const lines = element.lines.map((line) => `<span class="text-line">${escapeHtml(line)}</span>`).join("<br>");
-  return `<div class="geometry-text" data-element-id="${escapeHtml(element.id)}" style="${base};font-size:${px(size)};color:${escapeHtml(color)};font-family:${escapeHtml(font)}" role="${escapeHtml(element.accessibility.role)}" aria-label="${escapeHtml(element.accessibility.label)}">${lines}</div>`;
+  return `<div class="geometry-text" data-element-id="${escapeHtml(element.id)}" style="${base};font-size:${px(size)}${lineHeightCss};color:${escapeHtml(color)};font-family:${escapeHtml(font)}" role="${escapeHtml(element.accessibility.role)}" aria-label="${escapeHtml(element.accessibility.label)}">${lines}</div>`;
 }
 
 export function renderSlideSection(input: StandaloneDeckInput, resources: EmbeddedResources, index: number): string {

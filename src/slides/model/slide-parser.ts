@@ -1,3 +1,4 @@
+import { BoxOverrideError, parseBoxOverrides } from "../geometry/box-overrides.ts";
 import { array, exact, oneOf, record, stableId, text, unique, SlidePlanParseError } from "./parse-helpers.ts";
 import type { PlanSlide } from "./plan.ts";
 
@@ -132,12 +133,23 @@ export function validateSlides(
   array(value, "slides", true).forEach((slide, index) => {
     const path = `slides[${index}]`;
     const parsed = exact(slide, path,
-      ["id", "layout", "storyRole", "title", "payload", "bindings", "editorialPaths", "assetIds"], ["notes"]);
+      ["id", "layout", "storyRole", "title", "payload", "bindings", "editorialPaths", "assetIds"],
+      ["notes", "boxOverrides"]);
     ids.push(stableId(parsed.id, `${path}.id`));
     const layout = oneOf(parsed.layout, `${path}.layout`, LAYOUTS);
     oneOf(parsed.storyRole, `${path}.storyRole`, ROLES);
     text(parsed.title, `${path}.title`);
     if (parsed.notes !== undefined) text(parsed.notes, `${path}.notes`);
+    if (parsed.boxOverrides !== undefined) {
+      try {
+        parseBoxOverrides(parsed.boxOverrides, `${path}.boxOverrides`);
+      } catch (error) {
+        if (error instanceof BoxOverrideError) {
+          throw new SlidePlanParseError(error.path, error.message.replace(`${error.path}: `, ""));
+        }
+        throw error;
+      }
+    }
     const payloadPaths = parsePayload(layout, parsed.payload, `${path}.payload`);
     validateBindings(parsed.bindings, `${path}.bindings`, ["title", ...payloadPaths.factual], claimIds);
     const declared = array(parsed.editorialPaths, `${path}.editorialPaths`).map((item, itemIndex) =>

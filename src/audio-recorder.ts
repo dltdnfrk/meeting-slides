@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { spawn, type ChildProcess } from "node:child_process";
-import { closeSync, createReadStream, existsSync, openSync, readSync, rmSync, statSync, watch } from "node:fs";
-import { basename, dirname } from "node:path";
+import { closeSync, existsSync, openSync, readSync, rmSync, statSync } from "node:fs";
+import { basename } from "node:path";
 
 import type { MinutesStore } from "./minutes-store.ts";
 
@@ -13,6 +13,24 @@ export interface StoppedAudioRecording {
 
 export interface AudioRecorderHandle {
   stop(): Promise<StoppedAudioRecording>;
+}
+
+export interface AudioRetranscriptionLine {
+  capturedAtMs: number | null;
+  audioStartMs: number;
+  audioEndMs: number;
+  speakerTurn: number | null;
+  text: string;
+}
+
+export interface AudioRetranscription {
+  engine: string;
+  engineModel: string;
+  lines: readonly AudioRetranscriptionLine[];
+}
+
+export interface CanonicalAudioCaptureHandle extends AudioRecorderHandle {
+  retranscribe(recording: StoppedAudioRecording): Promise<AudioRetranscription>;
 }
 
 export function sha256File(path: string): string {
@@ -66,20 +84,39 @@ function removeIfPresent(path: string): void {
   if (existsSync(path)) rmSync(path, { force: true });
 }
 
+export function describeStoppedAudio(path: string): StoppedAudioRecording {
+  if (!existsSync(path)) throw new Error("audio recorder did not create output");
+  const stat = statSync(path);
+  const header = Buffer.alloc(4);
+  const fd = openSync(path, "r");
+  try {
+    readSync(fd, header, 0, header.length, 0);
+  } finally {
+    closeSync(fd);
+  }
+  if (stat.size <= 44 || header.toString("ascii") !== "RIFF") {
+    throw new Error("audio recorder output is not a valid WAV");
+  }
+  return { path, sha256: sha256File(path), byteLength: stat.size };
+}
+
 async function terminateRecorder(proc: ChildProcess): Promise<void> {
   if (proc.exitCode !== null || proc.signalCode !== null) return;
   await new Promise<void>((resolve) => {
     let settled = false;
+    let settleTimer: NodeJS.Timeout | undefined;
     const finish = () => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      clearTimeout(settleTimer);
       proc.off("close", finish);
       proc.off("error", finish);
       resolve();
     };
     const timer = setTimeout(() => {
       if (proc.exitCode === null && proc.signalCode === null) proc.kill("SIGKILL");
+      settleTimer = setTimeout(finish, 250);
     }, 5_000);
     proc.once("close", finish);
     proc.once("error", finish);
@@ -95,16 +132,18 @@ export class RawAudioRecorder implements AudioRecorderHandle {
   }): Promise<RawAudioRecorder> {
     removeIfPresent(input.outputPath);
     const targetName = basename(input.outputPath);
-    const { promise: outputCreated, resolve: created, reject: createFailed } = Promise.withResolvers<void>();
-    const watcher = watch(dirname(input.outputPath), (_event, filename) => {
-      if (filename === targetName && existsSync(input.outputPath)) created();
-    });
-    watcher.once("error", createFailed);
+    const { promise: outputCreated, resolve: created } = Promise.withResolvers<void>();
+    // fs.watch(FSEvents).close()가 macOS/bun에서 이벤트 루프를 5-10초 블록하는
+    // 스톨이 있어 폴링으로 대체한다. clearInterval은 항상 O(1)이라 종료 경로를
+    // 막지 않는다. stderr의 progress 라인이 1차 신호이고 폴링은 보조 신호다.
+    const pollTimer = setInterval(() => {
+      if (existsSync(input.outputPath)) created();
+    }, 150);
     let watcherClosed = false;
     const closeWatcher = () => {
       if (watcherClosed) return;
       watcherClosed = true;
-      watcher.close();
+      clearInterval(pollTimer);
     };
     const proc = spawn(input.bin, recorderArgs(input.bin, input.captureId, input.outputPath), {
       stdio: ["ignore", "ignore", "pipe"],
@@ -155,26 +194,8 @@ export class RawAudioRecorder implements AudioRecorderHandle {
 
   async stop(): Promise<StoppedAudioRecording> {
     try {
-      if (this.proc.exitCode === null && this.proc.signalCode === null) this.proc.kill("SIGTERM");
-      await new Promise<void>((resolve, reject) => {
-        if (this.proc.exitCode !== null || this.proc.signalCode !== null) return resolve();
-        const timer = setTimeout(() => {
-          this.proc.kill("SIGKILL");
-          reject(new Error("audio recorder did not stop within 5 seconds"));
-        }, 5_000);
-        this.proc.once("close", () => { clearTimeout(timer); resolve(); });
-        this.proc.once("error", (error) => { clearTimeout(timer); reject(error); });
-      });
-      if (!existsSync(this.outputPath)) throw new Error("audio recorder did not create output");
-      const stat = statSync(this.outputPath);
-      const header = Buffer.alloc(4);
-      const stream = createReadStream(this.outputPath, { start: 0, end: 3 });
-      let offset = 0;
-      for await (const chunk of stream) offset += (chunk as Buffer).copy(header, offset);
-      if (stat.size <= 44 || header.toString("ascii") !== "RIFF") {
-        throw new Error("audio recorder output is not a valid WAV");
-      }
-      return { path: this.outputPath, sha256: sha256File(this.outputPath), byteLength: stat.size };
+      await terminateRecorder(this.proc);
+      return describeStoppedAudio(this.outputPath);
     } catch (error) {
       removeIfPresent(this.outputPath);
       throw error;

@@ -10,10 +10,8 @@
 //   * a real ARIA tablist: roving tabindex, ArrowLeft/ArrowRight/Home/End,
 //     focus movement, and exactly one perceivable tabpanel at a time.
 //
-// It owns NO transport and NO meeting data: `app.js` keeps the WebSocket, the
-// rendering, the notes/history contract and every action payload spelling. This
-// module observes the frames `app.js` republishes and projects state onto the
-// shell. Nothing here renames a DOM ID, an action or a payload key.
+// It owns no socket or feature drafts. Injected callers supply server frames
+// and title/timer projections; classes and attributes are compatibility outputs.
 import {
   initialUiState,
   parseServerEvent,
@@ -26,6 +24,7 @@ import {
   reduceTranscript,
 } from "/generated/transcript-state.js";
 
+export function createOperatorSurface() {
 const app = document.querySelector(".app");
 
 // Expose the loaded modules for the browser QA driver. This is a read-only
@@ -39,6 +38,7 @@ window.__caretModules = {
 
 let uiState = initialUiState();
 let transcriptState = initialTranscriptState();
+let detailTab = "overview";
 
 const DETAIL_TABS = ["overview", "notes", "transcript"];
 
@@ -117,10 +117,11 @@ function handOffStartFocus() {
 /** Applies the reducer's projection to the shell's explicit state attributes. */
 function projectState() {
   if (!app) return;
-  const shellChanged = app.dataset.shell !== uiState.shell;
+  const shellChanged = lastDisclosureShell !== uiState.shell;
   app.dataset.uiState = uiState.name;
   app.dataset.capturePhase = uiState.capture;
   app.dataset.shell = uiState.shell;
+  app.classList.toggle("app--capturing", uiState.capture === "capturing" || uiState.capture === "stopping" || uiState.capture === "switching-model");
   const contextRail = document.getElementById("context-rail");
   if (contextRail) contextRail.hidden = uiState.shell !== "library";
   // `data-connection` on the document element belongs to app.js and keeps its
@@ -131,7 +132,7 @@ function projectState() {
   // Panel visibility depends on the shell, so re-apply it whenever the shell
   // flips. Focus is never moved by a state projection.
   if (shellChanged) {
-    setDetailTab(app.dataset.detailTab || "overview");
+    setDetailTab(detailTab);
     applyDockDisclosureDefault(uiState.shell);
   }
   // Focus is never moved BY a state projection; it is moved by the user's own
@@ -172,7 +173,7 @@ function ingestTransport(status) {
 
 // The shell is the only writer of these attributes, so `app.js` publishes into
 // it rather than setting them itself. Both scripts stay on the same state.
-window.__caretShell = {
+const controller = {
   ingestServerFrame,
   ingestTransport,
   /** Local activation of the record control (start or stop). */
@@ -186,9 +187,21 @@ window.__caretShell = {
   },
   /** The user picked a meeting: the reducer tracks which response is current. */
   selectMeeting(meetingId) {
+    transcriptState = reduceTranscript(transcriptState, { kind: "activateMeeting", meetingId });
     uiState = reduce(uiState, { kind: "selectMeeting", meetingId });
     projectState();
   },
+  activateMeeting(meetingId) {
+    transcriptState = reduceTranscript(transcriptState, { kind: "activateMeeting", meetingId });
+  },
+  resetMeeting() {
+    transcriptState = reduceTranscript(transcriptState, { kind: "reset" });
+    uiState = reduce(uiState, { kind: "returnToLibrary" });
+    projectState();
+  },
+  projectTitle,
+  projectTimer,
+  isCapturing: () => ["capturing", "stopping", "switching-model"].includes(uiState.capture),
   /** True when a `meeting` payload is still the one the user asked for. */
   isCurrentMeeting(meetingId) {
     return uiState.selectedMeetingId === null || uiState.selectedMeetingId === meetingId;
@@ -230,6 +243,7 @@ window.__caretShell = {
  */
 function setDetailTab(tab, { moveFocus = false } = {}) {
   if (!app || !DETAIL_TABS.includes(tab)) return;
+  detailTab = tab;
   app.dataset.detailTab = tab;
 
   // In the live shell the stage and the transcript are present together by
@@ -237,12 +251,7 @@ function setDetailTab(tab, { moveFocus = false } = {}) {
   // library-shell concern only; applying it in live would hide the transcript
   // column and remove it from the accessibility tree.
   //
-  // Live when EITHER the reducer says so or the legacy `.app--capturing` class is
-  // set (the compatibility signal a phase-less `capture` frame still produces).
-  // `bindCaptureClassBridge` re-applies this on every class flip, so the return
-  // to library re-hides the panels even though app.js clears the class after it
-  // has already forwarded the frame to this module.
-  const libraryShell = uiState.shell !== "live" && !app.classList.contains("app--capturing");
+  const libraryShell = uiState.shell !== "live";
 
   for (const name of DETAIL_TABS) {
     const button = document.getElementById(`detail-tab-${name}`);
@@ -295,7 +304,12 @@ function bindTablist() {
 // ── the output switcher reveals an existing surface ─────────────────────────
 
 function bindOutputSwitcher() {
-  const items = [...document.querySelectorAll(".output-switcher__item")];
+  // Dead-capability controls ship with `hidden` (live translation, transcript
+  // line edit, citation jump and the dock's duplicate of Review). A hidden item
+  // has no perceivable surface, so it gets no wiring and never participates in
+  // the switcher's aria-current bookkeeping.
+  const items = [...document.querySelectorAll(".output-switcher__item")]
+    .filter((item) => item instanceof HTMLElement && !item.hidden);
   for (const item of items) {
     item.addEventListener("click", (event) => {
       if (!(item instanceof HTMLElement) || item.matches(":disabled")) return;
@@ -324,27 +338,21 @@ function bindOutputSwitcher() {
 
 const recordBtn = document.getElementById("btn-record");
 const liveStop = document.getElementById("btn-live-stop");
-const captureTimer = document.getElementById("capture-timer");
 const liveTimer = document.getElementById("live-topbar-timer");
-const liveNote = document.getElementById("live-note");
-const notesInput = document.getElementById("notes-input");
 const chromeTitle = document.getElementById("meeting-chrome-title");
 const chromeDate = document.getElementById("meeting-chrome-date");
-const docTitle = document.getElementById("doc-title");
 
 liveStop?.addEventListener("click", () => {
-  if (recordBtn?.classList.contains("record-btn--on")) recordBtn.click();
+  if (["capturing", "switching-model", "stopping"].includes(uiState.capture)) recordBtn.click();
 });
 
-function syncTimers() {
-  if (liveTimer && captureTimer) {
-    liveTimer.textContent = captureTimer.textContent || "00:00";
-  }
+function projectTimer(text) {
+  if (liveTimer) liveTimer.textContent = text || "00:00";
 }
 
-function syncTitles() {
-  if (chromeTitle && docTitle) {
-    const text = (docTitle.textContent || "").trim();
+function projectTitle(value) {
+  if (chromeTitle) {
+    const text = (value || "").trim();
     chromeTitle.textContent = text && text !== "새 회의 준비" ? text : "Untitled";
   }
   if (chromeDate) {
@@ -356,68 +364,14 @@ function syncTitles() {
   }
 }
 
-// Notes mirror: the live scratch note and #notes-input hold the same text, so
-// the existing note-save and history contract keeps exactly one source.
-let noteSyncing = false;
-function bindNoteMirror() {
-  if (!liveNote || !notesInput) return;
-  liveNote.addEventListener("input", () => {
-    if (noteSyncing) return;
-    noteSyncing = true;
-    notesInput.value = liveNote.value;
-    notesInput.dispatchEvent(new Event("input", { bubbles: true }));
-    noteSyncing = false;
-  });
-  notesInput.addEventListener("input", () => {
-    if (noteSyncing) return;
-    noteSyncing = true;
-    liveNote.value = notesInput.value;
-    noteSyncing = false;
-  });
-}
-
-/**
- * Legacy compatibility: `.app--capturing` remains the class `app.js` toggles and
- * `public/operator-surface.js` reads. When it flips, the shell follows: entering
- * capture shows Overview, leaving it returns to the library document.
- */
-function bindCaptureClassBridge() {
-  if (!app) return;
-  let wasCapturing = app.classList.contains("app--capturing");
-  const observer = new MutationObserver(() => {
-    const capturing = app.classList.contains("app--capturing");
-    if (capturing !== wasCapturing) {
-      wasCapturing = capturing;
-      // Re-apply panel visibility in BOTH directions: entering live reveals the
-      // stage and transcript together, leaving it restores the one-panel library
-      // document. Focus is never moved by this bookkeeping.
-      setDetailTab(capturing ? "overview" : app.dataset.detailTab || "overview");
-      // A phase-less `capture` frame flips the shell through this class alone.
-      // `applyDockDisclosureDefault` de-duplicates against the shell it last
-      // applied, so the ordinary `starting` -> `capturing` sequence (which has
-      // already moved the shell to `live`) leaves the user's own toggle intact.
-      applyDockDisclosureDefault(capturing ? "live" : "library");
-    }
-    syncTimers();
-    syncTitles();
-  });
-  observer.observe(app, { attributes: true, attributeFilter: ["class"] });
-  if (captureTimer) {
-    observer.observe(captureTimer, { childList: true, characterData: true, subtree: true });
-  }
-  if (docTitle) {
-    observer.observe(docTitle, { childList: true, characterData: true, subtree: true });
-  }
-}
-
 // ── boot ────────────────────────────────────────────────────────────────────
 
 bindTablist();
 bindOutputSwitcher();
-bindNoteMirror();
-bindCaptureClassBridge();
-syncTitles();
-syncTimers();
-setDetailTab(app?.dataset.detailTab || "overview");
+projectTitle("");
+projectTimer("00:00");
+setDetailTab(detailTab);
 applyDockDisclosureDefault(uiState.shell);
 projectState();
+return Object.freeze(controller);
+}

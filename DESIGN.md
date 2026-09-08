@@ -114,6 +114,16 @@ All spacing derives from 4px.
 - **Motion**: none
 - **Layout**: typography-first summary with a blue rule
 
+### SlidePlan geometry canvas
+
+- **Structure**: `[data-slide-plan-paper][data-canvas=true] > [data-slide-plan-canvas] > .slide-plan-canvas__surface > button.slide-plan-canvas__el` plus eight `[data-resize-handle]` grips only when exactly one box is selected
+- **Job**: expose compiled geometry boxes on the 1280×720 paper so a title or body can be dragged, resized, nudged, multi-selected, and edited in place. This is not HTML-source editing.
+- **States**: idle (hairline transparent), selected (`--deck-coral` border; grips only for a single selection), multi-selected (coral, no grips), dragging (grabbing cursor, coral border), resizing (handle cursor, coral border), marquee (dashed coral), keyboard focus (`--deck-focus` ring)
+- **Motion**: pointer tracking only. No travel/spring. `prefers-reduced-motion` disables any opacity transition. Shift-click toggles membership; empty-paper drag marquees; a pointerdown on an already-selected member keeps the group. Arrow keys nudge 1px; Shift+Arrow nudges 8px. Group translate is clamped as one unit.
+- **Accessibility**: each element is a button; selected state is `aria-selected`. Grips are `aria-hidden`. Double-click edits text through `setText` with claim IDs. One box persists through `setBox`; a group drag or nudge persists through one `setBoxes` revision. Refine/`onSelect` run only when exactly one box is selected.
+- **Text editing**: double-click temporarily replaces the selected button with a labelled textarea at the same box. Enter or blur commits through `setText`; Shift+Enter preserves a line break. While editing, arrow keys move the text cursor and recording shortcuts do not run. The button returns after editing.
+- **Refine**: selecting a bound field enables `[data-slide-refine]`. The server rewrites that field from evidence quotes only and returns a before/after proposal. Apply is `setText`; it never writes model HTML.
+
 ## 6. Motion & Interaction
 
 | Type | Duration | Easing | Usage |
@@ -231,6 +241,11 @@ Compatibility rules:
   never means capture stopped: `reconnecting` keeps the last known capture phase and content.
 - Persisted layout keys `workspace.layout.v1` (`leftPx`, `rightPx`) and
   `workspace.transcript.v1` (`heightPx`) keep their names and payload keys.
+- SlidePlan draft/final labels project the normalized durable publication state; local copy or a
+  supplied Review ID never establishes finality. New writes use schema v2 (`schemaVersion: 2`),
+  legacy schema v1 is immutable read-only input, and `publication_seq` is the sole recency source.
+  The confirmed Review receipt and directory/path contract are specified in
+  [`docs/ppt-harness.md`](docs/ppt-harness.md#persisted-publication-contract).
 
 ### 9.4 Visual hierarchy
 
@@ -272,6 +287,14 @@ Measured reference values from task-1. These are semantic roles, not a palette t
 Color rules: no TIRO brown or beige, no purple AI glow, no iridescent or chromatic gradient,
 no gradient text, no category rainbow. Status is never carried by color alone; every colored
 state also carries text or an icon shape.
+
+- The Review overlay is strictly monochrome in its resting and selected states. Decision,
+  action, and open-item identity comes from the visible kind label plus neutral border
+  tone/style, never coral/blue/yellow category colors. Review completion, retry, expanded
+  state, and close affordances also stay neutral; recording/destructive red is reserved for
+  actual recording, destructive hover/confirm, and real errors.
+- Keyboard focus uses the dedicated neutral `--focus-ring` token. It never borrows the
+  recording/destructive color.
 
 Radius steps, measured (`radiusSteps`): `2px`, `6px`, `10px`, `14px`, `16px`, `24px`, `32px`,
 plus a fully round capsule step. The reference's `3.35544e+07px` pill value maps to the

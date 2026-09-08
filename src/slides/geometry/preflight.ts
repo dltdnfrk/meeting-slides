@@ -1,4 +1,5 @@
 import { deepFreeze } from "../theme/immutable.ts";
+import type { LayoutBox } from "../layouts/contract.ts";
 import type {
   AllowedOverlap,
   CompileIssue,
@@ -22,11 +23,18 @@ function boundaryPath(
   return null;
 }
 
+function boxesIntersect(
+  left: Readonly<{ x: number; y: number; width: number; height: number }>,
+  right: Readonly<{ x: number; y: number; width: number; height: number }>,
+): boolean {
+  return left.x < right.x + right.width &&
+    right.x < left.x + left.width &&
+    left.y < right.y + right.height &&
+    right.y < left.y + left.height;
+}
+
 function intersects(left: GeometryElement, right: GeometryElement): boolean {
-  return left.box.x < right.box.x + right.box.width &&
-    right.box.x < left.box.x + left.box.width &&
-    left.box.y < right.box.y + right.box.height &&
-    right.box.y < left.box.y + left.box.height;
+  return boxesIntersect(left.box, right.box);
 }
 
 function samePair(pair: readonly string[], left: string, right: string): boolean {
@@ -45,9 +53,15 @@ function permitsDecorativeOverlap(
     entry.purpose === "decorative" && samePair(entry.elementIds, left.id, right.id));
 }
 
+export interface AssetRect {
+  readonly id: string;
+  readonly box: LayoutBox;
+}
+
 export function preflightGeometrySlide(
   compiled: GeometryCompileResult,
   options: GeometryPreflightOptions = {},
+  assetRects: readonly AssetRect[] = [],
 ): GeometryPreflightResult {
   const issues: CompileIssue[] = [...compiled.issues];
   const elements = compiled.slide.elements;
@@ -77,6 +91,19 @@ export function preflightGeometrySlide(
         path: `elements[${leftIndex}].box`,
         elementIds: [left.id, right.id],
         message: "intersecting element boxes require an explicit decorative overlap declaration",
+      });
+    }
+  }
+
+  for (const [assetIndex, assetRect] of assetRects.entries()) {
+    for (const element of elements) {
+      if (!boxesIntersect(assetRect.box, element.box)) continue;
+      issues.push({
+        code: "undeclared-intersection",
+        severity: "error",
+        path: `assets[${assetIndex}].box`,
+        elementIds: [assetRect.id, element.id],
+        message: "asset box intersects a text element box",
       });
     }
   }

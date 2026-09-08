@@ -2,12 +2,8 @@
 //
 // Two layers of assertions live here:
 //
-//   1. Characterization of the CURRENT visible state seams in the shipped
-//      `public/app.js`. Today the operator surface has no canonical state: it
-//      keeps a handful of mutable module-scope flags and derives everything the
-//      user can see from them. These tests pin that reality (machine-consumed
-//      identifiers only, never prose) so the reducer is provably replacing a
-//      real seam rather than an imagined one.
+//   1. Characterization of machine-consumed state projections, independent of
+//      the source file or local variables used by the browser controllers.
 //
 //   2. The canonical reducer contract itself: every named UI state, the whole
 //      transition table, typed parse failures at the boundary, determinism,
@@ -19,6 +15,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import type { ServerMessage } from "../src/protocol.ts";
 
 import {
   initialUiState,
@@ -31,7 +28,6 @@ import {
 } from "../public/ui-state-machine.ts";
 
 const root = join(import.meta.dir, "..");
-const appSource = readFileSync(join(root, "public/app.js"), "utf8");
 
 // ── deterministic fixture data (no clock, no randomness) ────────────────────
 
@@ -117,43 +113,45 @@ function live(): UiState {
   ]);
 }
 
-// ── 1. characterization of the current app.js seams ────────────────────────
+// ── 1. machine-consumed state projections ──────────────────────────────────
 
-describe("current public/app.js visible state seams", () => {
-  test("capture visibility is a bare mutable boolean, not a named state", () => {
-    expect(appSource).toContain("let capturing = false;");
-    expect(appSource).toContain('appEl.classList.add("app--capturing")');
-    // No canonical state name is written anywhere in the shipped client today.
-    expect(appSource).not.toContain("capture-starting");
-    expect(appSource).not.toContain("idle-library");
+describe("visible state projections", () => {
+  test("an authoritative live capture projects its phase, shell and timer origin", () => {
+    const state = run([serverEvent(CAPTURE_LIVE)], online());
+    expect({ capture: state.capture, shell: state.shell, startedAt: state.captureStartedAt })
+      .toEqual({ capture: "capturing", shell: "live", startedAt: T0 - 125_000 });
   });
 
-  test("hydration, selection, preview and job seams are separate mutable flags", () => {
-    for (const seam of [
-      "let awaitingInitialCaptureState = true;",
-      "let selectedMeetingId = null;",
-      "let viewingHistory = null;",
-      "let viewingCompiled = false;",
-      "let activeJobId = null;",
-      "let jobControlsBusy = false;",
-    ]) {
-      expect(appSource).toContain(seam);
-    }
+  test("hydration does not invent a selection, preview or active job", () => {
+    const state = online();
+    expect({ hydrated: state.hydrated, selected: state.selectedMeetingId, preview: state.preview, job: state.activeJobId })
+      .toEqual({ hydrated: true, selected: null, preview: null, job: null });
   });
 
-  test("connection is projected onto a data attribute with four literal values", () => {
-    for (const value of ["connecting", "connected", "disconnected", "error"]) {
-      expect(appSource).toContain(`dataset.connection = "${value}"`);
-    }
+  test("transport signals project distinct machine connection values", () => {
+    const signals = ["connecting", "open", "closed", "error"] as const;
+    const states = signals.map((status) => reduce(live(), { kind: "transport", status }).connection);
+    expect(states).toEqual(["connecting", "connecting", "reconnecting", "error"]);
   });
 
-  test("stale job and stale meeting responses are dropped inline, per call site", () => {
-    expect(appSource).toContain("if (activeJobId && msg.jobId && msg.jobId !== activeJobId) return;");
-    expect(appSource).toContain("if (msg.meetingId !== selectedMeetingId) return;");
+  test("out-of-order meeting and job responses cannot replace the selected work", () => {
+    const running = run([
+      { kind: "selectMeeting", meetingId: 102 },
+      serverEvent(MEETING_102),
+      serverEvent({ type: "compile", status: "started", jobId: COMPILE_JOB, meetingId: 102 }),
+    ], online());
+    const stale = run([
+      serverEvent(MEETING_101),
+      serverEvent({ type: "compile", status: "success", jobId: "compile-old", meetingId: 101 }),
+    ], running);
+    expect({ selected: stale.selectedMeetingId, loaded: stale.loadedMeetingId, job: stale.activeJobId })
+      .toEqual({ selected: 102, loaded: 102, job: COMPILE_JOB });
   });
 
-  test("malformed frames are swallowed by a catch that only logs", () => {
-    expect(appSource).toContain('console.error("parse error", e);');
+  test("malformed traffic produces a typed protocol error without ending capture", () => {
+    const state = reduce(live(), { kind: "malformed", reason: "INVALID_FRAME" });
+    expect({ capture: state.capture, error: state.lastError })
+      .toEqual({ capture: "capturing", error: { scope: "protocol", reason: "INVALID_FRAME" } });
   });
 });
 
@@ -216,6 +214,13 @@ describe("reducer purity", () => {
 // ── 3. parse boundary ───────────────────────────────────────────────────────
 
 describe("parse boundary", () => {
+  test("a valid refine response leaves capture, selection and job state untouched", () => {
+    const before = live();
+    const frame = { type: "refine", requestId: "refine-contract", slideId: "s1", path: "title",
+      before: "BEFORE", after: "AFTER", claimIds: [] } satisfies ServerMessage;
+    expect(reduce(before, serverEvent(frame))).toEqual(before);
+  });
+
   test("accepts every server message type the protocol declares", () => {
     const contract = JSON.parse(
       readFileSync(join(root, "tests/fixtures/public-protocol-contract.json"), "utf8"),

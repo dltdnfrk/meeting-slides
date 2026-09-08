@@ -11,6 +11,7 @@ export const PIPELINE_PHASES = Object.freeze([
 ] as const);
 export type PipelinePhase = typeof PIPELINE_PHASES[number];
 export type PipelineArtifactFormat = "standalone-html" | "editable-pptx" | "raster-png-pdf";
+export type SlidePlanPublicationStatus = "draft" | "final";
 
 export interface PipelineProgressEvent {
   readonly phase: PipelinePhase;
@@ -79,6 +80,7 @@ export interface RunSlidePlanPipelineInput {
   readonly preflight: GeometryPreflightOptions;
   readonly stagingDirectory: string;
   readonly finalDirectory: string;
+  readonly confirmedReviewConfirmedAt?: number;
   readonly publishers: Readonly<{
     standalone: PipelineArtifactPublisher;
     pptx: PipelineArtifactPublisher;
@@ -98,18 +100,57 @@ export interface PublishedArtifact {
   readonly files: readonly PublishedArtifactFile[];
 }
 
-export interface SlidePlanPublicationManifest {
-  readonly schemaVersion: 1;
+export interface SlidePlanFinalityReceipt {
+  readonly reviewId: string;
+  readonly confirmedAt: number;
+  readonly transcriptVersionId: string;
+  readonly contentSha256: string;
+  readonly reviewedItemIds: readonly string[];
+}
+
+interface SlidePlanPublicationManifestFields {
   readonly identity: PipelineIdentity;
   readonly planSha256: string;
   readonly assetManifestSha256: string;
   readonly artifacts: readonly PublishedArtifact[];
 }
 
-export interface SlidePlanPublicationResult extends SlidePlanPublicationManifest {
+export type SlidePlanPublicationManifestV1 = SlidePlanPublicationManifestFields & {
+  readonly schemaVersion: 1;
+  readonly publicationStatus?: SlidePlanPublicationStatus;
+  readonly finalityReceipt?: never;
+};
+
+export type SlidePlanPublicationManifestV2 = SlidePlanPublicationManifestFields & (
+  | {
+    readonly schemaVersion: 2;
+    readonly publicationStatus: "draft";
+    readonly finalityReceipt?: never;
+  }
+  | {
+    readonly schemaVersion: 2;
+    readonly publicationStatus: "final";
+    readonly finalityReceipt: SlidePlanFinalityReceipt;
+  }
+);
+
+export type SlidePlanPublicationManifest =
+  | SlidePlanPublicationManifestV1
+  | SlidePlanPublicationManifestV2;
+
+export type NormalizedSlidePlanPublicationManifest = SlidePlanPublicationManifestFields & (
+  | {
+    readonly schemaVersion: 1;
+    readonly publicationStatus: SlidePlanPublicationStatus;
+    readonly finalityReceipt?: never;
+  }
+  | SlidePlanPublicationManifestV2
+);
+
+export type SlidePlanPublicationResult = SlidePlanPublicationManifestV2 & {
   readonly directory: string;
   readonly assetManifest: AssetManifest;
   readonly planJson: string;
   readonly manifestJson: string;
   readonly publicationSha256: string;
-}
+};

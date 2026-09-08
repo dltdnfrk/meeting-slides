@@ -19,6 +19,7 @@ import {
   RasterExportError,
   type RasterSlideDocument,
 } from "../../src/slides/render/raster-export.ts";
+import { validateRasterRequest } from "../../src/slides/render/raster-export-validation.ts";
 
 const TIMEOUT_MS = 120_000;
 const PLAYWRIGHT_BROWSERS_PATH = process.env.PLAYWRIGHT_BROWSERS_PATH
@@ -65,6 +66,34 @@ afterEach(() => {
 });
 
 describe("product-owned deterministic raster export", () => {
+  test("accepts stable plan ids without a slide- prefix", () => {
+    // Given: a verified document named after a legal stable slide ID.
+    root = mkdtempSync(join(tmpdir(), "meeting-slides-raster-stable-id-"));
+    const valid = document("hero-1", "#fff");
+
+    // When: the raster request is validated.
+    const validate = () => validateRasterRequest({
+      identity: {
+        planId: "plan-stable-id",
+        deckId: "deck-stable-id",
+        slideIds: ["hero-1"],
+        geometryIds: ["geometry-hero-1"],
+      },
+      documents: [valid],
+      output: output(root),
+      tools: {
+        slidesGrabPath: SLIDES_GRAB_PATH,
+        playwrightBrowsersPath: PLAYWRIGHT_BROWSERS_PATH,
+        sandboxExecutable: "/usr/bin/sandbox-exec",
+        sandboxProfile: SANDBOX_PROFILE,
+      },
+      timeoutMs: TIMEOUT_MS,
+    });
+
+    // Then: the stable ID is accepted without a slide- filename prefix.
+    expect(validate).not.toThrow();
+  });
+
   test("uses real slides-grab PNG bytes once and publishes hash-bound PNG, PDF, manifest, and receipt atomically", async () => {
     expect(PLAYWRIGHT_BROWSERS_PATH).not.toBe("");
     root = mkdtempSync(join(tmpdir(), "meeting-slides-raster-export-"));

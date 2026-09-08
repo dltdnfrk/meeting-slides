@@ -1,10 +1,10 @@
 import { buildDeckHtml, buildSlideFiles, renderSlideSpec, type DeckInput, type SlideFile } from "./deck.js";
-import { renderSceneSlideDocument } from "./scene-html.js";
-import { scenePublication } from "./scene-store.js";
+import { openVerifiedPublication } from "./publication-reader.ts";
+import { SlidePlanStore } from "./slide-plan-store.ts";
 import type { DeckOutline, SlideSpec } from "./slide-spec.js";
 import type { MeetingStore } from "./store.js";
 
-export type ExportDeckSource = "scene" | "compiled" | "legacy";
+export type ExportDeckSource = "slideplan" | "compiled" | "legacy";
 
 export interface ExportDeckMaterial {
   source: ExportDeckSource;
@@ -15,6 +15,17 @@ export interface ExportDeckMaterial {
   slideCount: number;
   maxBullets: number;
   lineCount: number;
+}
+
+export interface PrepareExportDeckOptions {
+  readonly requireSlidePlan?: boolean;
+}
+
+export class SlidePlanRequiredError extends Error {
+  constructor() {
+    super("A SlidePlan publication is required before PDF or PNG export");
+    this.name = "SlidePlanRequiredError";
+  }
 }
 
 function escapeHtml(value: string): string {
@@ -63,36 +74,37 @@ ${sections}
 </html>\n`;
 }
 
-/** Prefer only a successfully published compile; an uncompiled or failed compile explicitly falls back to live history. */
-export function prepareExportDeck(store: MeetingStore, meetingId: number): ExportDeckMaterial {
+/**
+ * 최신 SlidePlan 발행(standalone HTML 슬라이드)을 가장 우선하고,
+ * 없으면 성공한 컴파일 → 라이브 기록 순으로 폴백한다.
+ */
+export function prepareExportDeck(
+  store: MeetingStore,
+  meetingId: number,
+  options: PrepareExportDeckOptions = {},
+): ExportDeckMaterial {
   const meeting = store.meeting(meetingId);
   if (meeting === null) throw new Error(`Meeting ${meetingId} was not found`);
   const lines = store.lines(meetingId);
-  const publication = scenePublication(store.databaseHandle(), meetingId);
-  if (publication !== null) {
-    const files = publication.scene.slides.map((slide, index) => ({
-      filename: `slide-${String(index).padStart(2, "0")}.html`,
-      html: renderSceneSlideDocument(slide),
+  const slidePlan = new SlidePlanStore(store.databaseHandle()).latest(meetingId);
+  if (slidePlan !== null) {
+    const publication = openVerifiedPublication(slidePlan, slidePlan.plan.planId);
+    const files = slidePlan.plan.slides.map((slide) => ({
+      filename: `${slide.id}.html`,
+      html: publication.read(`standalone/slides/${slide.id}.html`).bytes.toString("utf8"),
     }));
     return {
-      source: "scene",
+      source: "slideplan",
       meetingId,
-      title: publication.scene.title,
-      indexHtml: buildCompiledDeckHtml({
-        meetingId,
-        title: publication.scene.title,
-        style: "scene-graph",
-        slides: publication.narrative.slides.map((slide) => ({
-          kind: "cover",
-          title: slide.title,
-        })),
-      }, files),
+      title: slidePlan.plan.title,
+      indexHtml: publication.read("standalone/index.html").bytes.toString("utf8"),
       files,
       slideCount: files.length,
       maxBullets: 0,
       lineCount: lines.length,
     };
   }
+  if (options.requireSlidePlan) throw new SlidePlanRequiredError();
   const compiled = store.deckOutline(meetingId);
   if (compiled !== null && compiled.publishedAt !== null) {
     const files = compiled.outline.slides.map(renderSlideSpec);

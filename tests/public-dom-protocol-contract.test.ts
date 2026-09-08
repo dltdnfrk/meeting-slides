@@ -1,17 +1,88 @@
 // Locks the machine-consumed DOM and wire-protocol surface of the shipped client.
-// Parses the real public/index.html, public/*.js and src/session.ts — never a copy —
+// Reads the shipped DOM/client and checks the public wire types — never a copy —
 // so a duplicated binding ID, a moved #current-slide, a renamed payload key, or a
 // removed server message type fails here before it reaches a browser test.
 // Only machine-consumed names are asserted. No prose, copy, or CSS wording is pinned.
-import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { afterAll, beforeAll, describe, expect, expectTypeOf, test } from "bun:test";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { rm } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { tmpdir } from "node:os";
+import puppeteer, { type Browser, type Page } from "puppeteer";
+import { createPublicTestHarness, type PublicTestHarness } from "./public-test-harness.ts";
+import { startMeetingServer, bounded } from "./helpers/meeting-server.ts";
+import { KNOWN_MESSAGE_TYPES, type KnownMessageType } from "../public/protocol-values.ts";
+import { initialUiState, parseServerEvent, reduce } from "../public/ui-state-machine.ts";
+import { initialTranscriptState, parseTranscriptEvent, reduceTranscript } from "../public/transcript-state.ts";
+import { MeetingSession } from "../src/session.ts";
+import type {
+  ClientAction, ClientListener, CompileJobId, ExportJobId, MeetingDetailUpdate,
+  ServerMessage, CaptureUpdate, CapturePhase, TranscriptUpdate,
+} from "../src/protocol.ts";
+import type * as LegacySession from "../src/session.ts";
 
 import domContract from "./fixtures/public-dom-contract.json" with { type: "json" };
 import protocolContract from "./fixtures/public-protocol-contract.json" with { type: "json" };
 
 const root = join(import.meta.dir, "..");
 const read = (relative: string): string => readFileSync(join(root, relative), "utf8");
+
+// Follow actual ESM imports, including root-relative browser specifiers and cycles.
+function shippedScriptGraph(): Map<string, string> {
+  const sources = new Map<string, string>();
+  const scanner = new Bun.Transpiler({ loader: "js" });
+  const visit = (path: string) => {
+    if (sources.has(path)) return;
+    const code = read(path);
+    sources.set(path, code);
+    for (const entry of scanner.scan(code).imports) {
+      const specifier = entry.path;
+      if (specifier.startsWith("/")) visit(join("public", specifier.slice(1)));
+      else if (specifier.startsWith(".")) visit(join(dirname(path), specifier));
+      else throw new Error(`Unshipped browser dependency: ${specifier}`);
+    }
+  };
+  for (const match of read(domContract.documents.html).matchAll(/<script\b[^>]*\ssrc="\/([^"]+)"/g)) {
+    visit(`public/${match[1]}`);
+  }
+  return sources;
+}
+const scriptGraph = shippedScriptGraph();
+let browser: Browser;
+beforeAll(async () => { browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox"] }); });
+afterAll(async () => { await browser?.close(); });
+
+async function withPublicPage(run: (page: Page, harness: PublicTestHarness) => Promise<void>) {
+  const harness = createPublicTestHarness();
+  const page = await browser.newPage();
+  try {
+    await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+    await page.goto(harness.origin, { waitUntil: "load" });
+    await bounded(harness.clientConnected, "public socket");
+    await run(page, harness);
+  } finally { await page.close(); harness.stop(); }
+}
+
+// One socket's status sentinel fences all preceding frames; subscribe before send.
+async function deliver(page: Page, harness: PublicTestHarness, ...frames: ServerMessage[]) {
+  const marker = `contract-receipt-${harness.sentSequence}`;
+  const receipt = await page.evaluateHandle((marker) => ({ done: new Promise<void>((resolve, reject) => {
+    const node = document.getElementById("status-text");
+    if (!node) throw new Error("status surface missing");
+    const timeout = setTimeout(() => { observer.disconnect(); reject(new Error(marker)); }, 5000);
+    const observer = new MutationObserver(() => {
+      if (node.textContent !== marker) return;
+      clearTimeout(timeout); observer.disconnect(); resolve();
+    });
+    observer.observe(node, { childList: true, characterData: true, subtree: true });
+  }) }), marker);
+  try {
+    for (const frame of frames) harness.pushMessage(frame);
+    harness.pushMessage({ type: "status", text: marker });
+    await receipt.evaluate((receipt) => receipt.done);
+  } finally { await receipt.dispose(); }
+}
+
 
 interface IdSpec {
   readonly id: string;
@@ -90,6 +161,23 @@ for (const element of elements) {
 const idSpecs = domContract.uniqueIds as readonly IdSpec[];
 
 describe("shipped DOM contract", () => {
+  test("the real public ESM graph loads and both generated parsers accept refine", async () => {
+    await withPublicPage(async (page, harness) => {
+      const result = await page.evaluate(async (paths) => {
+        const [protocol, ui, transcript] = await Promise.all(paths.map((path) => import(path)));
+        const frame = { type: "refine", requestId: "refine-contract", slideId: "s1", path: "title",
+          before: "BEFORE", after: "AFTER", claimIds: [] };
+        return { types: protocol.KNOWN_MESSAGE_TYPES,
+          ui: ui.parseServerEvent(frame), transcript: transcript.parseTranscriptEvent(frame) };
+      }, ["/generated/protocol-values.js", "/generated/ui-state-machine.js", "/generated/transcript-state.js"]);
+      const accepted = { ok: true, event: { kind: "server", message: "other", type: "refine" } };
+      expect(result).toEqual({ types: KNOWN_MESSAGE_TYPES, ui: accepted, transcript: accepted });
+      for (const module of domContract.documents.modules) {
+        expect(harness.servedPaths).toContain(module.replace(/^public/, ""));
+      }
+    });
+  });
+
   test("the manifest itself lists each binding id exactly once", () => {
     // Guards the fixture against a duplicated entry, which would otherwise
     // collapse silently in any id-keyed comparison below.
@@ -104,6 +192,46 @@ describe("shipped DOM contract", () => {
       count: byId.get(spec.id)?.length ?? 0,
     }));
     expect(occurrences).toEqual(idSpecs.map((spec) => ({ id: spec.id, count: 1 })));
+  });
+
+  test("the final rebuild decision keeps its frozen semantic ids and control types", () => {
+    expect([
+      byId.get("slide-final-rebuild-dialog")?.[0],
+      byId.get("btn-slide-final-rebuild-cancel")?.[0],
+      byId.get("btn-slide-final-rebuild-confirm")?.[0],
+    ].map((node) => node === undefined ? null : {
+      id: node.id,
+      tag: node.tag,
+      type: node.type,
+      role: node.role,
+    })).toEqual([
+      { id: "slide-final-rebuild-dialog", tag: "section", type: undefined, role: "dialog" },
+      { id: "btn-slide-final-rebuild-cancel", tag: "button", type: "button", role: undefined },
+      { id: "btn-slide-final-rebuild-confirm", tag: "button", type: "button", role: undefined },
+    ]);
+  });
+
+  test("compile control updates its accessible purpose for a confirmed review", async () => {
+    await withPublicPage(async (page, harness) => {
+      await deliver(page, harness, messageSamples.capture, { type: "meetings", items: [
+        { id: 7, title: "MEETING", started_at: 1, status: "ended" },
+      ] });
+      const selected = harness.nextClientMessage();
+      await page.click('.session-row[data-meeting-id="7"]');
+      expect(await selected).toEqual({ action: "selectMeeting", meetingId: 7 });
+      await deliver(page, harness, messageSamples.meeting);
+      const readControl = () => page.$eval("#btn-compile-deck", (node) => ({
+        text: node.textContent, label: node.getAttribute("aria-label"), title: node.getAttribute("title"),
+      }));
+      const draft = await readControl();
+      await deliver(page, harness, messageSamples.reviewConfirmed);
+      const final = await readControl();
+      expect(final.text).not.toBe(draft.text);
+      expect(final.label).not.toBe(draft.label);
+      expect(final.label).toBe(final.title);
+      expect(final.label?.length).toBeGreaterThan(0);
+      expect(await page.$$("#btn-compile-deck")).toHaveLength(1);
+    });
   });
 
   test("no id in the shipped HTML is duplicated at all", () => {
@@ -154,21 +282,18 @@ describe("shipped DOM contract", () => {
     expect(violations).toEqual([]);
   });
 
-  test("shipped HTML loads every contract script exactly once", () => {
-    // Matches any <script> that carries a src, whatever other attributes it
-    // declares first (`type="module"`, `defer`, ...). Only the src identity and
-    // its multiplicity are contracted; the loading mode is not.
+  test("HTML entries and their reachable ESM graph load every contract module", () => {
     const loaded = [...html.matchAll(/<script\b[^>]*\ssrc="\/([^"]+)"/g)].map((match) => `public/${match[1]}`);
-    for (const script of domContract.documents.scripts) {
-      expect({ script, count: loaded.filter((entry) => entry === script).length })
-        .toEqual({ script, count: 1 });
-    }
+    expect(loaded).toEqual(domContract.documents.scripts);
+    expect([...html.matchAll(/<script\b[^>]*type="module"[^>]*src="\/([^"]+)"/g)]
+      .map((match) => `public/${match[1]}`)).toEqual([domContract.documents.moduleEntrypoint]);
+    for (const module of domContract.documents.modules) expect(scriptGraph.has(module)).toBe(true);
+    for (const module of protocolContract.documents.clientScripts) expect(scriptGraph.has(module)).toBe(true);
+    expect([...scriptGraph.keys()].filter((path) => path.endsWith(".ts"))).toEqual([]);
   });
 
   test("scripts still resolve the binding ids they own", () => {
-    const sources = new Map(
-      domContract.documents.scripts.map((script) => [script, read(script)] as const),
-    );
+    const sources = scriptGraph;
     const missing = idSpecs
       .filter((spec) => spec.owner.endsWith(".js"))
       .filter((spec) => !(sources.get(spec.owner) ?? "").includes(`"${spec.id}"`))
@@ -178,7 +303,7 @@ describe("shipped DOM contract", () => {
 });
 
 describe("compatibility data attributes and persisted layout keys", () => {
-  const appJs = read("public/app.js");
+  const appJs = read(domContract.compatibilityAttributes.documentElementDataset.writtenBy);
   const operatorJs = read("public/operator-surface.js");
 
   test("connection state attribute keeps its exact spelling and value set", () => {
@@ -200,17 +325,18 @@ describe("compatibility data attributes and persisted layout keys", () => {
     expect(operatorJs).toContain("app.dataset.detailTab = tab");
   });
 
-  test("capture-state classes stay readable across shipped scripts", () => {
-    const capturing = domContract.compatibilityAttributes.appClasses
-      .find((entry) => entry.class === "app--capturing")!;
-    expect(appJs).toContain(`classList.add("${capturing.class}")`);
-    expect(appJs).toContain(`classList.remove("${capturing.class}")`);
-    expect(operatorJs).toContain(`classList.contains("${capturing.class}")`);
-
-    const recording = domContract.compatibilityAttributes.controlClasses
-      .find((entry) => entry.class === "record-btn--on")!;
-    expect(appJs).toContain(`classList.toggle("${recording.class}"`);
-    expect(operatorJs).toContain(`classList.contains("${recording.class}")`);
+  test("capture-state compatibility classes project authoritative capture frames", async () => {
+    await withPublicPage(async (page, harness) => {
+      for (const capturing of [true, false]) {
+        await deliver(page, harness, { type: "capture", capturing, mode: "mic", phase: capturing ? "capturing" : "idle", startedAt: 1 });
+        const projection = await page.evaluate(() => ({
+          capturing: document.querySelector(".app")?.classList.contains("app--capturing"),
+          recording: document.getElementById("btn-record")?.classList.contains("record-btn--on"),
+          pressed: document.getElementById("btn-record")?.getAttribute("aria-pressed"),
+        }));
+        expect(projection).toEqual({ capturing, recording: capturing, pressed: String(capturing) });
+      }
+    });
   });
 
   test("output switcher targets exist and resolve to real ids", () => {
@@ -240,12 +366,155 @@ describe("compatibility data attributes and persisted layout keys", () => {
   });
 });
 
+// These positive fixtures are also checked by tsc: Bun only erases their types.
+const messageSamples = {
+  slide: { type: "slide", current: null, history: [] },
+  caption: { type: "caption", text: "CAPTION", ts: 1, speaker: 2 },
+  line: { type: "line", text: "LINE", ts: 1 },
+  transcript: { type: "transcript", entries: [], reason: "snapshot", truncated: false },
+  status: { type: "status", text: "STATUS", mutationAction: "updateItem", meetingId: null, reviewId: null, itemId: null },
+  providers: { type: "providers", list: [], current: "codex" },
+  capture: { type: "capture", capturing: false, mode: "mic" },
+  sttModels: { type: "sttModels", models: [], selectedModelId: null },
+  meetings: { type: "meetings", items: [] },
+  meeting: { type: "meeting", meetingId: 7, title: "MEETING", purpose: null, transcript: [], current: null, history: [], compiled: null },
+  attendees: { type: "attendees", meeting_id: null, attendees: [] },
+  review: { type: "review", meetingId: 7, reviewId: "r1", transcriptVersionId: "v1", attendees: [], transcript: { lines: [] }, items: [], status: "draft" },
+  detect: { type: "detect", detecting: false },
+  saved: { type: "saved", path: "/artifact.md" },
+  compile: { type: "compile", status: "success", jobId: "compile-fixture", publicationStatus: "final" },
+  export: { type: "export", status: "started", action: "exportPdf", jobId: "pdf-fixture" },
+  ask: { type: "ask", requestId: "ask-fixture", answer: "ANSWER", matchedCount: 0 },
+  refine: { type: "refine", requestId: "refine-fixture", slideId: "s1", path: "title", before: "BEFORE", after: "AFTER", claimIds: [] },
+  reviewItemUpdated: { type: "reviewItemUpdated", meetingId: 7, reviewId: "r1", itemId: "i1", kind: "decision" },
+  reviewConfirmed: { type: "reviewConfirmed", meetingId: 7, reviewId: "r1", transcriptVersionId: "v1", confirmedAt: 2 },
+  meetingConcluded: { type: "meetingConcluded", concluded: true, meetingId: 7, reviewId: "r1", transcriptVersionId: "v1", bundleId: "b1", bundlePath: "/bundle", manifest: { sha256: "HASH", targetCommit: "COMMIT" }, concludedAt: 3 },
+} satisfies { [K in ServerMessage["type"]]: Extract<ServerMessage, { type: K }> };
+
+const actionSamples = [
+  { action: "startCapture", meeting_id: 7 },
+  { action: "audio", data: "AAAA" },
+  { action: "setCaptureSource", source: "system" },
+  { action: "stopCapture" }, { action: "reset" }, { action: "status" },
+  { action: "listMeetings" }, { action: "transcript" },
+  { action: "recheckProviders" }, { action: "recheckSttModels" }, { action: "attendees" },
+  { action: "startReview", meetingId: 7, notes: "NOTES", retry: true },
+  { action: "deleteMeeting", meetingId: 7 }, { action: "selectMeeting", meetingId: 7 },
+  { action: "compileSlidePlan" }, { action: "exportDeck" }, { action: "exportPdf" },
+  { action: "exportPng" }, { action: "saveNotes" }, { action: "saveTranscript" }, { action: "saveJson" },
+  { action: "persistSlidePlan", plan: {} },
+  { action: "setProvider", id: "codex", model: "MODEL", effort: "high" },
+  { action: "connectProvider", id: "codex" }, { action: "setProviderKey", id: "codex", key: "FIXTURE" },
+  { action: "setAttendees", purpose: null, attendees: [{ name: "ATTENDEE", attendeeId: "a1", crmPersonId: null }] },
+  { action: "updateItem", reviewId: "r1", itemId: "i1", kind: "decision", patch: { reviewState: "confirmed" } },
+  { action: "confirmReview", reviewId: "r1" },
+  { action: "ask", meetingId: 7, question: "QUESTION", requestId: "ask-fixture" },
+  { action: "refineSlideField", meetingId: 7, slideId: "s1", path: "title", text: "TEXT", instruction: "INSTRUCTION", claimIds: [], requestId: "refine-fixture" },
+  { action: "installSttModel", modelId: "small" }, { action: "cancelSttModel", modelId: "small" },
+  { action: "selectSttModel", modelId: "small" },
+] satisfies ClientAction[];
+
+const publicationSequence = { publicationSeq: 3 } satisfies
+  Pick<NonNullable<MeetingDetailUpdate["slidePlan"]>, "publicationSeq">;
+const jobIds = ["compile-fixture", "png-fixture", "pdf-fixture", "pptx-fixture"] satisfies
+  [CompileJobId, ExportJobId, ExportJobId, ExportJobId];
+
+describe("typed wire values and session compatibility", () => {
+  test("browser values and serialized samples cover the exact canonical unions", () => {
+    expectTypeOf<KnownMessageType>().toEqualTypeOf<ServerMessage["type"]>();
+    expectTypeOf<(typeof actionSamples)[number]["action"]>().toEqualTypeOf<ClientAction["action"]>();
+    expect(Object.keys(messageSamples).sort()).toEqual([...KNOWN_MESSAGE_TYPES].sort());
+    expect(Object.isFrozen(KNOWN_MESSAGE_TYPES)).toBe(true);
+  });
+
+  test("every valid frame parses in both projections and irrelevant frames are no-ops", () => {
+    const ui = initialUiState();
+    const transcript = initialTranscriptState();
+    for (const frame of Object.values(messageSamples)) {
+      const uiParsed = parseServerEvent(frame);
+      const transcriptParsed = parseTranscriptEvent(frame);
+      expect({ type: frame.type, ui: uiParsed.ok, transcript: transcriptParsed.ok })
+        .toEqual({ type: frame.type, ui: true, transcript: true });
+      if (uiParsed.ok && uiParsed.event.message === "other") expect(reduce(ui, uiParsed.event)).toEqual(ui);
+      if (transcriptParsed.ok && transcriptParsed.event.message === "other") {
+        expect(reduceTranscript(transcript, transcriptParsed.event)).toEqual(transcript);
+      }
+    }
+  });
+
+  test("legacy type imports are identical to the canonical protocol", () => {
+    expectTypeOf<LegacySession.ServerMessage>().toEqualTypeOf<ServerMessage>();
+    expectTypeOf<LegacySession.ClientAction>().toEqualTypeOf<ClientAction>();
+    expectTypeOf<LegacySession.ClientListener>().toEqualTypeOf<ClientListener>();
+    expectTypeOf<LegacySession.CompileJobId>().toEqualTypeOf<CompileJobId>();
+    expectTypeOf<LegacySession.ExportJobId>().toEqualTypeOf<ExportJobId>();
+  });
+
+  test("sample payloads match the accepted required and optional action keys", () => {
+    for (const command of actionSamples) {
+      const spec = protocolContract.clientActions.find((entry) => entry.action === command.action);
+      if (!spec) throw new Error(`missing action contract: ${command.action}`);
+      const keys = Object.keys(command).filter((key) => key !== "action");
+      expect(keys.filter((key) => !spec.payloadKeys.includes(key))).toEqual([]);
+      expect(spec.requiredKeys.filter((key) => !keys.includes(key))).toEqual([]);
+    }
+  });
+
+  test("each declared message and action has a serialized fixture", () => {
+    expect(protocolContract.serverMessages.map((message) => message.type).sort())
+      .toEqual(Object.values(messageSamples).map((message) => message.type).sort());
+    expect(protocolContract.clientActions.map((command) => command.action).sort())
+      .toEqual(actionSamples.map((command) => command.action).sort());
+  });
+
+  test("existing nullable identities, correlation and publication values survive JSON", () => {
+    expect(JSON.parse(JSON.stringify(messageSamples.attendees)))
+      .toEqual({ type: "attendees", meeting_id: null, attendees: [] });
+    expect(JSON.parse(JSON.stringify(publicationSequence))).toEqual({ publicationSeq: 3 });
+    expect(jobIds.map((id) => id.split("-")[0])).toEqual(["compile", "png", "pdf", "pptx"]);
+    expect(actionSamples.filter((command) => "requestId" in command).map((command) => command.requestId))
+      .toEqual([messageSamples.ask.requestId, messageSamples.refine.requestId]);
+  });
+
+  test("legacy session imports retain listener, transcript, sink and snapshot behavior", async () => {
+    // Given: subscribe before ingest; flush explicitly rather than waiting for a timer.
+    const messages: ServerMessage[] = [];
+    const listener: ClientListener = (message) => { messages.push(message); };
+    const stored: unknown[] = [];
+    const session = new MeetingSession({
+      detectBlock: async () => { throw new Error("automatic detection must remain disabled"); },
+      ping: async () => true,
+    }, 3, 12, new Set([listener]), {
+      onLine: (entry) => { stored.push(entry); },
+      onSlide: () => { throw new Error("caption ingest must not create slides"); },
+    }, { automaticDetection: false });
+    const chunk = { text: "TRANSCRIPT_SENTINEL", ts: 11, audioStartMs: 2, audioEndMs: 8, speaker: 4 };
+
+    // When
+    session.onChunk(chunk);
+    await session.flush();
+
+    // Then
+    expect(messages).toEqual([
+      { type: "line", text: chunk.text, ts: 11, speaker: 4 },
+      { type: "caption", text: chunk.text, ts: expect.any(Number), speaker: 4 },
+    ]);
+    expect(stored).toEqual([chunk]);
+    expect(session.transcript("snapshot")).toEqual({ type: "transcript", entries: [chunk], reason: "snapshot", truncated: false });
+    expect(session.snapshot()).toEqual(messageSamples.slide);
+  });
+});
+
 describe("shipped wire protocol contract", () => {
-  const clientSources = protocolContract.documents.clientScripts
-    .map((script) => read(script))
-    .join("\n");
-  const sessionTypes = read(protocolContract.documents.serverTypes);
-  const serverSource = read(protocolContract.documents.serverDispatch);
+  // Local editor command serializers are not socket traffic. Follow all reachable
+  // users of the injected transport, rather than treating every action-shaped
+  // object in a shared library as a frame the browser sends.
+  const wireModules = [...scriptGraph.entries()].filter(([, code]) => /\btransport\.send\s*\(/.test(code));
+  const clientSources = wireModules.map(([, code]) => code).join("\n");
+
+  test("the fixture covers every reachable controller that sends socket traffic", () => {
+    expect(wireModules.map(([path]) => path).sort()).toEqual([...protocolContract.documents.clientScripts].sort());
+  });
 
   test("the protocol manifest lists each action and message type exactly once", () => {
     const actions = protocolContract.clientActions.map((entry) => entry.action);
@@ -272,14 +541,13 @@ describe("shipped wire protocol contract", () => {
   });
 
   test("startCapture keeps the snake_case meeting_id payload spelling", () => {
-    const startCapture = protocolContract.clientActions
-      .find((entry) => entry.action === "startCapture")!;
-    expect(startCapture.payloadKeys).toEqual(["meeting_id"]);
-    const appJs = read("public/app.js");
-    const emitted = /\{\s*action:\s*"startCapture",\s*([A-Za-z_]+):/.exec(appJs)?.[1];
-    expect(emitted).toBe("meeting_id");
-    expect(sessionTypes).toContain('action: "startCapture"; meeting_id?: number');
-    expect(serverSource).toContain("cmd.meeting_id");
+    const parsed = parseServerEvent(messageSamples.capture);
+    if (!parsed.ok) throw new Error(parsed.error.reason);
+    const selected = reduce(reduce(initialUiState(), parsed.event), { kind: "selectMeeting", meetingId: 7 });
+    expect(reduce(selected, { kind: "activateCapture" }).outbox)
+      .toEqual([{ action: "startCapture", meeting_id: 7 }]);
+    expect(protocolContract.clientActions.find((entry) => entry.action === "startCapture")?.payloadKeys)
+      .toEqual(["meeting_id"]);
   });
 
   test("critical payload key spellings are present and their aliases absent", () => {
@@ -330,31 +598,17 @@ describe("shipped wire protocol contract", () => {
     );
   });
 
-  test("every server message type is declared in src/session.ts and in ServerMessage", () => {
-    const declared = new Set(
-      [...sessionTypes.matchAll(/^\s+type:\s*"([A-Za-z]+)";/gm)].map((match) => match[1]!),
-    );
-    const union = sessionTypes.slice(
-      sessionTypes.indexOf("export type ServerMessage ="),
-      sessionTypes.indexOf(";", sessionTypes.indexOf("export type ServerMessage =")),
-    );
-    const findings = protocolContract.serverMessages.map((entry) => ({
-      type: entry.type,
-      declared: declared.has(entry.type),
-      inUnion: union.length > 0,
-    }));
-    expect(findings).toEqual(
-      protocolContract.serverMessages.map((entry) => ({
-        type: entry.type,
-        declared: true,
-        inUnion: true,
-      })),
-    );
+  test("retired actions are absent from the live typed and emitted contracts", () => {
+    const actions = actionSamples.map((sample) => sample.action);
+    for (const retired of protocolContract.retiredActions) {
+      expect(actions.some((action) => action === retired)).toBe(false);
+      expect(clientSources).not.toMatch(new RegExp(`action:\\s*["']${retired}["']`));
+    }
   });
 
   test("the client still handles every message type it is contracted to handle", () => {
     const handled = new Set(
-      [...read("public/app.js").matchAll(/msg\.type === "([A-Za-z]+)"/g)].map((match) => match[1]!),
+      [...clientSources.matchAll(/msg\.type === "([A-Za-z]+)"/g)].map((match) => match[1]!),
     );
     const expectedHandled = protocolContract.serverMessages
       .filter((entry) => entry.handledByClient)
@@ -362,44 +616,65 @@ describe("shipped wire protocol contract", () => {
     expect(expectedHandled.filter((type) => !handled.has(type))).toEqual([]);
   });
 
-  test("capture and transcript message shapes keep their key spellings", () => {
-    const capture = protocolContract.captureMessage;
-    const captureBlock = sessionTypes.slice(
-      sessionTypes.indexOf("export interface CaptureUpdate"),
-      sessionTypes.indexOf("}", sessionTypes.indexOf("export interface CaptureUpdate")),
+  test("every server message handled by the client is marked handled", () => {
+    const handled = new Set(
+      [...clientSources.matchAll(/msg\.type === "([A-Za-z]+)"/g)].map((match) => match[1]!),
     );
-    expect(captureBlock.length).toBeGreaterThan(0);
-    for (const key of capture.requiredKeys) expect(captureBlock).toContain(`${key}:`);
-    for (const key of capture.optionalKeys) expect(captureBlock).toContain(`${key}?:`);
-    expect(sessionTypes).toContain(
-      `export type CapturePhase = ${capture.phases.map((phase) => `"${phase}"`).join(" | ")};`,
-    );
-
-    const transcript = protocolContract.transcriptMessage;
-    const transcriptBlock = sessionTypes.slice(
-      sessionTypes.indexOf("export interface TranscriptUpdate"),
-      sessionTypes.indexOf("}", sessionTypes.indexOf("export interface TranscriptUpdate")),
-    );
-    for (const key of transcript.requiredKeys) expect(transcriptBlock).toContain(`${key}:`);
-    for (const key of transcript.optionalKeys) expect(transcriptBlock).toContain(`${key}?:`);
-    for (const reason of transcript.reasons) expect(transcriptBlock).toContain(`"${reason}"`);
+    const markedUnhandled = protocolContract.serverMessages
+      .filter((entry) => handled.has(entry.type) && !entry.handledByClient)
+      .map((entry) => entry.type);
+    expect(markedUnhandled).toEqual([]);
   });
 
-  test("the server handler map registers exactly the contracted actions", () => {
-    const registry = serverSource.slice(
-      serverSource.indexOf("export const handlerMap = new Map"),
-      serverSource.indexOf("]);", serverSource.indexOf("export const handlerMap = new Map")),
-    );
-    const registered = [...registry.matchAll(/\["([A-Za-z]+)",/g)].map((match) => match[1]!);
-    expect(registered).toEqual([...protocolContract.serverHandlerMapActions]);
+  test("review actions include meetingId in their payload contracts", () => {
+    const reviewActions = ["startReview", "updateItem", "confirmReview"];
+    for (const action of reviewActions) {
+      const contract = protocolContract.clientActions.find((entry) => entry.action === action);
+      expect(contract?.payloadKeys).toContain("meetingId");
+    }
   });
 
-  test("actions not in the handler map still have an explicit dispatch branch", () => {
-    const inMap = new Set(protocolContract.serverHandlerMapActions);
-    const missing = protocolContract.clientActions
-      .map((entry) => entry.action)
-      .filter((action) => !inMap.has(action))
-      .filter((action) => !serverSource.includes(`cmd.action === "${action}"`));
-    expect(missing).toEqual([]);
+  test("capture and transcript keys and optional values match typed wire shapes", () => {
+    type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];
+    type OptionalKeys<T> = Exclude<keyof T, RequiredKeys<T>>;
+    const captureRequired = ["capturing", "mode"] as const;
+    const captureOptional = ["phase", "modelPath", "selectedModelId", "startedAt", "audioSource"] as const;
+    const transcriptRequired = ["entries"] as const;
+    const transcriptOptional = ["reason", "truncated"] as const;
+    const phases = ["idle", "starting", "capturing", "stopping", "switching-model"] as const;
+    const reasons = ["snapshot", "export"] as const;
+    expectTypeOf<(typeof captureRequired)[number]>().toEqualTypeOf<RequiredKeys<Omit<CaptureUpdate, "type">>>();
+    expectTypeOf<(typeof captureOptional)[number]>().toEqualTypeOf<OptionalKeys<CaptureUpdate>>();
+    expectTypeOf<(typeof transcriptRequired)[number]>().toEqualTypeOf<RequiredKeys<Omit<TranscriptUpdate, "type">>>();
+    expectTypeOf<(typeof transcriptOptional)[number]>().toEqualTypeOf<OptionalKeys<TranscriptUpdate>>();
+    expectTypeOf<(typeof phases)[number]>().toEqualTypeOf<CapturePhase>();
+    expectTypeOf<(typeof reasons)[number]>().toEqualTypeOf<NonNullable<TranscriptUpdate["reason"]>>();
+    expect(protocolContract.captureMessage.requiredKeys).toEqual([...captureRequired]);
+    expect(protocolContract.captureMessage.optionalKeys).toEqual([...captureOptional]);
+    expect(protocolContract.captureMessage.phases).toEqual([...phases]);
+    expect(protocolContract.transcriptMessage.requiredKeys).toEqual([...transcriptRequired]);
+    expect(protocolContract.transcriptMessage.optionalKeys).toEqual([...transcriptOptional]);
+    expect(protocolContract.transcriptMessage.reasons).toEqual([...reasons]);
+    for (const phase of phases) expect(parseServerEvent({ ...messageSamples.capture, phase }).ok).toBe(true);
+    for (const reason of reasons) expect(parseTranscriptEvent({ ...messageSamples.transcript, reason }).ok).toBe(true);
+  });
+
+  test("the imported application registry owns all 33 contracted actions and no retired action", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "public-contract-registry-"));
+    console.log(`contract registry fixture: ${directory}`);
+    let running: ReturnType<typeof startMeetingServer> | undefined;
+    try {
+      running = startMeetingServer({ ...process.env, LLM_PROVIDER: "cli", LLM_CLI_BIN: "/usr/bin/false",
+        LLM_CLI_PRESET: "claude", MEETINGS_DB_PATH: join(directory, "meetings.db"), MEETING_SLIDES_SETTINGS_ROOT: directory });
+      const actions = [...running.handlerMap.keys()].sort();
+      expect(actions).toEqual(protocolContract.serverHandlerMapActions);
+      expect(actions).toEqual(protocolContract.clientActions.map((entry) => entry.action).sort());
+      expect(actions).toHaveLength(33);
+      for (const action of actions) expect(typeof running.handlerMap.get(action)).toBe("function");
+      for (const action of protocolContract.retiredActions) expect(running.handlerMap.has(action)).toBe(false);
+    } finally {
+      try { await running?.close(); }
+      finally { await rm(directory, { recursive: true, force: true }); }
+    }
   });
 });

@@ -46,22 +46,55 @@ function breakWord(
   return chunks;
 }
 
+interface WrapToken {
+  readonly text: string;
+  readonly spaceBefore: boolean;
+}
+
+const KEEP_ALL_BREAK_AFTER = /\p{P}/u;
+
+/**
+ * keep-all allows soft wrap only after whitespace or punctuation: a CJK run
+ * stays a single unbreakable token, with punctuation attached to the run that
+ * precedes it. Whitespace-delimited words keep their joining space; segments
+ * split at punctuation rejoin without one so the paragraph text is preserved.
+ */
+function keepAllTokens(paragraph: string): readonly WrapToken[] {
+  const tokens: WrapToken[] = [];
+  for (const word of paragraph.trim().split(/\s+/u)) {
+    let run = "";
+    let spaceBefore = tokens.length > 0;
+    for (const character of word) {
+      run += character;
+      if (KEEP_ALL_BREAK_AFTER.test(character)) {
+        tokens.push({ text: run, spaceBefore });
+        run = "";
+        spaceBefore = false;
+      }
+    }
+    if (run !== "") tokens.push({ text: run, spaceBefore });
+  }
+  return tokens;
+}
+
 function wrapParagraph(
   paragraph: string,
   input: FitInput,
   fontSize: number,
 ): string[] {
   if (paragraph === "") return [""];
-  const words = paragraph.trim().split(/\s+/u);
+  const tokens: readonly WrapToken[] = input.policy.wordBreak === "keep-all"
+    ? keepAllTokens(paragraph)
+    : paragraph.trim().split(/\s+/u).map((text): WrapToken => ({ text, spaceBefore: true }));
   const lines: string[] = [];
   let line = "";
 
-  const append = (part: string): void => {
+  const append = (part: string, spaceBefore: boolean): void => {
     if (line === "") {
       line = part;
       return;
     }
-    const candidate = `${line} ${part}`;
+    const candidate = spaceBefore ? `${line} ${part}` : `${line}${part}`;
     if (measuredWidth(candidate, input.fontFamily, fontSize, input.measurer) <= input.width) {
       line = candidate;
     } else {
@@ -70,16 +103,18 @@ function wrapParagraph(
     }
   };
 
-  for (const word of words) {
-    if (measuredWidth(word, input.fontFamily, fontSize, input.measurer) <= input.width ||
+  for (const token of tokens) {
+    if (measuredWidth(token.text, input.fontFamily, fontSize, input.measurer) <= input.width ||
         input.policy.overflowWrap === "normal") {
-      append(word);
+      append(token.text, token.spaceBefore);
       continue;
     }
     const chunks = breakWord(
-      word, input.width, input.fontFamily, fontSize, input.measurer,
+      token.text, input.width, input.fontFamily, fontSize, input.measurer,
     );
-    for (const chunk of chunks) append(chunk);
+    for (const [index, chunk] of chunks.entries()) {
+      append(chunk, index === 0 && token.spaceBefore);
+    }
   }
   if (line !== "" || lines.length === 0) lines.push(line);
   return lines;

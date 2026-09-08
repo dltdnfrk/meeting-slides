@@ -16,8 +16,10 @@
 
 ### 조작
 
-1. Meeting Slides 앱을 실행한다.
+1. Meeting Slides 앱을 실행한다. 네이티브 launcher(`Meeting Slides.app`)를 쓰거나, 저장소에서 `bun run dev`로 서버를 직접 실행할 수도 있다. 두 경로 모두 같은 로컬 Bun 서버를 시작하고 브라우저 작업 공간을 연다.
 2. 브라우저가 열릴 때까지 기다린다.
+
+> 시운전 산출물을 실제 데이터와 분리하려면 실행 전 `MEETING_SLIDES_EXPORT_ROOT`를 별도 디렉터리로 지정한다. 녹음 WAV와 SlidePlan 발행물이 그 루트 아래에 생성된다.
 
 ### 정상 결과
 
@@ -107,7 +109,7 @@ Whisper 실행에 실패한 경우에는 `녹음 시작 실패`와 같은 별도
 
 1. 버튼을 누른 순간까지 누적된 전사가 스냅샷으로 고정된다.
 2. LLM이 장표 구조를 생성한다.
-3. Scene Graph 기반 PPTX가 생성된다.
+3. SlidePlan geometry 파이프라인이 같은 레이아웃에서 standalone HTML, 편집 가능한 PPTX, PNG, PDF를 생성한다.
 4. 완료 상태와 슬라이드 수가 표시된다.
 5. 저장 결과가 산출물 라벨로 표시된다.
 

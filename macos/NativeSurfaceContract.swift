@@ -278,6 +278,8 @@ public struct CaptureProjection: Equatable {
     /// Server-authoritative start time in epoch milliseconds; the timer is
     /// always derived from this, never from a native stopwatch.
     public let startedAt: Double?
+    /// Live capture origin. Empty when the snapshot does not name one.
+    public let audioSource: String
 }
 
 public enum DecodeFailure: String, Error, Equatable {
@@ -317,9 +319,12 @@ public enum NativeSurfaceDecoder {
                 startedAt = number.doubleValue
             }
 
+            let audioSource = object["audioSource"] as? String ?? ""
+
             return .capture(
                 CaptureProjection(
-                    capturing: capturing, mode: mode, phase: phase, startedAt: startedAt
+                    capturing: capturing, mode: mode, phase: phase, startedAt: startedAt,
+                    audioSource: audioSource
                 )
             )
 

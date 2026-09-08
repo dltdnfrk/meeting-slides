@@ -5,7 +5,6 @@ import {
   parseNarrativeDeck,
   type NarrativeDeck,
 } from "../src/scene-graph.ts";
-import { renderSceneSlideHtml } from "../src/scene-html.ts";
 
 const narrative: NarrativeDeck = {
   meetingId: 7,
@@ -50,13 +49,5 @@ describe("semantic slide scene graph", () => {
     ]));
   });
 
-  test("HTML renderer draws the scene without list markup", () => {
-    const scene = composeNarrativeDeck(narrative);
-    const html = renderSceneSlideHtml(scene.slides[2]!);
-
-    expect(html).toContain('data-scene-slide="actions"');
-    expect(html).toContain("릴리스 노트 작성");
-    expect(html).toContain("민지");
-    expect(html).not.toMatch(/<(?:ul|ol|li)\b/);
-  });
 });
+

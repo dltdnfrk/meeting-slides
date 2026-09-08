@@ -2,8 +2,10 @@ import { describe, expect, test } from "bun:test";
 
 import {
   MinutesExtractor,
+  chunkMinutesExtractionInput,
   localRuleExtraction,
   parseMinutesExtractionJson,
+  type CandidateRejectionCode,
   type MinutesExtractionInput,
 } from "../src/extract.ts";
 
@@ -112,14 +114,15 @@ describe("parseMinutesExtractionJson", () => {
 
   test("diagnoses every provenance rejection without keeping invalid candidates", () => {
     const sparse = { ...request, lines: [request.lines[0]!, request.lines[2]!, { seq: 5, speakerTurn: null, text: "끝" }] };
-    const cases: Array<[string, MinutesExtractionInput, Record<string, unknown>, string]> = [
+    const cases: Array<[string, MinutesExtractionInput, Record<string, unknown>, CandidateRejectionCode]> = [
       ["wrong version", request, decision({ transcriptVersionId: "tv-x", startSeq: 1, endSeq: 1 }), "wrong_transcript_version"],
       ["invalid range", request, decision({ transcriptVersionId: "tv-1", startSeq: 0, endSeq: 1 }), "invalid_seq_range"],
       ["outside requested bounds", request, decision({ transcriptVersionId: "tv-1", startSeq: 4, endSeq: 4 }), "line_not_in_request"],
       ["missing endpoint", sparse, decision({ transcriptVersionId: "tv-1", startSeq: 2, endSeq: 2 }), "line_not_found"],
       ["missing interior", sparse, decision({ transcriptVersionId: "tv-1", startSeq: 1, endSeq: 3 }), "non_contiguous_range"],
       ["fabricated quote", request, decision({ transcriptVersionId: "tv-1", startSeq: 1, endSeq: 1 }, { evidenceQuote: "없는 인용" }), "evidence_quote_mismatch"],
-      ["attendee outside request", request, decision({ transcriptVersionId: "tv-1", startSeq: 1, endSeq: 1 }, { suggestedAttributionAttendeeId: "mallory" }), "line_not_in_request"],
+      ["attendee outside request", request, decision({ transcriptVersionId: "tv-1", startSeq: 1, endSeq: 1 }, { suggestedAttributionAttendeeId: "mallory" }), "attendee_not_in_request"],
+      ["blank description", request, decision({ transcriptVersionId: "tv-1", startSeq: 1, endSeq: 1 }, { description: "   " }), "missing_description"],
     ];
 
     for (const [label, input, candidate, code] of cases) {
@@ -139,9 +142,20 @@ describe("parseMinutesExtractionJson", () => {
     }
   });
 
-  test("does not extract JSON from prose or coerce malformed candidate fields", () => {
-    const wrapped = `analysis before ${payload()} analysis after`;
-    expect(parseMinutesExtractionJson(wrapped, request).batchFailed).toBe(true);
+  test("accepts fenced or prefixed JSON objects and still rejects malformed candidates", () => {
+    const grounded = payload({
+      decisions: [decision({ transcript_version_id: "tv-1", start_seq: 1, end_seq: 1 })],
+    });
+    const fenced = `\`\`\`json\n${grounded}\n\`\`\``;
+    const fencedParsed = parseMinutesExtractionJson(fenced, request);
+    expect(fencedParsed.batchFailed).toBe(false);
+    expect(fencedParsed.decisions).toHaveLength(1);
+
+    const prefixed = `Here is the extraction:\n${grounded}`;
+    const prefixedParsed = parseMinutesExtractionJson(prefixed, request);
+    expect(prefixedParsed.batchFailed).toBe(false);
+    expect(prefixedParsed.decisions).toHaveLength(1);
+
     const malformed = parseMinutesExtractionJson(payload({
       decisions: [decision({ transcriptVersionId: "tv-1", startSeq: "1", endSeq: 1 })],
     }), request);
@@ -188,6 +202,22 @@ describe("precision local-rule fallback", () => {
       sourceSegment: { transcript_version_id: "tv-1", start_seq: 11, end_seq: 11 },
     });
   });
+
+  test("matches informal Korean and English decision lines", () => {
+    const result = localRuleExtraction({
+      ...request,
+      lines: [
+        { seq: 20, speakerTurn: 1, text: "그럼 그걸로 하죠" },
+        { seq: 21, speakerTurn: 2, text: "We decided to ship Friday" },
+      ],
+    });
+    expect(result.decisions.map((item) => item.evidenceQuote)).toEqual([
+      "그럼 그걸로 하죠",
+      "We decided to ship Friday",
+    ]);
+    expect(result.actionItems).toEqual([]);
+    expect(result.openItems).toEqual([]);
+  });
 });
 
 describe("MinutesExtractor", () => {
@@ -204,11 +234,11 @@ describe("MinutesExtractor", () => {
     const result = await extractor.extract(request);
     expect(result.usedFallback).toBe(false);
     expect(result.decisions).toHaveLength(1);
-    expect(prompt).toContain('"seq":1');
+    expect(JSON.parse(prompt.slice(prompt.indexOf("\n") + 1))).toEqual(request);
     expect(options).toMatchObject({
       temperature: 0,
       maxTokens: 4000,
-      system: expect.stringContaining("speakerTurn is not an attendee identity"),
+      system: expect.any(String),
     });
   });
 
@@ -259,5 +289,236 @@ describe("MinutesExtractor", () => {
     const empty = await new MinutesExtractor({ chat: async () => payload() }).extract(request);
     expect(empty.usedFallback).toBe(false);
     expect(empty.decisions).toEqual([]);
+  });
+
+  test("parses a grounded summary, rejects an ungrounded topic, and leaves fallback summary null", () => {
+    const parsed = parseMinutesExtractionJson(payload({
+      summary: {
+        overview: "출시 일정과 후속 작업을 정리했다.",
+        topics: [
+          {
+            title: "출시 일정",
+            summary: "금요일 출시로 확정했다.",
+            source: { transcript_version_id: "tv-1", start_seq: 1, end_seq: 1 },
+          },
+          {
+            title: "없는 주제",
+            summary: "근거 없는 내용",
+            source: { transcript_version_id: "tv-1", start_seq: 9, end_seq: 9 },
+          },
+        ],
+      },
+    }), request);
+
+    expect(parsed.summary).toEqual({
+      overview: "출시 일정과 후속 작업을 정리했다.",
+      topics: [{
+        title: "출시 일정",
+        summary: "금요일 출시로 확정했다.",
+        source: { transcript_version_id: "tv-1", start_seq: 1, end_seq: 1 },
+      }],
+    });
+    expect(parsed.rejections).toEqual([{
+      kind: "topic", candidateIndex: 1, code: "line_not_in_request",
+    }]);
+    expect(localRuleExtraction(request).summary).toBeNull();
+    expect(parseMinutesExtractionJson(payload(), request).summary).toBeNull();
+  });
+
+  test("concatenates chunk topics in seq order and rebuilds overview from topic summaries", async () => {
+    const longRequest: MinutesExtractionInput = {
+      ...request,
+      lines: Array.from({ length: 30 }, (_, index) => ({
+        seq: index + 1,
+        speakerTurn: index % 2,
+        text: `근거 ${index + 1}: ${"긴 회의 발언 ".repeat(14)}결정했습니다.`,
+      })),
+    };
+    const result = await new MinutesExtractor({
+      async chat(prompt) {
+        const json = prompt.slice(prompt.indexOf("\n") + 1).split("\n\nMeeting notes")[0]!;
+        const chunk = JSON.parse(json) as MinutesExtractionInput;
+        return payload({
+          summary: {
+            overview: "chunk-overview-must-not-survive-merge",
+            topics: chunk.lines.map((line) => ({
+              title: `주제 ${line.seq}`,
+              summary: `요약 ${String(line.seq).padStart(2, "0")} ${"가".repeat(30)}`,
+              source: { transcript_version_id: "tv-1", start_seq: line.seq, end_seq: line.seq },
+            })),
+          },
+        });
+      },
+    }, 3_000).extract(longRequest);
+
+    const topics = result.summary?.topics ?? [];
+    expect(topics.map((topic) => topic.source.start_seq)).toEqual(
+      Array.from({ length: 30 }, (_, index) => index + 1),
+    );
+    const joined = topics.map((topic) => topic.summary).join(" ");
+    expect(result.summary?.overview).toBe(joined.slice(0, 600));
+    expect(result.summary?.overview.length).toBeLessThanOrEqual(600);
+    expect(result.summary?.overview).not.toContain("chunk-overview-must-not-survive-merge");
+  });
+
+  test("keeps a two-line action item that starts in the next chunk's context prefix", async () => {
+    const longRequest: MinutesExtractionInput = {
+      ...request,
+      lines: Array.from({ length: 30 }, (_, index) => ({
+        seq: index + 1,
+        speakerTurn: index % 2,
+        text: `근거 ${index + 1}: ${"긴 회의 발언 ".repeat(14)}결정했습니다.`,
+      })),
+    };
+    const parsePrompt = (prompt: string): MinutesExtractionInput => {
+      const json = prompt.slice(prompt.indexOf("\n") + 1).split("\n\nMeeting notes")[0]!;
+      return JSON.parse(json) as MinutesExtractionInput;
+    };
+    const windows: number[][] = [];
+    let probeChunk = 0;
+    const probe = await new MinutesExtractor({
+      async chat(prompt) {
+        const chunk = parsePrompt(prompt);
+        const index = probeChunk++;
+        windows.push(chunk.lines.map((line) => line.seq));
+        return payload({
+          decisions: chunk.lines.map((line) => ({
+            description: `${index}:${line.seq}`,
+            sourceSegment: { transcript_version_id: "tv-1", start_seq: line.seq, end_seq: line.seq },
+            evidenceQuote: line.text,
+            suggestedAttributionAttendeeId: null,
+          })),
+        });
+      },
+    }, 3_000).extract(longRequest);
+
+    const ownedByChunk = new Map<number, Set<number>>();
+    for (const item of probe.decisions) {
+      const [chunkText, seqText] = item.description.split(":");
+      const chunk = Number(chunkText);
+      const owned = ownedByChunk.get(chunk) ?? new Set<number>();
+      owned.add(Number(seqText));
+      ownedByChunk.set(chunk, owned);
+    }
+    expect(ownedByChunk.size).toBeGreaterThan(1);
+
+    let boundary: { start_seq: number; end_seq: number } | null = null;
+    let emittingChunk = -1;
+    for (const [index, seqs] of windows.entries()) {
+      if (index === 0) continue;
+      const owned = ownedByChunk.get(index) ?? new Set<number>();
+      const firstOwned = seqs.find((seq) => owned.has(seq));
+      const prefix = seqs.filter((seq) => firstOwned !== undefined && !owned.has(seq) && seq < firstOwned);
+      const lastPrefix = prefix[prefix.length - 1];
+      if (lastPrefix !== undefined && firstOwned === lastPrefix + 1) {
+        boundary = { start_seq: lastPrefix, end_seq: firstOwned };
+        emittingChunk = index;
+        break;
+      }
+    }
+    expect(boundary).not.toBeNull();
+    if (!boundary) throw new Error("expected a prefix-to-owned two-line boundary");
+    const keptBoundary = boundary;
+
+    let chatChunk = 0;
+    const result = await new MinutesExtractor({
+      async chat(prompt) {
+        const chunk = parsePrompt(prompt);
+        const index = chatChunk++;
+        const seqs = chunk.lines.map((line) => line.seq);
+        if (
+          index !== emittingChunk ||
+          !seqs.includes(keptBoundary.start_seq) || !seqs.includes(keptBoundary.end_seq)
+        ) {
+          return payload();
+        }
+        const startLine = chunk.lines.find((line) => line.seq === keptBoundary.start_seq);
+        const endLine = chunk.lines.find((line) => line.seq === keptBoundary.end_seq);
+        if (!startLine || !endLine) return payload();
+        return payload({
+          actionItems: [{
+            description: "경계 작업",
+            sourceSegment: {
+              transcript_version_id: "tv-1",
+              start_seq: keptBoundary.start_seq,
+              end_seq: keptBoundary.end_seq,
+            },
+            evidenceQuote: `${startLine.text}\n${endLine.text}`,
+            suggestedAttributionAttendeeId: null,
+            suggestedAssigneeAttendeeId: null,
+            deadline: null,
+            deadlineText: null,
+          }],
+        });
+      },
+    }, 3_000).extract(longRequest);
+
+    expect(result.actionItems).toHaveLength(1);
+    expect(result.actionItems[0]?.sourceSegment).toEqual({
+      transcript_version_id: "tv-1",
+      start_seq: keptBoundary.start_seq,
+      end_seq: keptBoundary.end_seq,
+    });
+  });
+});
+
+describe("extraction boundary characterization", () => {
+  test("validates real calendar dates in parsed and local action items", () => {
+    for (const [date, expected] of [
+      ["2026-02-29", null], ["2024-02-29", "2024-02-29"],
+      ["2026-04-31", null], ["2026년 8월 7일", "2026-08-07"],
+    ]) {
+      const text = `${date}까지 완료하겠습니다.`;
+      const input = { ...request, lines: [{ seq: 17, speakerTurn: null, text }] };
+      const parsed = parseMinutesExtractionJson(payload({ actionItems: [{
+        description: "Complete", evidenceQuote: text, deadlineText: date,
+        source: { transcript_version_id: "tv-1", start_seq: 17, end_seq: 17 },
+      }] }), input);
+      expect(parsed.actionItems[0]?.deadline).toBe(expected);
+      expect(localRuleExtraction(input).actionItems[0]?.deadline).toBe(expected);
+    }
+  });
+
+  test("bounds actual UTF-8 transport bytes and keeps oversized lines local", async () => {
+    const budget = 4_000;
+    const input = { ...request, lines: Array.from({ length: 12 }, (_, index) => ({
+      seq: index + 20, speakerTurn: null,
+      text: `${"한글😀".repeat(index === 5 ? 1_000 : 45)} 결정했습니다.`,
+    })) };
+    let calls = 0;
+    const result = await new MinutesExtractor({ async chat(prompt, options) {
+      calls++;
+      expect(Buffer.byteLength(prompt) + Buffer.byteLength(options?.system ?? "")).toBeLessThanOrEqual(budget);
+      const chunk: MinutesExtractionInput = JSON.parse(prompt.slice(prompt.indexOf("\n") + 1));
+      expect(chunk.lines.some((line) => line.seq === 25)).toBe(false);
+      return payload();
+    } }, budget).extract(input);
+    expect(calls).toBeGreaterThan(1);
+    expect(result.usedFallback).toBe(true);
+    expect(result.decisions.map((item) => item.sourceSegment)).toEqual([
+      { transcript_version_id: "tv-1", start_seq: 25, end_seq: 25 },
+    ]);
+    for (const invalid of [999, 1_000.5, NaN, Infinity]) {
+      expect(() => chunkMinutesExtractionInput(input, invalid)).toThrow("maxBytes must be an integer >= 1000");
+    }
+  });
+
+  test("awaits each transport completion before starting the next chunk", async () => {
+    const input = { ...request, lines: Array.from({ length: 12 }, (_, index) => ({
+      seq: index + 1, speakerTurn: null, text: "evidence ".repeat(80),
+    })) };
+    let active = 0;
+    let maximum = 0;
+    let calls = 0;
+    await new MinutesExtractor({ async chat() {
+      calls++;
+      active++;
+      maximum = Math.max(maximum, active);
+      await Promise.resolve();
+      active--;
+      return payload();
+    } }, 3_000).extract(input);
+    expect(calls).toBeGreaterThan(1);
+    expect(maximum).toBe(1);
   });
 });

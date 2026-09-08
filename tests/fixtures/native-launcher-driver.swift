@@ -217,7 +217,11 @@ func parseTransportEvents(_ raw: Any?) throws -> [TransportEvent] {
 }
 
 func runTransportURL(_ input: [String: Any]) throws -> Any {
-    ["url": TransportEndpoint.webSocketURL(port: try requireInt(input, "port"))]
+    let port = try requireInt(input, "port")
+    return [
+        "url": TransportEndpoint.webSocketURL(port: port),
+        "origin": TransportEndpoint.webSocketOrigin(port: port),
+    ]
 }
 
 func runTransport(_ input: [String: Any]) throws -> Any {

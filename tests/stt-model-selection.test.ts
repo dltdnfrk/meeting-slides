@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { SttModelManager } from "../src/stt-model-downloader.ts";
-import { createSelectSttModel } from "../src/stt-model-selection.ts";
+import { createSelectSttModel, resolveSttCaptureIdentity } from "../src/stt-model-selection.ts";
 import { SttModelSettingsStore } from "../src/stt-model-settings.ts";
 import type { SttModelArtifact } from "../src/stt-model-catalog.ts";
 
@@ -12,6 +12,7 @@ function artifact(id: "small" | "medium", fileName: `${string}.bin`): SttModelAr
   return {
     id,
     label: id,
+    backend: "whisper",
     fileName,
     url: "http://127.0.0.1/model",
     sizeBytes: 5,
@@ -22,6 +23,33 @@ function artifact(id: "small" | "medium", fileName: `${string}.bin`): SttModelAr
 }
 
 describe("STT selection controller", () => {
+  test("resolves the actual backend and model path used by capture", () => {
+    expect(resolveSttCaptureIdentity({
+      selectedArtifact: null,
+      selectedPath: null,
+      fallbackModelPath: "/configured/ggml-large-v3-turbo.bin",
+    })).toEqual({
+      engine: "whisper.cpp",
+      engineModel: "/configured/ggml-large-v3-turbo.bin",
+    });
+    expect(resolveSttCaptureIdentity({
+      selectedArtifact: { backend: "whisper" },
+      selectedPath: "/installed/ggml-medium-q8_0.bin",
+      fallbackModelPath: "/configured/fallback.bin",
+    })).toEqual({
+      engine: "whisper.cpp",
+      engineModel: "/installed/ggml-medium-q8_0.bin",
+    });
+    expect(resolveSttCaptureIdentity({
+      selectedArtifact: { backend: "transcribe" },
+      selectedPath: "/installed/Qwen3-ASR-0.6B-Q8_0.gguf",
+      fallbackModelPath: "/configured/fallback.bin",
+    })).toEqual({
+      engine: "transcribe.cpp",
+      engineModel: "/installed/Qwen3-ASR-0.6B-Q8_0.gguf",
+    });
+  });
+
   function fixture() {
     const root = mkdtempSync(join(tmpdir(), "meeting-stt-select-"));
     const modelDir = join(root, "models", "stt");

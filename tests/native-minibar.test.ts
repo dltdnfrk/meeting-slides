@@ -606,6 +606,7 @@ beforeAll(() => {
     PROJECTION_SWIFT,
     CONTROLLER_SWIFT,
     VIEW_SWIFT,
+    join(ROOT, "macos", "SystemAudioCapture.swift"),
     LAUNCHER_SWIFT,
   ]);
   shellTypecheckExit = shell.exitCode;
@@ -699,6 +700,29 @@ describe("native minibar seam: sources and compilation", () => {
     }
   });
 
+  test("initial and reconnect WebSockets send the server-allowed native Origin", () => {
+    const controller = sourceOf(CONTROLLER_SWIFT);
+    expect(controller).toMatch(/URLRequest\(url:\s*endpoint\)/);
+    expect(controller).toMatch(
+      /setValue\(\s*TransportEndpoint\.webSocketOrigin\(port:\s*port\),\s*forHTTPHeaderField:\s*"Origin"\s*\)/,
+    );
+    expect(controller.match(/webSocketTask\(with:\s*(?:self\.)?webSocketRequest\)/g)).toHaveLength(2);
+    expect(controller).not.toMatch(/webSocketTask\(with:\s*endpoint\)/);
+  });
+
+  test("the native surface becomes online only after a successful receive", () => {
+    const controller = sourceOf(CONTROLLER_SWIFT);
+    expect(controller.match(/transport\.handle\(\.opened\)/g)).toHaveLength(1);
+    expect(controller).toMatch(
+      /case let \.success\(message\):\s*if self\.transport\.projection\.connection != \.online/,
+    );
+    expect(controller).not.toMatch(
+      /task\.resume\(\)\s*receiveNext\(\)\s*apply\(transport\.handle\(\.opened\)\)/,
+    );
+    expect(controller).toMatch(/private var isStopping = false/);
+    expect(controller).toMatch(/guard !self\.isStopping else \{ return \}/);
+  });
+
   test("the panel frame is authoritative so content cannot grow past the contract size", () => {
     // Real QA caught a 360x88 collapsed panel: Auto Layout content had grown the
     // window past the 360x56 contract. The frame now pins the content box.
@@ -712,6 +736,15 @@ describe("native minibar seam: sources and compilation", () => {
     expect(view).toMatch(/transcriptStack\.isHidden\s*=\s*true/);
     expect(view).toMatch(/transcriptStack\.isHidden\s*=\s*false/);
     expect(view).toMatch(/MinibarLayout\.expanded/);
+  });
+
+  test("a long reconnect title cannot grow the collapsed panel beyond 360pt", () => {
+    const view = sourceOf(VIEW_SWIFT);
+    expect(view).toMatch(/statusTitle\.lineBreakMode\s*=\s*\.byTruncatingTail/);
+    expect(view).toMatch(/statusTitle\.maximumNumberOfLines\s*=\s*1/);
+    expect(view).toMatch(
+      /statusTitle\.setContentCompressionResistancePriority\(\.defaultLow,\s*for:\s*\.horizontal\)/,
+    );
   });
 
   test("the AppKit shell stays thin: geometry and status come from the pure modules", () => {
@@ -1120,6 +1153,24 @@ describe("native minibar seam: window policy", () => {
     expect(controller).toMatch(/panel\.isOpaque\s*=\s*false/);
     expect(controller).toMatch(/panel\.backgroundColor\s*=\s*\.clear/);
     expect(controller).toMatch(/panel\.hasShadow\s*=\s*true/);
+  });
+
+  test("the minibar controls use one restrained monochrome palette", () => {
+    const view = readFileSync(VIEW_SWIFT, "utf8")
+      .split("\n")
+      .filter((line) => !line.trim().startsWith("//"))
+      .join("\n");
+
+    expect(view).toMatch(/isBordered\s*=\s*false/);
+    expect(view).toMatch(/layer\?\.backgroundColor/);
+    expect(view).toMatch(/layer\?\.borderColor/);
+    expect(view).toMatch(/final class MinibarButton: NSButton/);
+    expect(view).toMatch(/focusRingType\s*=\s*\.none/);
+    expect(view).toMatch(/override func becomeFirstResponder\(\) -> Bool/);
+    expect(view).toMatch(/layer\?\.cornerRadius\s*=\s*10/);
+    expect(view).not.toMatch(
+      /\.system(?:Red|Blue|Green|Orange|Pink|Purple|Yellow|Indigo|Teal|Mint|Cyan)\b/,
+    );
   });
 });
 

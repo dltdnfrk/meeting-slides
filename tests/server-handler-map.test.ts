@@ -1,60 +1,49 @@
 import { expect, test } from "bun:test";
-import { spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { startMeetingServer } from "./helpers/meeting-server.ts";
+import { MeetingStore } from "../src/store.ts";
+import { MinutesStore } from "../src/minutes-store.ts";
+import { transcriptContentSha256 } from "../src/transcript-versioning.ts";
 
-const root = join(import.meta.dir, "..");
-const existingActions = [
-  "startCapture",
-  "stopCapture",
-  "startReview",
-  "reset",
-  "setAttendees",
-  "attendees",
-  "updateItem",
-  "confirmReview",
-  "status",
-  "transcript",
-  "exportDeck",
-  "exportPdf",
-  "exportPng",
-  "saveNotes",
-  "saveJson",
-  "ask",
-  "setProvider",
-  "connectProvider",
-  "setProviderKey",
-  "recheckProviders",
-] as const;
+const liveActions = ["ask", "attendees", "audio", "cancelSttModel", "compileSlidePlan", "confirmReview", "connectProvider", "deleteMeeting", "exportDeck", "exportPdf", "exportPng", "installSttModel", "listMeetings", "persistSlidePlan", "recheckProviders", "recheckSttModels", "refineSlideField", "reset", "saveJson", "saveNotes", "saveTranscript", "selectMeeting", "selectSttModel", "setAttendees", "setCaptureSource", "setProvider", "setProviderKey", "startCapture", "startReview", "status", "stopCapture", "transcript", "updateItem"];
 
-test("the real WS registry contains executable handlers for every existing action", () => {
-  const probe = `
-    import { handlerMap } from "./server.ts";
-    const actions = ${JSON.stringify(existingActions)};
-    const missing = actions.filter((action) => !handlerMap.has(action));
-    const nonFunctions = actions.filter((action) => typeof handlerMap.get(action) !== "function");
-    console.log(JSON.stringify({ missing, nonFunctions, size: handlerMap.size }));
-    process.exit(missing.length || nonFunctions.length ? 1 : 0);
-  `;
-  const result = spawnSync(process.execPath, ["-e", probe], {
-    cwd: root,
-    encoding: "utf8",
-    timeout: 10_000,
-    env: {
-      ...process.env,
-      HTTP_PORT: String(19_300 + (process.pid % 500)),
-      OPEN_BROWSER: "false",
-      LLM_PROVIDER: "cli",
-      LLM_CLI_BIN: "/usr/bin/true",
-      LLM_CLI_PRESET: "claude",
-      WHISPER_INPUT_MODE: "mic",
-    },
-  });
+function fixture() {
+  const directory = mkdtempSync(join(tmpdir(), "handler-map-"));
+  const dbPath = join(directory, "meeting.db");
+  const running = startMeetingServer({ ...process.env, LLM_PROVIDER: "cli", LLM_CLI_BIN: "/usr/bin/false", LLM_CLI_PRESET: "claude", MEETINGS_DB_PATH: dbPath, MEETING_SLIDES_SETTINGS_ROOT: directory });
+  return { running, dbPath, async close() { await running.close(); rmSync(directory, { recursive: true, force: true }); } };
+}
 
-  expect(result.status, result.stderr).toBe(0);
-  const receipt = JSON.parse(result.stdout.trim().split("\n").at(-1)!) as {
-    missing: string[];
-    nonFunctions: string[];
-    size: number;
-  };
-  expect(receipt).toEqual({ missing: [], nonFunctions: [], size: existingActions.length });
+test("one complete registry owns every live action and excludes retired actions", async () => {
+  const app = fixture();
+  try {
+    expect([...app.running.handlerMap.keys()].sort()).toEqual([...liveActions].sort());
+    for (const action of liveActions) expect(typeof app.running.handlerMap.get(action)).toBe("function");
+    for (const action of ["unknownAction", "", "compileDeck", "compileTranscriptSnapshot", "exportPptx"]) expect(app.running.handlerMap.has(action)).toBe(false);
+  } finally { await app.close(); }
+});
+
+test("SlidePlan compile evidence includes attendee display names for confirmed owners", async () => {
+  const app = fixture();
+  const legacy = new MeetingStore(app.dbPath);
+  try {
+    const minutes = new MinutesStore(legacy.databaseHandle());
+    const meetingId = legacy.startMeeting("cli:test");
+    minutes.registerCapturingMeeting(meetingId);
+    minutes.addAttendees(meetingId, [{ attendeeId: "att-minsu", displayName: "김민수" }]);
+    const version = minutes.addTranscriptVersion(meetingId, { transcriptVersionId: "canonical-v1", sourceKind: "live_capture" });
+    minutes.addTranscriptVersionLines(version.transcriptVersionId, [{ seq: 1, text: "Please publish the release notes." }]);
+    minutes.finalizeTranscriptVersion(version.transcriptVersionId, transcriptContentSha256(minutes, version.transcriptVersionId));
+    minutes.setCanonical(meetingId, version.transcriptVersionId);
+    const reviewId = minutes.saveCandidates({      
+meetingId, transcriptVersionId: version.transcriptVersionId, actionItems: [{
+        id: "action-1", description: "Publish the release notes", evidenceQuote: "Please publish the release notes.",
+        source: { transcriptVersionId: version.transcriptVersionId, startSeq: 1, endSeq: 1 }, assigneeAttendeeId: "att-minsu", attributedAttendeeId: "att-minsu", deadline: "2026-08-28", reviewState: "confirmed",
+      }]    
+});
+    minutes.confirmReview(reviewId, "reviewer");
+    expect(app.running.slidePlanTranscriptFor(meetingId).confirmedReview).toMatchObject({ attendees: [{ attendeeId: "att-minsu", displayName: "김민수" }] });
+  } finally { legacy.close(); await app.close(); }
 });

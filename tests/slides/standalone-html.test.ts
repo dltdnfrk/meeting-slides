@@ -11,6 +11,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import sharp from "sharp";
 
 import type { ResolvedAssetLayer } from "../../src/slides/assets/integration.ts";
 import type {
@@ -21,6 +22,7 @@ import type {
 } from "../../src/slides/geometry/contract.ts";
 import type { Theme } from "../../src/slides/model/plan.ts";
 import { toCssCustomProperties } from "../../src/slides/theme/css-tokens.ts";
+import { fitSlidesGrabViewport } from "../../src/slides/render/standalone-presentation.ts";
 import {
   StandaloneHtmlError,
   renderStandaloneHtml,
@@ -210,7 +212,7 @@ function slideSections(html: string): string[] {
 
 function expectFailure(
   operation: () => unknown,
-  expected: { code: string; path: string; detail?: RegExp },
+  expected: { code: StandaloneHtmlError["code"]; path: string; detail?: RegExp },
 ): void {
   try {
     operation();
@@ -244,6 +246,62 @@ afterEach(() => {
 });
 
 describe("deterministic self-contained standalone deck HTML", () => {
+  test("legacy viewport adaptation changes only the head style and is idempotent", () => {
+    const legacy = "@media (width: 960px) and (height: 540px) and (min-resolution: 1.3dppx) and (max-resolution: 1.4dppx)";
+    const current = "@media (width: 960px) and (height: 540px)";
+    const html = `<style>${legacy}{.slide{transform:scale(.75)}}</style><p>${legacy}</p>`;
+    const adapted = fitSlidesGrabViewport(html);
+    expect(adapted).toBe(`<style>${current}{.slide{transform:scale(.75)}}</style><p>${legacy}</p>`);
+    expect(fitSlidesGrabViewport(adapted)).toBe(adapted);
+  });
+
+  test("real raster presets keep the far-right bottom geometry inside the image", async () => {
+    const font = readFileSync(join(import.meta.dir, "../../public/fonts/pretendard-variable.woff2"));
+    const actualTheme = {
+      ...theme(),
+      font: { family: "Pretendard Variable", localPath: "fonts/real.woff2", sha256: sha256(font) },
+    };
+    writeFileSync(join(root, actualTheme.font.localPath), font);
+    const base = geometry("slide-edge");
+    const edge: GeometrySlide = {
+      ...base,
+      elements: [...base.elements, geometryElement(
+        base.slideId, "slide-edge:corner", "decoration", "", [""],
+        { x: 1220, y: 660, width: 40, height: 40 }, 3,
+      )],
+    };
+    const artifact = render({
+      theme: actualTheme,
+      slides: [{ geometry: preflight(edge), assets: assetLayer(edge.slideId, false) }],
+    });
+    const slides = join(root, "slides");
+    mkdirSync(slides);
+    const document = artifact.slidesGrabDocuments[0]!;
+    writeFileSync(join(slides, document.filename), document.bytes);
+    for (const resolution of ["720p", "2160p"]) {
+      const output = join(root, resolution);
+      const child = Bun.spawn([
+        join(import.meta.dir, "../../node_modules/.bin/slides-grab"),
+        "png", "--slides-dir", slides, "--output-dir", output, "--resolution", resolution,
+      ], {
+        cwd: root,
+        env: { ...process.env, PLAYWRIGHT_BROWSERS_PATH: join(import.meta.dir, "../../vendor/ms-playwright") },
+        stdout: "pipe", stderr: "pipe",
+      });
+      const [code, stdout, stderr] = await Promise.all([
+        child.exited, new Response(child.stdout).text(), new Response(child.stderr).text(),
+      ]);
+      expect(code, stdout + stderr).toBe(0);
+      const image = join(output, document.filename.replace(/\.html$/, ".png"));
+      const { data, info } = await sharp(image).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+      const x = Math.floor(info.width * 1240 / 1280);
+      const y = Math.floor(info.height * 680 / 720);
+      const offset = (y * info.width + x) * info.channels;
+      expect([...data.subarray(offset, offset + 3)], `${resolution} far-right bottom marker`)
+        .toEqual([0xad, 0x4b, 0x2f]);
+    }
+  }, 120_000);
+
   test("renders and writes one byte-identical UTF-8 presentation document with every resource embedded", () => {
     let fetchCalls = 0;
     const originalFetch = globalThis.fetch;

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { TranscriptStore } from "./minutes-store-transcripts.ts";
-import type { SaveCandidatesInput, SourceRange } from "./minutes-store-types.ts";
+import type { ReviewSummary, SaveCandidatesInput, SourceRange } from "./minutes-store-types.ts";
 import { nonBlank, reviewError } from "./minutes-store-utils.ts";
 
 export class ReviewPersistenceStore extends TranscriptStore {
@@ -67,12 +67,48 @@ export class ReviewPersistenceStore extends TranscriptStore {
       for (const item of input.referencedMaterials ?? []) {
         if (item.source) this.validateSource(input.meetingId, input.transcriptVersionId, item.source);
         this.db.run(`
-          INSERT INTO referenced_materials VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO referenced_materials
+            (material_id, meeting_id, review_id, material_type, title, uri, notes,
+             source_transcript_version_id, source_start_seq, source_end_seq,
+             review_state, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [item.id ?? randomUUID(), input.meetingId, reviewId, item.materialType, item.title ?? null,
           item.uri ?? null, item.notes ?? null, item.source?.transcriptVersionId ?? null,
           item.source?.startSeq ?? null, item.source?.endSeq ?? null, item.reviewState ?? "candidate", now, now]);
       }
+      if (input.summary) {
+        for (const topic of input.summary.topics) {
+          this.validateSource(input.meetingId, input.transcriptVersionId, {
+            transcriptVersionId: topic.source.transcript_version_id,
+            startSeq: topic.source.start_seq,
+            endSeq: topic.source.end_seq,
+          });
+        }
+        this.db.run(`
+          INSERT INTO review_summaries (review_id, overview, topics_json, created_at)
+          VALUES (?, ?, ?, ?)
+        `, [reviewId, input.summary.overview, JSON.stringify(input.summary.topics), now]);
+      }
       return reviewId;
+    })();
+  }
+
+  replaceDraft(input: SaveCandidatesInput): string {
+    return this.db.transaction(() => {
+      const existing = this.reviewForMeeting(input.meetingId, input.transcriptVersionId);
+      if (existing?.status === "confirmed") {
+        throw reviewError("REVIEW_NOT_DRAFT", `review ${existing.reviewId} is missing or not draft`);
+      }
+      if (existing !== null) {
+        this.db.run(
+          "DELETE FROM meeting_reviews WHERE review_id = ? AND status = 'draft'",
+          [existing.reviewId],
+        );
+      }
+      return this.saveCandidates({
+        ...input,
+        reviewId: existing?.reviewId ?? input.reviewId,
+      });
     })();
   }
 
@@ -107,7 +143,7 @@ export class ReviewPersistenceStore extends TranscriptStore {
 
   review(reviewId: string): {
     reviewId: string; meetingId: number; transcriptVersionId: string; status: "draft" | "confirmed";
-    confirmedAt: number | null; confirmedBy: string | null;
+    confirmedAt: number | null; confirmedBy: string | null; summary: ReviewSummary | null;
   } | null {
     const row = this.db.query("SELECT * FROM meeting_reviews WHERE review_id = ?").get(reviewId) as
       Record<string, unknown> | null;
@@ -115,7 +151,17 @@ export class ReviewPersistenceStore extends TranscriptStore {
       reviewId: row.review_id as string, meetingId: row.meeting_id as number,
       transcriptVersionId: row.transcript_version_id as string, status: row.status as "draft" | "confirmed",
       confirmedAt: row.confirmed_at as number | null, confirmedBy: row.confirmed_by as string | null,
+      summary: this.summaryFor(reviewId),
     };
+  }
+
+  private summaryFor(reviewId: string): ReviewSummary | null {
+    const row = this.db.query(
+      "SELECT overview, topics_json FROM review_summaries WHERE review_id = ?",
+    ).get(reviewId) as { overview: string; topics_json: string } | null;
+    if (!row) return null;
+    const topics: unknown = JSON.parse(row.topics_json);
+    return { overview: row.overview, topics: Array.isArray(topics) ? topics as ReviewSummary["topics"] : [] };
   }
 
   reviewForMeeting(meetingId: number, transcriptVersionId?: string): ReturnType<ReviewPersistenceStore["review"]> {

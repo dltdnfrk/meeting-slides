@@ -22,7 +22,7 @@ export function draftDecision(value: unknown): LayoutDraft {
     const bottom = Math.floor((index + 1) * 528 / rationale.length);
     elements.push(element(slide.id, elements.length, {
     key: `rationale-${index}`, role: "rationale", text,
-    box: { x: 900, y: 190 + top, width: 300, height: Math.max(1, bottom - top - 8) },
+    box: { x: 860, y: 190 + top, width: 360, height: Math.max(1, bottom - top - 8) },
     tokens: { color: "colors.ink", size: "typography.body.size", font: "font.family" },
     evidence: evidenceFor(slide, `rationale[${index}]`), accessibilityLabel: `Rationale ${index + 1}: ${text}`,
     }));

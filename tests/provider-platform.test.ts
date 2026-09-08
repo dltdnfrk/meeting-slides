@@ -66,7 +66,7 @@ describe("subscription provider registry", () => {
     }
   });
 
-  test("Finder-like PATH discovers executables and never guesses unverifiable auth", () => {
+  test("Finder-like PATH discovers executables and never guesses unverifiable auth", async () => {
     const home = mkdtempSync(join(tmpdir(), "provider-probe-"));
     const bin = join(home, ".npm-global", "bin");
     const grokBin = join(home, ".grok", "bin");
@@ -77,7 +77,7 @@ describe("subscription provider registry", () => {
     fakeCli(grokBin, "grok", `test "$1" = "--version"`);
 
     try {
-      const states = inspectSubscriptionProviders({ HOME: home, PATH: "/usr/bin:/bin" });
+      const states = await inspectSubscriptionProviders({ HOME: home, PATH: "/usr/bin:/bin" });
       const byId = Object.fromEntries(states.map((state) => [state.id, state]));
       expect(byId["cli:codex"]).toMatchObject({ installed: true, auth: "connected" });
       expect(byId["cli:claude"]).toMatchObject({ installed: true, auth: "disconnected" });

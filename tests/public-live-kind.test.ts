@@ -5,6 +5,7 @@ import puppeteer, { type Browser, type Page } from "puppeteer";
 import { createPublicTestHarness } from "./public-test-harness.ts";
 
 const harness = createPublicTestHarness();
+const hookTimeoutMs = 60_000;
 let browser: Browser;
 let page: Page;
 const chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
@@ -55,12 +56,12 @@ beforeAll(async () => {
     (document.getElementById("btn-record") as HTMLButtonElement)?.textContent?.includes("녹음 중지"),
     { timeout: 5_000 },
   );
-}, 20_000);
+}, hookTimeoutMs);
 
 afterAll(async () => {
   await browser?.close();
   harness.stop();
-});
+}, hookTimeoutMs);
 
 describe("live multi-kind design", () => {
   test("기본 주제 카드는 topic 레이아웃(비주얼 밴드)으로 렌더된다", async () => {

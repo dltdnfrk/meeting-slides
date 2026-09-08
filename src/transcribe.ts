@@ -10,7 +10,13 @@ import { spawn, type ChildProcess } from "node:child_process";
 
 import { TranscribeModel, type Stream, type Session, type Backend } from "transcribe-cpp";
 
+import {
+  describeStoppedAudio,
+  type AudioRetranscription,
+  type StoppedAudioRecording,
+} from "./audio-recorder.js";
 import type { TranscriptChunk, WhisperOptions } from "./whisper.js";
+import { PcmIngest, type PcmSource } from "./pcm-ingest.ts";
 import type { WhisperConfig } from "./config.js";
 
 export interface TranscribeConfig {
@@ -19,6 +25,8 @@ export interface TranscribeConfig {
   threads: number;
   gpu: boolean;
   ffmpegBin: string;
+  audioOutputPath?: string;
+  pcmSource?: PcmSource;
 }
 
 interface ModelCacheEntry {
@@ -80,11 +88,20 @@ function koreanLocale(languages: readonly string[]): string | undefined {
   return languages.find((lang) => lang.toLowerCase().startsWith("ko"));
 }
 
-function pcmArgs(config: TranscribeConfig, filePath: string | null): string[] {
+export function transcribePcmArgs(config: TranscribeConfig, filePath: string | null): string[] {
   const base = ["-nostdin", "-hide_banner", "-loglevel", "error"];
   const input = filePath !== null
     ? ["-i", filePath]
     : ["-f", "avfoundation", "-i", config.captureId < 0 ? ":default" : `:${config.captureId}`];
+  if (filePath === null && config.audioOutputPath) {
+    return [
+      ...base,
+      ...input,
+      "-filter_complex", "[0:a]asplit=2[stt][archive]",
+      "-map", "[stt]", "-ar", "16000", "-ac", "1", "-acodec", "pcm_f32le", "-f", "f32le", "pipe:1",
+      "-map", "[archive]", "-ac", "1", "-acodec", "pcm_s16le", "-y", config.audioOutputPath,
+    ];
+  }
   return [...base, ...input, "-ar", "16000", "-ac", "1", "-acodec", "pcm_f32le", "-f", "f32le", "pipe:1"];
 }
 
@@ -200,6 +217,7 @@ abstract class TranscribeBase {
   abstract start(opts: WhisperOptions): Promise<void>;
 
   async stop(): Promise<void> {
+    if (this.config.pcmSource instanceof PcmIngest) this.config.pcmSource.finish();
     const proc = this.proc;
     if (proc && proc.exitCode === null && proc.signalCode === null) {
       proc.kill("SIGTERM");
@@ -217,8 +235,9 @@ abstract class TranscribeBase {
   }
 
   protected emitSentences(text: string, onChunk: (c: TranscriptChunk) => void): void {
-    // 한국어/영어 문장 부호 기준 최소 분할 (whisper.ts 어셈블러와 동일 계열)
-    for (const piece of text.split(/(?<=[.?!다요죠음임까]|는데)\s+/)) {
+    // 문장 종결 부호(.!?。？！)와 줄바꿈 경계에서만 분할한다. 한국어 어미(다/요/죠 등)로
+    // 자르면 '감사합니다 여러분' 같은 문장이 반으로 갈라지므로 어미로는 분할하지 않는다.
+    for (const piece of text.split(/(?<=[.!?。？！\n])/)) {
       const sentence = piece.trim();
       if (!sentence) continue;
       onChunk({ text: sentence, ts: Date.now() });
@@ -249,10 +268,13 @@ export class TranscribeStream extends TranscribeBase {
         timestamps: "segment",
       });
 
-      const args = pcmArgs(this.config, null);
-      this.proc = spawn(this.config.ffmpegBin, args, { stdio: ["ignore", "pipe", "pipe"] });
-      const reader = new PcmReader(this.proc, (err) => opts.onError?.(err));
-      this.proc.on("error", (err) => opts.onError?.(err));
+      const reader = this.config.pcmSource ?? (() => {
+        const args = transcribePcmArgs(this.config, null);
+        this.proc = spawn(this.config.ffmpegBin, args, { stdio: ["ignore", "pipe", "pipe"] });
+        const pcmReader = new PcmReader(this.proc, (err) => opts.onError?.(err));
+        this.proc.on("error", (err) => opts.onError?.(err));
+        return pcmReader;
+      })();
 
       let committed = "";
       for (;;) {
@@ -267,15 +289,42 @@ export class TranscribeStream extends TranscribeBase {
         }
       }
       const final = await this.stream.finalize();
-      if (final.committedChanged || this.stream.text.tentative) {
-        const text = this.stream.text.committed + this.stream.text.tentative;
-        const delta = text.slice(committed.length);
+      if (final.committedChanged) {
+        const delta = this.stream.text.committed.slice(committed.length);
         this.emitSentences(delta, opts.onChunk);
       }
     } finally {
       await this.stop();
       lease.release();
     }
+  }
+
+  stoppedAudio(): StoppedAudioRecording {
+    if (!this.config.audioOutputPath) throw new Error("transcribe audio saving is not configured");
+    if (this.config.pcmSource instanceof PcmIngest) this.config.pcmSource.finalizeWav();
+    return describeStoppedAudio(this.config.audioOutputPath);
+  }
+
+  async retranscribe(recording: StoppedAudioRecording): Promise<AudioRetranscription> {
+    const lines: AudioRetranscription["lines"][number][] = [];
+    const cli = new TranscribeCLI({ ...this.config, audioOutputPath: undefined }, recording.path);
+    await cli.start({
+      onChunk: (chunk) => {
+        if (chunk.audioStartMs === undefined || chunk.audioEndMs === undefined) return;
+        lines.push({
+          capturedAtMs: null,
+          audioStartMs: chunk.audioStartMs,
+          audioEndMs: chunk.audioEndMs,
+          speakerTurn: chunk.speaker ?? null,
+          text: chunk.text,
+        });
+      },
+    });
+    return {
+      engine: "transcribe.cpp",
+      engineModel: this.config.modelPath,
+      lines,
+    };
   }
 }
 
@@ -295,19 +344,27 @@ export class TranscribeCLI extends TranscribeBase {
       const language = koreanLocale(model.capabilities.languages);
       opts.onStatus?.(`transcribe.cpp 파일 전사 (파일: ${this.filePath}, backend=${model.backend})`);
 
-      const args = pcmArgs(this.config, this.filePath);
+      this.session = model.createSession({ nThreads: this.config.threads });
+      const maxAudioMs = this.session.limits.effectiveMaxAudioMs;
+      const maxSamples = maxAudioMs > 0 ? Math.floor(maxAudioMs * 16) : Infinity;
+      const args = transcribePcmArgs(this.config, this.filePath);
       this.proc = spawn(this.config.ffmpegBin, args, { stdio: ["ignore", "pipe", "pipe"] });
       const reader = new PcmReader(this.proc, (err) => opts.onError?.(err));
       this.proc.on("error", (err) => opts.onError?.(err));
 
       const parts: Float32Array[] = [];
+      let total = 0;
       for (;;) {
         const chunk = await reader.next();
         if (chunk === null) break;
+        total += chunk.length;
+        // Reject before retaining the overflowing chunk or allocating contiguous PCM.
+        if (total > maxSamples) {
+          throw new Error(`오디오가 모델 처리 한도를 초과합니다: ${Math.ceil(total / 16)}ms > ${maxAudioMs}ms`);
+        }
         parts.push(chunk);
       }
       if (parts.length === 0) throw new Error("디코드된 오디오가 없습니다");
-      const total = parts.reduce((sum, part) => sum + part.length, 0);
       const pcm = new Float32Array(total);
       let offset = 0;
       for (const part of parts) {
@@ -316,12 +373,7 @@ export class TranscribeCLI extends TranscribeBase {
       }
       parts.length = 0;
 
-      this.session = model.createSession({ nThreads: this.config.threads });
-      const maxAudioMs = this.session.limits.effectiveMaxAudioMs;
       const durationMs = (pcm.length / 16_000) * 1_000;
-      if (maxAudioMs > 0 && durationMs > maxAudioMs) {
-        throw new Error(`오디오가 모델 처리 한도를 초과합니다: ${Math.ceil(durationMs)}ms > ${maxAudioMs}ms`);
-      }
       const result = await this.session.run(pcm, {
         ...(language ? { language } : {}),
         timestamps: "segment",
@@ -329,10 +381,20 @@ export class TranscribeCLI extends TranscribeBase {
       for (const segment of result.segments) {
         const text = segment.text.trim();
         if (!text) continue;
-        opts.onChunk({ text, ts: Date.now() });
+        opts.onChunk({
+          text,
+          ts: Date.now(),
+          audioStartMs: segment.t0Ms,
+          audioEndMs: segment.t1Ms,
+        });
       }
       if (result.segments.length === 0 && result.text.trim()) {
-        opts.onChunk({ text: result.text.trim(), ts: Date.now() });
+        opts.onChunk({
+          text: result.text.trim(),
+          ts: Date.now(),
+          audioStartMs: 0,
+          audioEndMs: Math.round(durationMs),
+        });
       }
     } finally {
       await this.stop();

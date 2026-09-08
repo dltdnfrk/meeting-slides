@@ -9,7 +9,13 @@ import puppeteer, { type Browser, type Page } from "puppeteer";
 
 const PUBLIC_DIR = join(import.meta.dir, "..", "public");
 const PUBLIC_FILES = new Set([
-  "/index.html", "/style.css", "/app.js", "/review-panel-render.js", "/review-panel.js",
+  "/index.html", "/style.css", "/caret-operator.css", "/app.js", "/app-transport.js",
+  "/meeting-workspace.js", "/settings-panel.js", "/attendees-panel.js", "/ask-panel.js",
+  "/publication-controller.js", "/operator-surface.js", "/slide-plan-workspace.js",
+  "/deck-editor.js", "/deck-editor-utils.js", "/deck-editor-validation.js",
+  "/deck-stage-controller.js", "/deck-stage.js", "/slide-plan-canvas.js", "/focus-trap.js",
+  "/review-panel-render.js", "/review-panel.js",
+  "/generated/ui-state-machine.js", "/generated/transcript-state.js", "/generated/protocol-values.js",
 ]);
 
 type FakeSocket = { emit(value: unknown): void; close(): void };
@@ -92,6 +98,20 @@ const emit = (value: unknown) => page.evaluate((v) => window.__sockets.slice(-1)
 const sent = () => page.evaluate(() => window.__sent);
 const clearSent = () => page.evaluate(() => { window.__sent.length = 0; });
 
+const waitForCompileCopy = (expected: string) => page.evaluate((value) => new Promise<void>((resolve) => {
+  const button = document.getElementById("btn-compile-deck");
+  if (button?.textContent?.trim() === value) {
+    resolve();
+    return;
+  }
+  const observer = new MutationObserver(() => {
+    if (button?.textContent?.trim() !== value) return;
+    observer.disconnect();
+    resolve();
+  });
+  if (button) observer.observe(button, { attributes: true, childList: true, subtree: true });
+}), expected);
+
 /** Emits a review payload and resolves once the panel has painted its rows. */
 async function openReview(overrides: Record<string, unknown> = {}): Promise<void> {
   await emit(reviewMessage(overrides));
@@ -134,6 +154,7 @@ beforeAll(async () => {
 
   browser = await puppeteer.launch({ headless: true });
   page = await browser.newPage();
+  await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
   await page.setViewport({ width: 1280, height: 900 });
   await page.evaluateOnNewDocument(() => {
     class FakeWebSocket {
@@ -147,6 +168,7 @@ beforeAll(async () => {
         window.__sent ??= [];
         window.__sockets ??= [];
         window.__sockets.push(this as unknown as FakeSocket);
+        window.dispatchEvent(new Event("testsocketconnected"));
         queueMicrotask(() => this.onopen?.(new Event("open")));
       }
       send(raw: string) { window.__sent.push(JSON.parse(raw)); }
@@ -169,9 +191,35 @@ afterAll(async () => {
 beforeEach(async () => {
   await loadShell();
   await clearSent();
-});
+}, 20_000);
 
 describe("review panel shell", () => {
+  test("the final rebuild decision mounts as a hidden named semantic dialog", async () => {
+    expect(await page.evaluate(() => {
+      const dialog = document.getElementById("slide-final-rebuild-dialog");
+      const titleId = dialog?.getAttribute("aria-labelledby") ?? "";
+      const bodyId = dialog?.getAttribute("aria-describedby") ?? "";
+      return {
+        hidden: (dialog as HTMLElement | null)?.hidden,
+        role: dialog?.getAttribute("role"),
+        modal: dialog?.getAttribute("aria-modal"),
+        title: document.getElementById(titleId)?.textContent?.trim(),
+        body: document.getElementById(bodyId)?.textContent?.trim(),
+        actions: [
+          document.getElementById("btn-slide-final-rebuild-cancel")?.textContent?.trim(),
+          document.getElementById("btn-slide-final-rebuild-confirm")?.textContent?.trim(),
+        ],
+      };
+    })).toEqual({
+      hidden: true,
+      role: "dialog",
+      modal: "true",
+      title: "확정본을 새로 만들까요?",
+      body: "검토가 확정되어 현재 초안의 로컬 편집은 확정본에 저장할 수 없습니다. 새 확정본은 확정된 검토 내용으로 다시 만들며, 저장된 초안은 그대로 남습니다. 현재 로컬 편집은 확정본에 포함되지 않습니다.",
+      actions: ["취소", "확정본 새로 만들기"],
+    });
+  });
+
   test("the panel mounts hidden and leaves the slide shell intact", async () => {
     expect(await page.evaluate(() => ({
       panelExists: !!document.getElementById("review-panel"),
@@ -289,6 +337,99 @@ describe("candidate cards", () => {
       { kind: "action_item", assignee: true },
       { kind: "open_item", assignee: false },
     ]);
+  });
+});
+
+describe("review summary", () => {
+  const summaryPayload = {
+    overview: "구독 전환을 확정하고 계약 초안을 금요일까지 공유하기로 했다.",
+    topics: [
+      {
+        title: "가격 정책",
+        summary: "구독 모델로 확정",
+        source: { transcript_version_id: VERSION_ID, start_seq: 1, end_seq: 1 },
+      },
+      {
+        title: "후속 계약",
+        summary: "초안을 금요일까지 공유",
+        source: { transcript_version_id: VERSION_ID, start_seq: 2, end_seq: 3 },
+      },
+    ],
+  };
+
+  test("a review message with a summary renders the overview and topic ranges above the cards", async () => {
+    await openReview({ summary: summaryPayload });
+    const view = await page.evaluate(() => {
+      const panel = document.getElementById("review-panel")!;
+      const summary = panel.querySelector(".review-summary");
+      const firstCard = panel.querySelector(".review-item");
+      return {
+        overview: summary?.querySelector(".review-summary__overview")?.textContent?.trim() ?? null,
+        topics: Array.from(summary?.querySelectorAll(".review-summary__topic") ?? []).map((row) => ({
+          title: row.querySelector(".review-summary__title")?.textContent?.trim(),
+          range: row.querySelector(".review-summary__coords")?.textContent?.trim(),
+        })),
+        summaryBeforeCards: Boolean(
+          summary && firstCard
+          && (summary.compareDocumentPosition(firstCard) & Node.DOCUMENT_POSITION_FOLLOWING),
+        ),
+      };
+    });
+    expect(view).toEqual({
+      overview: "구독 전환을 확정하고 계약 초안을 금요일까지 공유하기로 했다.",
+      topics: [
+        { title: "가격 정책", range: "1번째 문장" },
+        { title: "후속 계약", range: "2~3번째 문장" },
+      ],
+      summaryBeforeCards: true,
+    });
+  });
+
+  test("a review message with summary null renders no summary block", async () => {
+    await openReview({ summary: null });
+    expect(await page.evaluate(() => document.querySelector(".review-summary"))).toBeNull();
+  });
+
+  test("usedFallback true shows the badge text", async () => {
+    await openReview({ usedFallback: true, summary: summaryPayload });
+    expect(await page.evaluate(() => {
+      const badge = document.querySelector(".review-fallback-badge") as HTMLElement | null;
+      return { hidden: badge?.hidden ?? true, text: badge?.textContent?.trim() ?? "" };
+    })).toEqual({ hidden: false, text: "기본 규칙으로 정리됨" });
+  });
+
+  test("usedFallback false hides the fallback badge", async () => {
+    await openReview({ usedFallback: false, summary: summaryPayload });
+    expect(await page.evaluate(() => {
+      const badge = document.querySelector(".review-fallback-badge") as HTMLElement | null;
+      return badge?.hidden ?? true;
+    })).toBe(true);
+  });
+
+  test("markup inside the overview is rendered as text", async () => {
+    await openReview({
+      summary: {
+        overview: "<img src=x onerror=window.__xss=1>개요",
+        topics: [{
+          title: "<script>window.__xss=1</script>",
+          summary: "<b>bold</b>",
+          source: { transcript_version_id: VERSION_ID, start_seq: 1, end_seq: 1 },
+        }],
+      },
+    });
+    expect(await page.evaluate(() => ({
+      xss: (window as unknown as { __xss?: number }).__xss ?? null,
+      injected: document.querySelectorAll("#review-panel img, #review-panel script, #review-panel svg").length,
+      overview: document.querySelector(".review-summary__overview")?.textContent,
+      title: document.querySelector(".review-summary__title")?.textContent,
+      topicText: document.querySelector(".review-summary__text")?.textContent,
+    }))).toEqual({
+      xss: null,
+      injected: 0,
+      overview: "<img src=x onerror=window.__xss=1>개요",
+      title: "<script>window.__xss=1</script>",
+      topicText: "<b>bold</b>",
+    });
   });
 });
 
@@ -597,24 +738,92 @@ describe("keyboard accessibility", () => {
 });
 
 describe("reconnect and update handling", () => {
+  test("reconnect restores draft or confirmed compile copy from the authoritative meeting frame", async () => {
+    await emit({ type: "meetings", items: [{ id: 7, title: "재연결 회의", started_at: Date.now(), status: "ended" }] });
+    await page.click('.session-row[data-meeting-id="7"]');
+    await clearSent();
+    const confirmed = reviewMessage({ status: "confirmed", confirmedAt: 1_700_000_000_000 });
+    const finalCopy = waitForCompileCopy("슬라이드 확정본 만들기");
+    await emit({
+      type: "meeting", meetingId: 7, title: "재연결 회의", transcript: [], current: null,
+      history: [], compiled: null, slidePlan: null, review: confirmed,
+    });
+    await finalCopy;
+    expect(await page.evaluate(() => ({
+      text: document.getElementById("btn-compile-deck")?.textContent?.trim(),
+      title: document.getElementById("btn-compile-deck")?.getAttribute("title"),
+      ariaLabel: document.getElementById("btn-compile-deck")?.getAttribute("aria-label"),
+      placeholder: document.querySelector("#current-slide .placeholder__sub")?.textContent?.trim(),
+    }))).toEqual({
+      text: "슬라이드 확정본 만들기",
+      title: "확정된 검토 내용으로 슬라이드 확정본 만들기",
+      ariaLabel: "확정된 검토 내용으로 슬라이드 확정본 만들기",
+      placeholder: "확정된 검토 내용으로 편집 가능한 PowerPoint 확정본을 만듭니다",
+    });
+
+    const reconnected = page.evaluate(() => new Promise<void>((resolve) => {
+      window.addEventListener("testsocketconnected", () => resolve(), { once: true });
+    }));
+    await page.evaluate(() => window.__sockets.slice(-1)[0]!.close());
+    await reconnected;
+    const draftCopy = waitForCompileCopy("슬라이드 초안 만들기");
+    await emit({
+      type: "meeting", meetingId: 7, title: "재연결 회의", transcript: [], current: null,
+      history: [], compiled: null, slidePlan: null, review: null,
+    });
+    await draftCopy;
+    expect(await page.evaluate(() => ({
+      text: document.getElementById("btn-compile-deck")?.textContent?.trim(),
+      title: document.getElementById("btn-compile-deck")?.getAttribute("title"),
+      ariaLabel: document.getElementById("btn-compile-deck")?.getAttribute("aria-label"),
+      placeholder: document.querySelector("#current-slide .placeholder__sub")?.textContent?.trim(),
+    }))).toEqual({
+      text: "슬라이드 초안 만들기",
+      title: "지금까지의 대화로 편집 가능한 PowerPoint 초안 만들기",
+      ariaLabel: "슬라이드 초안 만들기",
+      placeholder: "지금까지의 대화로 편집 가능한 PowerPoint 초안을 만듭니다",
+    });
+
+    const reconfirmedCopy = waitForCompileCopy("슬라이드 확정본 만들기");
+    await emit(reviewMessage({ status: "confirmed", confirmedAt: 1_700_000_000_001 }));
+    await reconfirmedCopy;
+    expect(await page.$eval("#btn-compile-deck", (button) => ({
+      text: button.textContent?.trim(),
+      title: button.getAttribute("title"),
+      ariaLabel: button.getAttribute("aria-label"),
+    }))).toEqual({
+      text: "슬라이드 확정본 만들기",
+      title: "확정된 검토 내용으로 슬라이드 확정본 만들기",
+      ariaLabel: "확정된 검토 내용으로 슬라이드 확정본 만들기",
+    });
+  }, 20_000);
+
   test("meeting selection restores an authoritative confirmed review without allowing new mutations", async () => {
+    const purposeSentinel = "PURPOSE_DOM_SENTINEL_91C2";
     await emit({ type: "meetings", items: [{ id: 7, title: "복원 회의", started_at: Date.now(), status: "ended" }] });
     await page.click('.session-row[data-meeting-id="7"]');
+    const conclusion = {
+      type: "meetingConcluded", concluded: true, meetingId: 7, reviewId: "rev-001",
+      transcriptVersionId: VERSION_ID, bundleId: "bundle-1", bundlePath: "/tmp/bundle-1",
+      manifest: { sha256: "a".repeat(64), targetCommit: "b".repeat(40) }, concludedAt: 1_700_000_000_001,
+    };
     const snapshot = reviewMessage({
       status: "confirmed",
       confirmedAt: 1_700_000_000_000,
-      conclusion: {
-        type: "meetingConcluded", concluded: true, meetingId: 7, reviewId: "rev-001",
-        transcriptVersionId: VERSION_ID, bundleId: "bundle-1", bundlePath: "/tmp/bundle-1",
-        manifest: { sha256: "a".repeat(64), targetCommit: "b".repeat(40) }, concludedAt: 1_700_000_000_001,
-      },
+      conclusion,
       items: reviewMessage().items.map((item) => ({ ...item, reviewState: item.id === "open-1" ? "rejected" : "confirmed" })),
     });
     await emit({
-      type: "meeting", meetingId: 7, title: "복원 회의", transcript: [], current: null,
-      history: [], compiled: null, review: snapshot, conclusion: snapshot.conclusion,
+      type: "meeting", meetingId: 7, title: "복원 회의", purpose: purposeSentinel,
+      transcript: [], current: null, history: [], compiled: null, review: snapshot, conclusion,
     });
 
+    expect(await page.$eval("#meeting-purpose", (node) => {
+      const element = node as HTMLElement;
+      const rect = element.getBoundingClientRect();
+      return { text: element.textContent, visible: !element.hidden && rect.width > 0 && rect.height > 0 };
+    })).toEqual({ text: purposeSentinel, visible: true });
+    expect(JSON.stringify(await page.accessibility.snapshot({ interestingOnly: false }))).toContain(purposeSentinel);
     expect(await page.$eval("#review-panel", (panel) => (panel as HTMLElement).hidden)).toBe(true);
     await page.click("#btn-review");
     expect(await page.evaluate(() => ({

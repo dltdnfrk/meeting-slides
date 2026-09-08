@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { MeetingSession, type ServerMessage } from "../src/session.ts";
 import type { BlockDetector, BlockDetectionResult } from "../src/llm.ts";
+import { connectMeetingServer, deferred, startMeetingServer } from "./helpers/meeting-server.ts";
 
 function makeSession(opts: {
   detectInterval?: number;
@@ -146,14 +150,14 @@ describe("MeetingSession", () => {
   });
 
   test("reset()은 진행 중이던 감지 결과를 폐기 (epoch 무효화)", async () => {
-    let resolveDetect: ((result: BlockDetectionResult) => void) | null = null;
+    const detection = deferred<BlockDetectionResult>();
     const harness = makeSession({
-      detectBlock: () => new Promise((resolve) => { resolveDetect = resolve; }),
+      detectBlock: () => detection.promise,
     });
     const finished = harness.waitFor((message) => message.type === "detect" && !message.detecting);
     harness.session.onChunk(chunk("감지 시작 문장"));
     harness.session.reset();
-    resolveDetect?.({ shouldAdvance: false, title: "stale 주제", bullets: ["옛날 요점"] });
+    detection.resolve({ shouldAdvance: false, title: "stale 주제", bullets: ["옛날 요점"] });
     await finished;
     expect(harness.session.snapshot()).toEqual({ type: "slide", current: null, history: [] });
   });
@@ -293,7 +297,7 @@ describe("meta card rejection", () => {
     expect(current).toBeNull();
   });
 
-  test("음성 인식 테스트 자체가 회의 주제이면 실제 논의 카드를 생성한다", async () => {
+  test("정상 no-op 감지는 음성 인식 논의도 원문 fallback 카드로 승격하지 않는다", async () => {
     const harness = makeSession({
       detectBlock: async () => ({
         shouldAdvance: false,
@@ -307,20 +311,7 @@ describe("meta card rejection", () => {
     harness.session.onChunk({ text: "슬라이드 생성 기준을 확인하겠습니다.", ts: 3 });
     await harness.session.flush();
 
-    expect(harness.session.snapshot().current).toMatchObject({
-      title: "음성 인식 테스트를 진행하겠습니다",
-      bullets: [
-        "음성 인식 테스트를 진행하겠습니다.",
-        "전사는 정상적으로 들어오고 있습니다.",
-        "슬라이드 생성 기준을 확인하겠습니다.",
-      ],
-    });
-    expect(harness.session.snapshot().current?.scene).toMatchObject({
-      intent: "statement",
-      elements: expect.arrayContaining([
-        expect.objectContaining({ type: "text", role: "statement" }),
-      ]),
-    });
+    expect(harness.session.snapshot().current).toBeNull();
   });
 
   test("장시간 전사는 메모리 snapshot을 50,000문장으로 제한하고 잘림을 알린다", () => {
@@ -335,9 +326,75 @@ describe("meta card rejection", () => {
 
 
   test("production server keeps real-time topic detection enabled", async () => {
-    const source = await Bun.file(new URL("../server.ts", import.meta.url)).text();
-    expect(source).toContain("{ automaticDetection: true }");
-    expect(source).not.toContain("{ automaticDetection: false }");
+    const directory = mkdtempSync(join(tmpdir(), "session-production-detection-"));
+    const finish = deferred<void>();
+    const calls: string[][] = [];
+    let running: ReturnType<typeof startMeetingServer> | undefined;
+    let socket: WebSocket | undefined;
+    try {
+      running = startMeetingServer({
+        ...process.env,
+        MEETINGS_DB_PATH: join(directory, "meetings.db"),
+        MEETING_SLIDES_SETTINGS_ROOT: directory,
+        LLM_PROVIDER: "cli",
+        LLM_CLI_BIN: "/usr/bin/false",
+        LLM_CLI_PRESET: "claude",
+        WHISPER_INPUT_MODE: "mic",
+        BLOCK_DETECT_SENTENCE_INTERVAL: "1",
+      }, {
+        detector: {
+          async ping() { return true; },
+          async detectBlock(sentences) {
+            calls.push([...sentences]);
+            return {
+              shouldAdvance: true,
+              title: "Friday launch",
+              bullets: ["Mina owns release notes"],
+            };
+          },
+          async planDeck() { throw new Error("Unexpected deck request"); },
+          async chat() { throw new Error("Unexpected chat request"); },
+        },
+        createCapture: () => ({
+          identity: { engine: "whisper.cpp", engineModel: "fixture.bin" },
+          audioCapture: null,
+          capture: {
+            async start(handlers) {
+              handlers.onChunk({ text: "Mina owns release notes for Friday.", ts: 100 });
+              await finish.promise;
+            },
+            async stop() { finish.resolve(); },
+          },
+        }),
+      });
+      const client = await connectMeetingServer(running.server.port!, 1_000);
+      socket = client.socket;
+      const detected = client.next(message => message.type === "detect" && message.detecting === false);
+      const slide = client.next(message => message.type === "slide" && message.current !== null);
+      const started = client.send(
+        { action: "startCapture" },
+        message => message.type === "capture" && message.capturing === true,
+      );
+      const [, , update] = await Promise.all([started, detected, slide]);
+      expect(calls).toEqual([["Mina owns release notes for Friday."]]);
+      expect(update).toMatchObject({
+        type: "slide",
+        current: { title: "Friday launch", bullets: ["Mina owns release notes"] },
+        history: [],
+      });
+      expect(client.messages.filter(message => message.type === "capture").at(-1)).toMatchObject({
+        capturing: true,
+        phase: "capturing",
+      });
+    } finally {
+      socket?.close();
+      finish.resolve();
+      try {
+        await running?.close();
+      } finally {
+        rmSync(directory, { recursive: true, force: true });
+      }
+    }
   });
 
 });

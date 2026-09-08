@@ -140,6 +140,7 @@ func runDecode(_ input: [String: Any]) throws -> Any {
             "mode": projection.mode,
             "phase": projection.phase.rawValue,
             "startedAt": projection.startedAt.map { $0 as Any } ?? NSNull(),
+            "audioSource": projection.audioSource,
         ]
     case let .status(text):
         return ["event": "status", "text": text]
@@ -187,7 +188,8 @@ func runStopGuard(_ input: [String: Any]) throws -> Any {
             capturing: phase == .capturing || phase == .starting,
             mode: "live",
             phase: phase,
-            startedAt: nil
+            startedAt: nil,
+            audioSource: ""
         )
     )
 
@@ -199,7 +201,7 @@ func runStopGuard(_ input: [String: Any]) throws -> Any {
     // Optional second round after an authoritative idle snapshot rearms the guard.
     if let follow = (input["thenIdleThenActivations"] as? NSNumber)?.intValue {
         guardState.apply(
-            CaptureProjection(capturing: false, mode: "live", phase: .idle, startedAt: nil)
+            CaptureProjection(capturing: false, mode: "live", phase: .idle, startedAt: nil, audioSource: "")
         )
         for _ in 0..<follow {
             if let action = guardState.activateStop() { actions.append(action.rawValue) }

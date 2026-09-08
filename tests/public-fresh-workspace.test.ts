@@ -4,6 +4,7 @@ import puppeteer, { type Browser, type Page } from "puppeteer";
 import { createPublicTestHarness } from "./public-test-harness.ts";
 
 const harness = createPublicTestHarness();
+const hookTimeoutMs = 20_000;
 let browser: Browser;
 let page: Page;
 
@@ -14,12 +15,12 @@ beforeAll(async () => {
   await page.goto(harness.origin, { waitUntil: "load" });
   await harness.clientConnected;
   await firstMessage;
-}, 20_000);
+}, hookTimeoutMs);
 
 afterAll(async () => {
   await browser?.close();
   harness.stop();
-});
+}, hookTimeoutMs);
 
 test("비캡처 재접속은 이전 라이브 화면 대신 빈 작업면을 유지한다", async () => {
   harness.pushMessage({ type: "capture", capturing: false, mode: "mic" });

@@ -2,15 +2,24 @@
 // Runs the real public/ shell in headless Chromium with a fake WebSocket so the
 // assertions read actual DOM state and actual wire payloads, never simulated ones.
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { createServer, type Server } from "node:http";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import puppeteer, { type Browser, type Page } from "puppeteer";
 
 const PUBLIC_DIR = join(import.meta.dir, "..", "public");
-const PUBLIC_FILES = new Set(["/index.html", "/style.css", "/caret-operator.css", "/app.js"]);
+const PUBLIC_FILES = new Set([
+  "/index.html", "/style.css", "/caret-operator.css", "/app.js", "/app-transport.js",
+  "/meeting-workspace.js", "/settings-panel.js", "/attendees-panel.js", "/ask-panel.js",
+  "/publication-controller.js", "/operator-surface.js", "/slide-plan-workspace.js",
+  "/deck-editor.js", "/deck-editor-utils.js", "/deck-editor-validation.js",
+  "/deck-stage-controller.js", "/deck-stage.js", "/slide-plan-canvas.js", "/focus-trap.js",
+  "/review-panel-render.js", "/review-panel.js",
+  "/generated/ui-state-machine.js", "/generated/transcript-state.js", "/generated/protocol-values.js",
+]);
 
 type FakeSocket = { emit(value: unknown): void; close(): void };
 
@@ -75,6 +84,7 @@ beforeAll(async () => {
 
   browser = await puppeteer.launch({ headless: true });
   page = await browser.newPage();
+  await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
   await page.setViewport({ width: 1280, height: 900 });
   await page.evaluateOnNewDocument(() => {
     class FakeWebSocket {
@@ -316,6 +326,7 @@ describe("pre-capture attendee registration form", () => {
       attendees: [{ attendee_id: "a-1", display_name: "김현준", crm_person_entity_id: null }],
     });
     await page.waitForFunction(() => window.__attendeeState.meetingId === 77);
+    await page.keyboard.press("Escape");
     await clearSent();
     await page.click("#btn-record");
     expect(await sent()).toEqual([
@@ -333,6 +344,7 @@ describe("pre-capture attendee registration form", () => {
   test("an unsaved roster surfaces an error but still starts capture", async () => {
     await page.click("#btn-attendees");
     await addAttendee("김현준");
+    await page.keyboard.press("Escape");
     await clearSent();
     await page.click("#btn-record");
     expect(await sent()).toEqual([{ action: "startCapture" }, { action: "listMeetings" }]);
@@ -479,32 +491,49 @@ describe("pre-capture attendee registration form", () => {
       .map((message) => message.action)
       .filter((action): action is string => typeof action === "string")
       .filter((action) => action !== "listMeetings");
-    const server = readFileSync(join(import.meta.dir, "..", "server.ts"), "utf8");
-    expect(server).toContain('cmd.action === "listMeetings"');
 
     const probe = `
-      import { handlerMap } from "./server.ts";
+      import { createMeetingApplication } from "./server.ts";
+      import { loadConfig } from "./src/config.ts";
+      const application = createMeetingApplication({
+        config: { ...loadConfig(), server: { httpPort: 0, openBrowser: false } },
+        paths: { databasePath: process.env.MEETING_SLIDES_SETTINGS_ROOT + "/meetings.db",
+          exportRoot: process.env.MEETING_SLIDES_SETTINGS_ROOT + "/exports",
+          bundleOutputRoot: process.env.MEETING_SLIDES_SETTINGS_ROOT + "/bundles" },
+        discoverProviders: async () => [],
+      });
+      const { handlerMap } = application.start();
       const actions = ${JSON.stringify(restoreActions)};
       console.log(JSON.stringify(actions.filter((action) => !handlerMap.has(action))));
-      process.exit(0);
+      await application.close();
     `;
-    const result = spawnSync(process.execPath, ["-e", probe], {
-      cwd: join(import.meta.dir, ".."),
-      encoding: "utf8",
-      timeout: 20_000,
-      env: {
-        ...process.env,
-        HTTP_PORT: String(19_800 + (process.pid % 400)),
-        OPEN_BROWSER: "false",
-        LLM_PROVIDER: "cli",
-        LLM_CLI_BIN: "/usr/bin/true",
-        LLM_CLI_PRESET: "claude",
-        WHISPER_INPUT_MODE: "mic",
-      },
-    });
-    expect(result.status, result.stderr).toBe(0);
-    const unroutable = JSON.parse(result.stdout.trim().split("\n").slice(-1)[0]!) as string[];
-    expect(unroutable).toEqual([]);
+    const probeRoot = mkdtempSync(join(tmpdir(), "meeting-slides-attendee-probe-"));
+    try {
+      const result = spawnSync(process.execPath, ["-e", probe], {
+        cwd: join(import.meta.dir, ".."),
+        encoding: "utf8",
+        timeout: 20_000,
+        env: {
+          ...process.env,
+          HTTP_PORT: String(19_800 + (process.pid % 400)),
+          OPEN_BROWSER: "false",
+          MEETINGS_DB_PATH: ":memory:",
+          MEETING_SLIDES_SETTINGS_ROOT: probeRoot,
+          LLM_PROVIDER: "cli",
+          LLM_CLI_BIN: "/usr/bin/true",
+          LLM_CLI_PRESET: "claude",
+          WHISPER_INPUT_MODE: "mic",
+        },
+      });
+      expect(result.status, result.stderr).toBe(0);
+      const outputLines = result.stdout.trim().split("\n");
+      const output = outputLines[outputLines.length - 1];
+      expect(output).toBeDefined();
+      const unroutable = JSON.parse(output ?? "[]") as string[];
+      expect(unroutable).toEqual([]);
+    } finally {
+      rmSync(probeRoot, { recursive: true, force: true });
+    }
   }, 40_000);
 
   test("existing slide rendering and dock controls survive the new panel", async () => {

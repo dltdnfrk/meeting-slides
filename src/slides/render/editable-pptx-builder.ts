@@ -11,6 +11,7 @@ import type { VerifiedEditablePptxRequest, VerifiedPlacement } from "./editable-
 
 const INCHES_PER_PIXEL_X = 13.3333333333 / 1280;
 const INCHES_PER_PIXEL_Y = 7.5 / 720;
+const POINTS_PER_PIXEL = 0.75;
 
 function inches(box: Readonly<{ x: number; y: number; width: number; height: number }>): { x: number; y: number; w: number; h: number } {
   return {
@@ -43,9 +44,10 @@ function addText(slide: PptxGenJS.Slide, element: GeometryElement, theme: Theme)
     ...inches(element.box),
     objectName: element.id,
     fontFace: resolvedString(element, "font", theme.font.family),
-    fontSize: element.fitTrace.finalFontSize,
+    fontSize: element.fitTrace.finalFontSize * POINTS_PER_PIXEL,
     color: resolvedString(element, "color", theme.colors.ink),
     bold: weight(element, theme) >= 600,
+    lang: "ko-KR",
     margin: 0,
     breakLine: false,
     fit: "none",
@@ -82,7 +84,9 @@ function unique(values: readonly string[]): string[] {
 
 function notesFor(verified: VerifiedEditablePptxRequest, slideIndex: number): string {
   const entry = verified.request.slides[slideIndex]!;
-  const lines = [`slide-id=${entry.geometry.slide.slideId}`, `geometry-id=${entry.geometry.slide.id}`];
+  const lines: string[] = [];
+  if (entry.notes?.trim()) lines.push(entry.notes);
+  lines.push(`slide-id=${entry.geometry.slide.slideId}`, `geometry-id=${entry.geometry.slide.id}`);
   for (const element of entry.geometry.slide.elements) {
     lines.push(`element-id=${element.id}`);
     if (element.evidence !== null) {
@@ -94,7 +98,6 @@ function notesFor(verified: VerifiedEditablePptxRequest, slideIndex: number): st
     lines.push(`asset-id=${placement.assetId}`, `placement-id=${placement.id}`);
     for (const claimId of placement.evidence?.claimIds ?? []) lines.push(`claim-id=${claimId}`);
   }
-  if (entry.notes?.trim()) lines.push("speaker-notes=", entry.notes);
   return `${lines.join("\n")}\n`;
 }
 

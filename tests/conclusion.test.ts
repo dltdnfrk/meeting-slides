@@ -71,6 +71,52 @@ afterEach(() => {
 });
 
 describe("meeting conclusion", () => {
+  test("rolls confirmation back after a conclusion commit failure and reuses the published bundle on retry", async () => {
+    const fx = fixture();
+    const db = fx.store.databaseHandle();
+    db.run(`CREATE TRIGGER fail_conclusion BEFORE INSERT ON meeting_conclusions
+      BEGIN SELECT RAISE(ABORT, 'injected conclusion commit failure'); END`);
+
+    await expect(concludeMeeting(fx.reviewId, options(fx))).rejects.toThrow("injected conclusion commit failure");
+
+    expect(persisted(fx.store)).toBeNull();
+    expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
+    const published = readdirSync(fx.outputRoot);
+    expect(published).toHaveLength(1);
+    expect(db.query("SELECT COUNT(*) count FROM artifacts").get()).toEqual({ count: 5 });
+    db.run("DROP TRIGGER fail_conclusion");
+    const retried = await concludeMeeting(fx.reviewId, options(fx, {
+      renderPdf: async () => { throw new Error("retry must reuse published bytes"); },
+    }));
+    expect(retried.concluded).toBe(true);
+    expect(readdirSync(fx.outputRoot)).toEqual(published);
+    fx.legacy.close();
+  });
+
+  test.each([
+    ["tamper", "[BUNDLE_HASH_MISMATCH]"],
+    ["path", "[CONCLUSION_IDENTITY_MISMATCH]"],
+  ])("retains conclusion-specific validation for %s", async (kind, code) => {
+    const fx = fixture();
+    const exporter = async (...args: Parameters<typeof exportBundle>) => {
+      const result = await exportBundle(...args);
+      if (kind === "tamper") {
+        await Bun.write(join(result.bundlePath, "minutes.pdf"), "%PDF-tampered");
+      } else {
+        result.manifest.entries.push({ ...result.manifest.entries[0], path: "../outside" });
+        await Bun.write(join(result.bundlePath, "manifest.json"), JSON.stringify(result.manifest));
+      }
+      return result;
+    };
+
+    await expect(concludeMeeting(fx.reviewId, options(fx, { exporter }))).rejects.toThrow(code);
+
+    expect(persisted(fx.store)).toBeNull();
+    expect(fx.store.review(fx.reviewId)?.status).toBe("draft");
+    expect(readdirSync(fx.outputRoot)).toHaveLength(1);
+    fx.legacy.close();
+  });
+
   test("confirms, atomically builds the bundle, then persists and returns its complete identity", async () => {
     const fx = fixture();
     let calls = 0;
@@ -104,7 +150,7 @@ describe("meeting conclusion", () => {
       manifest_sha256: result.manifest.sha256,
       target_commit: targetCommit,
     });
-    expect(fx.store.databaseHandle().query("SELECT COUNT(*) count FROM artifacts WHERE bundle_id = ?").get(bundleId)).toEqual({ count: 4 });
+    expect(fx.store.databaseHandle().query("SELECT COUNT(*) count FROM artifacts WHERE bundle_id = ?").get(bundleId)).toEqual({ count: 5 });
     fx.legacy.close();
   });
 

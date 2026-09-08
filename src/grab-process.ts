@@ -37,11 +37,10 @@ export function runGrabProcess(command: string, args: readonly string[], options
     let tail = "";
     let settled = false;
     let timedOut = false;
-    let forced = false;
-    let closed = false;
     let closeCode: number | null = null;
     let spawnError: Error | null = null;
-    let forceTimer: ReturnType<typeof setTimeout> | undefined;
+    let forceTimer: NodeJS.Timeout | undefined;
+    let settleTimer: NodeJS.Timeout | undefined;
 
     const drain = (data: Buffer) => { tail = (tail + data.toString("utf8")).slice(-tailBytes); };
     proc.stdout?.on("data", drain);
@@ -51,7 +50,8 @@ export function runGrabProcess(command: string, args: readonly string[], options
       if (settled) return;
       settled = true;
       clearTimeout(timeoutTimer);
-      if (forceTimer) clearTimeout(forceTimer);
+      clearTimeout(forceTimer);
+      clearTimeout(settleTimer);
       if (timedOut) reject(new GrabProcessTimeoutError(`${args[0] ?? command} timed out`));
       else if (spawnError) reject(new GrabProcessExitError(spawnError.message));
       else if (closeCode === 0) resolve();
@@ -62,9 +62,8 @@ export function runGrabProcess(command: string, args: readonly string[], options
       timedOut = true;
       signalTree(proc, "SIGTERM");
       forceTimer = setTimeout(() => {
-        forced = true;
         signalTree(proc, "SIGKILL");
-        if (closed) finish();
+        settleTimer = setTimeout(finish, 250);
       }, grace);
     }, Math.max(1, options.timeoutMs));
 
@@ -73,9 +72,10 @@ export function runGrabProcess(command: string, args: readonly string[], options
       if (proc.pid === undefined) finish();
     });
     proc.once("close", (code) => {
-      closed = true;
       closeCode = code;
-      if (!timedOut || forced) finish();
+      // close가 오면 TERM 순응 프로세스든 KILL 후든 즉시 정리한다.
+      // close가 절대 오지 않는 경우는 SIGKILL 직후 250ms settle 타이머가 받는다.
+      finish();
     });
   });
 }

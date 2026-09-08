@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { spawn, type ChildProcessByStdio } from "node:child_process";
+import type { Readable } from "node:stream";
 import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -8,6 +9,7 @@ import { join } from "node:path";
 import { MinutesStore } from "../src/minutes-store.ts";
 import { MeetingStore } from "../src/store.ts";
 import { transcriptContentSha256 } from "../src/transcript-versioning.ts";
+import { localWebSocket } from "./helpers/meeting-server.ts";
 
 function fixture() {
   const legacy = new MeetingStore(":memory:");
@@ -186,7 +188,7 @@ describe("MinutesStore review mutation transaction", () => {
 
 const root = join(import.meta.dir, "..");
 const timeoutMs = 10_000;
-let child: ChildProcessWithoutNullStreams;
+let child: ChildProcessByStdio<null, Readable, Readable>;
 let socket: WebSocket;
 let tempDir: string;
 let dbPath: string;
@@ -278,7 +280,7 @@ beforeAll(async () => {
     stdio: ["ignore", "pipe", "pipe"],
   });
   await waitForOutput(`HTTP: http://localhost:${port}`);
-  socket = new WebSocket(`ws://127.0.0.1:${port}/ws`);
+  socket = localWebSocket(port);
   socket.addEventListener("message", (event) => messages.push(JSON.parse(String(event.data)) as Record<string, unknown>));
   await waitFor<void>((done, fail) => {
     socket.addEventListener("open", () => done(), { once: true });
@@ -392,7 +394,7 @@ test("real WS actions reject adversarial patches, persist valid changes, and con
   expect(persistedReview.status).toBe("confirmed");
   expect(persistedReview.confirmed_at).toBeGreaterThan(0);
   expect(db.query("SELECT COUNT(*) AS count FROM artifact_bundles WHERE status = 'complete'").get()).toEqual({ count: 1 });
-  expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 4 });
+  expect(db.query("SELECT COUNT(*) AS count FROM artifacts").get()).toEqual({ count: 5 });
   expect(db.query("SELECT COUNT(*) AS count FROM meeting_conclusions").get()).toEqual({ count: 1 });
   db.close();
 }, 20_000);

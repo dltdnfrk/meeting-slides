@@ -212,8 +212,6 @@ describe("Todo 18 active shell convergence", () => {
       "/focus-trap.js",
       "/workspace-split.js",
       "/transcript-resize.js",
-      "/slide-plan-workspace.js",
-      "/operator-surface.js",
       "/review-panel-render.js",
       "/review-panel.js",
       "/app.js",

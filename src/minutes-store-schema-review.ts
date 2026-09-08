@@ -116,6 +116,13 @@ CREATE TABLE IF NOT EXISTS referenced_materials (
   FOREIGN KEY (meeting_id, source_transcript_version_id, source_end_seq)
     REFERENCES transcript_version_lines(meeting_id, transcript_version_id, seq)
 );
+CREATE TABLE IF NOT EXISTS review_summaries (
+  review_id TEXT PRIMARY KEY,
+  overview TEXT NOT NULL,
+  topics_json TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (review_id) REFERENCES meeting_reviews(review_id) ON DELETE CASCADE
+);
 `;
 
 

@@ -32,9 +32,13 @@ const confirmedReview = {
   reviewId: "review-v7",
   transcriptVersionId: snapshot.transcriptVersionId,
   items: [
-    { id: "claim-launch", kind: "decision", description: "The beta launches Friday.", source: { transcriptVersionId: snapshot.transcriptVersionId, startSeq: 3, endSeq: 3, evidenceQuote: snapshot.lines[2]!.text }, reviewState: "confirmed" },
-    { id: "claim-action", kind: "action_item", description: "Mina publishes the release notes Thursday.", source: { transcriptVersionId: snapshot.transcriptVersionId, startSeq: 4, endSeq: 4, evidenceQuote: snapshot.lines[3]!.text }, reviewState: "confirmed" },
-    { id: "claim-gate", kind: "open_item", description: "Quality remains the release gate.", source: { transcriptVersionId: snapshot.transcriptVersionId, startSeq: 2, endSeq: 2, evidenceQuote: "Quality is the release gate" }, reviewState: "confirmed" },
+    { id: "claim-launch", kind: "decision", description: "The beta launches Friday.", source: { transcriptVersionId: snapshot.transcriptVersionId, startSeq: 3, endSeq: 3, evidenceQuote: snapshot.lines[2]!.text }, reviewState: "confirmed", attributedAttendeeId: "att-mina" },
+    { id: "claim-action", kind: "action_item", description: "Mina publishes the release notes Thursday.", source: { transcriptVersionId: snapshot.transcriptVersionId, startSeq: 4, endSeq: 4, evidenceQuote: snapshot.lines[3]!.text }, reviewState: "confirmed", assigneeAttendeeId: "att-mina", deadline: "2026-08-20", deadlineText: "Thursday", attributedAttendeeId: "att-owen" },
+    { id: "claim-gate", kind: "open_item", description: "Quality remains the release gate.", source: { transcriptVersionId: snapshot.transcriptVersionId, startSeq: 2, endSeq: 2, evidenceQuote: "Quality is the release gate" }, reviewState: "confirmed", attributedAttendeeId: null },
+  ],
+  attendees: [
+    { attendeeId: "att-mina", displayName: "Mina" },
+    { attendeeId: "att-owen", displayName: "Owen" },
   ],
 } as const;
 
@@ -154,7 +158,7 @@ function validModelPlan(): ModelPlanContent {
         id: "slide-signal",
         layout: "metrics",
         storyRole: "argument",
-        title: "Retention rose while quality stayed the gate",
+        title: "Retention rose while the quality gate remains unresolved",
         payload: {
           mode: "chart",
           metrics: [{ label: "Retention", value: "+12%", detail: "After the cohort change" }],
@@ -183,6 +187,58 @@ function validModelPlan(): ModelPlanContent {
           "items[0].due": ["claim-action"],
         },
         editorialPaths: [],
+        assetIds: [],
+      },
+      {
+        id: "slide-overview",
+        layout: "summary",
+        storyRole: "context",
+        title: "Quality gate confirmation remains open",
+        payload: { mode: "overview", items: ["Quality gate needs confirmation."] },
+        bindings: { title: ["claim-gate"], "items[0]": ["claim-gate"] },
+        editorialPaths: [],
+        assetIds: [],
+      },
+      {
+        id: "slide-call",
+        layout: "decision",
+        storyRole: "decision",
+        title: "Friday is the launch date",
+        payload: { decision: "The beta launches Friday.", rationale: ["Quality gate needs confirmation."] },
+        bindings: { title: ["claim-launch"], decision: ["claim-launch"], "rationale[0]": ["claim-gate"] },
+        editorialPaths: [],
+        assetIds: [],
+      },
+      {
+        id: "slide-compare",
+        layout: "comparison",
+        storyRole: "argument",
+        title: "Retention versus the unresolved quality gate",
+        payload: {
+          sides: [
+            { label: "Signal", items: ["Retention increased by 12%."] },
+            { label: "Gate", items: ["Quality gate needs confirmation."] },
+          ],
+        },
+        bindings: {
+          title: ["claim-retention", "claim-gate"],
+          "sides[0].items[0]": ["claim-retention"],
+          "sides[1].items[0]": ["claim-gate"],
+        },
+        editorialPaths: ["sides[0].label", "sides[1].label"],
+        assetIds: [],
+      },
+      {
+        id: "slide-path",
+        layout: "timeline",
+        storyRole: "commitment",
+        title: "Notes go out Thursday",
+        payload: {
+          mode: "process",
+          events: [{ label: "Notes", text: "Mina publishes the release notes Thursday." }],
+        },
+        bindings: { title: ["claim-action"], "events[0].text": ["claim-action"] },
+        editorialPaths: ["events[0].label"],
         assetIds: [],
       },
     ],
@@ -251,6 +307,13 @@ describe("transcript-to-SlidePlan planner", () => {
         titlesFormNarrative: true,
       },
       primaryLayouts: ["hero", "summary", "decision", "comparison", "timeline", "metrics", "actions"],
+      layoutCoverage: {
+        slideCount: 7,
+        minimumDistinctFamilies: 4,
+        reuseAllowed: true,
+        chooseByEvidence: true,
+        unsupportedFamilyCanBeOmitted: true,
+      },
       modelOutput: { format: "strict-json", htmlAllowed: false },
       rendering: {
         canvas: { width: 1280, height: 720 },
@@ -262,6 +325,12 @@ describe("transcript-to-SlidePlan planner", () => {
         citationsRequired: true,
         sourceRangesRequired: true,
         quotesMustMatchTranscript: true,
+        confirmedReview: {
+          ownerDueSource: "confirmedReview",
+          ownerField: "assigneeAttendeeId",
+          dueFields: ["deadlineText", "deadline"],
+          attendeeDisplayNameField: "displayName",
+        },
       },
       assets: {
         manifestOnly: true,
@@ -343,6 +412,14 @@ describe("transcript-to-SlidePlan planner", () => {
     ["wrong kind", (plan: ModelPlanContent) => { plan.claims[2]!.kind = "fact"; }],
     ["wrong method", (plan: ModelPlanContent) => { plan.claims[2]!.method = "extractive"; }],
     ["wrong version", (plan: ModelPlanContent) => { plan.claims[2]!.sources[0]!.transcriptVersionId = "transcript-v8"; }],
+    ["invented owner", (plan: ModelPlanContent) => {
+      const actions = plan.slides.find((slide) => slide.layout === "actions");
+      if (actions?.layout === "actions") actions.payload.items[0]!.owner = "Nobody";
+    }],
+    ["invented due", (plan: ModelPlanContent) => {
+      const actions = plan.slides.find((slide) => slide.layout === "actions");
+      if (actions?.layout === "actions") actions.payload.items[0]!.due = "Never";
+    }],
   ])("repairs then returns a typed failure for %s in confirmed Review claims", async (_label, mutate) => {
     const invalid = validModelPlan();
     invalid.claims[1]!.kind = "fact";
@@ -353,6 +430,25 @@ describe("transcript-to-SlidePlan planner", () => {
 
     expect(model.calls).toHaveLength(2);
     expect(model.calls[1]!.validationFailure).toBeDefined();
+    expect(error).toMatchObject({ code: "model-output-invalid", attempts: 2 });
+  });
+
+  test("rejects action owner and due fields rebound away from their reviewed action", async () => {
+    const invalid = validModelPlan();
+    invalid.claims[1]!.kind = "fact";
+    const actions = invalid.slides.find((slide) => slide.layout === "actions");
+    if (actions?.layout !== "actions") throw new Error("expected actions slide");
+    actions.payload.items[0]!.due = "Friday";
+    actions.bindings["items[0].owner"] = ["claim-launch"];
+    actions.bindings["items[0].due"] = ["claim-launch"];
+    const model = completionSequence([JSON.stringify(invalid), JSON.stringify(invalid)]);
+
+    const error = await capturedError(
+      planTranscriptToSlides(reviewedSnapshot, plannerOptions(model.complete)),
+    );
+
+    expect(model.calls).toHaveLength(2);
+    expect(model.calls[1]!.validationFailure).toMatchObject({ kind: "evidence-mismatch" });
     expect(error).toMatchObject({ code: "model-output-invalid", attempts: 2 });
   });
 
@@ -435,5 +531,210 @@ describe("transcript-to-SlidePlan planner", () => {
     expect(first.planId).toBe("plan-first");
     expect(second.planId).toBe("plan-second");
     expect(withoutInjectedMetadata(first)).toEqual(withoutInjectedMetadata(second));
+  });
+
+  test("includes the confirmed review overview and topic titles in the planner prompt when a summary is present", async () => {
+    const summary = {
+      overview: "Quality stays the gate and the beta launches Friday.",
+      topics: [
+        {
+          title: "Quality gate",
+          summary: "Quality remains the release gate.",
+          source: {
+            transcriptVersionId: snapshot.transcriptVersionId,
+            startSeq: 2,
+            endSeq: 2,
+          },
+        },
+        {
+          title: "Friday launch",
+          summary: "The beta launches Friday.",
+          source: {
+            transcriptVersionId: snapshot.transcriptVersionId,
+            startSeq: 3,
+            endSeq: 3,
+          },
+        },
+      ],
+    } as const;
+    const content = validModelPlan();
+    content.claims[1]!.kind = "fact";
+    const model = completionSequence([JSON.stringify(content)]);
+
+    await planTranscriptToSlides(
+      { ...reviewedSnapshot, confirmedReview: { ...confirmedReview, summary } },
+      plannerOptions(model.complete),
+    );
+
+    const prompt = model.calls[0]!.userPrompt;
+    const match = prompt.match(/<review-summary>([^<]+)<\/review-summary>/u);
+    expect(match).not.toBeNull();
+    expect(match![1]!).toContain(summary.overview);
+    expect(match![1]!).toContain("Quality gate");
+    expect(match![1]!).toContain("Friday launch");
+    expect(model.calls[0]!.snapshot.confirmedReview?.summary).toEqual(summary);
+  });
+
+  test("omits the review-summary prompt section when confirmed review has no summary", async () => {
+    const content = validModelPlan();
+    content.claims[1]!.kind = "fact";
+    const model = completionSequence([JSON.stringify(content)]);
+
+    await planTranscriptToSlides(reviewedSnapshot, plannerOptions(model.complete));
+
+    expect(model.calls[0]!.userPrompt).not.toContain("<review-summary>");
+  });
+});
+
+describe("server-owned theme", () => {
+  test("the supplied theme is authoritative: model output that omits theme parses into it", async () => {
+    const content = validModelPlan() as Partial<ModelPlanContent>;
+    const theme = structuredClone(content.theme!);
+    delete content.theme;
+    const model = completionSequence([JSON.stringify(content)]);
+    const plan = await planTranscriptToSlides(snapshot, { ...plannerOptions(model.complete), theme });
+    expect(plan.theme).toEqual(theme);
+    expect(model.calls).toHaveLength(1);
+  });
+
+  test("a model-emitted theme never overrides the supplied theme", async () => {
+    const content = validModelPlan();
+    const theme = structuredClone(content.theme);
+    content.theme = { ...content.theme, font: { family: "system-ui", localPath: "", sha256: "" } };
+    const model = completionSequence([JSON.stringify(content)]);
+    const plan = await planTranscriptToSlides(snapshot, { ...plannerOptions(model.complete), theme });
+    expect(plan.theme).toEqual(theme);
+  });
+
+  test("the contract tells the model to omit theme", async () => {
+    const model = completionSequence([JSON.stringify(validModelPlan())]);
+    await planTranscriptToSlides(snapshot, plannerOptions(model.complete));
+    const contract = contractFrom(model.calls[0]!.systemPrompt) as { modelOutput: { omitAuthoritativeFields: string[]; requiredFields: string[] } };
+    expect(contract.modelOutput.omitAuthoritativeFields).toContain("theme");
+    expect(contract.modelOutput.requiredFields).not.toContain("theme");
+  });
+});
+
+describe("binding contract", () => {
+  test("the contract spells out binding keys, factual paths and editorial paths per layout", async () => {
+    const model = completionSequence([JSON.stringify(validModelPlan())]);
+    await planTranscriptToSlides(snapshot, plannerOptions(model.complete));
+    const contract = contractFrom(model.calls[0]!.systemPrompt) as {
+      bindings: {
+        keyFormat: string;
+        titleKey: string;
+        factualPaths: Record<string, string[]>;
+        editorialPaths: Record<string, string[]>;
+        example: Record<string, string[]>;
+      };
+    };
+    expect(contract.bindings.titleKey).toBe("title");
+    expect(contract.bindings.keyFormat).toContain("without");
+    expect(contract.bindings.factualPaths).toEqual({
+      hero: ["statement"],
+      summary: ["items[i]"],
+      decision: ["decision", "rationale[i]"],
+      comparison: ["sides[i].items[j]"],
+      timeline: ["events[i].text"],
+      metrics: ["metrics[i].label", "metrics[i].value", "metrics[i].detail"],
+      actions: ["items[i].task", "items[i].owner", "items[i].due"],
+    });
+    expect(contract.bindings.editorialPaths).toEqual({
+      comparison: ["sides[i].label"],
+      timeline: ["events[i].label"],
+    });
+    expect(Object.keys(contract.bindings.example)).toEqual(["title", "statement"]);
+  });
+
+  test("normalizes payload-prefixed binding keys before parse", async () => {
+    const content = validModelPlan();
+    const hero = content.slides[0]!;
+    hero.bindings = { title: ["claim-launch"], "payload.statement": ["claim-launch"] };
+    const model = completionSequence([JSON.stringify(content)]);
+    const plan = await planTranscriptToSlides(snapshot, plannerOptions(model.complete));
+    expect(plan.slides[0]!.bindings).toEqual({
+      title: ["claim-launch"],
+      statement: ["claim-launch"],
+    });
+  });
+
+  test("moves comparison and timeline label bindings into editorialPaths", async () => {
+    const content = validModelPlan();
+    content.slides = content.slides.filter((slide) => slide.layout !== "comparison" && slide.layout !== "timeline");
+    content.slides.push({
+      id: "slide-compare",
+      layout: "comparison",
+      storyRole: "argument",
+      title: "Quality stays the gate while retention rose",
+      payload: {
+        sides: [
+          { label: "Signal", items: ["Retention increased by 12%."] },
+          { label: "Gate", items: ["Quality remains the release gate."] },
+        ],
+      },
+      bindings: {
+        title: ["claim-retention", "claim-gate"],
+        "payload.sides[0].label": ["claim-retention"],
+        "payload.sides[0].items[0]": ["claim-retention"],
+        "payload.sides[1].label": ["claim-gate"],
+        "payload.sides[1].items[0]": ["claim-gate"],
+      },
+      editorialPaths: [],
+      assetIds: [],
+    }, {
+      id: "slide-timeline",
+      layout: "timeline",
+      storyRole: "commitment",
+      title: "Launch follows the Thursday note",
+      payload: {
+        mode: "process",
+        events: [{ label: "Notes", text: "Mina publishes the release notes Thursday." }],
+      },
+      bindings: {
+        title: ["claim-action"],
+        "payload.events[0].label": ["claim-action"],
+        "payload.events[0].text": ["claim-action"],
+      },
+      editorialPaths: [],
+      assetIds: [],
+    });
+    const model = completionSequence([JSON.stringify(content)]);
+    const plan = await planTranscriptToSlides(snapshot, plannerOptions(model.complete));
+    const compare = plan.slides.find((slide) => slide.id === "slide-compare")!;
+    const timeline = plan.slides.find((slide) => slide.id === "slide-timeline")!;
+    expect(compare.editorialPaths).toEqual(["sides[0].label", "sides[1].label"]);
+    expect(compare.bindings).toEqual({
+      title: ["claim-retention", "claim-gate"],
+      "sides[0].items[0]": ["claim-retention"],
+      "sides[1].items[0]": ["claim-gate"],
+    });
+    expect(timeline.editorialPaths).toEqual(["events[0].label"]);
+    expect(timeline.bindings).toEqual({
+      title: ["claim-action"],
+      "events[0].text": ["claim-action"],
+    });
+  });
+
+  test("coerces unknown storyRole to the layout default so parse can proceed", async () => {
+    const content = validModelPlan();
+    content.slides[1]!.storyRole = "guardrails" as typeof content.slides[1]["storyRole"];
+    content.slides[2]!.storyRole = "next-steps" as typeof content.slides[2]["storyRole"];
+    const model = completionSequence([JSON.stringify(content)]);
+    const plan = await planTranscriptToSlides(snapshot, plannerOptions(model.complete));
+    expect(plan.slides[1]!.storyRole).toBe("argument");
+    expect(plan.slides[2]!.storyRole).toBe("commitment");
+  });
+
+  test("rejects a plan that does not contain exactly seven slides", async () => {
+    const content = validModelPlan();
+    content.slides = content.slides.filter((slide) => slide.layout !== "actions");
+    const omitted = JSON.stringify(content);
+    const model = completionSequence([omitted, omitted]);
+    const error = await capturedError(planTranscriptToSlides(snapshot, plannerOptions(model.complete)));
+    expect(error).toBeInstanceOf(SlidePlannerError);
+    expect((error as SlidePlannerError).validationFailure).toMatchObject({
+      kind: "contract-invalid",
+      path: "slides",
+    });
   });
 });

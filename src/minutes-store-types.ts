@@ -44,6 +44,21 @@ export interface ReferencedMaterialCandidate {
   reviewState?: ReviewState;
 }
 
+export interface ReviewSummaryTopic {
+  title: string;
+  summary: string;
+  source: {
+    transcript_version_id: string;
+    start_seq: number;
+    end_seq: number;
+  };
+}
+
+export interface ReviewSummary {
+  overview: string;
+  topics: ReviewSummaryTopic[];
+}
+
 export interface SaveCandidatesInput {
   meetingId: number;
   transcriptVersionId: string;
@@ -52,6 +67,7 @@ export interface SaveCandidatesInput {
   actionItems?: ActionItemCandidate[];
   openItems?: OpenItemCandidate[];
   referencedMaterials?: ReferencedMaterialCandidate[];
+  summary?: ReviewSummary | null;
 }
 
 export interface TranscriptLineInput {

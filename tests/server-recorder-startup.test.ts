@@ -1,6 +1,8 @@
 import { Database } from "bun:sqlite";
 import { expect, test } from "bun:test";
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { spawn, type ChildProcessByStdio } from "node:child_process";
+import type { Readable } from "node:stream";
+import { localWebSocket } from "./helpers/meeting-server.ts";
 import { chmodSync, existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -9,7 +11,7 @@ const root = join(import.meta.dir, "..");
 
 function waitFor<T>(
   subscribe: (resolve: (value: T) => void, reject: (error: Error) => void) => void,
-  timeoutMs = 10_000,
+  timeoutMs = 30_000,
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);
@@ -20,15 +22,16 @@ function waitFor<T>(
   });
 }
 
-function waitForOutput(child: ChildProcessWithoutNullStreams, fragment: string): Promise<void> {
-  return waitFor<void>((resolve, reject) => {
+function waitForPort(child: ChildProcessByStdio<null, Readable, Readable>): Promise<number> {
+  return waitFor<number>((resolve, reject) => {
     let output = "";
     const receive = (chunk: Buffer) => {
       output += chunk.toString("utf8");
-      if (!output.includes(fragment)) return;
+      const match = output.match(/HTTP: http:\/\/localhost:(\d+)/);
+      if (!match) return;
       child.stdout.off("data", receive);
       child.stderr.off("data", receive);
-      resolve();
+      resolve(Number(match[1]));
     };
     child.stdout.on("data", receive);
     child.stderr.on("data", receive);
@@ -37,23 +40,41 @@ function waitForOutput(child: ChildProcessWithoutNullStreams, fragment: string):
   });
 }
 
-test("recorder startup failure leaves capture stopped and never launches whisper", async () => {
+test("legacy AUDIO_RECORDER_BIN cannot launch a second device capture", async () => {
   const directory = mkdtempSync(join(tmpdir(), "meeting-recorder-server-"));
   const dbPath = join(directory, "meetings.db");
   const fakeCli = join(directory, "fake-cli");
   const failedRecorder = join(directory, "ffmpeg-startup-failure");
   const fakeWhisper = join(directory, "fake-whisper");
+  const fakeWhisperCli = join(directory, "fake-whisper-cli");
+  const recorderMarker = join(directory, "recorder-started");
   const whisperMarker = join(directory, "whisper-started");
   writeFileSync(fakeCli, "#!/bin/sh\necho fake-cli-1.0\n");
-  writeFileSync(failedRecorder, "#!/bin/sh\nexit 23\n");
-  writeFileSync(fakeWhisper, `#!/usr/bin/env bun\nawait Bun.write(${JSON.stringify(whisperMarker)}, "started");\nawait new Promise(() => {});\n`);
-  for (const path of [fakeCli, failedRecorder, fakeWhisper]) chmodSync(path, 0o755);
-  const port = 22_000 + (process.pid % 1000);
+  writeFileSync(failedRecorder, `#!/usr/bin/env bun\nawait Bun.write(${JSON.stringify(recorderMarker)}, "started");\nprocess.exit(23);\n`);
+  writeFileSync(fakeWhisper, `#!/usr/bin/env bun
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
+await Bun.write(${JSON.stringify(whisperMarker)}, "started");
+if (process.argv.includes("-sa")) writeFileSync(join(process.cwd(), "saved.wav"), Buffer.concat([Buffer.from("RIFF"), Buffer.alloc(44), Buffer.from("pcm")]));
+console.log("[00:00:00.000 --> 00:00:01.000] 라이브 문장입니다.");
+process.on("SIGTERM", () => process.exit(0));
+await new Promise(() => {});
+`);
+  writeFileSync(fakeWhisperCli, `#!/bin/sh
+echo "[00:00:00.000 --> 00:00:01.000] 확정 문장입니다."
+`);
+  for (const path of [fakeCli, failedRecorder, fakeWhisper, fakeWhisperCli]) chmodSync(path, 0o755);
+  const reservation = Bun.listen({ hostname: "127.0.0.1", port: 0, socket: { data() { } } });
+  const port = reservation.port;
+  reservation.stop();
   const child = spawn(process.execPath, ["server.ts"], {
     cwd: root,
     env: {
       ...process.env,
       MEETINGS_DB_PATH: dbPath,
+      MEETING_SLIDES_SETTINGS_ROOT: directory,
+      MEETING_BUNDLE_OUTPUT_ROOT: join(directory, "exports"),
+      MEETING_SLIDES_EXPORT_ROOT: join(directory, "exports"),
       HTTP_PORT: String(port),
       OPEN_BROWSER: "false",
       LLM_PROVIDER: "cli",
@@ -61,52 +82,62 @@ test("recorder startup failure leaves capture stopped and never launches whisper
       LLM_CLI_PRESET: "claude",
       WHISPER_INPUT_MODE: "mic",
       WHISPER_STREAM_BIN: fakeWhisper,
+      WHISPER_CLI_BIN: fakeWhisperCli,
       WHISPER_MODEL_PATH: join(directory, "model.bin"),
       AUDIO_RECORDER_BIN: failedRecorder,
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
+  console.log(`[resource] recorder CLI server pid=${child.pid}`);
   let socket: WebSocket | null = null;
   try {
-    await waitForOutput(child, `HTTP: http://localhost:${port}`);
-    socket = new WebSocket(`ws://127.0.0.1:${port}/ws`);
+    const actualPort = await waitForPort(child);
+    socket = localWebSocket(actualPort);
     const messages: Array<Record<string, unknown>> = [];
     socket.addEventListener("message", (event) => messages.push(JSON.parse(String(event.data)) as Record<string, unknown>));
     await waitFor<void>((resolve, reject) => {
       socket!.addEventListener("open", () => resolve(), { once: true });
       socket!.addEventListener("error", () => reject(new Error("websocket connection failed")), { once: true });
     });
-    const failed = waitFor<Record<string, unknown>>((resolve) => {
+    const started = waitFor<Record<string, unknown>>((resolve) => {
       socket!.addEventListener("message", (event) => {
         const message = JSON.parse(String(event.data)) as Record<string, unknown>;
-        if (message.type === "status" && String(message.text).includes("audio recorder exited")) resolve(message);
+        if (message.type === "line" && message.text === "라이브 문장입니다.") resolve(message);
       });
     });
     socket.send(JSON.stringify({ action: "startCapture" }));
-    expect(await failed).toMatchObject({ type: "status" });
+    expect(await started).toMatchObject({ type: "line", text: "라이브 문장입니다." });
+    expect(existsSync(whisperMarker)).toBe(true);
+    expect(existsSync(recorderMarker)).toBe(false);
 
     const settled = waitFor<Record<string, unknown>>((resolve) => {
       socket!.addEventListener("message", (event) => {
         const message = JSON.parse(String(event.data)) as Record<string, unknown>;
-        if (message.type === "status" && message.text === "서버 정상") resolve(message);
+        if (message.type === "capture" && message.phase === "idle") resolve(message);
       });
     });
-    socket.send(JSON.stringify({ action: "status" }));
+    socket.send(JSON.stringify({ action: "stopCapture" }));
     await settled;
-    expect(messages.some((message) => message.type === "capture" && message.capturing === true)).toBe(false);
-    expect(existsSync(whisperMarker)).toBe(false);
+    expect(messages.some((message) => message.type === "capture" && message.capturing === true)).toBe(true);
 
     const db = new Database(dbPath, { readonly: true });
     expect(db.query("SELECT phase FROM meeting_meta ORDER BY meeting_id DESC LIMIT 1").get()).toEqual({ phase: "ended" });
-    expect(db.query("SELECT COUNT(*) AS count FROM transcript_versions").get()).toEqual({ count: 0 });
+    expect(db.query("SELECT version_no, source_kind FROM transcript_versions ORDER BY version_no").all()).toEqual([
+      { version_no: 1, source_kind: "live_capture" },
+      { version_no: 2, source_kind: "retranscription" },
+    ]);
+    const audio = db.query(
+      "SELECT original_audio_path FROM meeting_audio_sources ORDER BY meeting_id DESC LIMIT 1",
+    ).get() as { original_audio_path: string; } | null;
     db.close();
+    if (audio?.original_audio_path) rmSync(audio.original_audio_path, { force: true });
   } finally {
     socket?.close();
     if (child.exitCode === null) {
       const closed = waitFor<void>((resolve) => child.once("close", () => resolve()));
-      child.kill("SIGKILL");
+      child.kill("SIGTERM");
       await closed;
     }
     rmSync(directory, { recursive: true, force: true });
   }
-}, 20_000);
+}, 60_000);

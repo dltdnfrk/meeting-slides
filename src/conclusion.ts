@@ -1,6 +1,4 @@
-import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
-import { isAbsolute, join } from "node:path";
+import { bundleFileSha256, hasBundleSignature, isSafeBundlePath, matchesBundleFile, readBundleFile } from "./bundle-integrity.ts";
 
 import {
   exportBundle,
@@ -12,6 +10,7 @@ import type { MinutesStore } from "./minutes-store.ts";
 const REQUIRED_ARTIFACTS = {
   minutes_pdf: "minutes.pdf",
   minutes_json: "minutes.json",
+  minutes_docx: "minutes.docx",
   canonical_transcript: null,
   slide_deck: "deck/index.html",
 } as const;
@@ -80,11 +79,6 @@ function conclusionFor(store: MinutesStore, reviewId: string): ConclusionRow | n
     .get(reviewId) as ConclusionRow | null;
 }
 
-function safePath(path: string): boolean {
-  return Boolean(path) && !isAbsolute(path) && !path.includes("\\") &&
-    path.split("/").every((part) => Boolean(part) && part !== "." && part !== "..");
-}
-
 async function validateResult(
   result: ExportBundleResult,
   meetingId: number,
@@ -94,7 +88,7 @@ async function validateResult(
 ): Promise<string> {
   let bytes: Buffer;
   try {
-    bytes = await readFile(join(result.bundlePath, "manifest.json"));
+    bytes = await readBundleFile(result.bundlePath, "manifest.json");
   } catch (error) {
     throw failure("BUNDLE_INCOMPLETE", "published manifest is missing", error);
   }
@@ -119,25 +113,27 @@ async function validateResult(
     throw failure("CONCLUSION_IDENTITY_MISMATCH", "returned manifest differs from the published manifest");
   }
   if (!disk.entries.length || !disk.entries.every((entry) =>
-    entry.version.transcript_version_id === transcriptVersionId && safePath(entry.path))) {
+    entry.version.transcript_version_id === transcriptVersionId && isSafeBundlePath(entry.path))) {
     throw failure("CONCLUSION_IDENTITY_MISMATCH", "manifest entries do not identify the confirmed transcript version");
   }
   for (const entry of disk.entries) {
     let artifact: Buffer;
     try {
-      artifact = await readFile(join(result.bundlePath, entry.path));
+      artifact = await readBundleFile(result.bundlePath, entry.path);
     } catch (error) {
       throw failure("BUNDLE_INCOMPLETE", `missing ${entry.path}`, error);
     }
-    const digest = createHash("sha256").update(artifact).digest("hex");
-    if (artifact.byteLength !== entry.byte_size || entry.byte_length !== entry.byte_size || digest !== entry.sha256) {
+    if (!matchesBundleFile(artifact, entry)) {
       throw failure("BUNDLE_HASH_MISMATCH", entry.path);
     }
   }
-  if (!(await readFile(join(result.bundlePath, "minutes.pdf"))).subarray(0, 5).equals(Buffer.from("%PDF-"))) {
+  if (!hasBundleSignature(await readBundleFile(result.bundlePath, "minutes.pdf"), "pdf")) {
     throw failure("INVALID_MINUTES_PDF", "PDF signature missing");
   }
-  return createHash("sha256").update(bytes).digest("hex");
+  if (!hasBundleSignature(await readBundleFile(result.bundlePath, "minutes.docx"), "docx")) {
+    throw failure("INVALID_MINUTES_DOCX", "DOCX (OPC/ZIP) signature missing");
+  }
+  return bundleFileSha256(bytes);
 }
 
 function validateArtifactLinks(

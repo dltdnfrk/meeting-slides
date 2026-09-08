@@ -7,6 +7,11 @@ import {
   type ResolvedAssetLayer,
 } from "../../src/slides/assets/integration.ts";
 import { createAssetManifest, type AssetManifest } from "../../src/slides/assets/manifest.ts";
+import { compileGeometrySlide } from "../../src/slides/geometry/compiler.ts";
+import type { TextMeasureInput, TextMeasurer, TextFitPolicy } from "../../src/slides/geometry/contract.ts";
+import { preflightGeometrySlide } from "../../src/slides/geometry/preflight.ts";
+import type { LayoutDraft, LayoutElement } from "../../src/slides/layouts/contract.ts";
+import { draftLayout } from "../../src/slides/layouts/registry.ts";
 import type { PlanSlide, SlidePlan } from "../../src/slides/model/plan.ts";
 import { createDeckTheme } from "../../src/slides/theme/theme.ts";
 import { MEETING_PAPER_STYLE_PROFILE } from "../../src/slides/theme/meeting-paper.ts";
@@ -474,5 +479,166 @@ describe("SlidePlan asset integration boundary", () => {
       () => resolve(collision, "slide-hero"),
       { code: "ASSET_PLACEMENT_COLLISION", path: "slides[0].assetIds[1]", detail: /asset-hero-photo.*asset-summary-mark/i },
     );
+  });
+});
+
+describe("asset placement versus text geometry", () => {
+  interface Box {
+    readonly x: number;
+    readonly y: number;
+    readonly width: number;
+    readonly height: number;
+  }
+
+  function boxesOverlap(left: Box, right: Box): boolean {
+    return left.x < right.x + right.width &&
+      right.x < left.x + left.width &&
+      left.y < right.y + right.height &&
+      right.y < left.y + left.height;
+  }
+
+  class StaticMeasurer implements TextMeasurer {
+    measure(input: TextMeasureInput): { width: number; height: number } {
+      return { width: input.text.length * input.fontSize * 0.5, height: input.fontSize };
+    }
+  }
+
+  const bodyPolicy: TextFitPolicy = {
+    mode: "wrap", wordBreak: "normal", overflowWrap: "break-word", fontFloor: 12,
+  };
+
+  function compiledBody(): ReturnType<typeof compileGeometrySlide> {
+    const element: LayoutElement = {
+      id: "fixture:body",
+      role: "body",
+      text: "alpha",
+      box: { x: 80, y: 180, width: 200, height: 60 },
+      tokens: { color: "colors.ink", size: "typography.body.size", font: "font.family" },
+      accessibility: { role: "body", label: "body: alpha", readingOrder: 0 },
+      evidence: null,
+    };
+    const draft: LayoutDraft = {
+      id: "fixture:layout",
+      slideId: "fixture",
+      layout: "summary",
+      canvas: { width: 1280, height: 720 },
+      variant: "overlap-fixture",
+      elements: [element],
+    };
+    return compileGeometrySlide(draft, theme, {
+      textMeasurer: new StaticMeasurer(),
+      textPolicies: { body: bodyPolicy },
+    });
+  }
+
+  test("chart-mode metrics place no card under the chart rect", () => {
+    // Given: a metrics slide in chart mode with a resolved chart placement
+    const source = plan();
+    const draft = draftLayout(slide(source, "slide-metrics"));
+    const chart = resolve(source, "slide-metrics").placements[0]!;
+
+    // When: every drafted element box is compared with the chart rect
+    const overlapped = draft.elements.filter((entry) => boxesOverlap(entry.box, chart.box));
+
+    // Then: no text box sits under the chart, and every card stays in the left column
+    expect(chart.box).toEqual({ x: 480, y: 152, width: 720, height: 480 });
+    expect(overlapped.map((entry) => entry.id)).toEqual([]);
+    expect(draft.elements
+      .filter((entry) => entry.role.startsWith("metric-"))
+      .every((entry) => entry.box.x + entry.box.width <= chart.box.x)).toBe(true);
+  });
+
+  test("a hero image placement does not intersect the statement box", () => {
+    // Given: a cover hero slide with a resolved image placement
+    const source = plan();
+    const draft = draftLayout(slide(source, "slide-hero"));
+    const image = resolve(source, "slide-hero").placements[0]!;
+    const statement = draft.elements.find((entry) => entry.role === "statement")!;
+
+    // When: the statement box is compared with the image rect
+    // Then: the image rect is disjoint from the statement and every other hero text box
+    expect(image.box).toEqual({ x: 704, y: 0, width: 576, height: 720 });
+    expect(boxesOverlap(statement.box, image.box)).toBe(false);
+    expect(draft.elements.every((entry) => !boxesOverlap(entry.box, image.box))).toBe(true);
+  });
+
+  test("a statement-variant hero image placement does not intersect text boxes", () => {
+    const source = plan();
+    const heroSlide = slide(source, "slide-hero");
+    if (heroSlide.layout !== "hero") throw new Error("expected hero slide");
+    const statementSlide = {
+      ...heroSlide,
+      payload: { variant: "statement" as const, statement: heroSlide.payload.statement },
+    };
+    source.slides = source.slides.map((entry) => entry.id === statementSlide.id ? statementSlide : entry);
+    const draft = draftLayout(statementSlide);
+    const image = resolve(source, "slide-hero").placements[0]!;
+
+    expect(image.box).toEqual({ x: 704, y: 0, width: 576, height: 720 });
+    expect(draft.elements.every((entry) => !boxesOverlap(entry.box, image.box))).toBe(true);
+  });
+
+  test("a summary icon placement does not intersect text boxes", () => {
+    const source = plan();
+    const summarySlide = slide(source, "slide-summary");
+    if (summarySlide.layout !== "summary") throw new Error("expected summary slide");
+    const listSlide = {
+      ...summarySlide,
+      payload: {
+        mode: "overview" as const,
+        items: ["The launch date is approved.", "Quality remains the gate.", "Mina owns notes."],
+      },
+      bindings: {
+        title: ["claim-launch"],
+        "items[0]": ["claim-launch"],
+        "items[1]": ["claim-launch"],
+        "items[2]": ["claim-launch"],
+      },
+    };
+    const icon = resolve(source, "slide-summary").placements[0]!;
+    const statementDraft = draftLayout(summarySlide);
+    const listDraft = draftLayout(listSlide);
+
+    expect(icon.box).toEqual({ x: 880, y: 160, width: 240, height: 240 });
+    expect(statementDraft.elements.every((entry) => !boxesOverlap(entry.box, icon.box))).toBe(true);
+    expect(listDraft.elements.every((entry) => !boxesOverlap(entry.box, icon.box))).toBe(true);
+  });
+
+  test("preflight reports an overlap error when an asset rect intersects a text element", () => {
+    // Given: a compiled slide whose body element occupies x 80..280, y 180..240
+    const compiled = compiledBody();
+
+    // When: preflight compares an intersecting asset rect against the text boxes
+    const result = preflightGeometrySlide(compiled, {}, [
+      { id: "fixture:asset", box: { x: 140, y: 160, width: 60, height: 80 } },
+    ]);
+
+    // Then: the asset-text intersection blocks publication deterministically
+    expect(result.status).toBe("blocked");
+    expect(result.issues.map((issue) => ({
+      code: issue.code,
+      severity: issue.severity,
+      path: issue.path,
+      elementIds: issue.elementIds,
+    }))).toEqual([{
+      code: "undeclared-intersection",
+      severity: "error",
+      path: "assets[0].box",
+      elementIds: ["fixture:asset", "fixture:body"],
+    }]);
+  });
+
+  test("preflight keeps a slide with a disjoint asset rect publishable", () => {
+    // Given: the same compiled body element
+    const compiled = compiledBody();
+
+    // When: preflight compares a non-intersecting asset rect
+    const result = preflightGeometrySlide(compiled, {}, [
+      { id: "fixture:asset", box: { x: 400, y: 400, width: 50, height: 50 } },
+    ]);
+
+    // Then: the slide stays publishable with no new issues
+    expect(result.status).toBe("publishable");
+    expect(result.issues).toEqual([]);
   });
 });

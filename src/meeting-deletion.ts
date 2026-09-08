@@ -17,7 +17,8 @@ export function deleteMeetingHistory(database: Database, meetingId: number): boo
     database.run("DELETE FROM meeting_reviews WHERE meeting_id = ?", [meetingId]);
     database.run("DELETE FROM meeting_transcript_state WHERE meeting_id = ?", [meetingId]);
     database.run("DELETE FROM transcript_line_attributions WHERE meeting_id = ?", [meetingId]);
-    database.run("DELETE FROM transcript_version_lines WHERE meeting_id = ?", [meetingId]);
+    // Delete the parent version so ON DELETE CASCADE removes its lines after the
+    // finalized parent is gone; direct line deletion correctly trips immutability.
     database.run("DELETE FROM transcript_versions WHERE meeting_id = ?", [meetingId]);
     for (const table of [
       "meeting_audio_sources",

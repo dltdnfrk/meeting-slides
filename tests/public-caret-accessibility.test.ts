@@ -457,14 +457,17 @@ function readTabOrder() {
 beforeAll(async () => {
   harness = createPublicTestHarness();
   browser = await puppeteer.launch({
+    executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     headless: true,
     args: ["--no-sandbox", "--disable-dev-shm-usage", "--font-render-hinting=none"],
   });
+  console.log(`accessibility Chrome pid=${browser.process()?.pid} version=${await browser.version()}`);
 });
 
 afterAll(async () => {
   await browser?.close();
   harness?.stop();
+  console.log("accessibility Chrome and harness closed");
 });
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1314,7 +1317,7 @@ function readDialogTabbables(dialogId: string) {
   const tabbables = [...root.querySelectorAll<HTMLElement>(
     'a[href], button, input, select, textarea, summary, [tabindex]',
   )].filter((el) => {
-    if (el.hasAttribute("disabled")) return false;
+    if (el.matches(":disabled")) return false;
     if (el.getAttribute("tabindex") === "-1") return false;
     for (let n: HTMLElement | null = el; n; n = n.parentElement) {
       if (n.hidden) return false;
@@ -1324,7 +1327,17 @@ function readDialogTabbables(dialogId: string) {
     const r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0;
   });
-  return tabbables.map((el, index) => {
+  // A named radio group contributes one browser tab stop, not every input.
+  // The shipped settings group is checked; unchecked groups are exercised
+  // independently below in both directions, against explicit focus targets.
+  const stops = tabbables.filter((el) => {
+    if (!(el instanceof HTMLInputElement) || el.type !== "radio" || !el.name) return true;
+    const group = tabbables.filter((peer): peer is HTMLInputElement =>
+      peer instanceof HTMLInputElement && peer.type === "radio"
+      && peer.name === el.name && peer.form === el.form && peer.getRootNode() === el.getRootNode());
+    return el === (group.find((peer) => peer.checked) ?? group[0]);
+  });
+  return stops.map((el, index) => {
     const token = `${el.id || el.tagName.toLowerCase()}#${index}`;
     el.dataset.a11yProbe = token;
     return token;
@@ -1456,6 +1469,103 @@ const TRAPPED_DIALOGS = [
   { id: "review-panel", label: "review dialog", open: openReviewPanel, trigger: "btn-review" },
   { id: "ask-panel", label: "Ask dialog", open: openAsk, trigger: "btn-ask" },
 ] as const;
+
+describe("settings radio group tab stops in Chrome", () => {
+  for (const scenario of [
+    { name: "checked first member", checked: 0, disabled: -1, fieldset: false, forward: 0, reverse: 0 },
+    { name: "checked last member", checked: 2, disabled: -1, fieldset: false, forward: 2, reverse: 2 },
+    { name: "unchecked group", checked: -1, disabled: -1, fieldset: false, forward: 0, reverse: 2 },
+    { name: "disabled checked member", checked: 0, disabled: 0, fieldset: false, forward: 1, reverse: 2 },
+    { name: "fieldset-disabled checked member", checked: 0, disabled: 0, fieldset: true, forward: 1, reverse: 2 },
+  ]) {
+    test(`${scenario.name} retains forward/reverse Tab containment and Escape restoration`, async () => {
+      const session = await openSession(1244, 836);
+      try {
+        await session.page.evaluate((scenario) => {
+          const panel = document.getElementById("provider-panel");
+          if (!panel) throw new TypeError("settings panel missing");
+          const form = document.createElement("form");
+          for (let index = 0; index < 3; index += 1) {
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = 'fixture[radio]"group';
+            radio.id = `fixture-radio-${index}`;
+            radio.checked = index === scenario.checked;
+            if (index === scenario.disabled && scenario.fieldset) {
+              const fieldset = document.createElement("fieldset");
+              fieldset.disabled = true;
+              fieldset.append(radio);
+              form.append(fieldset);
+            } else {
+              radio.disabled = index === scenario.disabled;
+              form.append(radio);
+            }
+          }
+          panel.append(form);
+        }, scenario);
+        await openSettings(session);
+        expect(await session.page.evaluate(readActiveId)).toBe("btn-recheck");
+        expect(await tabUntil(session, "provider-panel", `fixture-radio-${scenario.forward}`))
+          .toEqual({ reached: true, escaped: false });
+        await session.page.keyboard.press("Tab");
+        expect(await session.page.evaluate(readActiveId)).toBe("btn-recheck");
+        await session.page.keyboard.down("Shift");
+        try { await session.page.keyboard.press("Tab"); }
+        finally { await session.page.keyboard.up("Shift"); }
+        expect(await session.page.evaluate(readActiveId)).toBe(`fixture-radio-${scenario.reverse}`);
+        // Reversing direction from the last unchecked member must still wrap:
+        // that member is the same tab stop as the first forward candidate.
+        await session.page.keyboard.press("Tab");
+        expect(await session.page.evaluate(readActiveId)).toBe("btn-recheck");
+        await session.act('document.getElementById("provider-panel")?.hidden === true',
+          () => session.page.keyboard.press("Escape"), 5000);
+        expect(await session.page.evaluate(readActiveId)).toBe("btn-settings");
+        expect(await session.page.$$eval('input[name="capture-source"]', (nodes) => nodes.length)).toBe(2);
+      } finally { await session.close(); }
+    }, 20_000);
+  }
+
+  for (const named of [true, false]) {
+    test(`${named ? "same-name form-associated" : "unnamed"} radios retain independent tab stops`, async () => {
+      const session = await openSession(1244, 836);
+      try {
+        await session.page.evaluate((named) => {
+          const panel = document.getElementById("provider-panel");
+          if (!panel) throw new TypeError("settings panel missing");
+          for (const id of ["fixture-form-a", "fixture-form-b"]) {
+            const form = document.createElement("form");
+            form.id = id;
+            panel.append(form);
+          }
+          // Explicit form association rather than ancestry determines the group.
+          for (let index = 0; index < 4; index += 1) {
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = named ? "shared-name" : "";
+            radio.id = `fixture-independent-${index}`;
+            radio.setAttribute("form", index % 2 === 0 ? "fixture-form-a" : "fixture-form-b");
+            radio.checked = index < 2;
+            panel.append(radio);
+          }
+        }, named);
+        await openSettings(session);
+        expect(await tabUntil(session, "provider-panel", "fixture-independent-0"))
+          .toEqual({ reached: true, escaped: false });
+        for (let index = 1; index <= (named ? 1 : 3); index += 1) {
+          await session.page.keyboard.press("Tab");
+          expect(await session.page.evaluate(readActiveId)).toBe(`fixture-independent-${index}`);
+        }
+        await session.page.keyboard.press("Tab");
+        expect(await session.page.evaluate(readActiveId)).toBe("btn-recheck");
+        await session.page.keyboard.down("Shift");
+        try { await session.page.keyboard.press("Tab"); }
+        finally { await session.page.keyboard.up("Shift"); }
+        expect(await session.page.evaluate(readActiveId)).toBe(`fixture-independent-${named ? 1 : 3}`);
+        expect(await session.page.evaluate(readFocusInside, "provider-panel")).toBe(true);
+      } finally { await session.close(); }
+    }, 20_000);
+  }
+});
 
 describe("Todo 15 · every shipped dialog traps Tab and Shift+Tab", () => {
   for (const dialog of TRAPPED_DIALOGS) {

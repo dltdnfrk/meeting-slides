@@ -442,6 +442,7 @@ describe("native surface seam: server payload decode subset", () => {
       mode: "live",
       phase: "capturing",
       startedAt: 1723370000000,
+      audioSource: "",
     });
   });
 
@@ -520,7 +521,7 @@ describe("native surface seam: launcher and build invariants", () => {
     // entry point still owns EventKit auto-capture.
     const source = launcher();
     const lifecycle = readFileSync(join(ROOT, "macos", "AppLifecycle.swift"), "utf8");
-    expect(source).toMatch(/api\/auto-capture/);
+    expect(lifecycle).toMatch(/api\/auto-capture/);
     expect(lifecycle).toMatch(/HTTP_PORT/);
     expect(lifecycle).toMatch(/defaultHTTPPort = 8787/);
     expect(lifecycle).toMatch(/runtime-bootstrap/);

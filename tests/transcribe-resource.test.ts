@@ -7,6 +7,7 @@ import {
   PCM_READER_HIGH_WATER_CHUNKS,
   PCM_READER_LOW_WATER_CHUNKS,
   PcmReader,
+  transcribePcmArgs,
 } from "../src/transcribe.ts";
 
 class FakeProcess extends EventEmitter {
@@ -15,6 +16,21 @@ class FakeProcess extends EventEmitter {
 }
 
 describe("PcmReader resource bounds", () => {
+  test("one ffmpeg input tees the mic PCM to live STT and the canonical WAV", () => {
+    const args = transcribePcmArgs({
+      modelPath: "/models/qwen.gguf",
+      captureId: 4,
+      threads: 4,
+      gpu: true,
+      ffmpegBin: "ffmpeg",
+      audioOutputPath: "/archive/meeting.wav",
+    }, null);
+    expect(args.filter((value) => value === "avfoundation")).toHaveLength(1);
+    expect(args.filter((value) => value === "[0:a]asplit=2[stt][archive]")).toHaveLength(1);
+    expect(args).toContain("pipe:1");
+    expect(args.at(-1)).toBe("/archive/meeting.wav");
+  });
+
   test("pauses at the high-water mark, resumes at low water, and preserves every sample", async () => {
     const proc = new FakeProcess();
     const errors: Error[] = [];
@@ -43,10 +59,36 @@ describe("PcmReader resource bounds", () => {
   test("emits an aligned tail once when error and stream end both fire", async () => {
     const proc = new FakeProcess();
     const reader = new PcmReader(proc as unknown as ChildProcess, () => {});
+    const ended = new Promise((resolve) => proc.stdout.once("end", resolve));
     proc.stdout.end(Buffer.from([1, 2, 3, 4, 5, 6]));
-    await new Promise((resolve) => proc.stdout.once("end", resolve));
+    await ended;
     proc.emit("error", new Error("duplicate terminal event"));
     expect((await reader.next())?.length).toBe(1);
     expect(await reader.next()).toBeNull();
   });
+});
+
+describe("TranscribeCLI public runtime", () => {
+  test("imports the installed binding without mocks", async () => {
+    const proc = Bun.spawn([process.execPath, "-e",
+      'await import("./src/transcribe.ts"); console.log("TRANSCRIBE_IMPORT_OK")'],
+    { cwd: new URL("..", import.meta.url).pathname, stdout: "pipe", stderr: "pipe" });
+    const [code, stdout, stderr] = await Promise.all([
+      proc.exited, new Response(proc.stdout).text(), new Response(proc.stderr).text(),
+    ]);
+    expect({ code, stderr }).toEqual({ code: 0, stderr: "" });
+    expect(stdout.trim()).toBe("TRANSCRIBE_IMPORT_OK");
+  });
+
+  test.each(["overflow", "tail-overflow", "exact", "unlimited", "empty", "run-error", "fallback"])(
+    "bounds batch input and disposes resources: %s", async (scenario) => {
+      const proc = Bun.spawn([process.execPath, new URL("./transcribe-batch-scenario.ts", import.meta.url).pathname, scenario],
+        { stdout: "pipe", stderr: "pipe" });
+      const [code, stdout, stderr] = await Promise.all([
+        proc.exited, new Response(proc.stdout).text(), new Response(proc.stderr).text(),
+      ]);
+      expect({ code, stderr }).toEqual({ code: 0, stderr: "" });
+      expect(stdout.trim()).toBe(`TRANSCRIBE_SCENARIO_OK ${scenario}`);
+    }, 10_000,
+  );
 });

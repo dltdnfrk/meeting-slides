@@ -2,28 +2,7 @@
 // Source: public/ui-state-machine.ts
 // Generator: scripts/build-public-modules.ts
 // Rebuild: bun run scripts/build-public-modules.ts
-const KNOWN_MESSAGE_TYPES = [
-  "slide",
-  "caption",
-  "line",
-  "transcript",
-  "status",
-  "capture",
-  "detect",
-  "providers",
-  "sttModels",
-  "meetings",
-  "meeting",
-  "attendees",
-  "review",
-  "saved",
-  "compile",
-  "export",
-  "ask",
-  "reviewItemUpdated",
-  "reviewConfirmed",
-  "meetingConcluded"
-];
+import { isKnownMessageType } from "./protocol-values.js";
 const CAPTURE_PHASES = ["idle", "starting", "capturing", "stopping", "switching-model"];
 const COMPILE_STATUSES = ["started", "progress", "success", "error", "timeout"];
 function isRecord(value) {
@@ -47,7 +26,7 @@ export function parseServerEvent(raw) {
   const type = raw["type"];
   if (typeof type !== "string")
     return fail("frame has no string type");
-  if (!KNOWN_MESSAGE_TYPES.includes(type))
+  if (!isKnownMessageType(type))
     return fail(`unknown message type: ${type}`);
   if (type === "capture") {
     const capturing = raw["capturing"];

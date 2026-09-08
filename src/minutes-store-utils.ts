@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { canonicalLinesFromRows, hashCanonicalTranscript } from "./canonical-transcript.ts";
 import type { ReviewMutationErrorCode } from "./minutes-store-types.ts";
 
 export function nonBlank(value: string, label: string): string {
@@ -19,15 +19,5 @@ export function reviewError(code: ReviewMutationErrorCode, message: string): Err
 export function transcriptLinesHash(lines: Array<{
   seq: number; captured_at_ms: number | null; speaker_turn: number | null; text: string;
 }>): string {
-  const hash = createHash("sha256");
-  for (const line of lines) {
-    hash.update(JSON.stringify({
-      seq: line.seq,
-      ts: line.captured_at_ms,
-      speaker_turn: line.speaker_turn,
-      text: line.text,
-    }));
-    hash.update("\n");
-  }
-  return hash.digest("hex");
+  return hashCanonicalTranscript(canonicalLinesFromRows(lines));
 }

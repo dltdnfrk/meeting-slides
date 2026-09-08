@@ -9,6 +9,7 @@ import type {
   TextFitPolicy,
 } from "../../src/slides/geometry/contract.ts";
 import { compileGeometrySlide } from "../../src/slides/geometry/compiler.ts";
+import { fitText } from "../../src/slides/geometry/text-fit.ts";
 import { preflightGeometrySlide } from "../../src/slides/geometry/preflight.ts";
 import { draftLayout, PRIMARY_LAYOUT_FAMILIES } from "../../src/slides/layouts/registry.ts";
 import type { PlanSlide } from "../../src/slides/model/plan.ts";
@@ -56,7 +57,9 @@ class MultilingualFontMetrics implements TextMeasurer {
   }
 }
 
-const LABEL_ROLES = new Set(["comparison-label", "event-label", "metric-label"]);
+const LABEL_ROLES = new Set([
+  "summary-marker", "comparison-marker", "comparison-label", "event-label", "metric-label",
+]);
 const PROMINENT_ROLES = new Set(["statement", "decision", "metric-value", "action-task"]);
 
 function policyFor(role: string): TextFitPolicy {
@@ -284,6 +287,70 @@ function withImpossibleText(slide: PlanSlide, target: "title" | "body"): PlanSli
     },
   };
 }
+
+/**
+ * Minimal deterministic metrics for the keep-all wrap unit: Hangul syllables
+ * occupy one em, every other code point (space, punctuation, Latin) half an em.
+ */
+class KeepAllWrapMetrics implements TextMeasurer {
+  measure(input: TextMeasureInput): { width: number; height: number } {
+    const ems = [...input.text].reduce((sum, character) =>
+      sum + (/^[\u1100-\u11ff\u3130-\u318f\uac00-\ud7a3]$/u.test(character) ? 1 : 0.5), 0);
+    return { width: ems * input.fontSize, height: input.fontSize * 1.2 };
+  }
+}
+
+function keepAllWrap(text: string, width: number): ReturnType<typeof fitText> {
+  return fitText({
+    text,
+    width,
+    height: 400,
+    fontFamily: "fixture",
+    fontSize: 22,
+    policy: { mode: "wrap", wordBreak: "keep-all", overflowWrap: "break-word", fontFloor: 18 },
+    measurer: new KeepAllWrapMetrics(),
+  });
+}
+
+describe("keep-all word break policy in the fit engine", () => {
+  test("wraps a spaced Hangul sentence only at spaces when keep-all + break-word", () => {
+    const trace = keepAllWrap("출시 결정은 금요일 확정", 132);
+
+    expect(trace.lines).toEqual(["출시 결정은", "금요일 확정"]);
+  });
+
+  test("splits a single over-wide Hangul token only when it alone exceeds the width", () => {
+    const wide = keepAllWrap("회귀테스트를완료합니다", 242);
+    const narrow = keepAllWrap("회귀테스트를완료합니다", 110);
+
+    expect(wide.lines).toEqual(["회귀테스트를완료합니다"]);
+    expect(narrow.lines.length).toBeGreaterThan(1);
+    expect(narrow.lines.every((line) =>
+      new KeepAllWrapMetrics().measure({ text: line, fontFamily: "fixture", fontSize: 22 }).width <= 110)).toBe(true);
+    expect(narrow.lines.join("")).toBe("회귀테스트를완료합니다");
+  });
+
+  test("breaks at punctuation under keep-all instead of splitting a word per code point", () => {
+    const trace = keepAllWrap("출시 결정은,금요일 확정", 132);
+
+    expect(trace.lines).toEqual(["출시 결정은,", "금요일 확정"]);
+    expect(trace.lines.join("")).toBe("출시 결정은,금요일 확정");
+  });
+
+  test("keeps the existing wrap behavior under wordBreak normal", () => {
+    const trace = fitText({
+      text: "ABCDEFGHIJKL",
+      width: 66,
+      height: 400,
+      fontFamily: "fixture",
+      fontSize: 22,
+      policy: { mode: "wrap", wordBreak: "normal", overflowWrap: "break-word", fontFloor: 18 },
+      measurer: new KeepAllWrapMetrics(),
+    });
+
+    expect(trace.lines).toEqual(["ABCDEF", "GHIJKL"]);
+  });
+});
 
 describe("multilingual long-copy containment across semantic layouts", () => {
   test("all seven realistic maximum-density layouts are publishable, contained, floor-safe, and deterministic", () => {

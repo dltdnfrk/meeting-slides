@@ -1,5 +1,26 @@
 import { SttModelManager } from "./stt-model-downloader.js";
-import type { SttModelId } from "./stt-model-catalog.js";
+import type { SttModelArtifact, SttModelId } from "./stt-model-catalog.js";
+
+export interface SttCaptureIdentity {
+  readonly engine: "whisper.cpp" | "transcribe.cpp";
+  readonly engineModel: string;
+}
+
+export function resolveSttCaptureIdentity(input: {
+  readonly selectedArtifact: Pick<SttModelArtifact, "backend"> | null;
+  readonly selectedPath: string | null;
+  readonly fallbackModelPath: string;
+}): SttCaptureIdentity {
+  if (input.selectedArtifact?.backend === "transcribe" && input.selectedPath === null) {
+    throw new Error("selected transcribe model is not installed");
+  }
+  const engineModel = input.selectedPath ?? input.fallbackModelPath;
+  if (engineModel.trim() === "") throw new Error("capture model path must not be blank");
+  return Object.freeze({
+    engine: input.selectedArtifact?.backend === "transcribe" ? "transcribe.cpp" : "whisper.cpp",
+    engineModel,
+  });
+}
 
 export interface SttCaptureController {
   isCapturing(): boolean;

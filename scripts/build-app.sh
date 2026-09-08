@@ -42,11 +42,12 @@ cat > "$CONTENTS/Info.plist" <<'EOF'
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundleDevelopmentRegion</key><string>ko</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.productivity</string>
-  <key>LSMinimumSystemVersion</key><string>13.0</string>
+  <key>LSMinimumSystemVersion</key><string>14.2</string>
   <key>LSMultipleInstancesProhibited</key><true/>
   <key>NSHighResolutionCapable</key><true/>
   <key>NSSupportsAutomaticGraphicsSwitching</key><true/>
   <key>NSMicrophoneUsageDescription</key><string>회의 음성을 로컬에서 전사하기 위해 마이크가 필요합니다.</string>
+  <key>NSAudioCaptureUsageDescription</key><string>Zoom이나 브라우저에서 재생되는 회의 소리를 로컬에서 전사하기 위해 컴퓨터 오디오가 필요합니다.</string>
   <key>NSCalendarsUsageDescription</key><string>다음 회의 시작에 맞춰 녹음을 자동으로 시작하기 위해 캘린더 일정을 읽습니다.</string>
   <key>NSCalendarsFullAccessUsageDescription</key><string>다음 회의 시작에 맞춰 녹음을 자동으로 시작하기 위해 캘린더 일정을 읽습니다.</string>
   <key>NSAppTransportSecurity</key>
@@ -80,7 +81,10 @@ swiftc -O -o "$MACOS_DIR/meeting-slides" \
   macos/MinibarProjection.swift \
   macos/MinibarWindowController.swift \
   macos/MinibarView.swift \
+  macos/SystemAudioCapture.swift \
   -framework AVFoundation \
+  -framework CoreAudio \
+  -framework AudioToolbox \
   -framework AppKit \
   -framework Foundation
 chmod +x "$MACOS_DIR/meeting-slides"

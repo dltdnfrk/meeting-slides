@@ -29,7 +29,7 @@ done
 # --- Info.plist identity and the TCC strings the runtime actually needs ---
 plutil -lint "$PLIST" >/dev/null || fail "Info.plist does not lint"
 for key in CFBundleIdentifier CFBundleExecutable CFBundleShortVersionString \
-  CFBundleVersion NSMicrophoneUsageDescription NSCalendarsUsageDescription \
+  CFBundleVersion NSMicrophoneUsageDescription NSAudioCaptureUsageDescription NSCalendarsUsageDescription \
   NSCalendarsFullAccessUsageDescription; do
   value="$(plutil -extract "$key" raw -o - "$PLIST" 2>/dev/null || true)"
   [[ -n "$value" ]] || fail "Info.plist missing $key"
@@ -43,7 +43,7 @@ done
 symbols="$(strings -a "$EXEC")"
 for module in LauncherEnvironment ServerLifecycle NativeSurfaceGeometry \
   StopCommandGuard TransportClient MinibarProjection MinibarWindowController \
-  MinibarView MinibarPanel; do
+  MinibarView MinibarPanel SystemAudioCapture; do
   grep -q "$module" <<<"$symbols" || fail "packaged executable is missing $module"
 done
 grep -q 'statusItemWithLength:' <<<"$symbols" || fail "packaged executable has no menu-bar item"
@@ -62,7 +62,8 @@ done
 index="$project/public/index.html"
 grep -q 'href="/style.css"' "$index" || fail "index has no generated-slide stylesheet"
 grep -q 'href="/caret-operator.css"' "$index" || fail "index has no operator stylesheet"
-grep -q 'src="/operator-surface.js"' "$index" || fail "index has no operator surface script"
+grep -q 'type="module" src="/app.js"' "$index" || fail "index has no app module"
+grep -Fq 'from "./operator-surface.js"' "$project/public/app.js" || fail "app module has no operator surface import"
 if grep -Eq 'workspace-shell\.css|operational-liquid\.css|caret-shell\.css|caret-foundation\.css|transcript-overlay' "$index"; then
   fail "obsolete active shell reference in public/index.html"
 fi

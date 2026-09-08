@@ -1,9 +1,16 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
-import { isAbsolute, join } from "node:path";
+import { join } from "node:path";
 
-import { buildDeckHtml, buildSlideFiles, type DeckInput } from "./deck.ts";
+import { bundleFileSha256 as hash, hasBundleSignature, isSafeBundlePath, matchesBundleFile, readBundleFile } from "./bundle-integrity.ts";
+import { serializeCanonicalTranscript } from "./canonical-transcript.ts";
+
+import {
+  buildBundleArchivalDeck,
+  type BundleArchivalDeckInput,
+} from "./bundle-archival-deck.ts";
 import { buildMinutesHtml, type MinutesInput, type MinutesSourceSegment } from "./minutes.ts";
+import { buildMinutesDocx } from "./minutes-docx.ts";
 import type { MinutesStore } from "./minutes-store.ts";
 import { renderMinutesPdf } from "./pdf.ts";
 
@@ -14,12 +21,11 @@ export interface ExportBundleResult { bundleId: string; bundlePath: string; mani
 
 type Row = Record<string, unknown>;
 const enc = new TextEncoder();
-const hash = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
 const source = (row: Row): MinutesSourceSegment => ({ transcript_version_id: row.source_transcript_version_id as string, start_seq: row.source_start_seq as number, end_seq: row.source_end_seq as number });
 
 function safeRelative(path: string): void {
-  if (!path || isAbsolute(path) || path.includes("\\") || path.split("/").some((part) => !part || part === "." || part === "..")) throw new Error(`[UNSAFE_BUNDLE_PATH] ${path}`);
+  if (!isSafeBundlePath(path)) throw new Error(`[UNSAFE_BUNDLE_PATH] ${path}`);
 }
 function contentType(path: string): string {
   if (path.endsWith(".pdf")) return "application/pdf";
@@ -28,23 +34,25 @@ function contentType(path: string): string {
   if (path.endsWith(".html")) return "text/html; charset=utf-8";
   if (path.endsWith(".css")) return "text/css; charset=utf-8";
   if (path.endsWith(".png")) return "image/png";
+  if (path.endsWith(".docx")) return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
   return "application/octet-stream";
 }
 
 async function validateBundle(path: string, bundleId: string, targetCommit: string): Promise<BundleManifest> {
-  const manifest = JSON.parse(await readFile(join(path, "manifest.json"), "utf8")) as BundleManifest;
+  const manifest = JSON.parse((await readBundleFile(path, "manifest.json")).toString("utf8")) as BundleManifest;
   if (manifest.bundle_id !== bundleId || manifest.target_commit !== targetCommit || !Array.isArray(manifest.entries) || !Array.isArray(manifest.artifacts)) throw new Error("[BUNDLE_IDENTITY_MISMATCH] bundle identity or manifest shape differs");
-  const required = ["minutes.pdf", "minutes.json", "audio.ref.json", "deck/index.html"];
+  const required = ["minutes.pdf", "minutes.json", "minutes.docx", "audio.ref.json", "deck/index.html"];
   const transcript = manifest.entries.filter((entry) => /^transcript\.v\d+\.jsonl$/.test(entry.path));
   if (transcript.length !== 1) throw new Error("[BUNDLE_INCOMPLETE] canonical transcript is missing or ambiguous");
   for (const requiredPath of required) if (!manifest.entries.some((entry) => entry.path === requiredPath)) throw new Error(`[BUNDLE_INCOMPLETE] missing ${requiredPath}`);
   if (JSON.stringify(manifest.entries) !== JSON.stringify(manifest.artifacts)) throw new Error("[BUNDLE_MANIFEST_MISMATCH] artifact indexes differ");
   for (const entry of manifest.entries) {
     safeRelative(entry.path);
-    const bytes = await readFile(join(path, entry.path));
-    if (bytes.byteLength !== entry.byte_size || entry.byte_length !== entry.byte_size || hash(bytes) !== entry.sha256) throw new Error(`[BUNDLE_HASH_MISMATCH] ${entry.path}`);
+    const bytes = await readBundleFile(path, entry.path);
+    if (!matchesBundleFile(bytes, entry)) throw new Error(`[BUNDLE_HASH_MISMATCH] ${entry.path}`);
   }
-  if (!(await readFile(join(path, "minutes.pdf"))).subarray(0, 5).equals(Buffer.from("%PDF-"))) throw new Error("[INVALID_MINUTES_PDF] PDF signature missing");
+  if (!hasBundleSignature(await readBundleFile(path, "minutes.pdf"), "pdf")) throw new Error("[INVALID_MINUTES_PDF] PDF signature missing");
+  if (!hasBundleSignature(await readBundleFile(path, "minutes.docx"), "docx")) throw new Error("[INVALID_MINUTES_DOCX] DOCX (OPC/ZIP) signature missing");
   return manifest;
 }
 
@@ -60,9 +68,8 @@ function loadSnapshot(store: MinutesStore, meetingId: number, reviewId: string) 
   const meta = store.meetingMeta(meetingId);
   if (!meeting || !meta) throw new Error("[MEETING_NOT_FOUND] meeting metadata is missing");
   const attendees = store.attendeesFor(meetingId), lines = store.transcriptVersionLines(version.transcriptVersionId);
-  const storedBytes = enc.encode(lines.map((line) => JSON.stringify({ seq: line.seq, ts: line.capturedAtMs, speaker_turn: line.speakerTurn, text: line.text })).join("\n") + (lines.length ? "\n" : ""));
-  if (hash(storedBytes) !== version.contentSha256) throw new Error("[TRANSCRIPT_INTEGRITY_FAILED] canonical transcript rows do not match their finalized hash");
-  const transcriptBytes = enc.encode(lines.map((line) => JSON.stringify({ seq: line.seq, ts: line.capturedAtMs, speaker_turn: line.speakerTurn, text: line.text })).join("\n") + (lines.length ? "\n" : ""));
+  const transcriptBytes = enc.encode(serializeCanonicalTranscript(lines));
+  if (hash(transcriptBytes) !== version.contentSha256) throw new Error("[TRANSCRIPT_INTEGRITY_FAILED] canonical transcript rows do not match their finalized hash");
   const select = (table: string, id: string) => db.query(`SELECT *, ${id} AS item_id FROM ${table} WHERE review_id = ? AND review_state = 'confirmed' ORDER BY created_at, ${id}`).all(reviewId) as Row[];
   const decisions = select("decisions", "decision_id"), actions = select("action_items", "action_item_id"), open = select("open_items", "open_item_id"), materials = select("referenced_materials", "material_id");
   const seqs = new Set(lines.map((line) => line.seq));
@@ -99,7 +106,7 @@ function recordComplete(s: ReturnType<typeof loadSnapshot>, bundleId: string, bu
       throw new Error("[BUNDLE_IDENTITY_MISMATCH] persisted bundle identity differs");
     }
     if (!existing) s.db.run("INSERT INTO artifact_bundles VALUES (?, ?, ?, ?, ?, 'complete', ?, ?)", [bundleId, s.meeting.id as number, s.review.review_id as string, s.version.transcriptVersionId, bundlePath, now, now]);
-    const specs: Array<[string, string]> = [["minutes_pdf", "minutes.pdf"], ["minutes_json", "minutes.json"], ["canonical_transcript", `transcript.v${s.version.versionNo}.jsonl`], ["slide_deck", "deck/index.html"]];
+    const specs: Array<[string, string]> = [["minutes_pdf", "minutes.pdf"], ["minutes_json", "minutes.json"], ["minutes_docx", "minutes.docx"], ["canonical_transcript", `transcript.v${s.version.versionNo}.jsonl`], ["slide_deck", "deck/index.html"]];
     for (const [type, path] of specs) {
       const entry = entries.find((candidate) => candidate.path === path);
       if (!entry) throw new Error(`[BUNDLE_INCOMPLETE] missing database artifact ${path}`);
@@ -140,14 +147,17 @@ export async function exportBundle(meetingId: number, reviewId: string, options:
   try {
     const entries: ManifestEntry[] = [], version = { transcript_version_id: s.version.transcriptVersionId, version_no: s.version.versionNo };
     const put = async (path: string, data: string | Uint8Array) => { safeRelative(path); const bytes = typeof data === "string" ? enc.encode(data) : data; await mkdir(join(temporary, ...path.split("/").slice(0, -1)), { recursive: true }); await writeFile(join(temporary, path), bytes); entries.push({ path, sha256: hash(bytes), byte_size: bytes.byteLength, byte_length: bytes.byteLength, content_type: contentType(path), version }); };
-    const transcriptPath = `transcript.v${s.version.versionNo}.jsonl`, html = buildMinutesHtml(minutesInput(s));
-    await put("minutes.pdf", await (options.renderPdf ?? renderMinutesPdf)(html)); await put("minutes.json", json(minutesJson(s, transcriptPath))); await put(transcriptPath, s.transcriptBytes);
+    const minutes = minutesInput(s), transcriptPath = `transcript.v${s.version.versionNo}.jsonl`;
+    await put("minutes.pdf", await (options.renderPdf ?? renderMinutesPdf)(buildMinutesHtml(minutes)));
+    await put("minutes.docx", await buildMinutesDocx(minutes));
+    await put("minutes.json", json(minutesJson(s, transcriptPath))); await put(transcriptPath, s.transcriptBytes);
     const audio = s.db.query("SELECT * FROM meeting_audio_sources WHERE meeting_id = ?").get(meetingId) as Row | null;
     if (audio?.original_audio_path) { const path = audio.original_audio_path as string; let bytes: Buffer; try { if (!(await stat(path)).isFile()) throw new Error(); bytes = await readFile(path); } catch { throw new Error("[ORIGINAL_AUDIO_MISSING] recorded source is unavailable"); } if (hash(bytes) !== audio.original_audio_sha256 || bytes.byteLength !== audio.byte_length) throw new Error("[ORIGINAL_AUDIO_INTEGRITY_FAILED] recorded source bytes changed"); }
     await put("audio.ref.json", json({ path: audio?.original_audio_path ?? null, original_audio_sha256: audio?.original_audio_sha256 ?? null }));
     const slides = s.db.query("SELECT x.idx, x.title, x.bullets, x.started_at FROM slides x JOIN (SELECT idx, MAX(id) id FROM slides WHERE meeting_id = ? GROUP BY idx) y ON x.id=y.id ORDER BY x.idx").all(meetingId) as Array<{ idx: number; title: string; bullets: string; started_at: number }>;
-    const deck: DeckInput = { title: "Meeting Notes", startedAt: s.meeting.started_at as number, provider: s.meeting.provider as string | null, slides: slides.map((slide) => ({ idx: slide.idx, title: slide.title, bullets: JSON.parse(slide.bullets), startedAt: slide.started_at })), lines: s.lines.map((line) => ({ seq: line.seq, ts: line.capturedAtMs ?? 0, speaker: line.speakerTurn, text: line.text })) };
-    const root = options.projectRoot ?? process.cwd(); await put("deck/index.html", buildDeckHtml(deck)); await put("deck/theme.css", await readFile(join(root, "deck", "theme.css"))); for (const file of buildSlideFiles(deck)) await put(`deck/slides/${file.filename}`, file.html); await put("deck/slides/theme.css", await readFile(join(root, "deck", "theme.css")));
+    const deck: BundleArchivalDeckInput = { title: "Meeting Notes", startedAt: s.meeting.started_at as number, provider: s.meeting.provider as string | null, slides: slides.map((slide) => ({ idx: slide.idx, title: slide.title, bullets: JSON.parse(slide.bullets), startedAt: slide.started_at })), lines: s.lines.map((line) => ({ seq: line.seq, ts: line.capturedAtMs ?? 0, speaker: line.speakerTurn, text: line.text })) };
+    const archivalDeck = buildBundleArchivalDeck(deck);
+    const root = options.projectRoot ?? process.cwd(); await put("deck/index.html", archivalDeck.indexHtml); await put("deck/theme.css", await readFile(join(root, "deck", "theme.css"))); for (const file of archivalDeck.files) await put(`deck/slides/${file.filename}`, file.html); await put("deck/slides/theme.css", await readFile(join(root, "deck", "theme.css")));
     entries.sort((a, b) => a.path.localeCompare(b.path)); const manifest: BundleManifest = { schema_version: 1, bundle_id: bundleId, meeting_id: meetingId, review_id: reviewId, target_commit: targetCommit, created_at: new Date(s.review.confirmed_at as number).toISOString(), entries, artifacts: entries }; await writeFile(join(temporary, "manifest.json"), json(manifest)); await validateBundle(temporary, bundleId, targetCommit);
     try {
       await rename(temporary, target);

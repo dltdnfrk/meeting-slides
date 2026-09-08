@@ -66,19 +66,24 @@ function esc(value: string | number): string {
   }[character] ?? character));
 }
 
-function coordinate(source: MinutesSourceSegment): string {
-  const tuple = `(${source.transcript_version_id},${source.start_seq},${source.end_seq})`;
-  const label = source.start_seq === source.end_seq
+/** 문장 범위 라벨 — HTML 좌표 스팬과 DOCX 좌표 텍스트가 같은 문구를 쓰도록 공유한다. */
+export function coordinateLabel(source: MinutesSourceSegment): string {
+  return source.start_seq === source.end_seq
     ? `${source.start_seq}번째 문장`
     : `${source.start_seq}~${source.end_seq}번째 문장`;
-  return `<span class="source-coordinate" data-source-coordinate="${esc(tuple)}" data-transcript-version-id="${esc(source.transcript_version_id)}" data-start-seq="${esc(source.start_seq)}" data-end-seq="${esc(source.end_seq)}">${esc(label)}</span>`;
+}
+
+function coordinate(source: MinutesSourceSegment): string {
+  const tuple = `(${source.transcript_version_id},${source.start_seq},${source.end_seq})`;
+  return `<span class="source-coordinate" data-source-coordinate="${esc(tuple)}" data-transcript-version-id="${esc(source.transcript_version_id)}" data-start-seq="${esc(source.start_seq)}" data-end-seq="${esc(source.end_seq)}">${esc(coordinateLabel(source))}</span>`;
 }
 
 function transcriptVersion(transcriptVersionId: string): string {
   return `<span class="transcript-version" data-transcript-version-id="${esc(transcriptVersionId)}">원문 연결됨</span>`;
 }
 
-function displayProvider(provider: string): string {
+/** provider 식별자를 회의록에 표시할 이름으로 변환 — HTML과 DOCX가 공유한다. */
+export function displayProvider(provider: string): string {
   const names: Record<string, string> = {
     "cli:codex": "ChatGPT",
     "cli:grok": "Grok",
@@ -90,11 +95,11 @@ function displayProvider(provider: string): string {
   return names[provider] ?? provider;
 }
 
-function displayTimeZone(timeZone: string): string {
+export function displayTimeZone(timeZone: string): string {
   return timeZone === "Asia/Seoul" ? "한국 표준시" : timeZone;
 }
 
-function attendeeName(input: MinutesInput, attendeeId: string | null | undefined): string {
+export function attendeeName(input: MinutesInput, attendeeId: string | null | undefined): string {
   if (!attendeeId) return "미지정";
   return input.attendees.find((attendee) => attendee.attendeeId === attendeeId)?.displayName ?? attendeeId;
 }

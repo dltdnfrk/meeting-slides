@@ -83,33 +83,53 @@ describe("Caret 오퍼레이터 표면", () => {
     expect(dock.outputLabels).toEqual(["슬라이드", "전체 전사", "회의 결과"]);
   });
 
-  test("번역과 전사 편집은 서버 계약 사유를 노출한 채 비활성화된다", async () => {
+  test("서버 계약이 없는 제어는 숨겨지고 검토는 #btn-review 하나로만 열린다", async () => {
     const state = await page.evaluate(() => {
-      const translation = document.getElementById("translation-toggle");
-      const speaker = document.getElementById("transcript-speaker-edit");
-      const segment = document.getElementById("transcript-segment-edit");
+      const isHidden = (id: string): boolean => {
+        const el = document.getElementById(id);
+        return el === null || (el as HTMLElement).hidden === true;
+      };
+      const dock = document.querySelector(".dock");
+      const dockReview = dock?.querySelector('[data-output-target="review-panel"]');
+      const reviewButton = document.getElementById("btn-review");
       return {
-        spokenLanguage: Boolean(document.getElementById("spoken-language")),
-        writtenLanguage: Boolean(document.getElementById("written-language")),
-        translation: translation instanceof HTMLButtonElement
-          ? { disabled: translation.disabled, reason: translation.title }
-          : null,
-        speaker: speaker instanceof HTMLButtonElement
-          ? { disabled: speaker.disabled, reason: speaker.title }
-          : null,
-        segment: segment instanceof HTMLButtonElement
-          ? { disabled: segment.disabled, reason: segment.title }
-          : null,
+        spokenLanguage: isHidden("spoken-language"),
+        writtenLanguage: isHidden("written-language"),
+        translation: isHidden("translation-toggle"),
+        speakerEdit: isHidden("transcript-speaker-edit"),
+        segmentEdit: isHidden("transcript-segment-edit"),
+        citationJump: isHidden("transcript-citation-jump"),
+        followup: isHidden("action-followup"),
+        dockReview: dockReview == null || (dockReview as HTMLElement).hidden === true,
+        dockReviewPainted: (() => {
+          if (!(dockReview instanceof HTMLElement) || dockReview.hidden) return false;
+          const style = getComputedStyle(dockReview);
+          const rect = dockReview.getBoundingClientRect();
+          return style.display !== "none" && style.visibility !== "hidden"
+            && rect.width > 0 && rect.height > 0;
+        })(),
+        reviewButtonCount: document.querySelectorAll("#btn-review").length,
+        reviewButtonInDock: Boolean(dock && reviewButton && dock.contains(reviewButton)),
+        reviewPanelBinding: reviewButton?.getAttribute("aria-controls") ?? null,
       };
     });
 
-    expect(state).toEqual({
-      spokenLanguage: true,
-      writtenLanguage: true,
-      translation: { disabled: true, reason: "번역 모델 연결이 필요합니다" },
-      speaker: { disabled: true, reason: "서버 편집 계약이 필요합니다" },
-      segment: { disabled: true, reason: "서버 편집 계약이 필요합니다" },
-    });
+    // 말한 언어(STT)는 실제 계약이 있으므로 남고, 쓰는 언어(번역)는 숨는다.
+    expect(state.spokenLanguage).toBe(false);
+    expect(state.writtenLanguage).toBe(true);
+    // 번역, 전사 편집, 인용 점프, 후속 메일은 서버 계약이 없으므로 보이지 않는다.
+    expect(state.translation).toBe(true);
+    expect(state.speakerEdit).toBe(true);
+    expect(state.segmentEdit).toBe(true);
+    expect(state.citationJump).toBe(true);
+    expect(state.followup).toBe(true);
+    // 도크의 '회의 결과' 중복은 숨고 실제로도 그려지지 않는다.
+    expect(state.dockReview).toBe(true);
+    expect(state.dockReviewPainted).toBe(false);
+    // 검토는 정확히 하나의 #btn-review로만 열린다 — 도크에 두 번째 트리거는 없다.
+    expect(state.reviewButtonCount).toBe(1);
+    expect(state.reviewButtonInDock).toBe(false);
+    expect(state.reviewPanelBinding).toBe("review-panel");
   });
 
   test("capture 메시지가 녹음 버튼을 파형 상태로 전환한다", async () => {

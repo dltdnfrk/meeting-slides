@@ -13,6 +13,7 @@ import { basename, dirname, join } from "node:path";
 import { assembleRasterPdf } from "./raster-export-pdf.ts";
 import {
   RASTER_GEOMETRY,
+  rasterRenderFilename,
   rasterSha256,
   validatePng,
   validateRasterRequest,
@@ -116,8 +117,12 @@ export async function exportDeterministicRaster(request: RasterExportRequest): P
 
   try {
     mkdirSync(slidesDirectory, { recursive: true });
-    for (const document of verified.documents) {
-      writeFileSync(join(slidesDirectory, document.filename), document.bytes, { flag: "wx" });
+    for (const [index, document] of verified.documents.entries()) {
+      writeFileSync(
+        join(slidesDirectory, rasterRenderFilename(document, index)),
+        document.bytes,
+        { flag: "wx" },
+      );
     }
 
     const tool = await runSlidesGrab(verified, slidesDirectory, stagedPngDirectory);
@@ -130,7 +135,8 @@ export async function exportDeterministicRaster(request: RasterExportRequest): P
       );
     }
 
-    const expectedPngNames = verified.documents.map((document) => document.filename.replace(/\.html$/i, ".png"));
+    const expectedPngNames = verified.documents.map((document, index) =>
+      rasterRenderFilename(document, index).replace(/\.html$/i, ".png"));
     assertPngSet(stagedPngDirectory, expectedPngNames);
     const pngBytes: Uint8Array[] = [];
     const slides = verified.documents.map((document, index) => {

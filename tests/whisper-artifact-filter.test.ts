@@ -49,4 +49,17 @@ describe("existing Whisper artifact filters", () => {
     whisper.restartParser();
     expect(whisper.feed("첫 회의 문장입니다.")[0]).toMatchObject({ speaker: 1, text: "첫 회의 문장입니다." });
   });
+
+  test("a marker-only [SPEAKER_TURN] line increments the speaker of the next speech line", () => {
+    const whisper = new FilterHarness({ ...config, diarize: true });
+    expect(whisper.feed("첫 화자가 말합니다.")[0]).toMatchObject({
+      speaker: 1,
+      text: "첫 화자가 말합니다.",
+    });
+    expect(whisper.feed("[SPEAKER_TURN]")).toEqual([]);
+    expect(whisper.feed("다음 화자가 이어서 말합니다.")[0]).toMatchObject({
+      speaker: 2,
+      text: "다음 화자가 이어서 말합니다.",
+    });
+  });
 });

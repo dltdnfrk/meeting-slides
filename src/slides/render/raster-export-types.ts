@@ -24,7 +24,10 @@ export class RasterExportError extends Error {
 }
 
 export interface RasterSlideDocument {
+  /** Identity-bound source name: `${slideId}.html`. */
   readonly filename: string;
+  /** Optional slides-grab discovery name. It does not replace slide identity. */
+  readonly renderFilename?: string;
   readonly html: string;
   readonly bytes: Uint8Array;
   readonly sha256: string;

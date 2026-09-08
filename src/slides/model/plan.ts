@@ -75,6 +75,10 @@ interface SlideBase<L extends string, P> {
   editorialPaths: string[];
   assetIds: string[];
   notes?: string;
+  boxOverrides?: Array<{
+    elementId: string;
+    box: { x: number; y: number; width: number; height: number };
+  }>;
 }
 
 export type HeroSlide = SlideBase<"hero", {

@@ -112,6 +112,7 @@ export interface ElementInput {
   readonly box: LayoutBox;
   readonly tokens: Record<string, ThemeTokenName>;
   readonly evidence: LayoutEvidence | null;
+  readonly accessibilityRole?: string;
   readonly accessibilityLabel?: string;
 }
 
@@ -125,7 +126,7 @@ export function element(slideId: string, order: number, input: ElementInput): La
     box: { ...input.box },
     tokens,
     accessibility: {
-      role: input.role,
+      role: input.accessibilityRole ?? input.role,
       label: input.accessibilityLabel ?? `${input.role}: ${input.text}`,
       readingOrder: order,
     },

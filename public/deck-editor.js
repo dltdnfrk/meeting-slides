@@ -5,12 +5,14 @@ import {
 import { LAYOUTS, preparePlan, validateSlide } from "./deck-editor-validation.js";
 
 export const DECK_EDITOR_COMMAND_TYPES = Object.freeze([
-  "setText", "chooseLayout", "replaceAsset", "reorderSlide", "insertSlide",
+  "setText", "setBox", "setBoxes", "chooseLayout", "replaceAsset", "reorderSlide", "insertSlide",
   "deleteSlide", "regenerateSlide", "undo", "redo",
 ]);
 
 const COMMAND_FIELDS = {
   setText: ["type", "expectedRevision", "slideId", "path", "text", "claimIds"],
+  setBox: ["type", "expectedRevision", "slideId", "elementId", "box"],
+  setBoxes: ["type", "expectedRevision", "slideId", "boxes"],
   chooseLayout: ["type", "expectedRevision", "slideId", "layout"],
   replaceAsset: ["type", "expectedRevision", "slideId", "assetId", "replacementAssetId"],
   reorderSlide: ["type", "expectedRevision", "slideId", "toIndex"],
@@ -115,6 +117,67 @@ function editText(state, command, index) {
   return deepFreeze(slide);
 }
 
+function parsedBox(boxValue, path = "box") {
+  if (boxValue === null || typeof boxValue !== "object" || Array.isArray(boxValue)) {
+    throw Object.freeze({ code: "INVALID_BOX", path });
+  }
+  const box = exact(boxValue, `command.${path}`, ["x", "y", "width", "height"]);
+  for (const key of ["x", "y", "width", "height"]) {
+    if (typeof box[key] !== "number" || !Number.isFinite(box[key])) {
+      throw Object.freeze({ code: "INVALID_BOX", path: `${path}.${key}` });
+    }
+  }
+  if (box.x < 0 || box.y < 0 || box.width <= 0 || box.height <= 0 ||
+      box.x + box.width > 1280 || box.y + box.height > 720) {
+    throw Object.freeze({ code: "INVALID_BOX", path });
+  }
+  return { x: box.x, y: box.y, width: box.width, height: box.height };
+}
+
+function putBoxOverride(slide, elementId, nextBox) {
+  const previous = (slide.boxOverrides ?? []).find((entry) => entry.elementId === elementId);
+  if (previous && previous.box.x === nextBox.x && previous.box.y === nextBox.y &&
+      previous.box.width === nextBox.width && previous.box.height === nextBox.height) {
+    return false;
+  }
+  const rest = (slide.boxOverrides ?? []).filter((entry) => entry.elementId !== elementId);
+  slide.boxOverrides = [...rest, { elementId, box: nextBox }];
+  return true;
+}
+
+function editBox(state, command, index) {
+  const elementId = stableId(command.elementId, "command.elementId");
+  const nextBox = parsedBox(command.box);
+  const slide = clone(state.deck.slides[index]);
+  if (!putBoxOverride(slide, elementId, nextBox)) return state.deck.slides[index];
+  validateSlide(slide, "editedSlide", knownIds(state.deck, "claims"), knownIds(state.deck, "assets"));
+  return deepFreeze(slide);
+}
+
+function editBoxes(state, command, index) {
+  const items = arrayValue(command.boxes, "command.boxes", true);
+  const parsed = [];
+  const seen = new Set();
+  items.forEach((item, itemIndex) => {
+    if (item === null || typeof item !== "object" || Array.isArray(item)) {
+      throw Object.freeze({ code: "INVALID_COMMAND", path: `boxes[${itemIndex}]` });
+    }
+    exact(item, `command.boxes[${itemIndex}]`, ["elementId", "box"]);
+    const elementId = stableId(item.elementId, `command.boxes[${itemIndex}].elementId`);
+    if (seen.has(elementId)) throw Object.freeze({ code: "DUPLICATE_ELEMENT_ID", path: `boxes[${itemIndex}].elementId` });
+    seen.add(elementId);
+    parsed.push({ elementId, box: parsedBox(item.box, `boxes[${itemIndex}].box`) });
+  });
+  const slide = clone(state.deck.slides[index]);
+  let changed = false;
+  for (const { elementId, box } of parsed) {
+    if (putBoxOverride(slide, elementId, box)) changed = true;
+  }
+  if (!changed) return state.deck.slides[index];
+  validateSlide(slide, "editedSlide", knownIds(state.deck, "claims"), knownIds(state.deck, "assets"));
+  return deepFreeze(slide);
+}
+
 function replaceOne(slides, index, slide) {
   const next = slides.slice(); next[index] = slide; return Object.freeze(next);
 }
@@ -167,6 +230,7 @@ function convertLayout(deck, slide, layout) {
     bindings["items[0].task"] = task.ids; bindings["items[0].owner"] = owner.ids; bindings["items[0].due"] = due.ids;
   }
   const converted = { ...slide, layout, payload, bindings, editorialPaths };
+  delete converted.boxOverrides;
   validateSlide(converted, "convertedSlide", knownIds(deck, "claims"), knownIds(deck, "assets"));
   return deepFreeze(converted);
 }
@@ -202,6 +266,16 @@ function execute(state, command) {
   }
   const index = findSlide(state, command);
   if (command.type === "setText") return editedState(state, replaceOne(state.deck.slides, index, editText(state, command, index)));
+  if (command.type === "setBox") {
+    const slide = editBox(state, command, index);
+    if (slide === state.deck.slides[index]) return state;
+    return editedState(state, replaceOne(state.deck.slides, index, slide));
+  }
+  if (command.type === "setBoxes") {
+    const slide = editBoxes(state, command, index);
+    if (slide === state.deck.slides[index]) return state;
+    return editedState(state, replaceOne(state.deck.slides, index, slide));
+  }
   if (command.type === "chooseLayout") {
     oneOf(command.layout, "command.layout", LAYOUTS);
     if (command.layout === state.deck.slides[index].layout) return state;

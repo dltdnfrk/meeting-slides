@@ -15,16 +15,51 @@ protocol MinibarViewDelegate: AnyObject {
     func minibarViewDidActivate(_ control: MinibarControl)
 }
 
+final class MinibarButton: NSButton {
+    private var restingBorderAlpha: CGFloat = 0.14
+
+    func applyNeutralStyle(emphasized: Bool) {
+        isBordered = false
+        focusRingType = .none
+        wantsLayer = true
+        layer?.cornerRadius = 10
+        layer?.backgroundColor = NSColor.white.withAlphaComponent(
+            emphasized ? 0.16 : 0.08
+        ).cgColor
+        restingBorderAlpha = emphasized ? 0.28 : 0.14
+        setFocusVisible(false)
+    }
+
+    override func becomeFirstResponder() -> Bool {
+        let accepted = super.becomeFirstResponder()
+        if accepted { setFocusVisible(true) }
+        return accepted
+    }
+
+    override func resignFirstResponder() -> Bool {
+        let accepted = super.resignFirstResponder()
+        if accepted { setFocusVisible(false) }
+        return accepted
+    }
+
+    private func setFocusVisible(_ visible: Bool) {
+        layer?.borderWidth = visible ? 2 : 0.5
+        layer?.borderColor = NSColor.white.withAlphaComponent(
+            visible ? 0.72 : restingBorderAlpha
+        ).cgColor
+    }
+}
+
 final class MinibarView: NSVisualEffectView {
     weak var delegate: MinibarViewDelegate?
 
     private let statusGlyph = NSTextField(labelWithString: "")
     private let statusTitle = NSTextField(labelWithString: "")
     private let timerLabel = NSTextField(labelWithString: "")
-    private let stopButton = NSButton()
-    private let disclosureButton = NSButton()
-    private let openWorkspaceButton = NSButton()
-    private let closeButton = NSButton()
+    private let stopButton = MinibarButton()
+    private let disclosureButton = MinibarButton()
+    private let openWorkspaceButton = MinibarButton()
+    private let closeButton = MinibarButton()
     private let transcriptStack = NSStackView()
     private let collapsedLine = NSTextField(labelWithString: "")
     private let statusPanel = NSView()
@@ -64,6 +99,9 @@ final class MinibarView: NSVisualEffectView {
         statusGlyph.textColor = .labelColor
         statusTitle.font = .systemFont(ofSize: 13, weight: .semibold)
         statusTitle.textColor = .labelColor
+        statusTitle.lineBreakMode = .byTruncatingTail
+        statusTitle.maximumNumberOfLines = 1
+        statusTitle.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         timerLabel.font = .monospacedDigitSystemFont(ofSize: 13, weight: .regular)
         timerLabel.textColor = .secondaryLabelColor
 
@@ -116,13 +154,11 @@ final class MinibarView: NSVisualEffectView {
         setAccessibilityRole(.group)
     }
 
-    private func configure(_ button: NSButton, control: MinibarControl) {
+    private func configure(_ button: MinibarButton, control: MinibarControl) {
         button.bezelStyle = .rounded
         button.font = .systemFont(ofSize: 12, weight: .medium)
-        if control == .stop {
-            button.bezelColor = .systemRed
-            button.contentTintColor = .white
-        }
+        button.applyNeutralStyle(emphasized: control == .stop)
+        button.contentTintColor = .labelColor
         button.target = self
         button.tag = MinibarView.tag(for: control)
         button.action = #selector(controlActivated(_:))
@@ -289,6 +325,7 @@ final class MinibarView: NSVisualEffectView {
             guard let button = self.button(for: control.id) else { continue }
             button.isHidden = false
             button.isEnabled = control.enabled
+            button.alphaValue = control.enabled ? 1 : 0.45
             button.title = control.label
             button.setAccessibilityLabel(control.label)
             // A disabled control states WHY, so it is never an unexplained dead
@@ -306,7 +343,7 @@ final class MinibarView: NSVisualEffectView {
         needsDisplay = true
     }
 
-    private func button(for control: MinibarControl) -> NSButton? {
+    private func button(for control: MinibarControl) -> MinibarButton? {
         switch control {
         case .stop: return stopButton
         case .disclosure: return disclosureButton

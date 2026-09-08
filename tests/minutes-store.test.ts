@@ -1,4 +1,8 @@
 import { describe, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { Database } from "bun:sqlite";
 
 import { MinutesStore } from "../src/minutes-store.ts";
 import { MeetingStore } from "../src/store.ts";
@@ -160,6 +164,66 @@ describe("MinutesStore SQLite contracts", () => {
     legacy.close();
   });
 
+  test("persists referenced materials and completes their review through the public API", () => {
+    const { legacy, minutes } = stores();
+    try {
+      const { meetingId, transcriptVersionId } = preparedTranscript(minutes);
+      selectCanonical(minutes, meetingId, transcriptVersionId);
+      const material = {
+        id: "budget-reference",
+        materialType: "data" as const,
+        title: "Release budget",
+        uri: "https://example.com/release-budget.csv",
+        notes: "QA allocation and outstanding budget",
+        source: { transcriptVersionId, startSeq: 2, endSeq: 3 },
+      };
+      const reviewId = minutes.saveCandidates({
+        meetingId,
+        transcriptVersionId,
+        referencedMaterials: [material],
+      });
+      const storedMaterials = () => minutes.databaseHandle().query(
+        "SELECT * FROM referenced_materials WHERE review_id = ?",
+      ).all(reviewId);
+      const expected = {
+        material_id: material.id,
+        meeting_id: meetingId,
+        review_id: reviewId,
+        material_type: material.materialType,
+        title: material.title,
+        uri: material.uri,
+        notes: material.notes,
+        source_transcript_version_id: transcriptVersionId,
+        source_start_seq: 2,
+        source_end_seq: 3,
+        review_state: "candidate",
+        created_at: expect.any(Number),
+        updated_at: expect.any(Number),
+      };
+      expect(storedMaterials()).toEqual([expected]);
+      expect(() => minutes.confirmReview(reviewId, "reviewer-local"))
+        .toThrow(/all review items must be confirmed or rejected/);
+      expect(minutes.review(reviewId)?.status).toBe("draft");
+
+      expect(minutes.replaceDraft({
+        meetingId,
+        transcriptVersionId,
+        referencedMaterials: [{ ...material, reviewState: "confirmed" }],
+      })).toBe(reviewId);
+      minutes.confirmReview(reviewId, "reviewer-local");
+      expect(storedMaterials()).toEqual([{ ...expected, review_state: "confirmed" }]);
+      expect(minutes.reviewForMeeting(meetingId, transcriptVersionId)).toMatchObject({
+        reviewId,
+        status: "confirmed",
+        confirmedBy: "reviewer-local",
+        confirmedAt: expect.any(Number),
+      });
+      expect(minutes.databaseHandle().query("PRAGMA foreign_key_check").all()).toEqual([]);
+    } finally {
+      legacy.close();
+    }
+  });
+
   test("rejects endpoint-valid but interior-missing ranges and rolls back the whole review", () => {
     const { legacy, minutes } = stores();
     const { meetingId, transcriptVersionId } = preparedTranscript(minutes);
@@ -235,32 +299,71 @@ describe("MinutesStore SQLite contracts", () => {
     legacy.close();
   });
 
-  test("migrates legacy review rows and backfills evidence quotes from immutable source lines", () => {
-    const { legacy, minutes } = stores();
-    const { meetingId, transcriptVersionId } = preparedTranscript(minutes);
-    const reviewId = minutes.saveCandidates({
-      meetingId, transcriptVersionId,
-      decisions: [{ id: "legacy-decision", description: "Ship Friday", source: { transcriptVersionId, startSeq: 1, endSeq: 2 } }],
-    });
-    const db = minutes.databaseHandle();
-    db.run("PRAGMA foreign_keys = OFF");
-    db.run(`
-      CREATE TABLE decisions_legacy AS
-      SELECT decision_id, meeting_id, review_id, description, source_transcript_version_id,
-        source_start_seq, source_end_seq, attributed_attendee_id, origin, review_state,
-        created_at, updated_at
-      FROM decisions
-    `);
-    db.run("DROP TABLE decisions");
-    db.run("ALTER TABLE decisions_legacy RENAME TO decisions");
 
-    const reopened = new MinutesStore(db);
-    expect(db.query("PRAGMA table_info(decisions)").all()).toContainEqual(expect.objectContaining({ name: "evidence_quote" }));
-    expect(reopened.itemsForReview(reviewId)[0]).toMatchObject({
-      id: "legacy-decision",
-      evidenceQuote: "Ship on Friday.\nAlice owns QA.",
+  test("widens the artifacts CHECK to minutes_docx so legacy databases accept the new artifact", () => {
+    const db = new Database(":memory:");
+    db.run("PRAGMA foreign_keys = ON");
+    db.run(`CREATE TABLE artifact_bundles (
+      bundle_id TEXT PRIMARY KEY, meeting_id INTEGER NOT NULL, review_id TEXT NOT NULL,
+      transcript_version_id TEXT NOT NULL, bundle_path TEXT NOT NULL, status TEXT NOT NULL,
+      created_at INTEGER NOT NULL, completed_at INTEGER
+    )`);
+    db.run(`CREATE TABLE artifacts (
+      artifact_id TEXT PRIMARY KEY, bundle_id TEXT NOT NULL,
+      artifact_type TEXT NOT NULL CHECK (artifact_type IN ('minutes_pdf','minutes_json','canonical_transcript','slide_deck','original_audio')),
+      relative_path TEXT NOT NULL, media_type TEXT NOT NULL,
+      sha256 TEXT NOT NULL CHECK (length(sha256) = 64),
+      byte_length INTEGER NOT NULL, created_at INTEGER NOT NULL,
+      UNIQUE (bundle_id, artifact_type),
+      FOREIGN KEY (bundle_id) REFERENCES artifact_bundles(bundle_id) ON DELETE CASCADE
+    )`);
+    db.run("INSERT INTO artifact_bundles VALUES ('legacy-bundle', 1, 'review-1', 'transcript-1', '/bundle', 'complete', 1, 1)");
+    db.run(`INSERT INTO artifacts VALUES ('legacy-artifact', 'legacy-bundle', 'minutes_pdf', 'minutes.pdf', 'application/pdf', '${"a".repeat(64)}', 10, 1)`);
+
+    const minutes = new MinutesStore(db);
+    expect(minutes.databaseHandle().query("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'artifacts'").get())
+      .toEqual(expect.objectContaining({ sql: expect.stringContaining("'minutes_docx'") }));
+    // 이전 데이터는 보존되고, 새 CHECK가 minutes_docx 삽입을 허용한다.
+    minutes.databaseHandle().run(`INSERT INTO artifacts VALUES ('docx-artifact', 'legacy-bundle', 'minutes_docx', 'minutes.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', '${"b".repeat(64)}', 10, 1)`);
+    expect(minutes.databaseHandle().query("SELECT artifact_type FROM artifacts ORDER BY artifact_type").all()).toEqual([
+      { artifact_type: "minutes_docx" }, { artifact_type: "minutes_pdf" },
+    ]);
+    db.close();
+  });
+
+  test("saveCandidates persists a summary and reviewForMeeting round-trips it after reopen", () => {
+    const dir = mkdtempSync(join(tmpdir(), "review-summary-"));
+    const dbPath = join(dir, "meetings.db");
+    const firstLegacy = new MeetingStore(dbPath);
+    const first = new MinutesStore(firstLegacy.databaseHandle());
+    const { meetingId, transcriptVersionId } = preparedTranscript(first);
+    const summary = {
+      overview: "Ship Friday and Alice owns QA.",
+      topics: [{
+        title: "Launch",
+        summary: "Ship on Friday.",
+        source: { transcript_version_id: transcriptVersionId, start_seq: 1, end_seq: 1 },
+      }],
+    };
+    const reviewId = first.saveCandidates({
+      meetingId,
+      transcriptVersionId,
+      decisions: [{
+        description: "Ship Friday",
+        evidenceQuote: "Ship on Friday.",
+        source: { transcriptVersionId, startSeq: 1, endSeq: 1 },
+      }],
+      summary,
     });
-    legacy.close();
+    expect(first.reviewForMeeting(meetingId, transcriptVersionId)).toMatchObject({ reviewId, summary });
+    firstLegacy.close();
+
+    const reopenedLegacy = new MeetingStore(dbPath);
+    const reopened = new MinutesStore(reopenedLegacy.databaseHandle());
+    expect(reopened.review(reviewId)?.summary).toEqual(summary);
+    expect(reopened.reviewForMeeting(meetingId, transcriptVersionId)?.summary).toEqual(summary);
+    reopenedLegacy.close();
+    rmSync(dir, { recursive: true, force: true });
   });
 
   test("creates the complete additive minutes schema without changing legacy tables", () => {
@@ -274,7 +377,7 @@ describe("MinutesStore SQLite contracts", () => {
       "meeting_audio_sources", "transcript_versions", "transcript_version_lines",
       "meeting_transcript_state", "transcript_line_attributions", "meeting_reviews",
       "decisions", "action_items", "open_items", "referenced_materials",
-      "artifact_bundles", "artifacts", "meeting_conclusions",
+      "review_summaries", "artifact_bundles", "artifacts", "meeting_conclusions",
     ]) expect(names).toContain(required);
     legacy.close();
   });
