@@ -18,6 +18,9 @@ vendor/ms-playwright/
 .omo/drafts/
 .omo/ulw-loop/
 .omo/ulw-research/
+.omo/ulw-execute/
+.omo/ulw/
+.omo/evidence/
 .omo/senpi-task/
 .omo/aside-tests/
 .omo/boulder.json
