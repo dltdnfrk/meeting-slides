@@ -79,7 +79,8 @@ func parseProbe(_ raw: Any?) throws -> HealthProbe {
     return HealthProbe(
         reachable: reachable,
         statusCode: (object["status"] as? NSNumber)?.intValue,
-        body: object["body"] as? String
+        body: object["body"] as? String,
+        projectIdentity: object["identity"] as? String
     )
 }
 
@@ -149,7 +150,8 @@ func runLaunchPlan(_ input: [String: Any]) throws -> Any {
 }
 
 func runStartup(_ input: [String: Any]) throws -> Any {
-    let decision = try StartupPlanner.decide(probe: try parseProbe(input["probe"]))
+    let canonical = input["canonicalProjectPath"] as? String
+    let decision = try StartupPlanner.decide(probe: try parseProbe(input["probe"]), canonicalProjectPath: canonical)
     return ["decision": decision.rawValue, "ownsServer": decision.ownsServer]
 }
 

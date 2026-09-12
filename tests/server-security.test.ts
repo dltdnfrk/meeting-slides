@@ -48,6 +48,13 @@ test("static responses deny framing and apply local-app security headers", async
   expect(response.headers.get("cache-control")).toBe("no-store");
 });
 
+test("Finder-style duplicate public paths return 404 while normal files still serve", async () => {
+  const normal = await fetch(`${origin}/index.html`);
+  expect(normal.status).toBe(200);
+  const duplicate = await fetch(`${origin}/index%202.html`);
+  expect(duplicate.status).toBe(404);
+});
+
 test("cross-origin or form-like auto-capture requests are rejected before microphone side effects", async () => {
   const evil = await fetch(`${origin}/api/auto-capture`, {
     method: "POST", headers: { origin: "https://evil.example", "content-type": "application/json" }, body: "{}",

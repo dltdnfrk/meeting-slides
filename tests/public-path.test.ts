@@ -21,4 +21,6 @@ test("decodes percent-encoding before resolving, but rejects NUL and bad escapes
   expect(resolvePublicFile(publicDir, "/font%20files/a.css")).toBe(join(publicDir, "font files", "a.css"));
   expect(resolvePublicFile(publicDir, "/a%00b.html")).toBe(join(publicDir, "ab.html"));
   expect(resolvePublicFile(publicDir, "/%zz")).toBeNull();
+  expect(resolvePublicFile(publicDir, "/font-manifest%202.json")).toBeNull();
+  expect(resolvePublicFile(publicDir, "/fonts/roboto.woff2")).toBe(join(publicDir, "fonts", "roboto.woff2"));
 });

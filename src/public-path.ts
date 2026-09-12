@@ -17,6 +17,7 @@ export function resolvePublicFile(publicDir: string, requestPath: string): strin
     return null;
   }
   const clean = decoded.replace(/\0/g, "");
+  if (clean.split(/[\\/]/).some((segment) => / 2\.[^/\\]+$/.test(segment))) return null;
   const relative = clean.replace(/^[/\\]+/, "");
   const filePath = resolve(publicDir, relative);
   if (filePath !== publicDir && !filePath.startsWith(`${publicDir}${sep}`)) {

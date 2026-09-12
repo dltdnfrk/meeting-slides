@@ -1,4 +1,4 @@
-import { basename } from "node:path";
+import { basename, resolve } from "node:path";
 import { resolvePublicFile } from "../public-path.ts";
 import { resolveSlidePlanArtifact, SlidePlanArtifactError } from "../slide-plan-artifacts.ts";
 
@@ -39,6 +39,7 @@ export function createHttpHandler(deps: {
   readonly allowedOrigins: ReadonlySet<string>;
   readonly allowOriginlessWs: boolean;
   readonly automationToken: string;
+  readonly httpPort?: number;
   readonly slidePlanStore: Parameters<typeof resolveSlidePlanArtifact>[1];
   readonly capture: { readonly capturing: boolean; startCapture(): Promise<void>; stopCapture(): Promise<void> };
   readonly resolveArtifact?: typeof resolveSlidePlanArtifact;
@@ -48,6 +49,7 @@ export function createHttpHandler(deps: {
     allowedOrigins: ALLOWED_WS_ORIGINS,
     allowOriginlessWs,
     automationToken,
+    httpPort = 8787,
     slidePlanStore,
     capture,
   } = deps;
@@ -81,6 +83,7 @@ export function createHttpHandler(deps: {
       return new Response("Upgrade failed", { status: 426 });
     }
     if (url.pathname === "/favicon.ico") return secureResponse(null, { status: 204 });
+    const identityHeaders = { "x-meeting-slides-project": resolve(publicDir, "..") };
     const path =
       url.pathname === "/" || url.pathname === "/app" || url.pathname === "/app/" ? "/index.html" : url.pathname;
     if (url.pathname === "/api/auto-capture" && req.method === "POST") {
@@ -136,16 +139,25 @@ export function createHttpHandler(deps: {
           return secureResponse("Artifact unavailable", { status: 500 });
         });
     }
+    if (/(?: |%20)2\.[^/\\]+$/i.test(path)) {
+      return secureResponse("Not Found", { status: 404 });
+    }
     const filePath = resolvePublicFile(publicDir, path);
     if (filePath === null) {
       return secureResponse("Forbidden", { status: 403 });
     }
     const f = Bun.file(filePath);
-    return f.exists().then((exists) => {
+    return f.exists().then(async (exists) => {
       if (!exists) return secureResponse("Not Found", { status: 404 });
       const ext = path.split(".").pop() ?? "";
       const mime = MIME[ext] ?? "application/octet-stream";
-      return secureResponse(f, { headers: { "content-type": mime } });
+      if (path === "/index.html") {
+        const html = await f.text();
+        return secureResponse(html.replaceAll("__HTTP_PORT__", String(httpPort)), {
+          headers: { "content-type": mime, ...identityHeaders },
+        });
+      }
+      return secureResponse(f, { headers: { "content-type": mime, ...identityHeaders } });
     });
   };
 }

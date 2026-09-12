@@ -61,11 +61,13 @@ public struct HealthProbe: Equatable {
     public let reachable: Bool
     public let statusCode: Int?
     public let body: String?
+    public let projectIdentity: String?
 
-    public init(reachable: Bool, statusCode: Int? = nil, body: String? = nil) {
+    public init(reachable: Bool, statusCode: Int? = nil, body: String? = nil, projectIdentity: String? = nil) {
         self.reachable = reachable
         self.statusCode = statusCode
         self.body = body
+        self.projectIdentity = projectIdentity
     }
 
     public static let unreachable = HealthProbe(reachable: false)
@@ -76,6 +78,7 @@ public enum HealthReason: String, Equatable {
     case unreachable
     case badStatus
     case signatureMismatch
+    case identityMismatch
 }
 
 public struct HealthVerdict: Equatable {
@@ -206,10 +209,14 @@ public enum StartupPlanner {
     ///
     /// A reachable but foreign listener is a typed conflict: starting a second
     /// Bun session on an occupied port would create a second source of truth.
-    public static func decide(probe: HealthProbe) throws -> StartupDecision {
+    public static func decide(probe: HealthProbe, canonicalProjectPath: String? = nil) throws -> StartupDecision {
         if !probe.reachable { return .startServer }
         let verdict = ServerHealth.evaluate(probe)
-        if verdict.healthy { return .adoptRunningServer }
+        guard verdict.healthy else { throw LauncherFailure.portOccupiedByForeignServer }
+        if let canonicalProjectPath, probe.projectIdentity != canonicalProjectPath {
+            throw LauncherFailure.portOccupiedByForeignServer
+        }
+        return .adoptRunningServer
         throw LauncherFailure.portOccupiedByForeignServer
     }
 }

@@ -97,7 +97,11 @@ const SCENARIOS = {
     {
       name: "startup-already-running-bun",
       kind: "startup",
-      input: { probe: { reachable: true, status: 200, body: HEALTHY_BODY } },
+      input: { canonicalProjectPath: "/checkout", probe: { reachable: true, status: 200, body: HEALTHY_BODY, identity: "/checkout" } },
+    },
+    {
+      name: "startup-foreign-identical-html", kind: "startup",
+      input: { canonicalProjectPath: "/checkout", probe: { reachable: true, status: 200, body: HEALTHY_BODY, identity: "/other-checkout" } },
     },
     {
       name: "startup-foreign-server-on-port",
@@ -562,6 +566,12 @@ describe("native launcher seam: startup decision uses one Bun session", () => {
       decision: "adoptRunningServer",
       ownsServer: false,
     });
+  });
+
+  test("identical HTML from a different checkout is rejected", () => {
+    const conflict = result("startup-foreign-identical-html");
+    expect(conflict.ok).toBe(false);
+    expect(conflict.error?.kind).toBe("portOccupiedByForeignServer");
   });
 
   test("a foreign listener on the port is a typed port conflict, never a second server", () => {

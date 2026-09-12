@@ -237,6 +237,7 @@ function startApplication(options: ApplicationOptions) {
     allowedOrigins,
     allowOriginlessWs: options.allowOriginlessWs ?? process.env.MEETING_SLIDES_ALLOW_ORIGINLESS_WS === "true",
     automationToken: options.automationToken ?? process.env.MEETING_SLIDES_AUTOMATION_TOKEN?.trim() ?? "",
+    httpPort: config.server.httpPort,
     slidePlanStore,
     capture,
   });

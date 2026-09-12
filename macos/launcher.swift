@@ -109,7 +109,8 @@ enum LauncherIO {
             probe = HealthProbe(
                 reachable: true,
                 statusCode: http.statusCode,
-                body: data.flatMap { String(data: $0, encoding: .utf8) }
+                body: data.flatMap { String(data: $0, encoding: .utf8) },
+                projectIdentity: http.value(forHTTPHeaderField: "x-meeting-slides-project")
             )
         }
         task.resume()
@@ -268,7 +269,9 @@ enum MeetingSlidesLauncher {
         // ── 2. 이미 떠 있는 Bun 세션이 있으면 그것을 단일 진실로 채택한다. ──
         let startup: StartupDecision
         do {
-            startup = try StartupPlanner.decide(probe: LauncherIO.probeWebApp(port: port))
+            startup = try StartupPlanner.decide(
+                probe: LauncherIO.probeWebApp(port: port), canonicalProjectPath: projectDir
+            )
         } catch {
             LauncherIO.log("포트 \(port)를 다른 서버가 사용 중입니다 — 두 번째 서버를 띄우지 않습니다.")
             exit(1)
