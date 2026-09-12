@@ -94,6 +94,24 @@ describe("MeetingSession", () => {
     });
   });
 
+  test("detectBlock 지연이 console.log에 기록된다", async () => {
+    const logs: string[] = [];
+    const original = console.log;
+    console.log = (msg: unknown) => { if (typeof msg === "string") logs.push(msg); };
+    try {
+      const harness = makeSession({
+        detectBlock: async () => {
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          return { shouldAdvance: false, title: "주제", bullets: ["요점"] };
+        },
+      });
+      await addAndDetect(harness, "회의를 시작합니다");
+    } finally {
+      console.log = original;
+    }
+    expect(logs.some((line) => line.includes("[latency] detectBlock="))).toBe(true);
+  });
+
   test("hysteresis: 같은 pending 후보 2회만 advance하고 첫 신호는 현재 카드를 오염시키지 않음", async () => {
     let call = 0;
     const harness = makeSession({

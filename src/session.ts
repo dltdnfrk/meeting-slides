@@ -229,11 +229,15 @@ export class MeetingSession {
     this.detecting = true;
     this.broadcast({ type: "detect", detecting: true });
     const epoch = this.epoch;
+    const detectStart = Date.now();
     try {
       const detected = await this.llm.detectBlock(context);
       // await 도중 reset()이 돌았으면 stale 결과 적용 금지.
       if (epoch !== this.epoch) return;
+      const detectMs = Date.now() - detectStart;
       this.applyDetection(detected);
+      const applyMs = Date.now() - detectStart - detectMs;
+      console.log(`[latency] detectBlock=${detectMs}ms apply=${applyMs}ms`);
     } catch (e) {
       if (epoch !== this.epoch) return;
       const message = e instanceof Error ? e.message : String(e);
