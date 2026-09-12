@@ -169,9 +169,32 @@ export class MeetingStore {
   lines(meetingId?: number): StoredLine[] {
     const id = meetingId ?? this.meetingId;
     if (id === null) return [];
+    // canonical 버전이 선택된 회의는 transcript_version_lines가 진실의 원천이다.
+    // 레거시 transcript_lines는 트리거로 동기화되지 않아 드리프트할 수 있으므로,
+    // canonical 선택이 없는(구형/진행 중) 회의에서만 폴백으로 읽는다.
+    const canonical = this.canonicalLines(id);
+    if (canonical !== null) return canonical;
     return this.db
       .query("SELECT seq, ts, speaker, text FROM transcript_lines WHERE meeting_id = ? ORDER BY seq")
       .all(id) as StoredLine[];
+  }
+
+  private canonicalLines(meetingId: number): StoredLine[] | null {
+    // MinutesStore가 한 번도 붙지 않은 DB(단독 MeetingStore)에는 canonical 테이블이 없다.
+    const table = this.db
+      .query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'meeting_transcript_state'")
+      .get();
+    if (!table) return null;
+    const state = this.db
+      .query("SELECT canonical_transcript_version_id AS versionId FROM meeting_transcript_state WHERE meeting_id = ?")
+      .get(meetingId) as { versionId: string } | null;
+    if (!state) return null;
+    return this.db
+      .query(`
+        SELECT seq, coalesce(captured_at_ms, audio_start_ms, 0) AS ts, speaker_turn AS speaker, text
+        FROM transcript_version_lines WHERE transcript_version_id = ? ORDER BY seq
+      `)
+      .all(state.versionId) as StoredLine[];
   }
 
   slides(meetingId?: number): StoredSlide[] {

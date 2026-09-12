@@ -71,6 +71,38 @@ describe("historical canonical transcript bytes", () => {
     expect(hash).toBe("f19e55fdb8880c69a214b21c5fcf51726e7cb4fbe397ff3724dc549fd1b104aa");
   });
 
+  test("legacy reads follow the canonical version once one is selected", () => {
+    const legacy = new MeetingStore(":memory:");
+    try {
+      const store = new MinutesStore(legacy.databaseHandle());
+      const meetingId = legacy.startMeeting("cli:test");
+      store.registerCapturingMeeting(meetingId);
+      legacy.addLine({ ts: 1000, text: "legacy draft" });
+      expect(legacy.lines(meetingId).map((line) => line.text)).toEqual(["legacy draft"]);
+
+      const version = store.addTranscriptVersion(meetingId, { sourceKind: "retranscription" });
+      store.addTranscriptVersionLines(version.transcriptVersionId, [
+        { seq: 1, capturedAtMs: 2000, speakerTurn: 1, text: "canonical one" },
+        { seq: 2, capturedAtMs: null, audioStartMs: 2500, text: "canonical two" },
+      ]);
+      store.finalizeTranscriptVersion(version.transcriptVersionId, transcriptContentSha256(store, version.transcriptVersionId));
+      store.setCanonical(meetingId, version.transcriptVersionId);
+
+      expect(legacy.lines(meetingId)).toEqual([
+        { seq: 1, ts: 2000, speaker: 1, text: "canonical one" },
+        { seq: 2, ts: 2500, speaker: null, text: "canonical two" },
+      ]);
+      expect(legacy.meetingDetail(meetingId)?.transcript).toEqual([
+        { text: "canonical one", ts: 2000, speaker: 1 },
+        { text: "canonical two", ts: 2500 },
+      ]);
+      expect(legacy.exportTranscript(meetingId)).toContain("canonical two");
+      expect(legacy.exportTranscript(meetingId)).not.toContain("legacy draft");
+    } finally {
+      legacy.close();
+    }
+  });
+
   test("emits no newline and hashes zero bytes for an empty transcript", () => {
     const legacy = new MeetingStore(":memory:");
     try {
