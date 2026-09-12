@@ -529,6 +529,24 @@ describe("editable Geometry/Assets PPTX renderer", () => {
     }
   });
 
+  test("marks notes slide runs and master default run properties as ko-KR", async () => {
+    const source = fixture();
+    const artifact = await renderEditablePptx(source.request);
+    const archive = await JSZip.loadAsync(artifact.bytes, { checkCRC32: true });
+    const notes = await textPart(archive, "ppt/notesSlides/notesSlide1.xml");
+    const noteRuns = [...notes.matchAll(/<a:rPr\b([^>]*)\/?>/g)];
+    expect(noteRuns.length).toBeGreaterThan(0);
+    for (const match of noteRuns) {
+      expect(match[1]).toMatch(/\blang="ko-KR"/);
+    }
+    const master = await textPart(archive, "ppt/slideMasters/slideMaster1.xml");
+    const defRuns = [...master.matchAll(/<a:defRPr\b([^>]*)>/g)];
+    expect(defRuns.length).toBeGreaterThan(0);
+    for (const match of defRuns) {
+      expect(match[1]).toMatch(/\blang="ko-KR"/);
+    }
+  });
+
   test("binds notes to slide IDs and evidence, applies theme fonts/colors, and returns a deterministic semantic manifest and receipt", async () => {
     const source = fixture();
     const first = await renderEditablePptx(source.request);

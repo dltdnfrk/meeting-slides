@@ -58,6 +58,10 @@ export async function canonicalizeEditablePptx(bytes: Uint8Array, request: Edita
       data = normalized;
     } else if (/^ppt\/slides\/slide\d+\.xml$/.test(name)) {
       data = Buffer.from(data).toString("utf8").replace(/<\/(p:sp|p:pic)>(?=<p:(?:sp|pic)>)/g, "</$1>\n");
+    } else if (/^ppt\/notesSlides\/notesSlide\d+\.xml$/.test(name)) {
+      data = Buffer.from(data).toString("utf8").replaceAll('lang="en-US"', 'lang="ko-KR"');
+    } else if (name === "ppt/slideMasters/slideMaster1.xml") {
+      data = Buffer.from(data).toString("utf8").replace(/<a:defRPr\b/g, '<a:defRPr lang="ko-KR"');
     } else if (name.endsWith(".rels")) {
       let xml = Buffer.from(data).toString("utf8");
       for (const [original, replacement] of renamedMedia) {
