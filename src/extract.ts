@@ -28,9 +28,18 @@ export class MinutesExtractor {
       const parsed = parseMinutesExtractionJson(await this.transport.chat(extractionPrompt(request), {
         system: EXTRACTION_SYSTEM_PROMPT, temperature: 0, maxTokens: 4000,
       }), request);
-      result = !parsed.batchFailed
-        ? parsed
-        : { ...localRuleExtraction(request), batchFailed: true, rejections: parsed.rejections };
+      if (!parsed.batchFailed) {
+        const empty = !parsed.decisions.length && !parsed.actionItems.length && !parsed.openItems.length;
+        if (empty) {
+          const backfilled = mergeExtractionResults(request, [parsed, localRuleExtraction(request)]);
+          backfilled.usedFallback = false;
+          result = backfilled;
+        } else {
+          result = parsed;
+        }
+      } else {
+        result = { ...localRuleExtraction(request), batchFailed: true, rejections: parsed.rejections };
+      }
     } catch {
       result = localRuleExtraction(request);
     }

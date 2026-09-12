@@ -288,7 +288,8 @@ describe("MinutesExtractor", () => {
     }
     const empty = await new MinutesExtractor({ chat: async () => payload() }).extract(request);
     expect(empty.usedFallback).toBe(false);
-    expect(empty.decisions).toEqual([]);
+    // empty LLM result is unioned with local rules (recall backfill), not returned as-is
+    expect(empty.decisions.every((d) => d.origin === "local_rule")).toBe(true);
   });
 
   test("parses a grounded summary, rejects an ungrounded topic, and leaves fallback summary null", () => {
@@ -495,9 +496,11 @@ describe("extraction boundary characterization", () => {
     } }, budget).extract(input);
     expect(calls).toBeGreaterThan(1);
     expect(result.usedFallback).toBe(true);
-    expect(result.decisions.map((item) => item.sourceSegment)).toEqual([
+    // oversized line stays local; empty LLM chunks union with local rules
+    expect(result.decisions.map((item) => item.sourceSegment)).toContainEqual(
       { transcript_version_id: "tv-1", start_seq: 25, end_seq: 25 },
-    ]);
+    );
+    expect(result.decisions.every((item) => item.origin === "local_rule")).toBe(true);
     for (const invalid of [999, 1_000.5, NaN, Infinity]) {
       expect(() => chunkMinutesExtractionInput(input, invalid)).toThrow("maxBytes must be an integer >= 1000");
     }
