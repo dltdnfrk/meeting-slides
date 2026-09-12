@@ -8,6 +8,7 @@ import AVFoundation
 final class SystemAudioCapture: @unchecked Sendable {
     enum CaptureError: LocalizedError {
         case coreAudio(String, OSStatus)
+        case permissionDenied
         case invalidFormat(String)
         case unsupportedSystem
 
@@ -15,6 +16,8 @@ final class SystemAudioCapture: @unchecked Sendable {
             switch self {
             case let .coreAudio(operation, status):
                 return "\(operation) failed (\(Self.describe(status)))."
+            case .permissionDenied:
+                return "System Audio Recording permission is required. Allow it in System Settings > Privacy & Security > Screen & System Audio Recording, then try again."
             case let .invalidFormat(detail):
                 return "Unsupported system audio format: \(detail)"
             case .unsupportedSystem:
@@ -67,6 +70,7 @@ final class SystemAudioCapture: @unchecked Sendable {
                 running = true
             } catch {
                 tearDown()
+                onError(error.localizedDescription)
                 throw error
             }
         }
@@ -78,6 +82,11 @@ final class SystemAudioCapture: @unchecked Sendable {
 
     @available(macOS 14.2, *)
     private func createTapAndDevice() throws {
+        var completed = false
+        defer {
+            if !completed { tearDown() }
+        }
+
         let tapDescription = CATapDescription(monoGlobalTapButExcludeProcesses: [])
         tapDescription.name = "Meeting Slides Computer Audio"
         tapDescription.uuid = UUID()
@@ -87,6 +96,9 @@ final class SystemAudioCapture: @unchecked Sendable {
         var newTapID = AudioObjectID(kAudioObjectUnknown)
         var status = AudioHardwareCreateProcessTap(tapDescription, &newTapID)
         guard status == noErr else {
+            if status == kAudioDevicePermissionsError {
+                throw CaptureError.permissionDenied
+            }
             throw CaptureError.coreAudio("Creating the system audio tap", status)
         }
         tapID = newTapID
@@ -136,6 +148,7 @@ final class SystemAudioCapture: @unchecked Sendable {
             throw CaptureError.coreAudio("Creating the system audio input", status)
         }
         aggregateDeviceID = newAggregateID
+        completed = true
     }
 
     private func startIO() throws {
