@@ -71,6 +71,7 @@ function completionFor(transport: ChatTransport, forcedRevision?: 0): SlidePlann
       temperature: 0,
       maxTokens: 16_000,
       timeoutMs: SLIDE_PLANNER_TIMEOUT_MS,
+      responseFormat: request.responseFormat,
     });
     if (forcedRevision === undefined) return output;
     const decoded: unknown = JSON.parse(output);

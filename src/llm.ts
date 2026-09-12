@@ -40,6 +40,7 @@ export interface ChatOptions {
   temperature?: number;
   maxTokens?: number;
   timeoutMs?: number;
+  responseFormat?: "json";
 }
 
 export interface ChatTransport {
@@ -273,6 +274,7 @@ export class LLMClient implements MeetingLLM, ChatTransport {
         messages,
         temperature: options.temperature ?? 0.3,
         max_tokens: options.maxTokens ?? 4000,
+        ...(options.responseFormat === "json" ? { response_format: { type: "json_object" as const } } : {}),
       }),
       signal: AbortSignal.timeout(options.timeoutMs ?? CHAT_TIMEOUT_MS),
     });
