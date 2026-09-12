@@ -18,7 +18,7 @@ export type CandidateKind = "decision" | "action_item" | "open_item";
 export type CandidateRejectionCode =
   | "missing_source" | "missing_description" | "wrong_transcript_version" | "invalid_seq_range"
   | "line_not_in_request" | "attendee_not_in_request" | "line_not_found" | "non_contiguous_range"
-  | "evidence_quote_mismatch";
+  | "evidence_quote_mismatch" | "attendee_not_in_quote";
 
 export interface CandidateRejection {
   kind: CandidateKind | "batch" | "topic";

@@ -66,10 +66,16 @@ function rejectionFor(
     return "evidence_quote_mismatch";
   }
   const attendeeIds = new Set(request.attendees.map((attendee) => attendee.attendeeId));
+  const attendeeById = new Map(request.attendees.map((attendee) => [attendee.attendeeId, attendee.displayName]));
+  const citedText = `${sourceText(source, request)}\n${quote}`;
   for (const key of ["suggestedAttributionAttendeeId", "suggestedAssigneeAttendeeId"] as const) {
     const value = raw[key];
     if (value !== undefined && value !== null && (typeof value !== "string" || !attendeeIds.has(value))) {
       return "attendee_not_in_request";
+    }
+    if (typeof value === "string" && value) {
+      const name = attendeeById.get(value);
+      if (name && !citedText.includes(name)) return "attendee_not_in_quote";
     }
   }
   return typeof raw.description === "string" && raw.description.trim() ? null : "missing_description";
